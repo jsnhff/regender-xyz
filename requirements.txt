@@ -1,3 +1,4 @@
 pandas
-spacy
+# spacy
 neuralcoref
+xlrd
