@@ -22,3 +22,31 @@ a. every time you work on the project, activate this virtual environment
 ```sh
 souce nlp/bin/activate
 ```
+
+2. Install NeuralCoref from core & the correct associated version of Spacy with it
+
+```sh
+pip uninstall neuralcoref
+git clone https://github.com/huggingface/neuralcoref.git
+cd neuralcoref
+pip install -r requirements.txt
+pip install -e .
+pip uninstall spacy
+pip install spacy
+python -m spacy download en
+```
+
+test it quickly in Python to ensure that it works as expected:
+
+```py
+import spacy
+nlp = spacy.load('en')
+import neuralcoref      ## ignore RuntimeWarning(s)
+neuralcoref.add_to_pipe(nlp)
+doc = nlp(u'My sister has a dog. She loves him.')
+doc._.has_coref         ## True
+doc._.coref_clusters    ## [My sister: [My sister, She], a dog: [a dog, him]]
+doc._.coref_resolved    ## 'My sister has a dog. My sister loves a dog.'
+```
+
+Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
