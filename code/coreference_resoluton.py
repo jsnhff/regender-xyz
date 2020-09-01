@@ -3,6 +3,9 @@ import pandas as pd
 import spacy
 import neuralcoref
 
+# FIXED variables
+PROTAGONIST_REPLACEMENT_NAME = 'REPLACEMENT_NAME'
+
 # load needed language resources
 nlp = spacy.load('en')
 neuralcoref.add_to_pipe(nlp)
@@ -29,6 +32,7 @@ if not found_entities: # when no NEs have been found - explicitly label the prot
 # a. split the excerpt into paragraphs when trhe char sequence \n\n is detected
 paragraphs = text.split('\n\n')
 print('There are', len(paragraphs), 'paragraphs detected.')
+print("-------")
 
 # b. find the references to the protagonist in each paragraph
 for paragraph in paragraphs:
@@ -42,19 +46,45 @@ for paragraph in paragraphs:
     if has_found_corefs and name_count < 1:
         print('ERROR: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
     else:
-        print('/n')
         coref_clusters = doc._.coref_clusters
-        print(type(doc._.coref_clusters))
-        print('&&&&&&&&&&&&&')
-        # TYPE of coref_clusters[0] -> neuralcoref CLUSTER
-        # TYPE of coref_clusters[0].main -> spacy SPAN
-        # iterate over the coreference CLUSTERS found and DELETE all expect the one with the name of the protagonist
+
+        # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
+        protagonist_cluster = []
+
         for i in range(len(doc._.coref_clusters)):
+            current_cluster = coref_clusters[i]
             cluster_text = coref_clusters[i].main.text
-            print(type(cluster_text), cluster_text)
-            if cluster_text != protagonist:
-                print()
-                # deletes CLUSTER
-        print('&&&&&&&&&&&&&')
+            if cluster_text == protagonist:
+                protagonist_cluster = current_cluster
         print("-------")
+
+        doc._.coref_clusters = protagonist_cluster
+
+        reference_dict = {}
+
+        for i in range(len(doc._.coref_clusters)):
+            current_coreference = doc._.coref_clusters[i]
+            start_span_index = current_coreference.start
+            end_span_index = current_coreference.end
+            reference_dict[start_span_index] = end_span_index
+
+        regendered_paragraph = ''
+
+        # iterate over all spacy spans in the paragraph
+        i = 0
+        while i < len(doc):
+            if i not in reference_dict:
+                regendered_paragraph += doc[i].text
+                regendered_paragraph += " "
+            else:
+                replacement = 'HIS'
+                if doc[i:reference_dict[i]].text == protagonist:
+                    replacement = PROTAGONIST_REPLACEMENT_NAME
+                regendered_paragraph += replacement
+                regendered_paragraph += " "
+                i = reference_dict[i]
+            i += 1
+
+        print(regendered_paragraph)
+
     break
