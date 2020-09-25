@@ -13,6 +13,13 @@ neuralcoref.add_to_pipe(nlp)
 # load Spacy's entity ruler which allows for manual annotation of Named Entities
 ruler = nlp.create_pipe("entity_ruler")
 
+def find_the_best_word(word, pos_tag):
+    if pos_tag == 'poss':
+        return 'HIS'
+    if pos_tag == 'dobj':
+        return 'HIM'
+
+
 # load the Pride & Prejudice data
 excerpts = pd.read_excel('../data/Sample_Paragraphs.xlsx', 'Sheet1')
 text = excerpts.loc[8].Paragraph
@@ -36,6 +43,7 @@ print("-------")
 
 # b. find the references to the protagonist in each paragraph
 for paragraph in paragraphs:
+    paragraph = 'Not all that Mrs. Bennet, however, with the assistance of her five daughters, could ask on the subject, was sufficient to draw from her husband any satisfactory description of Mr. Bingley. He disliked her.'
     print(paragraph)
     # count how many times we expect the protagonist's name to occur in the current paragraph
     name_count = paragraph.count(protagonist)
@@ -73,11 +81,14 @@ for paragraph in paragraphs:
         # iterate over all spacy spans in the paragraph
         i = 0
         while i < len(doc):
+            word = doc[i].text
+            pos_tag =  doc[i].dep_
             if i not in reference_dict:
-                regendered_paragraph += doc[i].text
+                regendered_paragraph += word
                 regendered_paragraph += " "
             else:
-                replacement = 'HIS'
+                print('word to be replaced is', word, pos_tag)
+                replacement = find_the_best_word(word, pos_tag)
                 if doc[i:reference_dict[i]].text == protagonist:
                     replacement = PROTAGONIST_REPLACEMENT_NAME
                 regendered_paragraph += replacement
