@@ -14,9 +14,13 @@ neuralcoref.add_to_pipe(nlp)
 ruler = nlp.create_pipe("entity_ruler")
 
 def find_the_best_word(word, pos_tag):
-    if pos_tag == 'poss':
+    is_female = False
+    if word.lower() == 'her':
+        is_female = True
+
+    if is_female and pos_tag == 'poss':
         return 'HIS'
-    if pos_tag == 'dobj':
+    if is_female and pos_tag == 'dobj':
         return 'HIM'
 
 
