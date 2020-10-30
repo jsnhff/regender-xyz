@@ -15,13 +15,19 @@ ruler = nlp.create_pipe("entity_ruler")
 
 def find_the_best_word(word, pos_tag):
     is_female = False
+
     if word.lower() == 'her':
+        is_female = True
+
+    if word.lower() == 'she':
         is_female = True
 
     if is_female and pos_tag == 'poss':
         return 'HIS'
     if is_female and pos_tag == 'dobj':
         return 'HIM'
+    if is_female and pos_tag == 'nsubj':
+        return 'HE'
 
 
 # load the Pride & Prejudice data
@@ -40,14 +46,15 @@ if not found_entities: # when no NEs have been found - explicitly label the prot
     ruler.add_patterns([{"label": "PERSON", "pattern": protagonist}])
     nlp.add_pipe(ruler)
 
-# a. split the excerpt into paragraphs when trhe char sequence \n\n is detected
+# a. split the excerpt into paragraphs when the char sequence \n\n is detected
 paragraphs = text.split('\n\n')
 print('There are', len(paragraphs), 'paragraphs detected.')
 print("-------")
 
 # b. find the references to the protagonist in each paragraph
+para_count = 1
 for paragraph in paragraphs:
-    paragraph = 'Not all that Mrs. Bennet, however, with the assistance of her five daughters, could ask on the subject, was sufficient to draw from her husband any satisfactory description of Mr. Bingley. He disliked her.'
+    # paragraph = 'Not all that Mrs. Bennet, however, with the assistance of her five daughters, could ask on the subject, was sufficient to draw from her husband any satisfactory description of Mr. Bingley. He disliked her.'
     print(paragraph)
     # count how many times we expect the protagonist's name to occur in the current paragraph
     name_count = paragraph.count(protagonist)
@@ -69,6 +76,7 @@ for paragraph in paragraphs:
             if cluster_text == protagonist:
                 protagonist_cluster = current_cluster
         print("-------")
+        print('PROTAGONIST CLUSTER', protagonist_cluster)
 
         doc._.coref_clusters = protagonist_cluster
 
@@ -91,15 +99,20 @@ for paragraph in paragraphs:
                 regendered_paragraph += word
                 regendered_paragraph += " "
             else:
-                print('word to be replaced is', word, pos_tag)
                 replacement = find_the_best_word(word, pos_tag)
+                print('replacement', replacement, pos_tag, doc[i].pos_, doc[i].tag_, doc[i].shape_)
                 if doc[i:reference_dict[i]].text == protagonist:
+                    print('YESSSS')
                     replacement = PROTAGONIST_REPLACEMENT_NAME
+                print(type(replacement), "|", replacement, "|", doc[i:reference_dict[i]].text)
                 regendered_paragraph += replacement
                 regendered_paragraph += " "
-                i = reference_dict[i]
+                i = reference_dict[i] - 1
             i += 1
 
         print(regendered_paragraph)
+        print('--------------------------------------------------------, Next paragraph...')
 
-    break
+        para_count += 1
+
+
