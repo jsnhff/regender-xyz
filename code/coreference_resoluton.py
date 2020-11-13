@@ -6,6 +6,12 @@ import neuralcoref
 # FIXED variables
 PROTAGONIST_REPLACEMENT_NAME = 'REPLACEMENT_NAME'
 
+MALE_PRONOUNS = ["he", 'him', 'his', 'himself']
+FEMALE_PRONOUNS = ["she", 'her', 'hers', 'herself']
+
+# detect the gender
+is_female = True
+
 # load needed language resources
 nlp = spacy.load('en')
 neuralcoref.add_to_pipe(nlp)
@@ -34,6 +40,17 @@ def find_the_best_word(word, pos_tag):
 excerpts = pd.read_excel('../data/Sample_Paragraphs.xlsx', 'Sheet1')
 text = excerpts.loc[8].Paragraph
 protagonist = excerpts.loc[8].Character
+gender = excerpts.loc[8].Gender
+if gender.lower() == 'female':
+    is_female = True
+else:
+    is_female = False
+
+gendered_pronouns = None
+if is_female:
+    gendered_pronouns = FEMALE_PRONOUNS
+else:
+    gendered_pronouns = MALE_PRONOUNS
 
 # Count how many times the name of the character to be re-genders occurs in the texts
 ### we do not split the character name of Mrs. Bennet
@@ -76,18 +93,36 @@ for paragraph in paragraphs:
             if cluster_text == protagonist:
                 protagonist_cluster = current_cluster
         print("-------")
+
+        # clean protagonist cluster -> remove pronouns from a different gender
+        # protagonist_cluster = remove_different_gender_pronouns(protagonist_cluster)
         print('PROTAGONIST CLUSTER', protagonist_cluster)
 
         doc._.coref_clusters = protagonist_cluster
 
         reference_dict = {}
 
+        correct_protagonist_cluster = []
         for i in range(len(doc._.coref_clusters)):
             current_coreference = doc._.coref_clusters[i]
-            start_span_index = current_coreference.start
-            end_span_index = current_coreference.end
-            reference_dict[start_span_index] = end_span_index
+            # sometimes we need to exclude some of the pronoun coreferences - when they are not of the same gender as the protagonist
+            # we do this by getting all coreferences of length 1 (e.g. one-word ones) which are pronouns and comparing their gender to the gender of the protagonist
+            if len(current_coreference) == 1 and current_coreference[0].tag_.startswith('PRP'):
+                # check the gender
+                if current_coreference[0].text.lower() in gendered_pronouns:
+                    start_span_index = current_coreference.start
+                    end_span_index = current_coreference.end
+                    reference_dict[start_span_index] = end_span_index
 
+                    correct_protagonist_cluster.append(current_coreference[0].text)
+            else:
+                start_span_index = current_coreference.start
+                end_span_index = current_coreference.end
+                reference_dict[start_span_index] = end_span_index
+
+                correct_protagonist_cluster.append(current_coreference[0].text)
+
+        print('CORRECTED PROTAGONIST CLUSTER:', correct_protagonist_cluster)
         regendered_paragraph = ''
 
         # iterate over all spacy spans in the paragraph
