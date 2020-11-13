@@ -5,6 +5,7 @@ import neuralcoref
 
 # FIXED variables
 PROTAGONIST_REPLACEMENT_NAME = 'REPLACEMENT_NAME'
+SELECTED_PUCTUATION = ['.', ',', ';', ':', '!', '?']
 
 MALE_PRONOUNS = ["he", 'him', 'his', 'himself']
 FEMALE_PRONOUNS = ["she", 'her', 'hers', 'herself']
@@ -80,7 +81,8 @@ for paragraph in paragraphs:
     has_found_corefs = doc._.has_coref
     # ERROR HANDLING
     if has_found_corefs and name_count < 1:
-        print('ERROR: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
+        print('\nCAUTION: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
+        regendered_paragraph = paragraph
     else:
         coref_clusters = doc._.coref_clusters
 
@@ -94,10 +96,7 @@ for paragraph in paragraphs:
                 protagonist_cluster = current_cluster
         print("-------")
 
-        # clean protagonist cluster -> remove pronouns from a different gender
-        # protagonist_cluster = remove_different_gender_pronouns(protagonist_cluster)
-        print('PROTAGONIST CLUSTER', protagonist_cluster)
-
+        # overwrite the co-reference cluster with only the one of the protagonist
         doc._.coref_clusters = protagonist_cluster
 
         reference_dict = {}
@@ -120,34 +119,39 @@ for paragraph in paragraphs:
                 end_span_index = current_coreference.end
                 reference_dict[start_span_index] = end_span_index
 
-                correct_protagonist_cluster.append(current_coreference[0].text)
+                correct_protagonist_cluster.append(current_coreference)
 
         print('CORRECTED PROTAGONIST CLUSTER:', correct_protagonist_cluster)
         regendered_paragraph = ''
 
-        # iterate over all spacy spans in the paragraph
+        # iterate over all spacy spans in the paragraph AND REPLACE THE COREFERENCES
         i = 0
         while i < len(doc):
             word = doc[i].text
             pos_tag =  doc[i].dep_
             if i not in reference_dict:
                 regendered_paragraph += word
+                # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
+                if word in SELECTED_PUCTUATION:
+                    regendered_paragraph = regendered_paragraph[:-2]
+                    regendered_paragraph += word
                 regendered_paragraph += " "
             else:
+                word = doc[i:reference_dict[i]].text
                 replacement = find_the_best_word(word, pos_tag)
-                print('replacement', replacement, pos_tag, doc[i].pos_, doc[i].tag_, doc[i].shape_)
-                if doc[i:reference_dict[i]].text == protagonist:
-                    print('YESSSS')
+                if word == protagonist:
+                    # print('YESSSS, we are replacing the actual name of the protagonist')
                     replacement = PROTAGONIST_REPLACEMENT_NAME
-                print(type(replacement), "|", replacement, "|", doc[i:reference_dict[i]].text)
+                # print('replacement', replacement, pos_tag, doc[i].pos_, doc[i].tag_, doc[i].shape_)
+                # print(replacement, "|", doc[i:reference_dict[i]].text)
                 regendered_paragraph += replacement
                 regendered_paragraph += " "
                 i = reference_dict[i] - 1
             i += 1
 
-        print(regendered_paragraph)
-        print('--------------------------------------------------------, Next paragraph...')
+    print(regendered_paragraph)
+    print('--------------------------------------------------------, Next paragraph...')
 
-        para_count += 1
+    para_count += 1
 
 
