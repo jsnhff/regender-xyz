@@ -4,7 +4,8 @@ import spacy
 import neuralcoref
 
 # FIXED variables
-PROTAGONIST_REPLACEMENT_NAME = 'REPLACEMENT_NAME'
+PROTAGONIST_REPLACEMENT_NAME = 'Mr. Bennet'
+OTHER_CHARACTER_SAME_NAME_CHANGE = 'the other Mr. Bennet'
 SELECTED_PUCTUATION = ['.', ',', ';', ':', '!', '?']
 
 MALE_PRONOUNS = ["he", 'him', 'his', 'himself']
@@ -29,12 +30,21 @@ def find_the_best_word(word, pos_tag):
     if word.lower() == 'she':
         is_female = True
 
+    # change pronouns from female to male
     if is_female and pos_tag == 'poss':
-        return 'HIS'
+        return 'his'
     if is_female and pos_tag == 'dobj':
-        return 'HIM'
+        return 'him'
     if is_female and pos_tag == 'nsubj':
-        return 'HE'
+        return 'he'
+
+    # change pronouns from male to female
+    if not is_female and pos_tag == 'poss':
+        return 'hers'
+    if not is_female and pos_tag == 'dobj':
+        return 'her'
+    if not is_female and pos_tag == 'nsubj':
+        return 'she'
 
 
 # load the Pride & Prejudice data
@@ -72,8 +82,11 @@ print("-------")
 # b. find the references to the protagonist in each paragraph
 para_count = 1
 for paragraph in paragraphs:
-    # paragraph = 'Not all that Mrs. Bennet, however, with the assistance of her five daughters, could ask on the subject, was sufficient to draw from her husband any satisfactory description of Mr. Bingley. He disliked her.'
-    print(paragraph)
+
+    if PROTAGONIST_REPLACEMENT_NAME in paragraph:
+        # change the other character's name to something different
+        paragraph = paragraph.replace(PROTAGONIST_REPLACEMENT_NAME, OTHER_CHARACTER_SAME_NAME_CHANGE)
+
     # count how many times we expect the protagonist's name to occur in the current paragraph
     name_count = paragraph.count(protagonist)
 
@@ -121,7 +134,7 @@ for paragraph in paragraphs:
 
                 correct_protagonist_cluster.append(current_coreference)
 
-        print('CORRECTED PROTAGONIST CLUSTER:', correct_protagonist_cluster)
+        # print('CORRECTED PROTAGONIST CLUSTER:', correct_protagonist_cluster)
         regendered_paragraph = ''
 
         # iterate over all spacy spans in the paragraph AND REPLACE THE COREFERENCES
