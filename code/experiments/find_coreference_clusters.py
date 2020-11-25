@@ -67,7 +67,7 @@ for paragraph in paragraphs:
 
     protagonist_cluster = None
     for cluster in coref_clusters:
-        if cluster.main.text == 'Sarah':
+        if cluster.main.text == 'Emily':
             protagonist_cluster = cluster
 
     # overwrite the co-reference cluster with only the one of the protagonist
