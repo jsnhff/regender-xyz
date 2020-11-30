@@ -1,15 +1,28 @@
 # imports
+import random # for the generation of the unique IDs while still keeping them easy to read by humans
 import pandas as pd
 import spacy
 import neuralcoref
+import configparser
+
+# read variables from a CONFIG FILE
+configfile_name = "../config.ini"
+#Read config.ini file
+config = configparser.ConfigParser()
+config.read(configfile_name)
 
 # FIXED variables
-PROTAGONIST_REPLACEMENT_NAME = 'Mr. Bennet'
-OTHER_CHARACTER_SAME_NAME_CHANGE = 'the other Mr. Bennet'
+PROTAGONIST_REPLACEMENT_NAME = config.get('prideandprejudice', 'PROTAGONIST_REPLACEMENT_NAME')
+OTHER_CHARACTER_SAME_NAME_CHANGE = config.get('prideandprejudice', 'OTHER_CHARACTER_SAME_NAME_CHANGE')
 SELECTED_PUCTUATION = ['.', ',', ';', ':', '!', '?']
 
 MALE_PRONOUNS = ["he", 'him', 'his', 'himself']
 FEMALE_PRONOUNS = ["she", 'her', 'hers', 'herself']
+
+# we want to avoid regendering all coreferences which are between quotation marks
+OPENING_QUOTES = set(['"', '“'])
+CLOSING_QUOTES = set(['"', '”'])
+inside_dialog = False
 
 # detect the gender
 is_female = True
@@ -21,7 +34,7 @@ neuralcoref.add_to_pipe(nlp)
 # load Spacy's entity ruler which allows for manual annotation of Named Entities
 ruler = nlp.create_pipe("entity_ruler")
 
-def find_the_best_word(word, pos_tag):
+def find_the_best_replacement_word(word, pos_tag):
     is_female = False
 
     if word.lower() == 'her':
@@ -79,21 +92,24 @@ paragraphs = text.split('\n\n')
 print('There are', len(paragraphs), 'paragraphs detected.')
 print("-------")
 
+# assign unique ids for the pronouns of the correferences in the protagonist's cluster
+unique_id = random.randint(1000, 9999) # select at random a 4-digit number
+
 # b. find the references to the protagonist in each paragraph
 para_count = 1
 for paragraph in paragraphs:
+
+    # count how many times we expect the protagonist's name to occur in the current paragraph
+    name_count = paragraph.count(protagonist)
 
     if PROTAGONIST_REPLACEMENT_NAME in paragraph:
         # change the other character's name to something different
         paragraph = paragraph.replace(PROTAGONIST_REPLACEMENT_NAME, OTHER_CHARACTER_SAME_NAME_CHANGE)
 
-    # count how many times we expect the protagonist's name to occur in the current paragraph
-    name_count = paragraph.count(protagonist)
-
     doc = nlp(paragraph)
     has_found_corefs = doc._.has_coref
-    # ERROR HANDLING
-    if has_found_corefs and name_count < 1:
+
+    if has_found_corefs and name_count < 1: # ERROR HANDLING
         print('\nCAUTION: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
         regendered_paragraph = paragraph
     else:
@@ -135,6 +151,7 @@ for paragraph in paragraphs:
                 correct_protagonist_cluster.append(current_coreference)
 
         # print('CORRECTED PROTAGONIST CLUSTER:', correct_protagonist_cluster)
+
         regendered_paragraph = ''
 
         # iterate over all spacy spans in the paragraph AND REPLACE THE COREFERENCES
@@ -142,16 +159,24 @@ for paragraph in paragraphs:
         while i < len(doc):
             word = doc[i].text
             pos_tag =  doc[i].dep_
-            if i not in reference_dict:
+
+            if word in OPENING_QUOTES:
+                inside_dialog = True
+
+
+            if (i not in reference_dict) and (word in CLOSING_QUOTES and inside_dialog):
                 regendered_paragraph += word
                 # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
                 if word in SELECTED_PUCTUATION:
                     regendered_paragraph = regendered_paragraph[:-2]
                     regendered_paragraph += word
                 regendered_paragraph += " "
-            else:
+
+            if i in reference_dict and not inside_dialog:
                 word = doc[i:reference_dict[i]].text
-                replacement = find_the_best_word(word, pos_tag)
+                replacement = find_the_best_replacement_word(word, pos_tag)
+                if replacement != None: # error handling
+                    replacement += ", ID " + str(unique_id) + "," # printing the unique ID of the coreference for clarity
                 if word == protagonist:
                     # print('YESSSS, we are replacing the actual name of the protagonist')
                     replacement = PROTAGONIST_REPLACEMENT_NAME
@@ -160,6 +185,9 @@ for paragraph in paragraphs:
                 regendered_paragraph += replacement
                 regendered_paragraph += " "
                 i = reference_dict[i] - 1
+
+            if word in CLOSING_QUOTES and inside_dialog:
+                inside_dialog = False
             i += 1
 
     print(regendered_paragraph)
