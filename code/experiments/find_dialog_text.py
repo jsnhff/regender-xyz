@@ -12,6 +12,8 @@ REPLACEMENT_END = '<<<'
 OPENING_QUOTES = set(['"', '“'])
 CLOSING_QUOTES = set(['"', '”'])
 inside_dialog = False
+has_read_some_dialog = False
+just_closed_dialog = False
 
 # detect the gender
 is_female = True
@@ -34,7 +36,11 @@ if gender.lower() == 'female':
 else:
     is_female = False
 
-# Count how many times the name of the character to be re-genders occurs in the texts
+# FORCE change all quotes to simple quotes
+text = text.replace('“', '"')
+text = text.replace('”', '"')
+# END FORCE change all quotes to simple quotes
+
 
 ## see if spacy removes words which are not named entities, such as `Mrs.` and `the`
 print('--------')
@@ -63,35 +69,36 @@ for paragraph in paragraphs:
 
     doc = nlp(paragraph)
 
-    dialog_dict = {}
     i = 0
-    opening_index = None
-    closing_index = None
 
     quoteless_paragraph = ''
 
     while i < len(doc):
         word = doc[i].text
 
-        # check if we are not starting a quotation
-        if word in OPENING_QUOTES:
-            opening_index = i
-            old_i = i
-            inside_dialog = True
-            # print('Next words ---', next_word)
-
-        # check if we are not finishing a quotation
-        if word in CLOSING_QUOTES and inside_dialog:
-            closing_index = i
-            dialog_dict[opening_index] = (opening_index, closing_index)
-            inside_dialog = False
-
         if inside_dialog:
+            has_read_some_dialog = True
             quoteless_paragraph += 'YYY'
             quoteless_paragraph += ' '
         else:
             quoteless_paragraph += word
             quoteless_paragraph += ' '
+
+        # check if we are not finishing a quotation
+        if word in CLOSING_QUOTES and inside_dialog and has_read_some_dialog:
+            inside_dialog = False
+            has_read_some_dialog = False
+            just_closed_dialog = True
+            quoteless_paragraph += word
+            quoteless_paragraph += ' '
+
+        # check if we are not starting a quotation
+        if word in OPENING_QUOTES and not just_closed_dialog:
+            inside_dialog = True
+            just_closed_dialog = False
+
+        just_closed_dialog = False
+
         i += 1
 
     print(quoteless_paragraph)
