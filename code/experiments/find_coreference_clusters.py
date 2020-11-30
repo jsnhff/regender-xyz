@@ -9,6 +9,11 @@ SELECTED_PUCTUATION = ['.', ',', ';', ':', '!', '?']
 REPLACEMENT_START = '>>>'
 REPLACEMENT_END = '<<<'
 
+# we want to avoid regendering all coreferences which are between quotation marks
+OPENING_QUOTES = set(['"', '“'])
+CLOSING_QUOTES = set(['"', '”'])
+inside_dialog = False
+
 # detect the gender
 is_female = True
 
@@ -21,7 +26,7 @@ ruler = nlp.create_pipe("entity_ruler")
 
 
 # load the Sound and Fury data
-excerpts = pd.read_excel('../data/Sample_Paragraphs.xlsx', 'Sheet1')
+excerpts = pd.read_excel('../../data/Sample_Paragraphs.xlsx', 'Sheet1')
 text = excerpts.loc[1].Paragraph
 protagonist = excerpts.loc[1].Character
 gender = excerpts.loc[1].Gender
@@ -30,7 +35,6 @@ if gender.lower() == 'female':
 else:
     is_female = False
 
-# Count how many times the name of the character to be re-genders occurs in the texts
 
 ## see if spacy removes words which are not named entities, such as `Mrs.` and `the`
 print('--------')
@@ -90,14 +94,29 @@ for paragraph in paragraphs:
     while i < len(doc):
         word = doc[i].text
         pos_tag =  doc[i].dep_
+
+        # check if we are not starting a quotation
+        if word in OPENING_QUOTES:
+            inside_dialog = True
+
+
         if i not in reference_dict:
             regendered_paragraph += word
             regendered_paragraph += ' '
         else:
-            regendered_paragraph += REPLACEMENT_START
-            regendered_paragraph += word
-            regendered_paragraph += REPLACEMENT_END
-            regendered_paragraph += ' '
+            if not inside_dialog:
+                regendered_paragraph += REPLACEMENT_START
+                regendered_paragraph += word
+                regendered_paragraph += REPLACEMENT_END
+                regendered_paragraph += ' '
+            else:
+                regendered_paragraph += word
+                regendered_paragraph += ' '
+
+
+        # check if we are not finishing a quotation
+        if word in CLOSING_QUOTES and inside_dialog:
+            inside_dialog = False
         i += 1
 
     print(regendered_paragraph)
