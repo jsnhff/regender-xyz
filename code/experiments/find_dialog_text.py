@@ -11,6 +11,7 @@ REPLACEMENT_END = '<<<'
 
 OPENING_QUOTES = set(['"', '“'])
 CLOSING_QUOTES = set(['"', '”'])
+inside_dialog = False
 
 # detect the gender
 is_female = True
@@ -64,38 +65,34 @@ for paragraph in paragraphs:
 
     dialog_dict = {}
     i = 0
-    has_started_recording = False
     opening_index = None
     closing_index = None
+
+    quoteless_paragraph = ''
+
     while i < len(doc):
         word = doc[i].text
 
         # check if we are not starting a quotation
         if word in OPENING_QUOTES:
-            has_started_recording = True
             opening_index = i
             old_i = i
+            inside_dialog = True
+            # print('Next words ---', next_word)
 
         # check if we are not finishing a quotation
-        if word in CLOSING_QUOTES and has_started_recording:
+        if word in CLOSING_QUOTES and inside_dialog:
             closing_index = i
             dialog_dict[opening_index] = (opening_index, closing_index)
+            inside_dialog = False
 
-        i += 1
-
-    # remove all quotes
-    quoteless_paragraph = ''
-    i = 0
-    while i < len(doc):
-        word = doc[i].text
-        if i not in dialog_dict:
+        if inside_dialog:
+            quoteless_paragraph += 'YYY'
+            quoteless_paragraph += ' '
+        else:
             quoteless_paragraph += word
             quoteless_paragraph += ' '
-            i += 1
-        else:
-            quoteless_paragraph += '-'
-            quoteless_paragraph += ' '
-            i += dialog_dict[i][1] + 1
+        i += 1
 
     print(quoteless_paragraph)
 
