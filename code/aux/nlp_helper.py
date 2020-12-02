@@ -6,12 +6,15 @@ config = configparser.ConfigParser()
 config.read(configfile_name)
 
 # reading FIXED variables
-SELECTED_PUNCTUATION = config.get('misc', 'PUNCTUATION').split('|||')
+DELIMITER = config.get('delimiter', 'IN_CONFIG')
+SELECTED_PUNCTUATION = config.get('misc', 'PUNCTUATION').split(DELIMITER)
+OPENING_QUOTES = config.get('quotes', 'OPENING').split(DELIMITER)
+CLOSING_QUOTES = config.get('quotes', 'CLOSING').split(DELIMITER)
 PROTAGONIST_REPLACEMENT_NAME = config.get('prideandprejudice', 'PROTAGONIST_REPLACEMENT_NAME')
 # END of reading FIXED variables
 
 # finds the best replacement for pronouns when regendering
-# TODO: the caes of herself/himself are not handled here yet
+# TODO: the cases of herself/himself are not handled here yet
 def find_the_best_replacement_word(word, pos_tag):
     is_female = False
 
@@ -22,27 +25,31 @@ def find_the_best_replacement_word(word, pos_tag):
         is_female = True
 
     # change pronouns from female to male
-    if is_female and pos_tag == 'poss':
+    # find all English dependency pos tag reference here -> https://spacy.io/api/annotation#pos-tagging
+    if is_female and pos_tag == 'poss': # POS tag = possession modifier
         return 'his'
-    if is_female and pos_tag == 'dobj':
+    if is_female and pos_tag == 'dobj': # POS tag = direct object
         return 'him'
-    if is_female and pos_tag == 'nsubj':
+    if is_female and pos_tag == 'nsubj': # POS tag = nominal subject
         return 'he'
+    if is_female and pos_tag == 'pobj': # POS tag = object of preposition
+        return 'him'
 
     # change pronouns from male to female
-    if not is_female and pos_tag == 'poss':
+    if not is_female and pos_tag == 'poss': # POS tag = possession modifier
         return 'hers'
-    if not is_female and pos_tag == 'dobj':
+    if not is_female and pos_tag == 'dobj': # POS tag = direct object
         return 'her'
-    if not is_female and pos_tag == 'nsubj':
+    if not is_female and pos_tag == 'nsubj': # POS tag = nominal subject
         return 'she'
+    if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
+        return 'her'
 
 def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
     doc = nlp(protagonist)
     found_entities = doc.ents != ()
     if not found_entities:  # when no NEs have been found - explicitly label the protagonist's name as a NE
         ruler.add_patterns([{"label": "PERSON", "pattern": protagonist}])
-        nlp.add_pipe(ruler)
     return ruler
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
@@ -84,8 +91,38 @@ def find_all_protagonist_coreferences(doc, gendered_pronouns):
 
     return reference_dict
 
+def regender_outside_quotes(word, pos_tag, unique_id, protagonist, doc, i, reference_dict, regendered_paragraph):
+    if (i not in reference_dict):
+        regendered_paragraph += word
+        # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
+        if word in SELECTED_PUNCTUATION:
+            regendered_paragraph = regendered_paragraph[:-2]
+            regendered_paragraph += word
+        regendered_paragraph += " "
+
+    if i in reference_dict:
+        word = doc[i:reference_dict[i]].text
+        replacement = find_the_best_replacement_word(word, pos_tag)
+        if replacement != None:  # error handling
+            replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
+        if word == protagonist:
+            # print('YESSSS, we are replacing the actual name of the protagonist')
+            replacement = PROTAGONIST_REPLACEMENT_NAME
+
+        regendered_paragraph += replacement
+        regendered_paragraph += " "
+        i = reference_dict[i] - 1
+
+    return i, regendered_paragraph
 
 def regender_paragraph(doc, protagonist, unique_id, reference_dict):
+
+    # boolean helper variables
+    inside_dialog = False
+    has_read_some_dialog = False
+    just_closed_dialog = False
+    # END of booleans helper variables
+
     regendered_paragraph = ''
 
     # iterate over all spacy spans in the paragraph AND REPLACE THE COREFERENCES
@@ -93,28 +130,31 @@ def regender_paragraph(doc, protagonist, unique_id, reference_dict):
     while i < len(doc):
         word = doc[i].text
         pos_tag = doc[i].dep_
-
-        if (i not in reference_dict):
+        # here we mostly handle avoid manipulating text between quotation marks
+        if inside_dialog:
+            has_read_some_dialog = True
             regendered_paragraph += word
-            # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
-            if word in SELECTED_PUNCTUATION:
-                regendered_paragraph = regendered_paragraph[:-2]
-                regendered_paragraph += word
-            regendered_paragraph += " "
+            regendered_paragraph += ' '
+        else:
+            # HERE IS WHERE THE REGENDERING MAGIC HAPPENS
+            i, regendered_paragraph = regender_outside_quotes(word, pos_tag, unique_id, protagonist, doc, i, reference_dict, regendered_paragraph)
+            # END: HERE IS WHERE THE REGENDERING MAGIC HAPPENS
 
-        if i in reference_dict:
-            word = doc[i:reference_dict[i]].text
-            replacement = find_the_best_replacement_word(word, pos_tag)
-            if replacement != None:  # error handling
-                replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
-            if word == protagonist:
-                # print('YESSSS, we are replacing the actual name of the protagonist')
-                replacement = PROTAGONIST_REPLACEMENT_NAME
-            # print('replacement', replacement, pos_tag, doc[i].pos_, doc[i].tag_, doc[i].shape_)
-            # print(replacement, "|", doc[i:reference_dict[i]].text)
-            regendered_paragraph += replacement
-            regendered_paragraph += " "
-            i = reference_dict[i] - 1
+        # check if we are not finishing a quotation
+        if word in CLOSING_QUOTES and inside_dialog and has_read_some_dialog:
+            inside_dialog = False
+            has_read_some_dialog = False
+            just_closed_dialog = True
+            regendered_paragraph += word
+            regendered_paragraph += ' '
+
+        # check if we are not starting a quotation
+        if word in OPENING_QUOTES and not just_closed_dialog:
+            inside_dialog = True
+            just_closed_dialog = False
+
+        just_closed_dialog = False
+        # END here we mostly handle avoid manipulating text between quotation marks
 
         i += 1
 

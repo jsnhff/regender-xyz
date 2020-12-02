@@ -27,6 +27,7 @@ def load_spacy_neuralcoref():
 def load_exceprt_data(i):
     excerpts = pd.read_excel('../data/Sample_Paragraphs.xlsx', 'Sheet1')
     text = excerpts.loc[i].Paragraph
+    text_title = excerpts.loc[i]['Book Title']
     protagonist = excerpts.loc[i].Character
     gender = excerpts.loc[i].Gender
     if gender.lower() == 'female':
@@ -40,4 +41,4 @@ def load_exceprt_data(i):
     else:
         gendered_pronouns = MALE_PRONOUNS
 
-    return text, protagonist, gender, is_female, gendered_pronouns
+    return text, text_title, protagonist, gender, is_female, gendered_pronouns
