@@ -74,7 +74,7 @@ for paragraph in paragraphs:
         # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
         reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
         # regender paragraph
-        regendered_paragraph = regender_paragraph(doc, protagonist, unique_id, reference_dict)
+        regendered_paragraph = regender_paragraph(text_title, doc, protagonist, unique_id, reference_dict)
 
     print(regendered_paragraph)
     print('--------------------------------------------------------, Next paragraph...')
