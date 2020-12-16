@@ -37,7 +37,7 @@ OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_title, 'OTHER_CHARACTER_SAME_
 #### START LOGIC ####
 #####################
 
-# in case spacy does not regognize the protanogist's name we have as a Named Entity, add t manually
+# in case spacy does not regognize the protanogist's name we have as a Named Entity, add it manually
 print('--------')
 ruler = add_protagonist_as_a_named_entity(nlp, protagonist, ruler)
 nlp.add_pipe(ruler)
@@ -71,12 +71,14 @@ for paragraph in paragraphs:
         regendered_paragraph = paragraph
     else:
         # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-        doc = find_protagonist_coreference_cluster(doc, protagonist)
+        doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns)
+
+        print('Coreference slusters -> ', doc._.coref_clusters)
 
         # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
         reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
         # regender paragraph
-        regendered_paragraph = regender_paragraph(text_title, doc, protagonist, unique_id, reference_dict)
+        regendered_paragraph = regender_paragraph(text_title, doc, protagonist, is_female, unique_id, reference_dict)
 
     print(regendered_paragraph)
     print('--------------------------------------------------------, Next paragraph...')

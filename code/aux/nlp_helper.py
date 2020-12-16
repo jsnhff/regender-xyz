@@ -15,14 +15,7 @@ CLOSING_QUOTES = config.get('quotes', 'CLOSING').split(DELIMITER)
 
 # finds the best replacement for pronouns when regendering
 # TODO: the cases of herself/himself are not handled here yet
-def find_the_best_replacement_word(word, pos_tag):
-    is_female = False
-
-    if word.lower() == 'her':
-        is_female = True
-
-    if word.lower() == 'she':
-        is_female = True
+def find_the_best_replacement_word(word, pos_tag, is_female):
 
     # change pronouns from female to male
     # find all English dependency pos tag reference here -> https://spacy.io/api/annotation#pos-tagging
@@ -70,8 +63,6 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
 
         protagonist_cluster = select_protagonist_cluster(doc, protagonist)
 
-        print('CONV_DICT', doc._.coref_clusters)
-        print('\n')
 
         # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
         for i in range(len(doc._.coref_clusters)):
@@ -127,7 +118,7 @@ def find_all_protagonist_coreferences(doc, gendered_pronouns):
 
     return reference_dict
 
-def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, doc, i, reference_dict, regendered_paragraph):
+def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
     if (i not in reference_dict):
         regendered_paragraph += word
         # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
@@ -138,7 +129,8 @@ def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, d
 
     if i in reference_dict:
         word = doc[i:reference_dict[i]].text
-        replacement = find_the_best_replacement_word(word, pos_tag)
+        replacement = find_the_best_replacement_word(word, pos_tag, is_female)
+        print(word, pos_tag, replacement)
         if replacement != None:  # error handling
             replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
         if word == protagonist:
@@ -152,7 +144,7 @@ def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, d
 
     return i, regendered_paragraph
 
-def regender_paragraph(book_title, doc, protagonist, unique_id, reference_dict):
+def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, reference_dict):
 
     # boolean helper variables
     inside_dialog = False
@@ -174,7 +166,7 @@ def regender_paragraph(book_title, doc, protagonist, unique_id, reference_dict):
             regendered_paragraph += ' '
         else:
             # HERE IS WHERE THE REGENDERING MAGIC HAPPENS
-            i, regendered_paragraph = regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, doc, i, reference_dict, regendered_paragraph)
+            i, regendered_paragraph = regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
             # END: HERE IS WHERE THE REGENDERING MAGIC HAPPENS
 
         # check if we are not finishing a quotation
