@@ -20,23 +20,31 @@ def find_the_best_replacement_word(word, pos_tag, is_female):
     # change pronouns from female to male
     # find all English dependency pos tag reference here -> https://spacy.io/api/annotation#pos-tagging
     if is_female and pos_tag == 'poss': # POS tag = possession modifier
-        return 'his'
+        word = word.replace('hers', 'his')
+        return word
     if is_female and pos_tag == 'dobj': # POS tag = direct object
-        return 'him'
+        word = word.replace('her', 'him')
+        return word
     if is_female and pos_tag == 'nsubj': # POS tag = nominal subject
-        return 'he'
+        word = word.replace('she', 'he')
+        return word
     if is_female and pos_tag == 'pobj': # POS tag = object of preposition
-        return 'him'
+        word = word.replace('her', 'his')
+        return word
 
     # change pronouns from male to female
     if not is_female and pos_tag == 'poss': # POS tag = possession modifier
-        return 'hers'
+        word = word.replace('his', 'hers')
+        return word
     if not is_female and pos_tag == 'dobj': # POS tag = direct object
-        return 'her'
+        word = word.replace('him', 'her')
+        return word
     if not is_female and pos_tag == 'nsubj': # POS tag = nominal subject
-        return 'she'
+        word = word.replace('he', 'she')
+        return word
     if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
-        return 'her'
+        word = word.replace('him', 'hers')
+        return word
 
 def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
     doc = nlp(protagonist)
