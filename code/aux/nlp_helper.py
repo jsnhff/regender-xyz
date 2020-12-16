@@ -53,41 +53,56 @@ def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
     return ruler
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist):
+def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns):
     coref_clusters = doc._.coref_clusters
-    print('Clusters before removing some', doc._.coref_clusters)
-    protagonist_cluster = []
 
-    for i in range(len(doc._.coref_clusters)):
-        current_cluster = coref_clusters[i]
-        cluster_text = coref_clusters[i].main.text
-        if cluster_text == protagonist:
-            protagonist_cluster = current_cluster
+    protagonist_cluster = select_protagonist_cluster(doc, protagonist)
 
     # because of Beloved
     # what happens when there is no cluster which is headed by the protagonist's name
-    if protagonist_cluster == []:
+    if protagonist_cluster == None:
 
         # add conversion dictionary to neuralcoref TO ADD RARE WORDS
         nlp.remove_pipe("neuralcoref")
-        neuralcoref.add_to_pipe(nlp, conv_dict={protagonist: ['woman', 'actress']})
+        conv_dict = fix_convertion_dictionary_gender(protagonist, is_female)
+        neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
         doc = nlp(paragraph)
 
-        print('COV_DICT', doc._.coref_clusters)
+        protagonist_cluster = select_protagonist_cluster(doc, protagonist)
 
-        # protagonist_cluster = doc._.coref_clusters[0]
-        # print(protagonist_cluster, type(protagonist_cluster))
-        # protagonist_cluster.main.text = protagonist
-        #
-        # for i in range(len(doc._.coref_clusters)):
-        #     cluster_text = coref_clusters[i].main.text
-        #     print(cluster_text)
-        # print(protagonist_cluster)
+        print('CONV_DICT', doc._.coref_clusters)
+        print('\n')
 
+        # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
+        for i in range(len(doc._.coref_clusters)):
+            current_cluster_mentions = doc._.coref_clusters[i].mentions
+            cluster_text = doc._.coref_clusters[i].main.text
+            if any(map(cluster_text.__contains__, gendered_pronouns)):
+                protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
+
+    print('protanogist cluster', protagonist_cluster)
 
     # overwrite the co-reference cluster with only the one of the protagonist
     doc._.coref_clusters = protagonist_cluster
     return doc
+
+def select_protagonist_cluster(doc, protagonist):
+    protagonist_cluster = None
+    for i in range(len(doc._.coref_clusters)):
+        current_cluster = doc._.coref_clusters[i]
+        cluster_text = doc._.coref_clusters[i].main.text
+        if cluster_text == protagonist:
+            protagonist_cluster = current_cluster
+
+    return protagonist_cluster
+
+def fix_convertion_dictionary_gender(protagonist, is_female):
+    conv_dict = {}
+    if is_female:
+        conv_dict = {protagonist: ['woman', 'actress']}
+    else:
+        conv_dict = {protagonist: ['man', 'actror']}
+    return conv_dict
 
 # find all coreferences of the protagonist
 # output: returns a dictionary
