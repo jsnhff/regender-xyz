@@ -23,8 +23,10 @@ nlp, ruler = load_spacy_neuralcoref()
 
 # load the Pride & Prejudice data - give the argument 8
 # load the The Sound anf Fury data - give the argument 1
-text, text_title, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(1)
+# load Beloved data - give the argument 2
+text, text_title, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(2)
 text_title = text_title.replace(' ', '').lower() # using this variable to read from the config.ini file
+print(text, text_title, protagonist)
 
 # FIXED variables
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_title, 'PROTAGONIST_REPLACEMENT_NAME')

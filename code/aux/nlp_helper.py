@@ -1,4 +1,5 @@
 import configparser # to read the variable values from the config file
+import neuralcoref
 
 # read variables from a CONFIG FILE
 configfile_name = "../config.ini"
@@ -52,9 +53,9 @@ def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
     return ruler
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-def find_protagonist_coreference_cluster(doc, protagonist):
+def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist):
     coref_clusters = doc._.coref_clusters
-
+    print('Clusters before removing some', doc._.coref_clusters)
     protagonist_cluster = []
 
     for i in range(len(doc._.coref_clusters)):
@@ -62,6 +63,27 @@ def find_protagonist_coreference_cluster(doc, protagonist):
         cluster_text = coref_clusters[i].main.text
         if cluster_text == protagonist:
             protagonist_cluster = current_cluster
+
+    # because of Beloved
+    # what happens when there is no cluster which is headed by the protagonist's name
+    if protagonist_cluster == []:
+
+        # add conversion dictionary to neuralcoref TO ADD RARE WORDS
+        nlp.remove_pipe("neuralcoref")
+        neuralcoref.add_to_pipe(nlp, conv_dict={protagonist: ['woman', 'actress']})
+        doc = nlp(paragraph)
+
+        print('COV_DICT', doc._.coref_clusters)
+
+        # protagonist_cluster = doc._.coref_clusters[0]
+        # print(protagonist_cluster, type(protagonist_cluster))
+        # protagonist_cluster.main.text = protagonist
+        #
+        # for i in range(len(doc._.coref_clusters)):
+        #     cluster_text = coref_clusters[i].main.text
+        #     print(cluster_text)
+        # print(protagonist_cluster)
+
 
     # overwrite the co-reference cluster with only the one of the protagonist
     doc._.coref_clusters = protagonist_cluster
