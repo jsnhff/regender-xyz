@@ -43,7 +43,7 @@ def find_the_best_replacement_word(word, pos_tag, is_female):
         word = word.replace('he', 'she')
         return word
     if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
-        word = word.replace('him', 'hers')
+        word = word.replace('him', 'her')
         return word
 
 def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
