@@ -50,3 +50,6 @@ doc._.coref_resolved    ## 'My sister has a dog. My sister loves a dog.'
 ```
 
 Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
+
+
+using Trello as a Task manager, and Google Docs for human-understandable documentation.
