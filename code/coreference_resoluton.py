@@ -2,7 +2,7 @@
 import random # for the generation of the unique IDs while still keeping them easy to read by humans
 import configparser # to read the variable values from the config file
 
-from aux.nlp_helper import find_the_best_replacement_word, add_protagonist_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph # load auxiliary functions to help regendering words
+from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph # load auxiliary functions to help regendering words
 from aux.load import load_spacy_neuralcoref, load_exceprt_data # load auxiliary functions to load NLP libraries & data
 
 # read variables from a CONFIG FILE
@@ -26,11 +26,11 @@ nlp, ruler = load_spacy_neuralcoref()
 # load Beloved data - give the argument 2
 text, text_title, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(2)
 text_title = text_title.replace(' ', '').lower() # using this variable to read from the config.ini file
-print(text, text_title, protagonist)
 
 # FIXED variables
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_title, 'PROTAGONIST_REPLACEMENT_NAME')
 OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_title, 'OTHER_CHARACTER_SAME_NAME_CHANGE')
+CHARACTER = config.get(text_title, 'CHARACTER_1')
 # END of reading FIXED variables
 
 #####################
@@ -39,7 +39,8 @@ OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_title, 'OTHER_CHARACTER_SAME_
 
 # in case spacy does not regognize the protanogist's name we have as a Named Entity, add it manually
 print('--------')
-ruler = add_protagonist_as_a_named_entity(nlp, protagonist, ruler)
+ruler = add_character_as_a_named_entity(nlp, protagonist, ruler)
+ruler = add_character_as_a_named_entity(nlp, CHARACTER, ruler)
 nlp.add_pipe(ruler)
 
 # a. split the excerpt into paragraphs when the char sequence \n\n is detected
@@ -66,12 +67,18 @@ for paragraph in paragraphs:
     doc = nlp(paragraph)
     has_found_corefs = doc._.has_coref
 
+    print('original coreferences', doc._.coref_clusters)
+    print("-------")
+
     if has_found_corefs and name_count < 1: # ERROR HANDLING
         print('\nCAUTION: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
         regendered_paragraph = paragraph
     else:
         # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-        doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns)
+        additional_character = None
+        if CHARACTER != '': # in case no additional character name has been given in the config.ini file
+            additional_character = CHARACTER
+        doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns, additional_character)
 
         print('Coreference slusters -> ', doc._.coref_clusters)
 
