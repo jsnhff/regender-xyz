@@ -20,33 +20,43 @@ def find_the_best_replacement_word(word, pos_tag, is_female):
     # change pronouns from female to male
     # find all English dependency pos tag reference here -> https://spacy.io/api/annotation#pos-tagging
     if is_female and pos_tag == 'poss': # POS tag = possession modifier
-        word = word.replace('hers', 'his')
+        word = change_word(word, 'her', 'his')
         return word
     if is_female and pos_tag == 'dobj': # POS tag = direct object
-        word = word.replace('her', 'him')
+        word = change_word(word, 'her', 'him')
         return word
     if is_female and pos_tag == 'nsubj': # POS tag = nominal subject
-        word = word.replace('she', 'he')
+        word = change_word(word, 'she', 'he')
         return word
     if is_female and pos_tag == 'pobj': # POS tag = object of preposition
-        word = word.replace('her', 'his')
+        word = change_word(word, 'her', 'his')
         return word
 
     # change pronouns from male to female
     if not is_female and pos_tag == 'poss': # POS tag = possession modifier
-        word = word.replace('his', 'hers')
+        word = change_word(word, 'his', 'hers')
         return word
     if not is_female and pos_tag == 'dobj': # POS tag = direct object
-        word = word.replace('him', 'her')
+        word = change_word(word, 'him', 'her')
         return word
     if not is_female and pos_tag == 'nsubj': # POS tag = nominal subject
-        word = word.replace('he', 'she')
+        word = change_word(word, 'he', 'she')
         return word
     if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
-        word = word.replace('him', 'her')
+        word = change_word(word, 'him', 'her')
         return word
 
-def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
+def change_word(original_word, string_to_replace, replacement_word):
+    starts_with_capital_letter = original_word[0].isupper()
+    original_word = original_word.lower()
+    original_word = original_word.replace(string_to_replace, replacement_word)
+
+    if starts_with_capital_letter:
+        original_word = original_word[0].upper() + original_word[1:]
+
+    return original_word
+
+def add_character_as_a_named_entity(nlp, protagonist, ruler):
     doc = nlp(protagonist)
     found_entities = doc.ents != ()
     if not found_entities:  # when no NEs have been found - explicitly label the protagonist's name as a NE
@@ -54,9 +64,7 @@ def add_protagonist_as_a_named_entity(nlp, protagonist, ruler):
     return ruler
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns):
-    coref_clusters = doc._.coref_clusters
-
+def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns, additional_character):
     protagonist_cluster = select_protagonist_cluster(doc, protagonist)
 
     # because of Beloved
@@ -65,7 +73,12 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
 
         # add conversion dictionary to neuralcoref TO ADD RARE WORDS
         nlp.remove_pipe("neuralcoref")
-        conv_dict = fix_convertion_dictionary_gender(protagonist, is_female)
+        conv_dict = {}
+        conv_dict = add_convertion_dictionary_entry(conv_dict, protagonist, is_female, 'protagonist')
+        if additional_character != None:
+            # N.B. adding rare words ONLY WORKS FOR SINGLE WORDS - Phyllis, and not group words, e.g. Aunt Phyllis.
+            # N.B. keep a look at the documentation for any changes -> https://github.com/huggingface/neuralcoref
+            conv_dict = add_convertion_dictionary_entry(conv_dict, additional_character, is_female, 'character')
         neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
         doc = nlp(paragraph)
 
@@ -83,6 +96,7 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
 
     # overwrite the co-reference cluster with only the one of the protagonist
     doc._.coref_clusters = protagonist_cluster
+
     return doc
 
 def select_protagonist_cluster(doc, protagonist):
@@ -90,17 +104,17 @@ def select_protagonist_cluster(doc, protagonist):
     for i in range(len(doc._.coref_clusters)):
         current_cluster = doc._.coref_clusters[i]
         cluster_text = doc._.coref_clusters[i].main.text
+        cluster_text = doc._.coref_clusters[i].main.text
         if cluster_text == protagonist:
             protagonist_cluster = current_cluster
 
     return protagonist_cluster
 
-def fix_convertion_dictionary_gender(protagonist, is_female):
-    conv_dict = {}
+def add_convertion_dictionary_entry(conv_dict, protagonist, is_female, role):
     if is_female:
-        conv_dict = {protagonist: ['woman', 'actress']}
+        conv_dict[protagonist] = ['woman', 'girl', role]
     else:
-        conv_dict = {protagonist: ['man', 'actror']}
+        conv_dict[protagonist] = ['man', 'boy', role]
     return conv_dict
 
 # find all coreferences of the protagonist
@@ -138,7 +152,7 @@ def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, i
     if i in reference_dict:
         word = doc[i:reference_dict[i]].text
         replacement = find_the_best_replacement_word(word, pos_tag, is_female)
-        print(word, pos_tag, replacement)
+
         if replacement != None:  # error handling
             replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
         if word == protagonist:
