@@ -92,8 +92,6 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
             if any(map(cluster_text.__contains__, gendered_pronouns)):
                 protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
 
-    print('protanogist cluster', protagonist_cluster)
-
     # overwrite the co-reference cluster with only the one of the protagonist
     doc._.coref_clusters = protagonist_cluster
 
@@ -210,3 +208,18 @@ def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, refer
         i += 1
 
     return regendered_paragraph
+
+
+def find_word_indices_in_paragraph(entities, is_proper_names):
+    words = []
+    indices = []
+    for entity in entities:
+        entity = entity[-1]
+        if is_proper_names:
+            if entity.pos_ == 'PROPN': # PROPN == proper name
+                words.append(entity.text)
+                indices.append(entity.i)
+        else:
+            words.append(entity.text)
+            indices.append(entity.i)
+    return words, indices
