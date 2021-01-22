@@ -85,7 +85,7 @@ for paragraph in paragraphs:
 
         protagonist_coreference_words, protagonist_coreference_indices = find_word_indices_in_paragraph(doc._.coref_clusters, False)
         print('Coreference clusters -> ', doc._.coref_clusters)
-        print(protagonist_coreference_indices, "Proper Name Indices ->", paragraph_proper_name_indices)
+        print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->", paragraph_proper_name_indices)
 
         # remove the protagonist index from the paragraph's proper name indices
         paragraph_proper_name_indices = [x for x in paragraph_proper_name_indices if x not in protagonist_coreference_indices]

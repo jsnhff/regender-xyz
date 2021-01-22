@@ -31,10 +31,13 @@ def find_the_best_replacement_word(word, pos_tag, is_female):
     if is_female and pos_tag == 'pobj': # POS tag = object of preposition
         word = change_word(word, 'her', 'his')
         return word
+    if is_female and pos_tag == 'attr': # POS tag = object of preposition
+        word = change_word(word, 'hers', 'his')
+        return word
 
     # change pronouns from male to female
     if not is_female and pos_tag == 'poss': # POS tag = possession modifier
-        word = change_word(word, 'his', 'hers')
+        word = change_word(word, 'his', 'her')
         return word
     if not is_female and pos_tag == 'dobj': # POS tag = direct object
         word = change_word(word, 'him', 'her')
@@ -44,6 +47,9 @@ def find_the_best_replacement_word(word, pos_tag, is_female):
         return word
     if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
         word = change_word(word, 'him', 'her')
+        return word
+    if not is_female and pos_tag == 'attr': # POS tag = object of preposition
+        word = change_word(word, 'his', 'hers')
         return word
 
 def change_word(original_word, string_to_replace, replacement_word):
@@ -138,7 +144,7 @@ def find_all_protagonist_coreferences(doc, gendered_pronouns):
 
     return reference_dict
 
-def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
+def regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
     if (i not in reference_dict):
         regendered_paragraph += word
         # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
@@ -149,7 +155,7 @@ def regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, i
 
     if i in reference_dict:
         word = doc[i:reference_dict[i]].text
-        replacement = find_the_best_replacement_word(word, pos_tag, is_female)
+        replacement = find_the_best_replacement_word(word, dep_tag, is_female)
 
         if replacement != None:  # error handling
             replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
@@ -178,7 +184,7 @@ def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, refer
     i = 0
     while i < len(doc):
         word = doc[i].text
-        pos_tag = doc[i].dep_
+        dep_tag = doc[i].dep_ # we use the Syntactic dependency relation instead of the POS
         # here we mostly handle avoid manipulating text between quotation marks
         if inside_dialog:
             has_read_some_dialog = True
@@ -186,7 +192,7 @@ def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, refer
             regendered_paragraph += ' '
         else:
             # HERE IS WHERE THE REGENDERING MAGIC HAPPENS
-            i, regendered_paragraph = regender_outside_quotes(book_title, word, pos_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
+            i, regendered_paragraph = regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
             # END: HERE IS WHERE THE REGENDERING MAGIC HAPPENS
 
         # check if we are not finishing a quotation
