@@ -1,8 +1,11 @@
 import configparser # to read the variable values from the config file
 import neuralcoref
+import subprocess, os
+
+root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
 
 # read variables from a CONFIG FILE
-configfile_name = "../config.ini"
+configfile_name = root_dir + os.sep + "config.ini"
 config = configparser.ConfigParser()
 config.read(configfile_name)
 
@@ -15,40 +18,40 @@ CLOSING_QUOTES = config.get('quotes', 'CLOSING').split(DELIMITER)
 
 # finds the best replacement for pronouns when regendering
 # TODO: the cases of herself/himself are not handled here yet
-def find_the_best_replacement_word(word, pos_tag, is_female):
+def find_the_best_replacement_word(word, dep_tag, is_female):
 
     # change pronouns from female to male
     # find all English dependency pos tag reference here -> https://spacy.io/api/annotation#pos-tagging
-    if is_female and pos_tag == 'poss': # POS tag = possession modifier
+    if is_female and dep_tag == 'poss': # DEP tag = possession modifier
         word = change_word(word, 'her', 'his')
         return word
-    if is_female and pos_tag == 'dobj': # POS tag = direct object
+    if is_female and dep_tag == 'dobj': # DEP tag = direct object
         word = change_word(word, 'her', 'him')
         return word
-    if is_female and pos_tag == 'nsubj': # POS tag = nominal subject
+    if is_female and dep_tag == 'nsubj': # DEP tag = nominal subject
         word = change_word(word, 'she', 'he')
         return word
-    if is_female and pos_tag == 'pobj': # POS tag = object of preposition
+    if is_female and dep_tag == 'pobj': # DEP tag = object of preposition
         word = change_word(word, 'her', 'his')
         return word
-    if is_female and pos_tag == 'attr': # POS tag = object of preposition
+    if is_female and dep_tag == 'attr': # DEP tag = object of preposition
         word = change_word(word, 'hers', 'his')
         return word
 
     # change pronouns from male to female
-    if not is_female and pos_tag == 'poss': # POS tag = possession modifier
+    if not is_female and dep_tag == 'poss': # DEP tag = possession modifier
         word = change_word(word, 'his', 'her')
         return word
-    if not is_female and pos_tag == 'dobj': # POS tag = direct object
+    if not is_female and dep_tag == 'dobj': # DEP tag = direct object
         word = change_word(word, 'him', 'her')
         return word
-    if not is_female and pos_tag == 'nsubj': # POS tag = nominal subject
+    if not is_female and dep_tag == 'nsubj': # DEP tag = nominal subject
         word = change_word(word, 'he', 'she')
         return word
-    if not is_female and pos_tag == 'pobj': # POS tag = object of preposition
+    if not is_female and dep_tag == 'pobj': # DEP tag = object of preposition
         word = change_word(word, 'him', 'her')
         return word
-    if not is_female and pos_tag == 'attr': # POS tag = object of preposition
+    if not is_female and dep_tag == 'attr': # DEP tag = object of preposition
         word = change_word(word, 'his', 'hers')
         return word
 

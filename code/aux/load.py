@@ -2,9 +2,12 @@ import spacy # the NLP library we use
 import neuralcoref # the coreference resolution add-on to the NLP library we use
 import pandas as pd
 import configparser # to read the variable values from the config file
+import subprocess, os
+
+root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
 
 # read variables from a CONFIG FILE
-configfile_name = "../config.ini"
+configfile_name = root_dir + os.sep + "config.ini"
 config = configparser.ConfigParser()
 config.read(configfile_name)
 
@@ -12,6 +15,12 @@ config.read(configfile_name)
 MALE_PRONOUNS = config.get('pronouns', 'MALE').split('|||')
 FEMALE_PRONOUNS = config.get('pronouns', 'FEMALE').split('|||')
 # END of reading FIXED variables
+
+def get_root_folder():
+    root_path = None
+    stream = os.popen("git rev-parse --show -toplevel") # prints the absolute path to the root folder of the git repo on your local mahcine
+    root_path = stream.read()
+    return root_path
 
 def load_spacy_neuralcoref():
     # load needed language resources

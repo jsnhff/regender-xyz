@@ -2,12 +2,16 @@
 import bisect # used to insert an element in a sorted list
 import random # for the generation of the unique IDs while still keeping them easy to read by humans
 import configparser # to read the variable values from the config file
+import subprocess, os
 
 from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, find_word_indices_in_paragraph # load auxiliary functions to help regendering words,
 from aux.load import load_spacy_neuralcoref, load_exceprt_data # load auxiliary functions to load NLP libraries & data
+from aux.load import load_spacy_neuralcoref, load_exceprt_data # load auxiliary functions to load NLP libraries & data
+
+root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
 
 # read variables from a CONFIG FILE
-configfile_name = "../config.ini"
+configfile_name = root_dir + os.sep + "config.ini"
 config = configparser.ConfigParser()
 config.read(configfile_name)
 
@@ -69,6 +73,8 @@ for paragraph in paragraphs:
     doc = nlp(paragraph)
     has_found_corefs = doc._.has_coref
     print("-------")
+
+    print(doc._.coref_clusters)
 
     # find all non-protagonist proper names in the paragraph
     paragraph_proper_names, paragraph_proper_name_indices = find_word_indices_in_paragraph(doc.ents, True)
