@@ -106,10 +106,21 @@ Link with installation insturctuons found [here](https://github.com/huggingface/
 We use Trello for task management - here is the link to [our Trello board](https://trello.com/b/WlGnaGox/regender-alpha)
 - ask the admin (Jason Huff) to add you to it
 
+
 We use Google Docs to document our experiments in detail (e.g. human-readable documentation) - here is the [link](https://drive.google.com/drive/u/0/folders/14XVle1QEer1k527lhCYV376f5qxTpUUY) to it
 - ask the admin (Jason Huff) to grant access to you
 
+
 We use Github as our code repository. 
+
+
+---
+
+## Libraries <a name="libraries"></a>
+
+- [Spacy](https://spacy.io/) - as a general NLP tool
+- [Neuralcoref](https://github.com/huggingface/neuralcoref) with Spacy - for coreference resolution
+- [xlrd](https://pypi.org/project/xlrd/) - to read experiment's data from Excel sheets
 
 ---
 
