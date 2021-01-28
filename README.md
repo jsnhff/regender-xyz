@@ -1,36 +1,74 @@
 # Regender Books
 
 ToC:
-1. Initial Set-up
-2. Installation
-3. How to run
-Methodology
-Libraries Used
-3. Analysing a new piece of text
-4. What's been analysed so far
-5. Project Management
+1. [Initial Set-up & Installation](#initial-setup)
+2. [How to run](#run)
+3. [Approach](#approach)
+3. [Analysing a new piece of text](#continuing-work)
+4. [Progress - a.k.a What's been analysed so far](#progress)
+5. [Project Management](#management)
+4. [Libraries Used](#libraries)
 5. [Resources and References](#resources-and-references)
 
 ---
 
 
-### Spacy: co-reference resolution
+### Initial Set-up & Installation <a name="initial-setup"></a>
+
+1. Clone the git repo on your local machine by either:
+- downloading the `.zip` folder of the repo from [here](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine, OR
+- opening up the terminal, and using `git`:
 
 
+Check if you have git installed:
 
-### Installation & Dependencies
+```sh
+git --version # check if you have git isntalled
+> git version 2.XX.XX # OUTPUT if git is installed.If not, type in
+```
 
-1. Create a virtual environment on which to work on (in terminal) & install all needed packages
+Install `git` on **Linux**:
+
+```sh
+sudo apt update
+sudo apt install git # install git on Linux
+```
+
+
+Install `git` on **Mac**:
+
+```sh
+brew install git # install git on Mac
+```
+
+Finally clone the project
+
+```sh
+
+git clone https://github.com/estambolieva/regendered-books.git
+```
+
+
+2. Create a virtual environment on which to work on (in terminal) & install all needed packages
+
+In the root folder of the project - create a virtual environment to use when working on the projects - on which we install all needed packages
 
 ```sh
 python3 -m venv nlp # creates the virtual enviornment
-pip3 install -r requrements.txt # install app Python dependencies (needed packages)
 ```
 
-a. every time you work on the project, activate this virtual environment
+a. every time you work on the project, activate this virtual environment as the first step after opening the terminal. 
 
 ```sh
 souce nlp/bin/activate
+```
+
+Before I activate the virtual environment, my terminal window prompt looks something like this: `katia@katias-laptop`, and like this - `(nlp)katia@katias-laptop` - after I activate the environment. The `(nlp)` shows me  that the environment has been activated :+1:.  
+
+**Only once**, install all required pythong packages needed by executing
+
+```sh
+pip3 install -r requrements.txt # install app Python dependencies (needed packages)
 ```
 
 2. Install NeuralCoref from core & the correct associated version of Spacy with it
@@ -46,7 +84,7 @@ pip install spacy
 python -m spacy download en
 ```
 
-test it quickly in Python to ensure that it works as expected:
+test it quickly (if you'd like) in a Python console to ensure that it works as expected:
 
 ```py
 import spacy
