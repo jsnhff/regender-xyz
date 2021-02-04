@@ -2,6 +2,7 @@ import configparser # to read the variable values from the config file
 import neuralcoref
 import subprocess, os
 
+# get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
 
 # read variables from a CONFIG FILE

@@ -4,6 +4,7 @@ import pandas as pd
 import configparser # to read the variable values from the config file
 import subprocess, os
 
+# get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
 
 # read variables from a CONFIG FILE
@@ -33,12 +34,18 @@ def load_spacy_neuralcoref():
     return nlp, ruler
 
 # if i = 8, we load Pride and Prejudice excerpt
-def load_exceprt_data(i):
-    excerpts = pd.read_excel('../data/Sample_Paragraphs.xlsx', 'Sheet1')
-    text = excerpts.loc[i].Paragraph
-    text_title = excerpts.loc[i]['Book Title']
-    protagonist = excerpts.loc[i].Character
-    gender = excerpts.loc[i].Gender
+def load_exceprt_data(text_id):
+
+    # get the file with the text from config.ini
+    TEXT_FILE = root_dir + os.sep + config.get(text_id, 'TEXT_FILE')
+    TEXT_FILE_SHEET = config.get(text_id, 'TEXT_FILE_SHEET')
+    SHEET_LINE = int(config.get(text_id, 'SHEET_LINE')) # as we originally read it as a STR from config.ini
+    excerpts = pd.read_excel(TEXT_FILE, TEXT_FILE_SHEET)
+
+    text = excerpts.loc[SHEET_LINE].Paragraph
+    protagonist = excerpts.loc[SHEET_LINE].Character
+    gender = excerpts.loc[SHEET_LINE].Gender
+
     if gender.lower() == 'female':
         is_female = True
     else:
@@ -50,4 +57,4 @@ def load_exceprt_data(i):
     else:
         gendered_pronouns = MALE_PRONOUNS
 
-    return text, text_title, protagonist, gender, is_female, gendered_pronouns
+    return text, protagonist, gender, is_female, gendered_pronouns
