@@ -2,8 +2,9 @@
 
 ToC:
 1. [Initial Set-up & Installation](#initial-setup)
-2. [How to run](#run)
-   a. [config.ini](#config)
+2. [How to run](#run)<br>
+   a. [config.ini](#config)<br>
+   b. [reflect config.ini changes in the code](#code-changes)
 3. [Approach](#approach)
 3. [Analysing a new piece of text](#continuing-work)
 4. [Progress - a.k.a What's been analysed so far](#progress)
@@ -114,7 +115,7 @@ This is how it works for now -> whenever we start working with a new text, we cr
 - `CHARACTER_1` - we list the name of another very prominent character in the text/book, whose name might cause coreference problems. ❗ **Important** - work in progress, this logic has not been fully developed yet.
 
 
-### b. reflect config.ini changes in the code
+### b. reflect config.ini changes in the code <a name="code-changes"></a>
 
 
 
