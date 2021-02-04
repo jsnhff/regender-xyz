@@ -102,11 +102,11 @@ Note: make sure you are running this from the root folder of the git project if 
 
 ### a. config.ini <a name="config"></a>
 
-Every time we start working with a new piece of text - we need to update the `config.ini` file. It is located in the root folder of the project. Hint - you can install `Sublime Text` editor to edit it if you are wondering how to open it. 
+Every time we start working with a new piece of text - we need to update the `config.ini` file. It is located in the root folder of the project. Hint - you can install [Sublime Text](https://www.sublimetext.com/) editor to edit it if you are wondering how to open it. 
 
 This is how it works for now -> whenever we start working with a new text, we create the following entry for it in the `config.ini` file:
 
-![Config.ini for Rabbit Angstrom: Rabbit, Run](https://github.com/estambolieva/regendered-books/raw/master/imgs/beloved_config_ini.png)
+![Config.ini for Rabbit Angstrom: Rabbit, Run](https://github.com/estambolieva/regendered-books/raw/master/imgs/rabbit_config_ini.png)
 
 
 - `[BOOK_NAME]` is the marker used by Python to tell the rest of the code where to look for the replacement strings we introduce for each text/book in this file. **Note**: Currently we use the name of the book as the marker - e.g. when we work on Beloved, we set this marker to `[beloved]`. 
