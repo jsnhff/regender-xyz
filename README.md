@@ -3,6 +3,7 @@
 ToC:
 1. [Initial Set-up & Installation](#initial-setup)
 2. [How to run](#run)
+   a. [config.ini](#config)
 3. [Approach](#approach)
 3. [Analysing a new piece of text](#continuing-work)
 4. [Progress - a.k.a What's been analysed so far](#progress)
@@ -95,7 +96,16 @@ The main files which needs to be run in names `coreference_resolution.py` locate
 python3 code/coreference_resoluton.py
 ```
 
-IMPORTANT: install git if not existent - write shell script...
+Note: make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️. 
+
+
+### a. config.ini <a name="config"></a>
+
+Every time we start working with a new piece of text - we need to update the `config.ini` file. It is located in the root folder of the project. Hint - you can install `Sublime Text` editor to edit it if you are wondering how to open it. 
+
+This is how it works for now -> whenever we start working with a new text, we create the following entry for it in the `config.ini` file:
+
+![Config.ini for Rabbit Angstrom: Rabbit, Run](https://raw.githubusercontent.com/estambolieva/regendered-books/master/imgs/beloved_config_ini.png?token=ABLYNDEOJFEOVX3DD4NJ6MLADO5Y4)
 
 ---
 
