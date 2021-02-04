@@ -27,18 +27,10 @@ git --version # check if you have git isntalled
 > git version 2.XX.XX # OUTPUT if git is installed.If not, type in
 ```
 
-Install `git` on **Linux**:
+Install `git` on **Linux** or **Mac**:
 
 ```sh
-sudo apt update
-sudo apt install git # install git on Linux
-```
-
-
-Install `git` on **Mac**:
-
-```sh
-brew install git # install git on Mac
+sh requirements.sh # the script detects the Operating System automatically
 ```
 
 Finally clone the project
@@ -98,6 +90,17 @@ doc._.coref_resolved    ## 'My sister has a dog. My sister loves a dog.'
 ```
 
 Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
+
+
+## How to run <a name="run"></a>
+
+The main files which needs to be run in names `coreference_resolution.py` located in the `code` folder. To execute it, run:
+
+```sh
+python3 code/coreference_resoluton.py
+```
+
+IMPORTANT: install git if not existent - write shell script...
 
 ---
 
