@@ -18,6 +18,9 @@ config.read(configfile_name)
 # indicator to find the text we regender
 FIND_TEXT = config.get('quotes', 'OPENING').split('|||')
 
+## get the output folder
+OUTPUT_FOLDER = config.get('folders', 'OUTPUT_FOLDER')
+
 # we want to avoid regendering all coreferences which are between quotation marks
 OPENING_QUOTES = config.get('quotes', 'OPENING').split('|||')
 CLOSING_QUOTES = config.get('quotes', 'CLOSING').split('|||')
@@ -40,11 +43,14 @@ nlp, ruler = load_spacy_neuralcoref()
 text_id = 'rabbitrun'
 text, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(text_id)
 
-# FIXED variables
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_id, 'PROTAGONIST_REPLACEMENT_NAME')
 OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_id, 'OTHER_CHARACTER_SAME_NAME_CHANGE')
 CHARACTER = config.get(text_id, 'CHARACTER_1')
-# END of reading FIXED variables
+output_file = root_dir + os.sep + OUTPUT_FOLDER + os.sep + text_id + "_regendered.txt"
+
+# Creates an empty file as  output_file
+with open(output_file, 'w') as fp:
+    pass
 
 #####################
 #### START LOGIC ####
@@ -123,6 +129,11 @@ for paragraph in paragraphs:
         regendered_paragraph = regender_paragraph(text_id, doc, protagonist, is_female, unique_id, reference_dict)
 
     print(regendered_paragraph)
+    ## write the regendered paragraph to file
+    with open(output_file, 'a') as fp:
+        fp.write("\n")
+        fp.write(regendered_paragraph)
+
     print('--------------------------------------------------------, Next paragraph...')
 
     para_count += 1
