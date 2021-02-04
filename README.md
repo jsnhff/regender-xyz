@@ -108,8 +108,10 @@ This is how it works for now -> whenever we start working with a new text, we cr
 
 ![Config.ini for Rabbit Angstrom: Rabbit, Run](https://github.com/estambolieva/regendered-books/raw/master/imgs/rabbit_config_ini.png)
 
-
-- `[BOOK_NAME]` is the marker used by Python to tell the rest of the code where to look for the replacement strings we introduce for each text/book in this file. **Note**: Currently we use the name of the book as the marker - e.g. when we work on Beloved, we set this marker to `[beloved]`. 
+- `[__BOOK_NAME__]` is the marker used by Python to tell the rest of the code where to look for the replacement strings we introduce for each text/book in this file. **Note**: Currently we use the name of the book as the marker - e.g. when we work on Beloved, we set this marker to `[rabbitrun]` (`__BOOK_NAME__` = `rabbitrun`). 
+- `TEXT_FILE` - currently: pointing either to an Excel file with the experimental exceprts of books - pushed to the github repo OR alink to Harry Potter's Google doc on Gdrive; `future`: this can be any link - AWS S3, etc. 
+- `TEXT_FILE_SHEET` - either `None` (for Harry Potter) OR `Sheet1` which is the name of the only sheet in the Github repo Excel file 
+- `SHEET_LINE` - either `None` (for Harry Potter) OR an integer indicating the line in `Sheet1` in the Github repo Excel file, on which the book exceprt's info is stored at
 - `PROTAGONIST_REPLACEMENT_NAME` is the name we give to the protagonist who we regender, e.g. from `Sethe` to `Michael` in the context of `Beloved`
 - `OTHER_CHARACTER_SAME_NAME_CHANGE` - we define this in case there is another `Michael` mentioned somewhere in the text - we do not want our renamed proganist's name to clash with the name of another character. **Note** - we developed this for `Pride & Prejudice` - a text in which we regendered `Mrs. Bennet` and changed her name to `Mr. Bennet` - which happens to be the name of her husband. `OTHER_CHARACTER_SAME_NAME_CHANGE` in this case is set to `the other Mr. Bennet`.
 - `CHARACTER_1` - we list the name of another very prominent character in the text/book, whose name might cause coreference problems. ❗ **Important** - work in progress, this logic has not been fully developed yet.
