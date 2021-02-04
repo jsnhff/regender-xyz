@@ -116,7 +116,7 @@ This step consists of two sub-steps:
 
 Every time we start working with a new piece of text - we need to update the `config.ini` file. It is located in the root folder of the project. Hint - you can install [Sublime Text](https://www.sublimetext.com/) editor to edit it if you are wondering how to open it. 
 
-This is how it works for now -> whenever we start working with a new text, we create the following entry for it in the `config.ini` file:
+This is how it works for now -> whenever we start working with a new text, we create the following entry (if non-existent) for it in the `config.ini` file:
 
 ![Config.ini for Rabbit Angstrom: Rabbit, Run](https://github.com/estambolieva/regendered-books/raw/master/imgs/rabbit_config_ini.png)
 
@@ -129,8 +129,15 @@ This is how it works for now -> whenever we start working with a new text, we cr
 - `CHARACTER_1` - we list the name of another very prominent character in the text/book, whose name might cause coreference problems. ❗ **Important** - work in progress, this logic has not been fully developed yet.
 
 
+The `config.ini` file is ready to support the rengendering of a new piece of text. 
+
+
 #### b. reflect config.ini changes in the code <a name="code-changes"></a>
 
+
+We need make 1 change in the code in the file `coreference_resolution.py` in the `code` folder.
+
+![Change the code](https://github.com/estambolieva/regendered-books/raw/master/imgs/change_coreference_resolution_py.png)
 
 ---
 
