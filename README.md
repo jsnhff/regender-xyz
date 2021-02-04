@@ -15,25 +15,20 @@ ToC:
 
 ### Initial Set-up & Installation <a name="initial-setup"></a>
 
-1. Clone the git repo on your local machine by either:
-- downloading the `.zip` folder of the repo from [here](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine, OR
-- opening up the terminal, and using `git`:
-
-
-Check if you have git installed:
+1. Install the needed OS- and python- packages
 
 ```sh
+python3 requirements.txt # installs all Python-related dependencies
+sh requirements.sh # installs GIT on Linux/MAC
+
 git --version # check if you have git isntalled
 > git version 2.XX.XX # OUTPUT if git is installed.If not, type in
 ```
 
-Install `git` on **Linux** or **Mac**:
 
-```sh
-sh requirements.sh # the script detects the Operating System automatically
-```
-
-Finally clone the project
+2. Clone the git repo on your local machine by either:
+- downloading the `.zip` folder of the repo from [here](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine, OR
+- opening up the terminal, and using `git` - clone the project:
 
 ```sh
 
@@ -41,7 +36,7 @@ git clone https://github.com/estambolieva/regendered-books.git
 ```
 
 
-2. Create a virtual environment on which to work on (in terminal) & install all needed packages
+3. Create a virtual environment on which to work on (in terminal) & install all needed packages
 
 In the root folder of the project - create a virtual environment to use when working on the projects - on which we install all needed packages
 
@@ -63,7 +58,7 @@ Before I activate the virtual environment, my terminal window prompt looks somet
 pip3 install -r requrements.txt # install app Python dependencies (needed packages)
 ```
 
-2. Install NeuralCoref from core & the correct associated version of Spacy with it
+4. Install NeuralCoref from core & the correct associated version of Spacy with it
 
 ```sh
 pip uninstall neuralcoref
