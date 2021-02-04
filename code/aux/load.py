@@ -3,6 +3,7 @@ import neuralcoref # the coreference resolution add-on to the NLP library we use
 import pandas as pd
 import configparser # to read the variable values from the config file
 import subprocess, os
+import gdown
 
 # get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
@@ -33,14 +34,51 @@ def load_spacy_neuralcoref():
 
     return nlp, ruler
 
+def google_login():
+    # If modifying these scopes, delete the file token.pickle.
+    SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    return creds
+
+
 # if i = 8, we load Pride and Prejudice excerpt
 def load_exceprt_data(text_id):
 
     # get the file with the text from config.ini
     TEXT_FILE = root_dir + os.sep + config.get(text_id, 'TEXT_FILE')
     TEXT_FILE_SHEET = config.get(text_id, 'TEXT_FILE_SHEET')
-    SHEET_LINE = int(config.get(text_id, 'SHEET_LINE')) # as we originally read it as a STR from config.ini
-    excerpts = pd.read_excel(TEXT_FILE, TEXT_FILE_SHEET)
+
+    if TEXT_FILE_SHEET != 'None':
+        SHEET_LINE = int(config.get(text_id, 'SHEET_LINE')) # as we originally read it as a STR from config.ini
+        excerpts = pd.read_excel(TEXT_FILE, TEXT_FILE_SHEET)
+    else:
+        # creds = google_login()
+        # gdd.download_file_from_google_drive(file_id='1UQkkYWjSUmilX6loSQkpwxNHPr4XZ6l2',
+        #                                     dest_path=root_dir + os.sep + 'data/' +  text_id + '.docx',
+        #                                     credentials=creds)
+        # excerpts = read_doc()
+
+        url = ''
+        gdown.download(url, root_dir + 'donwload.txt', quiet=False)
 
     text = excerpts.loc[SHEET_LINE].Paragraph
     protagonist = excerpts.loc[SHEET_LINE].Character

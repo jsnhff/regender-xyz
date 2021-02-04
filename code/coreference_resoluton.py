@@ -40,7 +40,7 @@ nlp, ruler = load_spacy_neuralcoref()
 # for Rabbit Run -> rabbitrun
 # for the Sound and Fury -> thesoundandfury
 ### END
-text_id = 'rabbitrun'
+text_id = 'harrypotter'
 text, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(text_id)
 
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_id, 'PROTAGONIST_REPLACEMENT_NAME')
