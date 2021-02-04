@@ -20,7 +20,7 @@ ToC:
 1. Install the needed OS- and python- packages
 
 ```sh
-python3 requirements.txt # installs all Python-related dependencies
+python3 install -r requirements.txt # installs all Python-related dependencies
 sh requirements.sh # installs GIT on Linux/MAC
 
 git --version # check if you have git isntalled
@@ -63,6 +63,7 @@ pip3 install -r requrements.txt # install app Python dependencies (needed packag
 4. Install NeuralCoref from core & the correct associated version of Spacy with it
 
 ```sh
+cd .. # exit the root git directory (= github repo directory) before installing neuralcoref
 pip uninstall neuralcoref
 git clone https://github.com/huggingface/neuralcoref.git
 cd neuralcoref
@@ -91,16 +92,27 @@ Link with installation insturctuons found [here](https://github.com/huggingface/
 
 ## How to run <a name="run"></a>
 
-The main files which needs to be run in names `coreference_resolution.py` located in the `code` folder. To execute it, run:
+The main files which needs to be run in names `coreference_resolution.py` located in the `code` folder. To execute it, run the command below from the root git folder:
 
 ```sh
 python3 code/coreference_resoluton.py
 ```
 
-Note: make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️. 
+**Note**: make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️ as is. 
 
 
-### a. config.ini <a name="config"></a>
+This will execute the `regendering` logic to the selected text. Let's chat about how to select the text to regender.
+
+
+### Select Text to Regender
+
+This step consists of two sub-steps:
+- update the `config.ini` file in which we keep fixed variables we need when regendering any given text
+- update the code to point which text is being regendered on the current run
+- (optional) update the code to select that to print as intermediate steps
+
+
+#### a. Update config.ini <a name="config"></a>
 
 Every time we start working with a new piece of text - we need to update the `config.ini` file. It is located in the root folder of the project. Hint - you can install [Sublime Text](https://www.sublimetext.com/) editor to edit it if you are wondering how to open it. 
 
@@ -117,8 +129,7 @@ This is how it works for now -> whenever we start working with a new text, we cr
 - `CHARACTER_1` - we list the name of another very prominent character in the text/book, whose name might cause coreference problems. ❗ **Important** - work in progress, this logic has not been fully developed yet.
 
 
-### b. reflect config.ini changes in the code <a name="code-changes"></a>
-
+#### b. reflect config.ini changes in the code <a name="code-changes"></a>
 
 
 ---
