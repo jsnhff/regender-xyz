@@ -137,7 +137,22 @@ The `config.ini` file is ready to support the rengendering of a new piece of tex
 
 We need make 1 change in the code in the file `coreference_resolution.py` in the `code` folder.
 
+We need to copy the string (`text_id`) which we have defined in `config.ini` and replace what is shown highlighted in `coreference_resolution.py`  the image below.
+
 ![Change the code](https://github.com/estambolieva/regendered-books/raw/master/imgs/change_coreference_resolution_py.png)
+
+When this is done, we are ready to regender. Run:
+
+```sh
+python3 code/coreference_resoluton.py
+```
+
+The regendered text is written in a file in the `output` folder (no worries, the `requirements.sh` script you ran when doing the installation and setup has already created it in the root git folder) with a name which consists of:
+- the `text_id` or the name of the book the way we have written it in the `config.ini` file
+- `_regendered.txt`.
+
+
+#### c. (optional) update the code to select that to print as intermediate steps
 
 ---
 
