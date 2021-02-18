@@ -4,10 +4,10 @@
 # tutorials on how to install for Windows, Linux & Mac - https://www.atlassian.com/git/tutorials/install-git
 #######################################
 
+
 ## Detect the folder in which this file, requirements.sh, is located
 SCRIPT=$(readlink -f "$0") # Absolute path to this script
 SCRIPTPATH=$(dirname "$SCRIPT") # Absolute path this script is in
-echo "$SCRIPTPATH"
 
 ## Detect Operating System
 ## TODO: only works for Linux and Mac
