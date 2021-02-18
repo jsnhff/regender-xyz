@@ -20,7 +20,7 @@ ToC:
 1. Install the needed OS- and python- packages
 
 ```sh
-python3 install -r requirements.txt # installs all Python-related dependencies
+pip3 install --upgrade --force-reinstall -r requirements.txt # installs all Python-related dependencies
 sh requirements.sh # installs GIT on Linux/MAC
 
 git --version # check if you have git isntalled
@@ -92,10 +92,10 @@ Link with installation insturctuons found [here](https://github.com/huggingface/
 
 ## How to run <a name="run"></a>
 
-The main files which needs to be run in names `coreference_resolution.py` located in the `code` folder. To execute it, run the command below from the root git folder:
+The main files which needs to be run in names `regender_main.py` located in the `code` folder. To execute it, run the command below from the root git folder:
 
 ```sh
-python3 code/coreference_resoluton.py
+python3 code/regender_main.py
 ```
 
 **Note**: make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️ as is. 
@@ -132,19 +132,26 @@ This is how it works for now -> whenever we start working with a new text, we cr
 The `config.ini` file is ready to support the rengendering of a new piece of text. 
 
 
+**Notable Mention**
+
+One-time Gdrive Authentication
+
+`The authentication flow has completed. You may close this window.`
+
+
 #### b. reflect config.ini changes in the code <a name="code-changes"></a>
 
 
-We need make 1 change in the code in the file `coreference_resolution.py` in the `code` folder.
+We need make 1 change in the code in the file `regender_main.py` in the `code` folder.
 
-We need to copy the string (`text_id`) which we have defined in `config.ini` and replace what is shown highlighted in `coreference_resolution.py`  the image below.
+We need to copy the string (`text_id`) which we have defined in `config.ini` and replace what is shown highlighted in `regender_main.py`  the image below.
 
 ![Change the code](https://github.com/estambolieva/regendered-books/raw/master/imgs/change_coreference_resolution_py.png)
 
 When this is done, we are ready to regender. Run:
 
 ```sh
-python3 code/coreference_resoluton.py
+python3 code/regender_main.py
 ```
 
 The regendered text is written in a file in the `output` folder (no worries, the `requirements.sh` script you ran when doing the installation and setup has already created it in the root git folder) with a name which consists of:
