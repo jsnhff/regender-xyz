@@ -1,6 +1,6 @@
 import configparser # to read the variable values from the config file
 import neuralcoref
-import subprocess, os
+import subprocess, os, random
 
 # get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
@@ -148,7 +148,7 @@ def find_all_protagonist_coreferences(doc, gendered_pronouns):
 
     return reference_dict
 
-def regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
+def regender_outside_quotes(book_title, word, dep_tag, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
     if (i not in reference_dict):
         regendered_paragraph += word
         # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
@@ -162,7 +162,7 @@ def regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, i
         replacement = find_the_best_replacement_word(word, dep_tag, is_female)
 
         if replacement != None:  # error handling
-            replacement += ", ID " + str(unique_id) + ","  # printing the unique ID of the coreference for clarity
+            replacement += ", ID " + str(random.randint(1000, 9999)) + ","  # printing the unique ID of the coreference for clarity
         if word == protagonist:
             # print('YESSSS, we are replacing the actual name of the protagonist')
             PROTAGONIST_REPLACEMENT_NAME = config.get(book_title, 'PROTAGONIST_REPLACEMENT_NAME')
@@ -174,7 +174,7 @@ def regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, i
 
     return i, regendered_paragraph
 
-def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, reference_dict):
+def regender_paragraph(book_title, doc, protagonist, is_female, reference_dict):
 
     # boolean helper variables
     inside_dialog = False
@@ -196,7 +196,7 @@ def regender_paragraph(book_title, doc, protagonist, is_female, unique_id, refer
             regendered_paragraph += ' '
         else:
             # HERE IS WHERE THE REGENDERING MAGIC HAPPENS
-            i, regendered_paragraph = regender_outside_quotes(book_title, word, dep_tag, unique_id, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
+            i, regendered_paragraph = regender_outside_quotes(book_title, word, dep_tag, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
             # END: HERE IS WHERE THE REGENDERING MAGIC HAPPENS
 
         # check if we are not finishing a quotation

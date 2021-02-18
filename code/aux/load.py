@@ -48,8 +48,14 @@ def load_exceprt_data(text_id):
         protagonist = excerpts.loc[SHEET_LINE].Character
         gender = excerpts.loc[SHEET_LINE].Gender
     else:
-        gdown.download(TEXT_FILE, root_dir + os.sep + 'data' + os.sep + text_id + '.txt', quiet=False)
-        #TODO: read text
+        local_file = root_dir + os.sep + 'data' + os.sep + text_id + '.txt'
+        if not os.path.exists(local_file): # local_file DOES NOT exist, download
+            gdown.download(TEXT_FILE, local_file, quiet=False)
+        else:
+            print('This file', local_file, 'seems to has been downloaded. Skipping Gdrive download.')
+            print('\n')
+
+        text = None # we stream the reading of the txt file by reading a paragraph at a time
         protagonist = config.get(text_id, 'PROTAGONIST_NAME')
         gender = config.get(text_id, 'PROTAGONIST_GENDER')
 
