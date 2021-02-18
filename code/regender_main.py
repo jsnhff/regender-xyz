@@ -5,6 +5,7 @@ import subprocess, os
 
 from aux.nlp_helper import add_character_as_a_named_entity
 from aux.load import load_spacy_neuralcoref, load_exceprt_data # load auxiliary functions to load NLP libraries & data
+from classes.Protagonist import Protagonist
 from aux.regender_logic import regender_logic, save_regendered_paragraph
 
 # get the GIT root folder, e.g. the root folder of the project
@@ -41,17 +42,15 @@ nlp, ruler = load_spacy_neuralcoref()
 # for the Sound and Fury -> thesoundandfury
 ### END
 text_id = 'prideandprejudice'
-text, protagonist, gender, is_female, gendered_pronouns = load_exceprt_data(text_id)
+text, protagonist_name, gender, is_female, gendered_pronouns = load_exceprt_data(text_id)
 
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_id, 'PROTAGONIST_REPLACEMENT_NAME')
 OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_id, 'OTHER_CHARACTER_SAME_NAME_CHANGE')
 CHARACTER = config.get(text_id, 'CHARACTER_1')
 output_file = root_dir + os.sep + OUTPUT_FOLDER + os.sep + text_id + "_regendered.txt"
 
-PROTAGONIST_REPLACEMENT_NAME = config.get(text_id, 'PROTAGONIST_REPLACEMENT_NAME')
-OTHER_CHARACTER_SAME_NAME_CHANGE = config.get(text_id, 'OTHER_CHARACTER_SAME_NAME_CHANGE')
-CHARACTER = config.get(text_id, 'CHARACTER_1')
-output_file = root_dir + os.sep + OUTPUT_FOLDER + os.sep + text_id + "_regendered.txt"
+protagonist = Protagonist(protagonist_name, is_female, gendered_pronouns, PROTAGONIST_REPLACEMENT_NAME, CHARACTER,
+                 OTHER_CHARACTER_SAME_NAME_CHANGE, text_id)
 
 # Creates an empty file as  output_file
 with open(output_file, 'w') as fp:
@@ -68,7 +67,7 @@ if text == None: # we are reading from a txt file -> the text tpo regender is lo
         i = 0
         content = paragraphs_file.readlines()
         for paragraph in content:
-            regendered_paragraph = regender_logic(nlp, paragraph, protagonist, CHARACTER, PROTAGONIST_REPLACEMENT_NAME, OTHER_CHARACTER_SAME_NAME_CHANGE, text_id, is_female, gendered_pronouns)
+            regendered_paragraph = regender_logic(nlp, paragraph, protagonist)
             save_regendered_paragraph(regendered_paragraph, output_file)
             para_count += 1
 else: # we are reading text exceprts from an Excel sheet
@@ -78,6 +77,6 @@ else: # we are reading text exceprts from an Excel sheet
     print("-------")
 
     for paragraph in paragraphs:
-        regendered_paragraph = regender_logic(nlp, paragraph, protagonist, CHARACTER, PROTAGONIST_REPLACEMENT_NAME, OTHER_CHARACTER_SAME_NAME_CHANGE, text_id, is_female, gendered_pronouns)
+        regendered_paragraph = regender_logic(nlp, paragraph, protagonist)
         save_regendered_paragraph(regendered_paragraph, output_file)
         para_count += 1

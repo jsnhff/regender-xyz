@@ -7,11 +7,12 @@ class Protagonist:
     gendered_pronouns = []
     replacement_name = None
     # OTHER CHARACTER properties
+    character_1 = None
     other_character_replacement_name = None # use when regendering Mrs. Bennet makes her into Mr. Bennet who is already in the book
     # BOOK properties
     text_id = None
 
-    def __init__(self, name, is_female, gendered_pronouns, replacement_name, other_character_replacement_name, text_id):
+    def __init__(self, name, is_female, gendered_pronouns, replacement_name, character_1, other_character_replacement_name, text_id):
         self.name = name
         self.is_female = is_female
         self.gendered_pronouns = gendered_pronouns
@@ -66,3 +67,11 @@ class Protagonist:
     # sets the replacement name of an existing character in the book, whose name clashes with the protagonist's replacement name
     def set_other_character_replacement_name(self, other_character_replacement_name):
         self.other_character_replacement_name = other_character_replacement_name
+
+    # gets the name of another very prominent character in the text/book, whose name might cause coreference problems
+    def get_character_1(self):
+        return self.character_1
+
+    # sets the name of another very prominent character in the text/book, whose name might cause coreference problems
+    def set_character_1(self, character_1):
+        self.character_1 = character_1

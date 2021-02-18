@@ -74,8 +74,12 @@ def add_character_as_a_named_entity(nlp, protagonist, ruler):
     return ruler
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
-def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns, additional_character):
-    protagonist_cluster = select_protagonist_cluster(doc, protagonist)
+def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, additional_character):
+    protagonist_name = protagonist.get_name()
+    is_female = protagonist.get_is_female()
+    gendered_pronouns = protagonist.get_gendered_pronouns()
+
+    protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
 
     # because of Beloved
     # what happens when there is no cluster which is headed by the protagonist's name
@@ -84,7 +88,7 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
         # add conversion dictionary to neuralcoref TO ADD RARE WORDS
         nlp.remove_pipe("neuralcoref")
         conv_dict = {}
-        conv_dict = add_convertion_dictionary_entry(conv_dict, protagonist, is_female, 'protagonist')
+        conv_dict = add_convertion_dictionary_entry(conv_dict, protagonist_name, is_female, 'protagonist')
         if additional_character != None:
             # N.B. adding rare words ONLY WORKS FOR SINGLE WORDS - Phyllis, and not group words, e.g. Aunt Phyllis.
             # N.B. keep a look at the documentation for any changes -> https://github.com/huggingface/neuralcoref
@@ -92,7 +96,7 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
         neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
         doc = nlp(paragraph)
 
-        protagonist_cluster = select_protagonist_cluster(doc, protagonist)
+        protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
 
 
         # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
@@ -107,13 +111,13 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_fe
 
     return doc
 
-def select_protagonist_cluster(doc, protagonist):
+def select_protagonist_cluster(doc, protagonist_name):
     protagonist_cluster = None
     for i in range(len(doc._.coref_clusters)):
         current_cluster = doc._.coref_clusters[i]
         cluster_text = doc._.coref_clusters[i].main.text
         cluster_text = doc._.coref_clusters[i].main.text
-        if cluster_text == protagonist:
+        if cluster_text == protagonist_name:
             protagonist_cluster = current_cluster
 
     return protagonist_cluster
@@ -148,7 +152,10 @@ def find_all_protagonist_coreferences(doc, gendered_pronouns):
 
     return reference_dict
 
-def regender_outside_quotes(book_title, word, dep_tag, protagonist, is_female, doc, i, reference_dict, regendered_paragraph):
+def regender_outside_quotes(book_title, word, dep_tag, protagonist, doc, i, reference_dict, regendered_paragraph):
+    protagonist_name = protagonist.get_name()
+    is_female = protagonist.get_is_female()
+
     if (i not in reference_dict):
         regendered_paragraph += word
         # if the word is one of those punctuations, remove the white space before it (e.g. the last character)
@@ -163,7 +170,7 @@ def regender_outside_quotes(book_title, word, dep_tag, protagonist, is_female, d
 
         if replacement != None:  # error handling
             replacement += ", ID " + str(random.randint(1000, 9999)) + ","  # printing the unique ID of the coreference for clarity
-        if word == protagonist:
+        if word == protagonist_name:
             # print('YESSSS, we are replacing the actual name of the protagonist')
             PROTAGONIST_REPLACEMENT_NAME = config.get(book_title, 'PROTAGONIST_REPLACEMENT_NAME')
             replacement = PROTAGONIST_REPLACEMENT_NAME
@@ -196,7 +203,7 @@ def regender_paragraph(book_title, doc, protagonist, is_female, reference_dict):
             regendered_paragraph += ' '
         else:
             # HERE IS WHERE THE REGENDERING MAGIC HAPPENS
-            i, regendered_paragraph = regender_outside_quotes(book_title, word, dep_tag, protagonist, is_female, doc, i, reference_dict, regendered_paragraph)
+            i, regendered_paragraph = regender_outside_quotes(book_title, word, dep_tag, protagonist, doc, i, reference_dict, regendered_paragraph)
             # END: HERE IS WHERE THE REGENDERING MAGIC HAPPENS
 
         # check if we are not finishing a quotation

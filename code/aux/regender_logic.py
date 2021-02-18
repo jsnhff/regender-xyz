@@ -2,20 +2,25 @@
 import bisect # used to insert an element in a sorted list
 import random # for the generation of the unique IDs while still keeping them easy to read by humans
 from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, find_word_indices_in_paragraph # load auxiliary functions to help regendering words,
+from classes.Protagonist import Protagonist
 
-
-def regender_logic(nlp, paragraph, protagonist, character, replacement_name, other_character_replacement_name, text_id, is_female, gendered_pronouns):
+def regender_logic(nlp, paragraph, protagonist):
 
     ###############################
     #### START PARAGRAPH LOGIC ####
     ###############################
 
     # count how many times we expect the protagonist's name to occur in the current paragraph
-    name_count = paragraph.count(protagonist)
+    name_count = paragraph.count(protagonist.get_name())
+
+    replacement_name = protagonist.get_replacement_name()
+    is_female = protagonist.get_is_female()
+    text_id = protagonist.get_text_id()
+    gendered_pronouns = protagonist.get_gendered_pronouns()
 
     if replacement_name in paragraph:
         # change the other character's name to something different
-        paragraph = paragraph.replace(replacement_name, other_character_replacement_name)
+        paragraph = paragraph.replace(replacement_name, protagonist.get_other_character_replacement_name())
 
     # find all coreferences of the protanogist in this paragraphs
     doc = nlp(paragraph)
@@ -33,9 +38,10 @@ def regender_logic(nlp, paragraph, protagonist, character, replacement_name, oth
     else:
         # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
         additional_character = None
+        character = protagonist.character_1
         if character != '': # in case no additional character name has been given in the config.ini file
             additional_character = character
-        doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, is_female, gendered_pronouns, additional_character)
+        doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, additional_character)
 
         protagonist_coreference_words, protagonist_coreference_indices = find_word_indices_in_paragraph(doc._.coref_clusters, False)
         print('Coreference clusters -> ', doc._.coref_clusters)
