@@ -1,6 +1,6 @@
 import configparser # to read the variable values from the config file
 import neuralcoref
-import subprocess, os, random
+import subprocess, os, random, bisect
 
 # get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
@@ -240,3 +240,86 @@ def find_word_indices_in_paragraph(entities, is_proper_names):
             words.append(entity.text)
             indices.append(entity.i)
     return words, indices
+
+# a. remove coreferences of other characters from the protagonist cluster - on first occurrence of a proper name after the proper name of the protagonist in a paragraph
+# b. remove coreferences from the different gender
+def correct_protagonist_cluster(doc, gendered_pronouns):
+
+    # find all non-protagonist proper names in the paragraph
+    paragraph_proper_names, paragraph_proper_name_indices = find_word_indices_in_paragraph(doc.ents, True)
+
+    protagonist_coreference_words, protagonist_coreference_indices = find_word_indices_in_paragraph(
+        doc._.coref_clusters, False)
+    print('Coreference clusters -> ', doc._.coref_clusters)
+    print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->",
+          paragraph_proper_name_indices)
+
+    reference_dict = get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreference_indices, paragraph_proper_name_indices)
+    return reference_dict
+
+
+# Pride & Prejudice paragraph 4 example
+# protagonist_coreference_indices [13, 23, 63, 68, 74, 82, 88, 93, 111, 119, 128]
+# paragraph_proper_names ['Bennet', 'Bingley', 'Bennet', 'Hertfordshire', 'Netherfield', 'Lucas', 'London', 'Bingley', 'London', 'Bingley'](JUST AS A REFERENCE)
+# paragraph_proper_name_indices [13, 36, 63, 85, 109, 117, 132, 150, 197, 223]
+def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreference_indices, paragraph_proper_name_indices):
+    # a. see how many times the protagonist's name is seen in this paragraph - e.g the intersection of the two indices lists
+    # b. split both indices lists on the elements of the intersection
+    # c. ToDo complete
+
+    # a. intersecton = {13, 63} which are the positions of the occurrence of Mrs. Bennet in the paragraph
+    # e.g. we know that after that we expect correferences related to Mrs. Bennet (until a new proper name is seen)
+    intersection = set(protagonist_coreference_indices).intersection(set(paragraph_proper_name_indices))
+
+    # b. split both indices lists on the elements of the intersection
+    # Result ->
+    # [13, 23] & [63, 68, 74, 82, 88, 93, 111, 119, 128]
+    # [13, 36] & [63, 85, 109, 117, 132, 150, 197, 223]
+    intersecion_indices = [i for i in range(len(protagonist_coreference_indices)) if protagonist_coreference_indices[i] in intersection] #- find the indices of intersection in the two indices lists
+    coreference_split_results = split_arr_on_multiple_indices(protagonist_coreference_indices, intersecion_indices) # - split the lists at these indices
+    protagonist_split_resuls = split_arr_on_multiple_indices(paragraph_proper_name_indices, intersecion_indices) # - split the lists at these indices
+    print(coreference_split_results)
+
+    # c. remove coreferences from the end of the sublists if needed (e.g. another proper name is seen)
+    reference_slicing = []
+    reference_dict = []
+    for j in range(len(intersecion_indices)):
+        # for every sublist with indices
+        current_coreference_index_list = coreference_split_results[j]
+        current_protagonist_index_list = protagonist_split_resuls[j]
+        next_proper_name_index = current_protagonist_index_list[1] # the protagonist name is at index 0, the next proper name is at index 1
+        index_to_stop_protagonist_coreferences = bisect.bisect_left(current_coreference_index_list,
+                                                                    next_proper_name_index)
+        reference_slicing = reference_slicing + current_coreference_index_list[0: index_to_stop_protagonist_coreferences]
+
+    # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
+    reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
+
+    print(reference_dict, reference_slicing)
+
+    # remove coreference which we think link to other proper names / not protagonist's ones
+    # e.g. remove dict keys which are not in the list
+    for key in list(reference_dict.keys()):
+        if key not in reference_slicing:
+            reference_dict.pop(key)
+    print(reference_dict)
+
+    return reference_dict
+
+# helper method
+def split_arr_on_multiple_indices(arr, indices):
+    split_result = []
+    start_index = 0
+    for i in indices:
+        end_index = i
+        current_split = arr[start_index: end_index]
+        if len(current_split) > 0:
+            split_result.append(current_split)
+        start_index = end_index
+
+    if len(arr[start_index:]) > 0:
+        split_result.append(arr[start_index:])
+
+    return split_result
+
+

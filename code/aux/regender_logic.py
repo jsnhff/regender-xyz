@@ -1,8 +1,7 @@
 # imports
 import bisect # used to insert an element in a sorted list
 import random # for the generation of the unique IDs while still keeping them easy to read by humans
-from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, find_word_indices_in_paragraph # load auxiliary functions to help regendering words,
-from classes.Protagonist import Protagonist
+from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, correct_protagonist_cluster # load auxiliary functions to help regendering words,
 
 def regender_logic(nlp, paragraph, protagonist):
 
@@ -29,9 +28,6 @@ def regender_logic(nlp, paragraph, protagonist):
 
     print(doc._.coref_clusters)
 
-    # find all non-protagonist proper names in the paragraph
-    paragraph_proper_names, paragraph_proper_name_indices = find_word_indices_in_paragraph(doc.ents, True)
-
     if has_found_corefs and name_count < 1: # ERROR HANDLING
         print('\nCAUTION: we have found co-references to the name of the main protagonist is this paragraph, where there should be any....')
         regendered_paragraph = paragraph
@@ -42,28 +38,7 @@ def regender_logic(nlp, paragraph, protagonist):
         if character != '': # in case no additional character name has been given in the config.ini file
             additional_character = character
         doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, additional_character)
-
-        protagonist_coreference_words, protagonist_coreference_indices = find_word_indices_in_paragraph(doc._.coref_clusters, False)
-        print('Coreference clusters -> ', doc._.coref_clusters)
-        print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->", paragraph_proper_name_indices)
-
-        # remove the protagonist index from the paragraph's proper name indices
-        paragraph_proper_name_indices = [x for x in paragraph_proper_name_indices if x not in protagonist_coreference_indices]
-        print('----------')
-
-        first_occurrence_next_proper_name = paragraph_proper_name_indices[0] # stop protagonist cluster here
-
-        index_to_stop_protagonist_coreferences = bisect.bisect_left(protagonist_coreference_indices, first_occurrence_next_proper_name)
-        paragraph_index_to_stop_protagonist_coreferences = protagonist_coreference_indices[index_to_stop_protagonist_coreferences]
-
-        # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
-        reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
-
-        # remove coreference which we think link to other proper names / not protagonist's ones
-        # e.g. remove dict keys which are not in the list
-        for key in list(reference_dict.keys()):
-            if key >= paragraph_index_to_stop_protagonist_coreferences:
-                reference_dict.pop(key)
+        reference_dict = correct_protagonist_cluster(doc, gendered_pronouns)
 
         print('\n\n')
         # regender paragraph
