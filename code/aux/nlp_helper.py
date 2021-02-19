@@ -181,7 +181,7 @@ def regender_outside_quotes(book_title, word, dep_tag, protagonist, doc, i, refe
 
     return i, regendered_paragraph
 
-def regender_paragraph(book_title, doc, protagonist, is_female, reference_dict):
+def regender_paragraph(book_title, doc, protagonist, reference_dict):
 
     # boolean helper variables
     inside_dialog = False
@@ -223,6 +223,11 @@ def regender_paragraph(book_title, doc, protagonist, is_female, reference_dict):
         # END here we mostly handle avoid manipulating text between quotation marks
 
         i += 1
+
+    # replace all the occurrences of the protagonist's name with the new regendered name
+    protagonist_name = protagonist.get_name()
+    protagonist_repl_name = protagonist.get_replacement_name()
+    regendered_paragraph = regendered_paragraph.replace(protagonist_name, protagonist_repl_name)
 
     return regendered_paragraph
 
@@ -278,7 +283,6 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
     intersecion_indices = [i for i in range(len(protagonist_coreference_indices)) if protagonist_coreference_indices[i] in intersection] #- find the indices of intersection in the two indices lists
     coreference_split_results = split_arr_on_multiple_indices(protagonist_coreference_indices, intersecion_indices) # - split the lists at these indices
     protagonist_split_resuls = split_arr_on_multiple_indices(paragraph_proper_name_indices, intersecion_indices) # - split the lists at these indices
-    print(coreference_split_results)
 
     # c. remove coreferences from the end of the sublists if needed (e.g. another proper name is seen)
     reference_slicing = []

@@ -42,7 +42,7 @@ def regender_logic(nlp, paragraph, protagonist):
 
         print('\n\n')
         # regender paragraph
-        regendered_paragraph = regender_paragraph(text_id, doc, protagonist, is_female, reference_dict)
+        regendered_paragraph = regender_paragraph(text_id, doc, protagonist, reference_dict)
 
     return regendered_paragraph
 
