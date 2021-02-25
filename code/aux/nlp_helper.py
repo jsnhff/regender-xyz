@@ -340,6 +340,9 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
                                                                         next_proper_name_index)
             reference_slicing = reference_slicing + current_coreference_index_list[0: index_to_stop_protagonist_coreferences]
 
+    if len(reference_slicing) == 0:
+        reference_slicing = current_coreference_index_list
+
     # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
     reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
 
