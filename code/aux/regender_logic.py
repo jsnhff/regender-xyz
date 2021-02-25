@@ -1,7 +1,7 @@
 # imports
 import bisect # used to insert an element in a sorted list
 import random # for the generation of the unique IDs while still keeping them easy to read by humans
-from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, correct_protagonist_cluster # load auxiliary functions to help regendering words,
+from aux.nlp_helper import find_the_best_replacement_word, add_character_as_a_named_entity, find_protagonist_coreference_cluster, find_all_protagonist_coreferences, regender_paragraph, correct_protagonist_cluster, find_all_word_indeices_inside_quotes # load auxiliary functions to help regendering words,
 
 def regender_logic(nlp, paragraph, protagonist):
 
@@ -38,7 +38,8 @@ def regender_logic(nlp, paragraph, protagonist):
         if character != '': # in case no additional character name has been given in the config.ini file
             additional_character = character
         doc = find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, additional_character)
-        reference_dict = correct_protagonist_cluster(doc, gendered_pronouns)
+        quotes_dict = find_all_word_indeices_inside_quotes(doc)
+        reference_dict = correct_protagonist_cluster(doc, gendered_pronouns, quotes_dict)
 
         print('\n\n')
         # regender paragraph

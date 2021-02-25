@@ -1,6 +1,6 @@
 import configparser # to read the variable values from the config file
 import neuralcoref
-import subprocess, os, random, bisect
+import subprocess, os, random, bisect, math
 
 # get the GIT root folder, e.g. the root folder of the project
 root_dir = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True).stdout.decode('utf-8').rstrip()
@@ -93,11 +93,11 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, addit
             # N.B. adding rare words ONLY WORKS FOR SINGLE WORDS - Phyllis, and not group words, e.g. Aunt Phyllis.
             # N.B. keep a look at the documentation for any changes -> https://github.com/huggingface/neuralcoref
             conv_dict = add_convertion_dictionary_entry(conv_dict, additional_character, is_female, 'character')
+        # nlp.get_pipe('neuralcoref').set_conv_dict(conv_dict)
         neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
         doc = nlp(paragraph)
 
         protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
-
 
         # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
         for i in range(len(doc._.coref_clusters)):
@@ -108,6 +108,8 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, addit
 
     # overwrite the co-reference cluster with only the one of the protagonist
     doc._.coref_clusters = protagonist_cluster
+
+    print('updated coreference cluster .....', doc._.coref_clusters)
 
     return doc
 
@@ -248,20 +250,61 @@ def find_word_indices_in_paragraph(entities, is_proper_names):
 
 # a. remove coreferences of other characters from the protagonist cluster - on first occurrence of a proper name after the proper name of the protagonist in a paragraph
 # b. remove coreferences from the different gender
-def correct_protagonist_cluster(doc, gendered_pronouns):
+def correct_protagonist_cluster(doc, gendered_pronouns, quotes_index_dict):
 
     # find all non-protagonist proper names in the paragraph
     paragraph_proper_names, paragraph_proper_name_indices = find_word_indices_in_paragraph(doc.ents, True)
-
+    paragraph_proper_name_indices = remove_proper_names_between_quotes(paragraph_proper_name_indices, quotes_index_dict)
     protagonist_coreference_words, protagonist_coreference_indices = find_word_indices_in_paragraph(
         doc._.coref_clusters, False)
-    print('Coreference clusters -> ', doc._.coref_clusters)
     print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->",
           paragraph_proper_name_indices)
 
     reference_dict = get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreference_indices, paragraph_proper_name_indices)
     return reference_dict
 
+# the proper names we have identified and which are between quotes -
+# e.g. someone's speaking, should not interrupt the protagonist's cluster
+def remove_proper_names_between_quotes(paragraph_proper_name_indices, quotes_index_dict):
+    indices_to_remove = []
+    for start_index in quotes_index_dict.keys():
+        end_index = quotes_index_dict[start_index]
+        indices_to_remove = indices_to_remove + list(range(math.ceil(start_index), math.floor(end_index) + 1))
+
+    paragraph_proper_name_indices = list(set(paragraph_proper_name_indices) - set(indices_to_remove))
+    return paragraph_proper_name_indices
+
+# finds all pairs of indices - key (the beginning of the quote) & value (the end of the quote)
+#ToDO: this introduces a second pass over each and evry paragraph - not elegant. We can do better
+def find_all_word_indeices_inside_quotes(doc):
+    quotes_index_dict = {}
+    start_index = None
+    end_index = None
+    inside_dialog = False
+    outside_dialog = True
+    # iterate over all spacy spans in the paragraph AND FIND THE INDICES OF ALL OPENING/CLOSING QUOTES
+    i = 0
+    while i < len(doc):
+        word = doc[i].text
+        word_index = doc[i].i
+        # check if we are not finishing a quotation
+        if word in CLOSING_QUOTES and inside_dialog:
+            inside_dialog = False
+            outside_dialog = True
+            end_index = word_index
+            quotes_index_dict[start_index] = end_index
+            start_index = None
+            end_index = None
+
+        # check if we are not starting a quotation
+        if word in OPENING_QUOTES and outside_dialog:
+            inside_dialog = True
+            start_index = word_index
+            outside_dialog = False
+
+        i += 1
+
+    return quotes_index_dict
 
 # Pride & Prejudice paragraph 4 example
 # protagonist_coreference_indices [13, 23, 63, 68, 74, 82, 88, 93, 111, 119, 128]
@@ -291,10 +334,11 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
         # for every sublist with indices
         current_coreference_index_list = coreference_split_results[j]
         current_protagonist_index_list = protagonist_split_resuls[j]
-        next_proper_name_index = current_protagonist_index_list[1] # the protagonist name is at index 0, the next proper name is at index 1
-        index_to_stop_protagonist_coreferences = bisect.bisect_left(current_coreference_index_list,
-                                                                    next_proper_name_index)
-        reference_slicing = reference_slicing + current_coreference_index_list[0: index_to_stop_protagonist_coreferences]
+        if len(current_protagonist_index_list) > 1:
+            next_proper_name_index = current_protagonist_index_list[1] # the protagonist name is at index 0, the next proper name is at index 1
+            index_to_stop_protagonist_coreferences = bisect.bisect_left(current_coreference_index_list,
+                                                                        next_proper_name_index)
+            reference_slicing = reference_slicing + current_coreference_index_list[0: index_to_stop_protagonist_coreferences]
 
     # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
     reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
