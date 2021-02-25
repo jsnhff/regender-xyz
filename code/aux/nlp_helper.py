@@ -246,6 +246,8 @@ def find_word_indices_in_paragraph(entities, is_proper_names):
         else:
             words.append(entity.text)
             indices.append(entity.i)
+
+    print('--------------------------', words, indices)
     return words, indices
 
 # a. remove coreferences of other characters from the protagonist cluster - on first occurrence of a proper name after the proper name of the protagonist in a paragraph
@@ -259,6 +261,7 @@ def correct_protagonist_cluster(doc, gendered_pronouns, quotes_index_dict):
         doc._.coref_clusters, False)
     print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->",
           paragraph_proper_name_indices)
+    print('Quotessssss dict', quotes_index_dict)
 
     reference_dict = get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreference_indices, paragraph_proper_name_indices)
     return reference_dict
@@ -272,6 +275,7 @@ def remove_proper_names_between_quotes(paragraph_proper_name_indices, quotes_ind
         indices_to_remove = indices_to_remove + list(range(math.ceil(start_index), math.floor(end_index) + 1))
 
     paragraph_proper_name_indices = list(set(paragraph_proper_name_indices) - set(indices_to_remove))
+    paragraph_proper_name_indices = sorted(paragraph_proper_name_indices)
     return paragraph_proper_name_indices
 
 # finds all pairs of indices - key (the beginning of the quote) & value (the end of the quote)
@@ -346,14 +350,11 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
     # clean the protagonist's coreference cluster -> e.g when the protagonist is a woman but we have coreferences such as 'he' and 'him'
     reference_dict = find_all_protagonist_coreferences(doc, gendered_pronouns)
 
-    print(reference_dict, reference_slicing)
-
     # remove coreference which we think link to other proper names / not protagonist's ones
     # e.g. remove dict keys which are not in the list
     for key in list(reference_dict.keys()):
         if key not in reference_slicing:
             reference_dict.pop(key)
-    print(reference_dict)
 
     return reference_dict
 
