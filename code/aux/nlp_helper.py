@@ -75,41 +75,43 @@ def add_character_as_a_named_entity(nlp, protagonist, ruler):
 
 # iterate over the co-reference CLUSTERS found and SELECT ONLY the one with the name of the protagonist
 def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, additional_character):
-    protagonist_name = protagonist.get_name()
-    is_female = protagonist.get_is_female()
-    gendered_pronouns = protagonist.get_gendered_pronouns()
 
-    protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
-
-    # because of Beloved
-    # what happens when there is no cluster which is headed by the protagonist's name
-    if protagonist_cluster == None:
-
-        # add conversion dictionary to neuralcoref TO ADD RARE WORDS
-        nlp.remove_pipe("neuralcoref")
-        conv_dict = {}
-        conv_dict = add_convertion_dictionary_entry(conv_dict, protagonist_name, is_female, 'protagonist')
-        if additional_character != None:
-            # N.B. adding rare words ONLY WORKS FOR SINGLE WORDS - Phyllis, and not group words, e.g. Aunt Phyllis.
-            # N.B. keep a look at the documentation for any changes -> https://github.com/huggingface/neuralcoref
-            conv_dict = add_convertion_dictionary_entry(conv_dict, additional_character, is_female, 'character')
-        # nlp.get_pipe('neuralcoref').set_conv_dict(conv_dict)
-        neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
-        doc = nlp(paragraph)
+    if len(doc._.coref_clusters) > 0: # sometimes there are no entities and proper names in the paragraphs
+        protagonist_name = protagonist.get_name()
+        is_female = protagonist.get_is_female()
+        gendered_pronouns = protagonist.get_gendered_pronouns()
 
         protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
 
-        # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
-        for i in range(len(doc._.coref_clusters)):
-            current_cluster_mentions = doc._.coref_clusters[i].mentions
-            cluster_text = doc._.coref_clusters[i].main.text
-            if any(map(cluster_text.__contains__, gendered_pronouns)):
-                protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
+        # because of Beloved
+        # what happens when there is no cluster which is headed by the protagonist's name
+        if protagonist_cluster == None:
 
-    # overwrite the co-reference cluster with only the one of the protagonist
-    doc._.coref_clusters = protagonist_cluster
+            # add conversion dictionary to neuralcoref TO ADD RARE WORDS
+            nlp.remove_pipe("neuralcoref")
+            conv_dict = {}
+            conv_dict = add_convertion_dictionary_entry(conv_dict, protagonist_name, is_female, 'protagonist')
+            if additional_character != None:
+                # N.B. adding rare words ONLY WORKS FOR SINGLE WORDS - Phyllis, and not group words, e.g. Aunt Phyllis.
+                # N.B. keep a look at the documentation for any changes -> https://github.com/huggingface/neuralcoref
+                conv_dict = add_convertion_dictionary_entry(conv_dict, additional_character, is_female, 'character')
+            # nlp.get_pipe('neuralcoref').set_conv_dict(conv_dict)
+            neuralcoref.add_to_pipe(nlp, conv_dict=conv_dict)
+            doc = nlp(paragraph)
 
-    print('updated coreference cluster .....', doc._.coref_clusters)
+            protagonist_cluster = select_protagonist_cluster(doc, protagonist_name)
+
+            # enrich the coreferences of freshly added rare word cluster -> protagonist_cluster.mentions
+            for i in range(len(doc._.coref_clusters)):
+                current_cluster_mentions = doc._.coref_clusters[i].mentions
+                cluster_text = doc._.coref_clusters[i].main.text
+                if any(map(cluster_text.__contains__, gendered_pronouns)):
+                    protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
+
+        # overwrite the co-reference cluster with only the one of the protagonist
+        doc._.coref_clusters = protagonist_cluster
+
+        print('updated coreference cluster .....', doc._.coref_clusters)
 
     return doc
 
@@ -237,15 +239,16 @@ def regender_paragraph(book_title, doc, protagonist, reference_dict):
 def find_word_indices_in_paragraph(entities, is_proper_names):
     words = []
     indices = []
-    for entity in entities:
-        entity = entity[-1]
-        if is_proper_names:
-            if entity.pos_ == 'PROPN': # PROPN == proper name
+    if entities != None:
+        for entity in entities:
+            entity = entity[-1]
+            if is_proper_names:
+                if entity.pos_ == 'PROPN': # PROPN == proper name
+                    words.append(entity.text)
+                    indices.append(entity.i)
+            else:
                 words.append(entity.text)
                 indices.append(entity.i)
-        else:
-            words.append(entity.text)
-            indices.append(entity.i)
 
     print('--------------------------', words, indices)
     return words, indices
@@ -261,7 +264,6 @@ def correct_protagonist_cluster(doc, gendered_pronouns, quotes_index_dict):
         doc._.coref_clusters, False)
     print(protagonist_coreference_indices, paragraph_proper_names, "Proper Name Indices ->",
           paragraph_proper_name_indices)
-    print('Quotessssss dict', quotes_index_dict)
 
     reference_dict = get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreference_indices, paragraph_proper_name_indices)
     return reference_dict
@@ -334,6 +336,7 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
     # c. remove coreferences from the end of the sublists if needed (e.g. another proper name is seen)
     reference_slicing = []
     reference_dict = []
+    current_coreference_index_list = []
     for j in range(len(intersecion_indices)):
         # for every sublist with indices
         current_coreference_index_list = coreference_split_results[j]
