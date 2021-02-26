@@ -41,7 +41,7 @@ nlp, ruler = load_spacy_neuralcoref()
 # for Rabbit Run -> rabbitrun
 # for the Sound and Fury -> thesoundandfury
 ### END
-text_id = 'thesoundandfury'
+text_id = 'harrypotter'
 text, protagonist_name, gender, is_female, gendered_pronouns = load_exceprt_data(text_id)
 
 PROTAGONIST_REPLACEMENT_NAME = config.get(text_id, 'PROTAGONIST_REPLACEMENT_NAME')
@@ -67,9 +67,16 @@ if text == None: # we are reading from a txt file -> the text tpo regender is lo
         i = 0
         content = paragraphs_file.readlines()
         for paragraph in content:
-            regendered_paragraph = regender_logic(nlp, paragraph, protagonist)
-            save_regendered_paragraph(regendered_paragraph, output_file)
+            if paragraph != "\n": # e.g. it is NOT just an empty line, continue
+                print('Paragraph Content', paragraph, (paragraph == "\n"))
+                regendered_paragraph = regender_logic(nlp, paragraph, protagonist)
+                save_regendered_paragraph(regendered_paragraph, output_file)
+
+            else:
+                # write a new line to the output file
+                save_regendered_paragraph("\n", output_file)
             para_count += 1
+
 else: # we are reading text exceprts from an Excel sheet
     # a. split the excerpt into paragraphs when the char sequence \n\n is detected
     paragraphs = text.split('\n\n')

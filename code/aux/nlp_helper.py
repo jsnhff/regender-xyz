@@ -85,8 +85,7 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, addit
 
         # because of Beloved
         # what happens when there is no cluster which is headed by the protagonist's name
-        if protagonist_cluster == None:
-
+        if protagonist_cluster is None:
             # add conversion dictionary to neuralcoref TO ADD RARE WORDS
             nlp.remove_pipe("neuralcoref")
             conv_dict = {}
@@ -106,22 +105,25 @@ def find_protagonist_coreference_cluster(nlp, doc, paragraph, protagonist, addit
                 current_cluster_mentions = doc._.coref_clusters[i].mentions
                 cluster_text = doc._.coref_clusters[i].main.text
                 if any(map(cluster_text.__contains__, gendered_pronouns)):
-                    protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
+                    try:
+                        protagonist_cluster.mentions = protagonist_cluster.mentions + current_cluster_mentions
+                    except:
+                        print("There were NO mentions in the protagonist cluster. Something's wrong. Check manually.")
 
         # overwrite the co-reference cluster with only the one of the protagonist
         doc._.coref_clusters = protagonist_cluster
-
-        print('updated coreference cluster .....', doc._.coref_clusters)
 
     return doc
 
 def select_protagonist_cluster(doc, protagonist_name):
     protagonist_cluster = None
+
     for i in range(len(doc._.coref_clusters)):
         current_cluster = doc._.coref_clusters[i]
         cluster_text = doc._.coref_clusters[i].main.text
         cluster_text = doc._.coref_clusters[i].main.text
-        if cluster_text == protagonist_name:
+        # cluster_text.__contains__(protagonist_name) - when the protagonist's cluster main name is recognized as THREE-QUARTERS Harry
+        if cluster_text == protagonist_name or cluster_text.__contains__(protagonist_name):
             protagonist_cluster = current_cluster
 
     return protagonist_cluster
@@ -138,21 +140,22 @@ def add_convertion_dictionary_entry(conv_dict, protagonist, is_female, role):
 def find_all_protagonist_coreferences(doc, gendered_pronouns):
     reference_dict = {}
 
-    for i in range(len(doc._.coref_clusters)):
-        current_coreference = doc._.coref_clusters[i]
-        # sometimes we need to exclude some of the pronoun coreferences - when they are not of the same gender as the protagonist
-        # we do this by getting all coreferences of length 1 (e.g. one-word ones) which are pronouns and comparing their gender to the gender of the protagonist
-        if len(current_coreference) == 1 and current_coreference[0].tag_.startswith('PRP'):
-            # check the gender
-            if current_coreference[0].text.lower() in gendered_pronouns:
+    if doc._.coref_clusters is not None:
+        for i in range(len(doc._.coref_clusters)):
+            current_coreference = doc._.coref_clusters[i]
+            # sometimes we need to exclude some of the pronoun coreferences - when they are not of the same gender as the protagonist
+            # we do this by getting all coreferences of length 1 (e.g. one-word ones) which are pronouns and comparing their gender to the gender of the protagonist
+            if len(current_coreference) == 1 and current_coreference[0].tag_.startswith('PRP'):
+                # check the gender
+                if current_coreference[0].text.lower() in gendered_pronouns:
+                    start_span_index = current_coreference.start
+                    end_span_index = current_coreference.end
+                    reference_dict[start_span_index] = end_span_index
+
+            else:
                 start_span_index = current_coreference.start
                 end_span_index = current_coreference.end
                 reference_dict[start_span_index] = end_span_index
-
-        else:
-            start_span_index = current_coreference.start
-            end_span_index = current_coreference.end
-            reference_dict[start_span_index] = end_span_index
 
     return reference_dict
 
@@ -250,7 +253,6 @@ def find_word_indices_in_paragraph(entities, is_proper_names):
                 words.append(entity.text)
                 indices.append(entity.i)
 
-    print('--------------------------', words, indices)
     return words, indices
 
 # a. remove coreferences of other characters from the protagonist cluster - on first occurrence of a proper name after the proper name of the protagonist in a paragraph
@@ -337,6 +339,8 @@ def get_sub_correference_clusters(doc, gendered_pronouns, protagonist_coreferenc
     reference_slicing = []
     reference_dict = []
     current_coreference_index_list = []
+    print(len(intersecion_indices), len(coreference_split_results), len(protagonist_split_resuls))
+    print(intersecion_indices, coreference_split_results, protagonist_split_resuls)
     for j in range(len(intersecion_indices)):
         # for every sublist with indices
         current_coreference_index_list = coreference_split_results[j]
@@ -370,6 +374,8 @@ def split_arr_on_multiple_indices(arr, indices):
         current_split = arr[start_index: end_index]
         if len(current_split) > 0:
             split_result.append(current_split)
+        else:
+            split_result.append([]) # append an empty list
         start_index = end_index
 
     if len(arr[start_index:]) > 0:
