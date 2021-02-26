@@ -72,7 +72,7 @@ cd neuralcoref
 pip3 install -r requirements.txt
 pip3 install -e .
 pip3 uninstall spacy
-pip3 install spacy
+pip3 install spacyspacy==2.3.2
 python3 -m spacy download en
 ```
 
@@ -87,6 +87,8 @@ doc = nlp(u'My sister has a dog. She loves him.')
 doc._.has_coref         ## True
 doc._.coref_clusters    ## [My sister: [My sister, She], a dog: [a dog, him]]
 doc._.coref_resolved    ## 'My sister has a dog. My sister loves a dog.'
+
+exit()
 ```
 
 Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
