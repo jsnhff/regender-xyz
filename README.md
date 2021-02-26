@@ -20,8 +20,8 @@ ToC:
 1. Install the needed OS- and python- packages
 
 ```sh
-pip3 install --upgrade --force-reinstall -r requirements.txt # installs all Python-related dependencies
-sh requirements.sh # installs GIT on Linux/MAC
+sudo pip3 install --upgrade --force-reinstall -r requirements.txt # installs all Python-related dependencies
+sudo sh requirements.sh # installs GIT on Linux/MAC
 
 git --version # check if you have git isntalled
 > git version 2.XX.XX # OUTPUT if git is installed.If not, type in
@@ -62,23 +62,25 @@ pip3 install -r requrements.txt # install app Python dependencies (needed packag
 
 4. Install NeuralCoref from core & the correct associated version of Spacy with it
 
+- the normal `pip3` installation did not work. Thus we in
+
 ```sh
 cd .. # exit the root git directory (= github repo directory) before installing neuralcoref
-pip uninstall neuralcoref
+pip3 uninstall neuralcoref
 git clone https://github.com/huggingface/neuralcoref.git
 cd neuralcoref
-pip install -r requirements.txt
-pip install -e .
-pip uninstall spacy
-pip install spacy
-python -m spacy download en
+pip3 install -r requirements.txt
+pip3 install -e .
+pip3 uninstall spacy
+pip3 install spacy
+python3 -m spacy download en
 ```
 
 test it quickly (if you'd like) in a Python console to ensure that it works as expected:
 
 ```py
 import spacy
-nlp = spacy.load('en')
+nlp = spacy.load('en_core_web_sm')
 import neuralcoref      ## ignore RuntimeWarning(s)
 neuralcoref.add_to_pipe(nlp)
 doc = nlp(u'My sister has a dog. She loves him.')
