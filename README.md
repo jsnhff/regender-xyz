@@ -16,85 +16,102 @@
 
 ### Initial Setup & Installation <a name="initial-setup"></a>
 
-1. Open your terminal and get ready to use the command line 👾
+1. Open your terminal and get ready to use the command line for all the following steps 👾
 
-2. Install the required OS and Python packages
+2. Install the required libraries: Neuralcoref & spaCy 📚
 
-**Start by installing all Python-related dependencies.**
-You might see some 'WARNING' messages about script locations if your system has some of the required scrips already installed on your machine. You can ingore these or surpress them by appending --no-warn-script-location to the line below.
-```sh
-sudo pip3 install --upgrade --force-reinstall -r requirements.txt
-```
-
-Install GIT on Linux/MAC
-```sh
-sudo sh requirements.sh
-```
-Check if you have git isntalled
-```sh
-git --version
-```
-If git is installed you'll see this output on the command line
-```sh
-> git version 2.XX.XX
-```
-
-If you haven't installed pip you can find instructions [here](https://pip.pypa.io/en/stable/installing/)
-
-
-3. Clone the git repo to your local machine using your terminal's command line
+First let's uninstall any existing copies of Neuralcoref
 
 ```sh
-# Type this in your terminal's command line
-git clone https://github.com/estambolieva/regendered-books.git
-```
-
-Alternatively you can [download the `.zip` folder of the repo](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine
-
-
-4. Create a virtual environment to work on (in terminal) & install all needed packages
-
-In the root folder of the project "[user]/regender-xyz" create a virtual environment to use when working on the project. We'll install all the needed packages into this folder.
-
-```sh
-python3 -m venv nlp # creates the virtual enviornment
-```
-
-Every time you work on the project, activate this virtual environment as the first step after opening the terminal.:
-
-```sh
-source nlp/bin/activate
-```
-
-Before I activate the virtual environment, my terminal window prompt looks something like this: `katia@katias-laptop`, and like this - `(nlp)katia@katias-laptop` - after I activate the environment. The `(nlp)` shows me that the environment has been activated :+1:.
-
-**Only once**, install all required Python packages needed by executing
-
-```sh
-pip3 install -r requirements.txt # Install required Python dependencies for regender.xyz
-```
-
-5. Install NeuralCoref from core & the correct associated version of Spacy with it
-
-- the normal `pip3` installation did not work. Thus we in
-
-```sh
-cd .. # exit the root git directory (= github repo directory) before installing neuralcoref
 pip3 uninstall neuralcoref
+```
+Next, we'll use Git to clone the Neuralcoref repository and setup spaCy
+
+```sh
 git clone https://github.com/huggingface/neuralcoref.git
 cd neuralcoref
 pip3 install -r requirements.txt
 pip3 install -e .
 pip3 uninstall spacy
-pip3 install spacyspacy==2.3.2
+pip3 install spacy==2.3.2 # This version is copmatible with neuralcoref
+```
+Finally, we'll use python3 to download the latest english data model.
+
+```sh
 python3 -m spacy download en
 ```
 
-test it quickly (if you'd like) in a Python console to ensure that it works as expected:
+Great. The Neuralcoref and spaCy libraries are installed. Switch back to you root folder to get ready to setup the main regender-xyz software.
 
+```sh
+cd
+```
+
+3. Use Git to clone the regender-xyz repository to your local machine 💾
+
+```sh
+git clone https://github.com/jsnhff/regendered-xyz.git
+```
+
+*Alternatively you can [download the `.zip` folder of the repository](https://github.com/jsnhff/*regendered-xyz/archive/master.zip) and decompressing it in a location of your choice on your machine.*
+
+4. Install the required OS and Python packages 📦
+
+Move into the regneder-xyz directory.
+```sh
+cd regender-xyz
+```
+
+**Start by installing all Python-related dependencies for the project.**
+You might see some 'WARNING' messages about script locations if your system has some of the required scrips already installed on your machine. You can ingore these or surpress them by appending --no-warn-script-location to the line below.
+
+```sh
+pip3 install --user --upgrade --force-reinstall -r requirements.txt
+```
+*If you haven't installed pip you can find instructions [here](https://pip.pypa.io/en/stable/installing/)*
+
+**Update your systems packages and check for the latest installed version of Git**
+Katia created this helpful script.
+```sh
+sh requirements.sh
+```
+*Note: Right now this script only works for Linux and Mac systems. If it doesn't work for you please manually make sure your system is up-to-date, including git.*
+
+
+5. Create a virtual environment for your work (do the libraries for neuralcoref and spaCy need to be installed after the virtual environment is activated?)
+
+In the root folder of the project "[user]/regender-xyz" create a virtual environment to use when working on the project. We'll install all the needed packages into this folder.
+
+```sh
+python3 -m venv nlp
+```
+*This might take a second or two to complete.*
+
+
+**Activate your new virtual environment.**
+You'll need to do this each time you want to work on a regendering project.
+
+```sh
+source nlp/bin/activate
+```
+
+*You will know you've successfully activated the virtual environment when `(nlp)` appears at the beginning of your terminal's prompt. It will look something like this `(nlp)katia@katias-laptop`.*
+
+6. Test it quickly (if you'd like) in a Python console to ensure that it works as expected:
+
+First activate your virtual environment.
+```sh
+source nlp/bin/activate
+```
+Next open an Python console.
+```py
+python3
+```
+
+Test the script. We recommend pasting it line by line to catch errors and see results as each line runs.
 ```py
 import spacy
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('en')
 import neuralcoref      ## ignore RuntimeWarning(s)
 neuralcoref.add_to_pipe(nlp)
 doc = nlp(u'My sister has a dog. She loves him.')
@@ -107,6 +124,10 @@ exit()
 
 Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
 
+To leave the virtual environment type...
+```sh
+deactivate
+```
 
 ## Running the Software <a name="run"></a>
 
