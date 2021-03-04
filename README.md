@@ -21,8 +21,8 @@
 2. Install the required OS and Python packages
 
 
-*Install all Python-related dependencies.*
-/You might see some 'WARNING' messages about script locations if your system has some of the required scrips already installed on your machine. You can ingore these or surpress them by appending --no-warn-script-location to the line below./
+**Install all Python-related dependencies.**
+You might see some 'WARNING' messages about script locations if your system has some of the required scrips already installed on your machine. You can ingore these or surpress them by appending --no-warn-script-location to the line below.
 ```sh
 sudo pip3 install --upgrade --force-reinstall -r requirements.txt
 ```
