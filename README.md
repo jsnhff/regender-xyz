@@ -1,35 +1,49 @@
 # regender.xyz
 
 ## Table of Contents
-1. [Initial Set-up & Installation](#initial-setup)
-2. [How to run](#run)<br>
+1. [Initial Setup & Installation](#initial-setup)
+2. [Running the Software](#run)<br>
    a. [config.ini](#config)<br>
    b. [reflect config.ini changes in the code](#code-changes)
 3. [Approach](#approach)
-3. [Analysing a new piece of text](#continuing-work)
-4. [Progress - a.k.a What's been analysed so far](#progress)
-5. [Project Management](#management)
-4. [Libraries Used](#libraries)
-5. [Resources and References](#resources-and-references)
+4. [Analysing a new piece of text](#continuing-work)
+5. [Progress - a.k.a What's been analysed so far](#progress)
+6. [Project Management](#management)
+7. [Libraries Used](#libraries)
+8. [Resources and References](#resources-and-references)
 
 ---
 
-### Initial Set-up & Installation <a name="initial-setup"></a>
+### Initial Setup & Installation <a name="initial-setup"></a>
 
-1. Install the needed OS and Python packages
+1. Open your terminal and get ready to use the command line 👾
 
+2. Install the required OS and Python packages
+
+
+*Install all Python-related dependencies.*
+/You might see some 'WARNING' messages about script locations if your system has some of the required scrips already installed on your machine. You can ingore these or surpress them by appending --no-warn-script-location to the line below./
 ```sh
-sudo pip3 install --upgrade --force-reinstall -r requirements.txt # Installs all Python-related dependencies
-sudo sh requirements.sh # Installs GIT on Linux/MAC
+sudo pip3 install --upgrade --force-reinstall -r requirements.txt
+```
 
-git --version # Check if you have git isntalled
-
-# If git is installed you'll see this output on the command line
+Install GIT on Linux/MAC
+```sh
+sudo sh requirements.sh
+```
+Check if you have git isntalled
+```sh
+git --version
+```
+If git is installed you'll see this output on the command line
+```sh
 > git version 2.XX.XX
 ```
 
+If you haven't installed pip you can find instructions [here](https://pip.pypa.io/en/stable/installing/)
 
-2. Clone the git repo to your local machine using your terminal's command line
+
+3. Clone the git repo to your local machine using your terminal's command line
 
 ```sh
 # Type this in your terminal's command line
@@ -39,7 +53,7 @@ git clone https://github.com/estambolieva/regendered-books.git
 Alternatively you can [download the `.zip` folder of the repo](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine
 
 
-3. Create a virtual environment to work on (in terminal) & install all needed packages
+4. Create a virtual environment to work on (in terminal) & install all needed packages
 
 In the root folder of the project "[user]/regender-xyz" create a virtual environment to use when working on the project. We'll install all the needed packages into this folder.
 
@@ -61,7 +75,7 @@ Before I activate the virtual environment, my terminal window prompt looks somet
 pip3 install -r requirements.txt # Install required Python dependencies for regender.xyz
 ```
 
-4. Install NeuralCoref from core & the correct associated version of Spacy with it
+5. Install NeuralCoref from core & the correct associated version of Spacy with it
 
 - the normal `pip3` installation did not work. Thus we in
 
@@ -95,7 +109,7 @@ exit()
 Link with installation insturctuons found [here](https://github.com/huggingface/neuralcoref)
 
 
-## How to run <a name="run"></a>
+## Running the Software <a name="run"></a>
 
 The main files which needs to be run in names `regender_main.py` located in the `code` folder. To execute it, run the command below from the root git folder:
 
