@@ -16,35 +16,36 @@ OS=$(uname -s)
 ## a. Detected a linux system
 if [ $OS = "Linux" ]
 then
-  echo 'Detected a Linux system.. Following installation instructions for Linux systems.'
+  echo 'I detected a Linux system 🤖 Using apt to update your packages and install git...'
 
   ## Update packages and Upgrade system
-  echo 'Updating packages..'
+  echo 'Updating packages...'
   sudo apt-get update -y
   sudo apt autoremove
 
   ## Git ##
-  echo 'Installing Git..'
+  echo 'Installing Git...'
   sudo apt-get install git -y
 
   git --version
 fi
 
 
-## b. Detected a Mac
+## b. Detected a mac system
 if [ $OS = "Darwin" ]
 then
-  echo 'Detected a Mac..'
+  echo 'I detected a Mac system 🍎 Using brew to update your system and check for git...'
 
   ## Update packages and Upgrade system
-  echo 'Updating packages..'
+  echo 'Updating packages using brew update && upgrade. This might take a minute...'
   brew update && brew upgrade
 
-  echo 'Installing Git..'
+  echo 'Installing Git using brew install git. If you already have it it will know...'
   brew install git
 
   git --version
 fi
 
-## create the output folder in which we will write the files with regendered texts
+## Create the output folder in which we will write the files with regendered texts
+echo 'Creating an output folder in this directory for your regendering experiments...'
 mkdir $SCRIPTPATH/output
