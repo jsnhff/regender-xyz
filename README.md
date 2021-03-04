@@ -16,47 +16,49 @@
 
 ### Initial Set-up & Installation <a name="initial-setup"></a>
 
-1. Install the needed OS- and python- packages
+1. Install the needed OS and Python packages
 
 ```sh
-sudo pip3 install --upgrade --force-reinstall -r requirements.txt # installs all Python-related dependencies
-sudo sh requirements.sh # installs GIT on Linux/MAC
+sudo pip3 install --upgrade --force-reinstall -r requirements.txt # Installs all Python-related dependencies
+sudo sh requirements.sh # Installs GIT on Linux/MAC
 
-git --version # check if you have git isntalled
-> git version 2.XX.XX # OUTPUT if git is installed.If not, type in
+git --version # Check if you have git isntalled
+
+# If git is installed you'll see this output on the command line
+> git version 2.XX.XX
 ```
 
 
-2. Clone the git repo on your local machine by either:
-- downloading the `.zip` folder of the repo from [here](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine, OR
-- opening up the terminal, and using `git` - clone the project:
+2. Clone the git repo to your local machine using your terminal's command line
 
 ```sh
-
+# Type this in your terminal's command line
 git clone https://github.com/estambolieva/regendered-books.git
 ```
 
+Alternatively you can [download the `.zip` folder of the repo](https://github.com/estambolieva/regendered-books/archive/master.zip) and decompressing it in a location of your choice on your machine
 
-3. Create a virtual environment on which to work on (in terminal) & install all needed packages
 
-In the root folder of the project - create a virtual environment to use when working on the projects - on which we install all needed packages
+3. Create a virtual environment to work on (in terminal) & install all needed packages
+
+In the root folder of the project "[user]/regender-xyz" create a virtual environment to use when working on the project. We'll install all the needed packages into this folder.
 
 ```sh
 python3 -m venv nlp # creates the virtual enviornment
 ```
 
-a. every time you work on the project, activate this virtual environment as the first step after opening the terminal. 
+Every time you work on the project, activate this virtual environment as the first step after opening the terminal.:
 
 ```sh
 source nlp/bin/activate
 ```
 
-Before I activate the virtual environment, my terminal window prompt looks something like this: `katia@katias-laptop`, and like this - `(nlp)katia@katias-laptop` - after I activate the environment. The `(nlp)` shows me  that the environment has been activated :+1:.  
+Before I activate the virtual environment, my terminal window prompt looks something like this: `katia@katias-laptop`, and like this - `(nlp)katia@katias-laptop` - after I activate the environment. The `(nlp)` shows me that the environment has been activated :+1:.
 
-**Only once**, install all required pythong packages needed by executing
+**Only once**, install all required Python packages needed by executing
 
 ```sh
-pip3 install -r requrements.txt # install app Python dependencies (needed packages)
+pip3 install -r requirements.txt # Install required Python dependencies for regender.xyz
 ```
 
 4. Install NeuralCoref from core & the correct associated version of Spacy with it
@@ -101,7 +103,7 @@ The main files which needs to be run in names `regender_main.py` located in the 
 python3 code/regender_main.py
 ```
 
-**Note**: make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️ as is. 
+**Note**: Make sure you are running this from the root folder of the git project if you want to use the 1-liner above ⬆️ as is.
 
 
 This will execute the `regendering` logic to the selected text. Let's chat about how to select the text to regender.
@@ -183,7 +185,7 @@ We use Github as our code repository.
 
 ## Libraries <a name="libraries"></a>
 
-- [Spacy](https://spacy.io/) - as a general NLP tool
+- [Spacy](https://spacy.io/) - As a general NLP tool
 - [Neuralcoref](https://github.com/huggingface/neuralcoref) with Spacy - for coreference resolution
 - [xlrd](https://pypi.org/project/xlrd/) - to read experiment's data from Excel sheets
 
