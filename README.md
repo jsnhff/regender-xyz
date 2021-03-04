@@ -1,4 +1,4 @@
-# Regender Books
+# regender.xyz
 
 ToC:
 1. [Initial Set-up & Installation](#initial-setup)
