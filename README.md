@@ -48,7 +48,7 @@ python3 -m venv nlp # creates the virtual enviornment
 a. every time you work on the project, activate this virtual environment as the first step after opening the terminal. 
 
 ```sh
-souce nlp/bin/activate
+source nlp/bin/activate
 ```
 
 Before I activate the virtual environment, my terminal window prompt looks something like this: `katia@katias-laptop`, and like this - `(nlp)katia@katias-laptop` - after I activate the environment. The `(nlp)` shows me  that the environment has been activated :+1:.  
