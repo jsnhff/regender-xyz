@@ -1,6 +1,6 @@
 # regender.xyz
 
-ToC:
+## Table of Contents
 1. [Initial Set-up & Installation](#initial-setup)
 2. [How to run](#run)<br>
    a. [config.ini](#config)<br>
@@ -13,7 +13,6 @@ ToC:
 5. [Resources and References](#resources-and-references)
 
 ---
-
 
 ### Initial Set-up & Installation <a name="initial-setup"></a>
 
