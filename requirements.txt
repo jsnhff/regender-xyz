@@ -1,6 +1,0 @@
-pip
-pandas
-# spacy
-# neuralcoref
-xlrd==1.2.0 # to read Excel files (versions >= 2.0 like 2.0.1 support only XLS - not XLSX for example)
-gdown # to download shared Gdrive files
