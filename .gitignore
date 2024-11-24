@@ -1,0 +1,21 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment folder
+venv/
+.env/
+myenv/
+my_multi_agent_env/
+
+# IDE Config Files (optional)
+.vscode/
+.idea/
+
+# Python specific
+*.egg-info/
+.eggs/
+*.egg
+.DS_Store
+
