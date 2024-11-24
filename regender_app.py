@@ -13,6 +13,18 @@ import difflib  # To highlight changes between original and regendered text
 # Initial setup for OpenAI API - Replace 'YOUR_API_KEY' with your actual OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def check_openai_api_key():
+    try:
+        # Make a simple request to the OpenAI API to check if the API key is valid
+        openai.Model.list()
+        print("OpenAI API key is valid.")
+    except Exception as e:
+        print(f"Error: {e}")
+        print("OpenAI API key is invalid or there is an issue with the connection.")
+
+# Call the function to check the API key
+check_openai_api_key()
+
 def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, delay=5):
     """
     Function to interact with OpenAI's GPT-3.5 API using the chat endpoint.
@@ -21,7 +33,7 @@ def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, 
     attempt = 0
     while attempt < retries:
         try:
-            response = openai.ChatCompletion.create(
+            response = openai.Completion.create(
                 model=model,
                 messages=[
                     {"role": "user", "content": prompt}
@@ -29,16 +41,12 @@ def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, 
                 max_tokens=500,
                 temperature=temperature
             )
-            return response.choices[0].message['content'].strip()
+            return response.choices[0].message['content']
         except Exception as e:
             print(f"Error: {e}")
             attempt += 1
-            if attempt < retries:
-                print(f"Retrying in {delay} seconds... (Attempt {attempt + 1} of {retries})")
-                time.sleep(delay)
-            else:
-                print("Maximum retries reached. Please check your connection or API key and try again.")
-                return None
+            time.sleep(delay)
+    return None
 
 def detect_roles_gpt(input_text):
     """
@@ -48,7 +56,8 @@ def detect_roles_gpt(input_text):
     prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender."
     
     # Get the response from GPT-3.5
-    return get_gpt_response(prompt)
+    response = get_gpt_response(prompt)
+    return response
 
 def log_output(log_file_path, original_text, roles_info, confirmed_roles, regendered_text, highlighted_text=None):
     """
