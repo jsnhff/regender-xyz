@@ -1,0 +1,18 @@
+{
+    "1. Prince Leo": {
+        "role": "Son of King Harry",
+        "gender": "female"
+    },
+    "2. King Harry": {
+        "role": "Father of Prince Leo",
+        "gender": "Male"
+    },
+    "- Prince Leo": {
+        "role": "Son of King Harry, responsible for his father's life",
+        "gender": "female"
+    },
+    "- King Harry": {
+        "role": "Father of Prince Leo",
+        "gender": "female"
+    }
+}
