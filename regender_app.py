@@ -8,6 +8,13 @@ import os  # Importing os to access environment variables (like the API key)
 # Initial setup for OpenAI API - Replace 'YOUR_API_KEY' with your actual OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+def validate_api_key():
+    """
+    Function to validate the OpenAI API key.
+    """
+    if not openai.api_key:
+        raise ValueError("OpenAI API key is not set. Please set the 'OPENAI_API_KEY' environment variable.")
+
 def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7):
     """
     Function to interact with OpenAI's GPT-3.5 API using the chat endpoint.
@@ -74,6 +81,7 @@ def regender_text_gpt(input_text, target_gender="female"):
     return get_gpt_response(prompt)
 
 if __name__ == "__main__":
+    validate_api_key()
     # Sample story
     text = "Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding his steps. Shadows loomed, but he moved on, unafraid. As a brother and a son, he felt responsible. At the ancient oak, he placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing he’d found the way home."
     
