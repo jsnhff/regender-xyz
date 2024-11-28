@@ -87,8 +87,8 @@ if __name__ == "__main__":
     
     # Prompt for target gender after detecting roles
     target_gender = input("Enter the target gender (female/male): ").strip().lower()
-    if target_gender not in ["female", "male"]:
-        print("Invalid gender. Please enter 'female' or 'male'.")
+    if target_gender not in ["female", "male", "neutral"]:
+        print("Invalid gender. Please enter 'female', 'male', or 'neutral'.")
     else:
         regendered_text = regender_text_gpt(text, target_gender=target_gender)
         if regendered_text:
