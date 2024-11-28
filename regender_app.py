@@ -2,6 +2,7 @@ import os
 import time
 import difflib
 from openai import OpenAI
+from datetime import datetime
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -78,13 +79,22 @@ def highlight_changes(original_text, regendered_text):
     """
     return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
 
-def log_output(file_path, *args):
+def log_output(*args):
     """
-    Function to log the output to a file.
+    Function to log the output to a file with a unique name in the logs folder.
     """
+    # Create logs directory if it doesn't exist
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+
+    # Generate a unique filename using the current date and time
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join("logs", f"log_{timestamp}.txt")
+
+    # Write the output to the file with improved formatting and whitespace
     with open(file_path, 'w') as file:
         for arg in args:
-            file.write(str(arg) + "\n")
+            file.write(str(arg) + "\n\n")
 
 def create_highlighted_xml_log(file_path, highlighted_text):
     """
@@ -141,10 +151,10 @@ def main():
         print("Changes highlighted.")  # Debug print
 
         # Log the output to files
-        log_output("log.txt", input_text, roles_info, confirmed_roles, regendered_text)
-        print("Output logged to log.txt.")  # Debug print
+        log_output(input_text, roles_info, confirmed_roles, regendered_text)
+        print("Output logged to unique file in logs folder.")  # Debug print
         if highlighted_text:
-            log_output("highlighted_log.txt", input_text, roles_info, confirmed_roles, regendered_text, highlighted_text)
+            log_output(input_text, roles_info, confirmed_roles, regendered_text, highlighted_text)
             create_highlighted_xml_log("highlighted_log.xml", highlighted_text)
             print("Highlighted log created.")  # Debug print
 
