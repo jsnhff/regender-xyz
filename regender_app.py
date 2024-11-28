@@ -1,35 +1,45 @@
-# Multi-Agent Editor - Regendering Characters
-# Enhance the script to use OpenAI's GPT API for nuanced gender changes.
-# TODO:
-## 1. Fix where user input changes gender, needs to be after first snippet goes to GPT
-## 2. Add in roles cache that can open empty and get's reset each time the app runs
-## 3. Add openai key catch for errors
-## 4. Make story more complext to test additional characters with different genders
+import os
+import time
+import difflib
+from openai import OpenAI
 
-import openai
-import re
-import os  # Importing os to access environment variables (like the API key)
+# Initialize the OpenAI client with your API key
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-# Initial setup for OpenAI API - Replace 'YOUR_API_KEY' with your actual OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7):
-    """
-    Function to interact with OpenAI's GPT-3.5 API using the chat endpoint.
-    """
+def check_openai_api_key():
     try:
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=500,
-            temperature=temperature
-        )
-        return response.choices[0].message['content'].strip()
+        # Make a simple request to the OpenAI API to check if the API key is valid
+        client.models.list()
+        print("OpenAI API key is valid.")
     except Exception as e:
         print(f"Error: {e}")
-        return None
+        print("OpenAI API key is invalid or there is an issue with the connection.")
+
+# Call the function to check the API key
+check_openai_api_key()
+
+def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, delay=5):
+    """
+    Function to interact with OpenAI's GPT-3.5 API using the chat endpoint.
+    Includes retry mechanism for handling API errors.
+    """
+    attempt = 0
+    while attempt < retries:
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500,
+                temperature=temperature
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"Error: {e}")
+            attempt += 1
+            time.sleep(delay)
+    return "Error: Unable to get response after multiple attempts"
 
 def detect_roles_gpt(input_text):
     """
@@ -39,58 +49,104 @@ def detect_roles_gpt(input_text):
     prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender."
     
     # Get the response from GPT-3.5
-    return get_gpt_response(prompt)
+    response = get_gpt_response(prompt)
+    return response
 
-def regender_text_gpt(input_text, target_gender="female"):
+def regender_text_gpt(input_text, confirmed_roles, target_gender="female"):
     """
     Function to use GPT-3.5 for regendering the input text.
     """
-    # Detect roles and characters in the text (for better control and understanding of the changes)
+    # Create a prompt to instruct GPT to regender the text
+    prompt = f"""Regender the following text to {target_gender}:
+
+{input_text}
+
+Roles and genders:
+{confirmed_roles}
+{input_text}
+
+Roles and genders:
+{confirmed_roles}"""
+    
+    # Get the response from GPT-3.5
+    response = get_gpt_response(prompt)
+    return response
+
+def highlight_changes(original_text, regendered_text):
+    """
+    Function to highlight changes between original and regendered text.
+    """
+    return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
+
+def log_output(file_path, *args):
+    """
+    Function to log the output to a file.
+    """
+    with open(file_path, 'w') as file:
+        for arg in args:
+            file.write(str(arg) + "\n")
+
+def create_highlighted_xml_log(file_path, highlighted_text):
+    """
+    Function to create an XML log of highlighted changes.
+    """
+    # Placeholder for actual implementation
+    pass
+
+def load_input_text(file_path):
+    """
+    Function to load input text from a file.
+    """
+    with open(file_path, 'r') as file:
+        return file.read()
+
+def confirm_roles(roles_info):
+    """
+    Function to confirm roles and genders with the user.
+    """
+    roles = roles_info.splitlines()
+    confirmed_roles = []
+    for role in roles:
+        character, role_desc, gender = role.split(" - ")
+        print(f"Character: {character}, Role: {role_desc}, Current Gender: {gender}")
+        new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
+        if new_gender:
+            confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
+        else:
+            confirmed_roles.append(role)
+        print(f"Confirmed Roles so far: {confirmed_roles}")  # Debug print
+    return '\n'.join(confirmed_roles)
+
+def main():
+    # Load the input text from a file or user input
+    input_text = load_input_text("input.txt")
+    print("Input text loaded.")  # Debug print
+
+    # Detect roles and genders in the input text
     roles_info = detect_roles_gpt(input_text)
     if roles_info:
         print("Detected Roles and Genders:")
-        print(roles_info)  # Print detected roles and genders to help understand the context
+        print(roles_info)
 
-        # Allow the user to confirm or adjust the genders of characters
-        roles = roles_info.splitlines()
-        confirmed_roles = []
-        for role in roles:
-            character, role_desc, gender = role.split(" - ")
-            print(f"Character: {character}, Role: {role_desc}, Current Gender: {gender}")
-            new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
-            if new_gender:
-                confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
-            else:
-                confirmed_roles.append(role)
-        
-        print("\nConfirmed Roles and Genders:")
-        for confirmed_role in confirmed_roles:
-            print(confirmed_role)
-    
-    # Create a prompt to instruct GPT on how to change the gender of the text.
-    if target_gender == "female":
-        prompt = f"Rewrite the following text, changing all male characters to female, including roles, titles, and pronouns:\n\n{input_text}"
-    elif target_gender == "male":
-        prompt = f"Rewrite the following text, changing all female characters to male, including roles, titles, and pronouns:\n\n{input_text}"
-    else:
-        raise ValueError("Target gender must be 'female' or 'male'")
-    
-    # Get the response from GPT-3.5
-    return get_gpt_response(prompt)
+        # Confirm roles and genders with the user
+        confirmed_roles = confirm_roles(roles_info)
+        print("Roles confirmed.")  # Debug print
+
+        # Regender the text using GPT with confirmed roles
+        regendered_text = regender_text_gpt(input_text, confirmed_roles, target_gender="female")
+        print("Text regendered.")  # Debug print
+
+        # Highlight changes between original and regendered text
+        highlighted_text = highlight_changes(input_text, regendered_text) if regendered_text else None
+        print("Changes highlighted.")  # Debug print
+
+        # Log the output to files
+        log_output("log.txt", input_text, roles_info, confirmed_roles, regendered_text)
+        print("Output logged to log.txt.")  # Debug print
+        if highlighted_text:
+            log_output("highlighted_log.txt", input_text, roles_info, confirmed_roles, regendered_text, highlighted_text)
+            create_highlighted_xml_log("highlighted_log.xml", highlighted_text)
+            print("Highlighted log created.")  # Debug print
 
 if __name__ == "__main__":
-    # Sample story
-    text = "Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding his steps. Shadows loomed, but he moved on, unafraid. As a brother and a son, he felt responsible. At the ancient oak, he placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing he’d found the way home."
-    
-    # Detect roles in the text before regendering
-    detect_roles_gpt(text)
-    
-    # Prompt for target gender after detecting roles
-    target_gender = input("Enter the target gender (female/male): ").strip().lower()
-    if target_gender not in ["female", "male", "neutral"]:
-        print("Invalid gender. Please enter 'female', 'male', or 'neutral'.")
-    else:
-        regendered_text = regender_text_gpt(text, target_gender=target_gender)
-        if regendered_text:
-            print("Regendered Text:")
-            print(regendered_text)
+    main()
