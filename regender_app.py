@@ -1,5 +1,10 @@
 # Multi-Agent Editor - Regendering Characters
 # Enhance the script to use OpenAI's GPT API for nuanced gender changes.
+# TODO:
+## 1. Fix where user input changes gender, needs to be after first snippet goes to GPT
+## 2. Add in roles cache that can open empty and get's reset each time the app runs
+## 3. Add openai key catch for errors
+## 4. Make story more complext to test additional characters with different genders
 
 import openai
 import re
@@ -80,7 +85,7 @@ if __name__ == "__main__":
     # Detect roles in the text before regendering
     detect_roles_gpt(text)
     
-    # Regender the text to female using GPT
+    # Prompt for target gender after detecting roles
     target_gender = input("Enter the target gender (female/male): ").strip().lower()
     if target_gender not in ["female", "male"]:
         print("Invalid gender. Please enter 'female' or 'male'.")
@@ -89,6 +94,3 @@ if __name__ == "__main__":
         if regendered_text:
             print("Regendered Text:")
             print(regendered_text)
-    # if regendered_text:
-    #     print("Regendered Text:")
-    #     print(regendered_text)
