@@ -3,6 +3,7 @@ import time
 import difflib
 from openai import OpenAI
 from datetime import datetime
+import json
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -57,6 +58,29 @@ def detect_roles_gpt(input_text):
     character_list = [line for line in lines if " - " in line]
 
     return '\n'.join(character_list)
+
+def create_character_roles_genders_json(roles_info, file_path="character_roles_genders.json"):
+    """
+    Function to create a JSON file with character roles and genders.
+    """
+
+    # Split the roles_info into lines and process each line
+    roles = [line.split(". ", 1)[1] if ". " in line else line for line in roles_info.splitlines()]
+    characters = []
+    for role in roles:
+        parts = role.split(" - ")
+        if len(parts) == 3:
+            character, role_desc, gender = parts
+            characters.append({
+                "Name": character,
+                "Role": role_desc,
+                "Gender": gender
+            })
+
+    # Write the JSON data to the file
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump({"Characters": characters}, file, ensure_ascii=False, indent=4)
+    print(f"Character roles and genders saved to {file_path}")
 
 def regender_text_gpt(input_text, confirmed_roles):
     """
@@ -157,6 +181,9 @@ def main():
     if roles_info:
         print("Detected Characters, Roles, and Genders:")
         print(roles_info)
+
+        # Create a JSON file to store all identified characters, roles and genders for reference
+        create_character_roles_genders_json(roles_info)
 
         # Confirm roles and genders with the user
         confirmed_roles = confirm_roles(roles_info)
