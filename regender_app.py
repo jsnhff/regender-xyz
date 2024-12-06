@@ -47,11 +47,16 @@ def detect_roles_gpt(input_text):
     Function to use gpt-4o-mini to identify roles, genders, and character details in the input text.
     """
     # Create a prompt to instruct GPT to detect character roles and genders.
-    prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender."
+    prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender. Arrange the results in a numbered list."
     
     # Get the response from gpt-4o-mini
     response = get_gpt_response(prompt)
-    return response
+
+    # Extract the list of characters, roles, and genders from the response
+    lines = response.split('\n')
+    character_list = [line for line in lines if " - " in line]
+
+    return '\n'.join(character_list)
 
 def regender_text_gpt(input_text, confirmed_roles):
     """
@@ -129,7 +134,11 @@ def confirm_roles(roles_info):
     roles = roles_info.splitlines()
     confirmed_roles = []
     for role in roles:
-        character, role_desc, gender = role.split(" - ")
+        parts = role.split(" - ")
+        if len(parts) != 3:
+            print(f"Skipping invalid role format.")
+            continue
+        character, role_desc, gender = parts
         new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
         if new_gender:
             confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
@@ -146,13 +155,12 @@ def main():
     # Detect roles and genders in the input text
     roles_info = detect_roles_gpt(input_text)
     if roles_info:
-        print("Detected Roles and Genders:")
+        print("Detected Characters, Roles, and Genders:")
         print(roles_info)
 
         # Confirm roles and genders with the user
         confirmed_roles = confirm_roles(roles_info)
-        print("Roles confirmed:")  # Debug print
-        print(confirmed_roles)  # Debug print
+        print("Roles confirmed.")  # Debug print
 
         # Regender the text using GPT with confirmed roles
         regendered_text = regender_text_gpt(input_text, confirmed_roles)
