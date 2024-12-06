@@ -1,6 +1,9 @@
 # Logs folder
 logs/
 
+# Character JSON
+character_roles_genders.json
+
 # Byte-compiled files
 __pycache__/
 *.py[cod]
