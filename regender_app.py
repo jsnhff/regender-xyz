@@ -165,15 +165,26 @@ def confirm_roles(roles_info):
         character, role_desc, gender = parts
         new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
         if new_gender:
-            confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
+            new_name = get_new_name_suggestion(character, new_gender)
+            # print(f"Suggested new name for {character}: {new_name}")
+            confirmed_roles.append(f"{new_name} - {role_desc} - {new_gender}")
         else:
             confirmed_roles.append(role)
         print(f"Confirmed Roles so far: {confirmed_roles}")  # Debug print
     return '\n'.join(confirmed_roles)
 
+def get_new_name_suggestion(character, new_gender):
+    """
+    Function to get a new name suggestion based on the character and new gender.
+    """
+    prompt = f"Suggest one new name for the character '{character}' who is now '{new_gender}'. Provide the single best new name as your response and nothing more."
+    response = get_gpt_response(prompt)
+    return response.strip()
+
 def main():
     # Load the input text from a file or user input
-    input_text = load_input_text("input.txt")
+    # input_text = load_input_text("input_one_character.txt") # one character test
+    input_text = load_input_text("input_two_characters_related.txt") # two related characters test
     print("Input text loaded.")  # Debug print
 
     # Detect roles and genders in the input text
