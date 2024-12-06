@@ -12,7 +12,7 @@ def check_openai_api_key():
     try:
         # Make a simple request to the OpenAI API to check if the API key is valid
         client.models.list()
-        print("OpenAI API key is valid.")
+        # print("OpenAI API key is valid.")
     except Exception as e:
         print(f"Error: {e}")
         print("OpenAI API key is invalid or there is an issue with the connection.")
@@ -103,7 +103,7 @@ Please ensure the following:
 
 Provide the updated text below:"""
     
-    print(f"Prompt sent to gpt-4o-mini:\n{prompt}")  # Debug print to understand what was sent
+    # print(f"Prompt sent to gpt-4o-mini:\n{prompt}")  # Debug print to understand what was sent
 
     # Get the response from gpt-4o-mini using retries for robustness
     response = get_gpt_response(prompt)
@@ -111,7 +111,7 @@ Provide the updated text below:"""
         print("Failed to get a proper response from gpt-4o-mini.")
         return None
 
-    print(f"Response from gpt-4o-mini:\n{response}")  # Debug print for the response
+    # print(f"Response from gpt-4o-mini:\n{response}")  # Debug print for the response
     return response
 
 def highlight_changes(original_text, regendered_text):
@@ -160,14 +160,15 @@ def confirm_roles(roles_info):
     for role in roles:
         parts = role.split(" - ")
         if len(parts) != 3:
-            print(f"Skipping invalid role format.")
+            # print(f"Skipping invalid role format.")
             continue
         character, role_desc, gender = parts
+        gender = gender.strip() # Remove any leading or trailing spaces
         new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
-        if new_gender:
+        if new_gender and new_gender.lower() != gender.lower():
             new_name = get_new_name_suggestion(character, new_gender)
-            # print(f"Suggested new name for {character}: {new_name}")
             confirmed_roles.append(f"{new_name} - {role_desc} - {new_gender}")
+            print(f"New name for {character} is {new_name}")
         else:
             confirmed_roles.append(role)
         print(f"Confirmed Roles so far: {confirmed_roles}")  # Debug print
@@ -184,8 +185,9 @@ def get_new_name_suggestion(character, new_gender):
 def main():
     # Load the input text from a file or user input
     # input_text = load_input_text("input_one_character.txt") # one character test
-    input_text = load_input_text("input_two_characters_related.txt") # two related characters test
-    print("Input text loaded.")  # Debug print
+    # input_text = load_input_text("input_two_characters_related.txt") # two related characters test
+    input_text = load_input_text("input_three_characters_related_dialog.txt") # two related characters dialog test
+    # print("Input text loaded.")  # Debug print
 
     # Detect roles and genders in the input text
     roles_info = detect_roles_gpt(input_text)
