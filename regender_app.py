@@ -183,10 +183,11 @@ def get_new_name_suggestion(character, new_gender):
     return response.strip()
 
 def main():
-    # Load the input text from a file or user input
+    # Load the input text from a file or user input. Change input to test different scenarios.
     # input_text = load_input_text("input_one_character.txt") # one character test
     # input_text = load_input_text("input_two_characters_related.txt") # two related characters test
-    input_text = load_input_text("input_three_characters_related_dialog.txt") # two related characters dialog test
+    # input_text = load_input_text("input_three_characters_related_dialog.txt") # two related characters dialog test
+    input_text = load_input_text("input_six_characters_related_dialog.txt") # seven related characters dialog test
     # print("Input text loaded.")  # Debug print
 
     # Detect roles and genders in the input text
