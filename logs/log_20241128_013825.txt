@@ -1,0 +1,17 @@
+Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding his steps. Shadows loomed, but he moved on, unafraid. As a brother and a son, he felt responsible. At the ancient oak, he placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing he’d found the way home.
+
+1. Prince Leo - Protagonist - Male
+
+1. Prince Leo - Protagonist - neutral
+
+Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding their steps. Shadows loomed, but they moved on, unafraid. As a sibling and a child, they felt responsible. At the ancient oak, they placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing they’d found the way home.
+
+--- 
+
++++ 
+
+@@ -1 +1 @@
+
+-Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding his steps. Shadows loomed, but he moved on, unafraid. As a brother and a son, he felt responsible. At the ancient oak, he placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing he’d found the way home.
++Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding their steps. Shadows loomed, but they moved on, unafraid. As a sibling and a child, they felt responsible. At the ancient oak, they placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing they’d found the way home.
+

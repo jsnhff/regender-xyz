@@ -19,9 +19,9 @@ def check_openai_api_key():
 # Call the function to check the API key
 check_openai_api_key()
 
-def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, delay=5):
+def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, delay=5):
     """
-    Function to interact with OpenAI's GPT-3.5 API using the chat endpoint.
+    Function to interact with OpenAI's gpt-4o-mini API using the chat endpoint.
     Includes retry mechanism for handling API errors.
     """
     attempt = 0
@@ -44,33 +44,45 @@ def get_gpt_response(prompt, model="gpt-3.5-turbo", temperature=0.7, retries=3, 
 
 def detect_roles_gpt(input_text):
     """
-    Function to use GPT-3.5 to identify roles, genders, and character details in the input text.
+    Function to use gpt-4o-mini to identify roles, genders, and character details in the input text.
     """
     # Create a prompt to instruct GPT to detect character roles and genders.
     prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender."
     
-    # Get the response from GPT-3.5
+    # Get the response from gpt-4o-mini
     response = get_gpt_response(prompt)
     return response
 
-def regender_text_gpt(input_text, confirmed_roles, target_gender="female"):
+def regender_text_gpt(input_text, confirmed_roles):
     """
-    Function to use GPT-3.5 for regendering the input text.
+    Function to use gpt-4o-mini for regendering the input text.
     """
-    # Create a prompt to instruct GPT to regender the text
-    prompt = f"""Regender the following text to {target_gender}:
+    # Refine the prompt for more clarity and consistency
+    prompt = f"""You are a language expert tasked with regendering the characters in the following text.
+Please regender the characters in the text according to the characters and genders provided. 
+Maintain the storyline, coherence, and consistency of the original text, ensuring only the specified characters' genders are changed.
 
+Text:
 {input_text}
 
-Roles and genders:
+Characters and their genders:
 {confirmed_roles}
-{input_text}
 
-Roles and genders:
-{confirmed_roles}"""
+Please ensure the following:
+1. Ensure the overall story remains coherent and natural.
+2. Do not alter characters whose gender roles are not explicitly listed in the given list of characters.
+
+Provide the updated text below:"""
     
-    # Get the response from GPT-3.5
+    print(f"Prompt sent to gpt-4o-mini:\n{prompt}")  # Debug print to understand what was sent
+
+    # Get the response from gpt-4o-mini using retries for robustness
     response = get_gpt_response(prompt)
+    if "Error" in response:
+        print("Failed to get a proper response from gpt-4o-mini.")
+        return None
+
+    print(f"Response from gpt-4o-mini:\n{response}")  # Debug print for the response
     return response
 
 def highlight_changes(original_text, regendered_text):
@@ -118,7 +130,6 @@ def confirm_roles(roles_info):
     confirmed_roles = []
     for role in roles:
         character, role_desc, gender = role.split(" - ")
-        print(f"Character: {character}, Role: {role_desc}, Current Gender: {gender}")
         new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
         if new_gender:
             confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
@@ -140,10 +151,11 @@ def main():
 
         # Confirm roles and genders with the user
         confirmed_roles = confirm_roles(roles_info)
-        print("Roles confirmed.")  # Debug print
+        print("Roles confirmed:")  # Debug print
+        print(confirmed_roles)  # Debug print
 
         # Regender the text using GPT with confirmed roles
-        regendered_text = regender_text_gpt(input_text, confirmed_roles, target_gender="female")
+        regendered_text = regender_text_gpt(input_text, confirmed_roles)
         print("Text regendered.")  # Debug print
 
         # Highlight changes between original and regendered text
