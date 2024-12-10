@@ -213,7 +213,7 @@ def main():
     print("Input text loaded.")  # Debug print
 
     # TODO: Clean up chunking problems
-    # 1. Chunks end on a word boundary not a sentence boundary
+    # 1. Chunks end on a word boundary not a sentence boundary — DONE!
     # 2. Chunks are saved in the log file in a way that is hard to read, breaking formatting of the text
     # 3. Chunks are not processed in a way that allows for the regendering of the entire text
     # 4. Characters and not saved in a way that allows for the regendering of the entire text after one user decision about the gender of each character, the current version asks for a new gender each time
