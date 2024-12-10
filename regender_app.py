@@ -4,6 +4,7 @@ import difflib
 from openai import OpenAI
 from datetime import datetime
 import json
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -84,34 +85,18 @@ def create_character_roles_genders_json(roles_info, file_path="character_roles_g
 
 def regender_text_gpt(input_text, confirmed_roles):
     """
-    Function to use gpt-4o-mini for regendering the input text.
+    Function to use GPT-3.5 for regendering the input text.
     """
-    # Refine the prompt for more clarity and consistency
-    prompt = f"""You are a language expert tasked with regendering the characters in the following text.
-Please regender the characters in the text according to the characters and genders provided. 
-Maintain the storyline, coherence, and consistency of the original text, ensuring only the specified characters' genders are changed.
+    # Create a prompt to instruct GPT to regender the text
+    prompt = f"""Regender the following text:
 
-Text:
-{input_text}
+    {input_text}
 
-Characters and their genders:
-{confirmed_roles}
-
-Please ensure the following:
-1. Ensure the overall story remains coherent and natural.
-2. Do not alter characters whose gender roles are not explicitly listed in the given list of characters.
-
-Provide the updated text below:"""
+    Roles and genders:
+    {confirmed_roles}"""
     
-    # print(f"Prompt sent to gpt-4o-mini:\n{prompt}")  # Debug print to understand what was sent
-
-    # Get the response from gpt-4o-mini using retries for robustness
+    # Get the response from GPT-3.5
     response = get_gpt_response(prompt)
-    if "Error" in response:
-        print("Failed to get a proper response from gpt-4o-mini.")
-        return None
-
-    # print(f"Response from gpt-4o-mini:\n{response}")  # Debug print for the response
     return response
 
 def highlight_changes(original_text, regendered_text):
@@ -136,6 +121,7 @@ def log_output(*args):
     with open(file_path, 'w') as file:
         for arg in args:
             file.write(str(arg) + "\n\n")
+    print(f"Output logged to {file_path}")
 
 def create_highlighted_xml_log(file_path, highlighted_text):
     """
@@ -182,42 +168,101 @@ def get_new_name_suggestion(character, new_gender):
     response = get_gpt_response(prompt)
     return response.strip()
 
+def chunk_text(text, max_tokens=1000):
+    """
+    Function to split the text into chunks that fit within the token limits using RecursiveCharacterTextSplitter.
+    """
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=max_tokens, chunk_overlap=0)
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+def load_large_text_file(file_path):
+    """
+    Function to load a large text file in chunks to avoid memory issues.
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            while True:
+                chunk = file.read(1024 * 1024)  # Read in 1MB chunks
+                if not chunk:
+                    break
+                yield chunk
+    except Exception as e:
+        print(f"Error reading larger file {file_path}: {e}")
+        return
+
+def process_large_text_file(file_path):
+    """
+    Function to process a large text file by loading it in chunks.
+    """
+    text = ""
+    for chunk in load_large_text_file(file_path):
+        text += chunk
+    return text
+
 def main():
     # Load the input text from a file or user input. Change input to test different scenarios.
     # input_text = load_input_text("input_one_character.txt") # one character test
     # input_text = load_input_text("input_two_characters_related.txt") # two related characters test
     # input_text = load_input_text("input_three_characters_related_dialog.txt") # two related characters dialog test
-    input_text = load_input_text("input_six_characters_related_dialog.txt") # seven related characters dialog test
-    # print("Input text loaded.")  # Debug print
+    # input_text = load_input_text("input_six_characters_related_dialog.txt") # seven related characters dialog test
+    input_text = process_large_text_file("input_3_chunk_story_1000.txt")
+    if not input_text:
+        print("Failed to load input text.")
+        return
+    print("Input text loaded.")  # Debug print
 
-    # Detect roles and genders in the input text
-    roles_info = detect_roles_gpt(input_text)
-    if roles_info:
-        print("Detected Characters, Roles, and Genders:")
-        print(roles_info)
+    # TODO: Clean up chunking problems
+    # 1. Chunks end on a word boundary not a sentence boundary
+    # 2. Chunks are saved in the log file in a way that is hard to read, breaking formatting of the text
+    # 3. Chunks are not processed in a way that allows for the regendering of the entire text
+    # 4. Characters and not saved in a way that allows for the regendering of the entire text after one user decision about the gender of each character, the current version asks for a new gender each time
+    # 5. Chunking is producing an error where characters are changing gender when the user wants to keep them the same
 
-        # Create a JSON file to store all identified characters, roles and genders for reference
-        create_character_roles_genders_json(roles_info)
+    # Chunk the input text
+    chunks = chunk_text(input_text)
+    print(f"Text split into {len(chunks)} chunks.")  # Debug print
 
-        # Confirm roles and genders with the user
-        confirmed_roles = confirm_roles(roles_info)
-        print("Roles confirmed.")  # Debug print
+    all_roles_info = []
+    all_confirmed_roles = []
+    all_regendered_text = []
 
-        # Regender the text using GPT with confirmed roles
-        regendered_text = regender_text_gpt(input_text, confirmed_roles)
-        print("Text regendered.")  # Debug print
+    for i, chunk in enumerate(chunks):
+        print(f"Processing chunk {i+1}/{len(chunks)}")  # Debug print
 
-        # Highlight changes between original and regendered text
-        highlighted_text = highlight_changes(input_text, regendered_text) if regendered_text else None
-        print("Changes highlighted.")  # Debug print
+        # Detect roles and genders in the chunk
+        roles_info = detect_roles_gpt(chunk)
+        if roles_info:
+            print("Detected Roles and Genders:")
+            print(roles_info)
+            all_roles_info.append(roles_info)
 
-        # Log the output to files
-        log_output(input_text, roles_info, confirmed_roles, regendered_text)
-        print("Output logged to unique file in logs folder.")  # Debug print
-        if highlighted_text:
-            log_output(input_text, roles_info, confirmed_roles, regendered_text, highlighted_text)
-            create_highlighted_xml_log("highlighted_log.xml", highlighted_text)
-            print("Highlighted log created.")  # Debug print
+            # Confirm roles and genders with the user
+            confirmed_roles = confirm_roles(roles_info).splitlines()
+            print("Roles confirmed.")  # Debug print
+            all_confirmed_roles.append(confirmed_roles)
+
+            # Regender the text using GPT with confirmed roles
+            regendered_text = regender_text_gpt(chunk, confirmed_roles)
+            print("Text regendered.")  # Debug print
+            all_regendered_text.append(regendered_text)
+
+    # Combine all chunks
+    combined_roles_info = '\n'.join(all_roles_info)
+    combined_confirmed_roles = '\n'.join(['\n'.join(roles) for roles in all_confirmed_roles])
+    combined_regendered_text = '\n'.join(all_regendered_text)
+
+    # Highlight changes between original and regendered text
+    highlighted_text = highlight_changes(input_text, combined_regendered_text) if combined_regendered_text else None
+    print("Changes highlighted.")  # Debug print
+
+    # Log the output to files
+    log_output(input_text, combined_roles_info, combined_confirmed_roles, combined_regendered_text)
+    print("Output logged to unique file in logs folder.")  # Debug print
+    if highlighted_text:
+        log_output(input_text, combined_roles_info, combined_confirmed_roles, combined_regendered_text, highlighted_text)
+        create_highlighted_xml_log("highlighted_log.xml", highlighted_text)
+        print("Highlighted log created.")  # Debug print
 
 if __name__ == "__main__":
     main()
