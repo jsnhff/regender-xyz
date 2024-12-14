@@ -16,11 +16,16 @@ init(autoreset=True)  # Initialize colorama
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def check_openai_api_key():
+    """
+    Verify OpenAI API key with styled output.
+    """
     try:
         client.models.list()
+        print(f"{Fore.GREEN}✓ API connection established{Style.RESET_ALL}")
+        return True
     except Exception as e:
-        print(f"Error: {e}")
-        print("OpenAI API key is invalid or there is an issue with the connection.")
+        print(f"{Fore.RED}✗ API Error: Please check your OpenAI API key{Style.RESET_ALL}")
+        return False
 
 check_openai_api_key()
 
@@ -46,6 +51,35 @@ GENDER_CATEGORIES = {
         'pronouns': ['they', 'them', 'theirs']
     }
 }
+
+def print_banner():
+    """
+    Print a more ornate application banner with proper alignment.
+    """
+    banner = f"""
+{Fore.CYAN}╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┃  {Fore.WHITE}⚡ regender.xyz ⚡{Fore.CYAN}                      
+┃  {Fore.YELLOW}transforming gender in open source books{Fore.CYAN}     
+┃  {Fore.MAGENTA}[ Version  ]{Fore.CYAN}                      
+┃                                           
+┃  {Fore.WHITE}✧{Fore.BLUE} Gender Analysis {Fore.WHITE}✧{Fore.GREEN} Name Processing {Fore.WHITE}✧{Fore.CYAN}       
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Style.RESET_ALL}
+"""
+    print(banner)
+
+def print_startup_sequence():
+    """
+    Print an animated startup sequence.
+    """
+    # Clear screen first
+    print("\033[H\033[J", end="")
+    
+    # Print banner
+    print_banner()
+    
+    # Initialization message
+    print(f"{Fore.CYAN}┌─{Style.RESET_ALL} System Initialization")
+    print(f"{Fore.CYAN}│{Style.RESET_ALL}")
 
 # Add this utility function for consistent status messages
 def print_status(message, status_type="info"):
@@ -216,7 +250,7 @@ def update_character_roles_genders_json(confirmed_roles, file_path="character_ro
 
     with open(file_path, 'w', encoding='utf-8') as file:
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
-    print(f"Updated character roles and genders saved to {file_path}")
+    print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
 
 def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
     """
@@ -281,10 +315,19 @@ def create_highlighted_xml_log(file_path, highlighted_text):
 
 def load_input_text(file_path):
     """
-    Function to load input text from a file.
+    Load input text with status feedback.
     """
-    with open(file_path, 'r') as file:
-        return file.read()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            print(f"{Fore.GREEN}✓ Loaded: {Fore.BLUE}{file_path}{Style.RESET_ALL}")
+            return content
+    except FileNotFoundError:
+        print(f"{Fore.RED}✗ File not found: {file_path}{Style.RESET_ALL}")
+        return None
+    except Exception as e:
+        print(f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}")
+        return None
 
 def improved_chunk_text(text, max_tokens=1000):
     """
@@ -437,7 +480,7 @@ def load_confirmed_genders(file_path="character_roles_genders.json"):
                 raise FileNotFoundError
             data = json.loads(content)
             confirmed_genders = {character["Original_Name"]: character["Original_Gender"] for character in data["Characters"]}
-        print(f"Confirmed genders loaded from {file_path}")
+        print(f"{Fore.GREEN}├─ Confirmed genders loaded from {file_path}{Style.RESET_ALL}")
     except FileNotFoundError:
         confirmed_genders = {}
         print(f"No confirmed genders file found or file is empty. Starting with an empty dictionary.")
@@ -474,36 +517,48 @@ def clean_name(name):
     return re.sub(r'^\d+\.\s*', '', name).strip()
 
 def main():
-    # Load the input text
+    # Clear the terminal (optional)
+    print("\033[H\033[J", end="")
+    
+    # Show application banner
+    print_banner()
+    
+    # Check API connection
+    if not check_openai_api_key():
+        return
+
+    # Load and process the text
     input_text = process_large_text_file("input_3_chunk_story_1000.txt")
     if not input_text:
-        print("Failed to load input text.")
+        print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
-    print("Input text loaded.")
-
-    # Reset the character_roles_genders.json file
+    
+    # Initialize processing
+    print(f"\n{Fore.CYAN}┌─ Initializing...{Style.RESET_ALL}")
+    
+    # Reset the JSON file
     with open("character_roles_genders.json", 'w', encoding='utf-8') as file:
         json.dump({"Characters": []}, file, ensure_ascii=False, indent=4)
-    print("character_roles_genders.json reset to empty.")
+    print(f"{Fore.GREEN}├─ Reset character database{Style.RESET_ALL}")
 
     # Load confirmed genders
     confirmed_genders = load_confirmed_genders()
-    print("Confirmed genders loaded.")
+    print(f"{Fore.GREEN}├─ Loaded character profiles{Style.RESET_ALL}")
 
-    # Use improved chunking
+    # Process text chunks
     chunks, character_contexts = improved_chunk_text(input_text)
-    print(f"Text split into {len(chunks)} chunks with character tracking.")
+    print(f"{Fore.GREEN}└─ Split into {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
+    print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
 
-    # Process all chunks with context
+    # Process chunks
     combined_regendered_text = process_chunks_with_context(chunks, character_contexts, confirmed_genders)
 
-    # Highlight changes
-    highlighted_text = highlight_changes(input_text, combined_regendered_text)
-
-    # Log outputs
-    log_output(input_text, combined_regendered_text, highlighted_text)
-    if highlighted_text:
-        create_highlighted_xml_log("highlighted_log.xml", highlighted_text)
+    # Log results
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = f"logs/log_{timestamp}.txt"
+    log_output(input_text, combined_regendered_text)
+    print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
+    print(f"{Fore.BLUE}ℹ Output saved to: {Fore.YELLOW}{log_file}{Style.RESET_ALL}")
 
 if __name__ == "__main__":
     main()
