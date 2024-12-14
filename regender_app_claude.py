@@ -1,13 +1,4 @@
-# TODO: Clean up chunking problems with some improvements
-# DONE 1. Chunks end on a word boundary not a sentence boundary
-# DONE 2. Chunks are saved in the log file in a way that is hard to read, breaking formatting of the text
-# DONE 3. Characters and not saved in a way that allows for the regendering of the entire text after one user decision about the gender of each character, the current version asks for a new gender each time
-# DONE Claude 4. Successive chunks are not referencing the same character list and asking the user for input each time
-# DONE Claude 5. The user is not given the option to change the name of the character when changing the gender
-# DONE Claude 6. Gender descriptions are not consistent when identifying characters consider providing a framework to make matching easier
-# DONE Claude 7. Update inputs to be simple selects vs. free form typing
-# 8. Remove array objects storiing roles and rely on the JSON source of truth
-# DONE Claude 9. Chunking is producing an error where characters are changing gender when the user wants to keep them the same
+# TODO: TBD working with Claude
 
 import os
 import time
