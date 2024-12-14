@@ -5,6 +5,7 @@ from openai import OpenAI
 from datetime import datetime
 import json
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import re
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -73,15 +74,47 @@ def create_character_roles_genders_json(roles_info, file_path="character_roles_g
         if len(parts) == 3:
             character, role_desc, gender = parts
             characters.append({
-                "Name": character,
-                "Role": role_desc,
-                "Gender": gender
+                "Original_Name": character,
+                "Original_Role": role_desc,
+                "Original_Gender": gender
             })
 
     # Write the JSON data to the file
     with open(file_path, 'w', encoding='utf-8') as file:
         json.dump({"Characters": characters}, file, ensure_ascii=False, indent=4)
     print(f"Character roles and genders saved to {file_path}")
+
+def update_character_roles_genders_json(confirmed_roles, file_path="character_roles_genders.json"):
+    """
+    Function to update the JSON file with confirmed character roles and genders.
+    """
+    # Load the existing data from the JSON file
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {"Characters": []}
+
+    # Update the characters with confirmed roles and genders
+    updated_characters = []
+    for role in confirmed_roles:
+        parts = role.split(" - ")
+        if len(parts) == 3:
+            new_name, role_desc, new_gender = parts
+            new_name = clean_name(new_name)
+            updated_characters.append({
+                "Original_Name": new_name,
+                "Original_Role": role_desc,
+                "Original_Gender": new_gender,
+                "Updated_Name": new_name,
+                "Updated_Role": role_desc,
+                "Updated_Gender": new_gender
+            })
+
+    # Write the updated JSON data to the file
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
+    print(f"Updated character roles and genders saved to {file_path}")
 
 def regender_text_gpt(input_text, confirmed_roles):
     """
@@ -137,7 +170,7 @@ def load_input_text(file_path):
     with open(file_path, 'r') as file:
         return file.read()
 
-def confirm_roles(roles_info):
+def confirm_roles(roles_info, confirmed_genders):
     """
     Function to confirm roles and genders with the user.
     """
@@ -146,17 +179,20 @@ def confirm_roles(roles_info):
     for role in roles:
         parts = role.split(" - ")
         if len(parts) != 3:
-            # print(f"Skipping invalid role format.")
+            print(f"Skipping invalid role format: {role}")
             continue
         character, role_desc, gender = parts
-        gender = gender.strip() # Remove any leading or trailing spaces
-        new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
-        if new_gender and new_gender.lower() != gender.lower():
-            new_name = get_new_name_suggestion(character, new_gender)
-            confirmed_roles.append(f"{new_name} - {role_desc} - {new_gender}")
-            print(f"New name for {character} is {new_name}")
+        gender = gender.strip()  # Remove any leading or trailing spaces
+        if character in confirmed_genders:
+            new_gender = confirmed_genders[character]
+            print(f"Using confirmed gender: {new_gender}") #Debug print
         else:
-            confirmed_roles.append(role)
+            new_gender = input(f"Enter new gender for {character} (leave blank to keep '{gender}'): ")
+            if new_gender:
+                confirmed_genders[character] = new_gender
+            else:
+                new_gender = gender
+        confirmed_roles.append(f"{character} - {role_desc} - {new_gender}")
         print(f"Confirmed Roles so far: {confirmed_roles}")  # Debug print
     return '\n'.join(confirmed_roles)
 
@@ -183,7 +219,7 @@ def load_large_text_file(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             while True:
-                chunk = file.read(1024 * 1024)  # Read in 1MB chunks
+                chunk = file.read(1024 * 4)  # Read in 4KB chunks
                 if not chunk:
                     break
                 yield chunk
@@ -200,7 +236,41 @@ def process_large_text_file(file_path):
         text += chunk
     return text
 
+def load_confirmed_genders(file_path="character_roles_genders.json"):
+    """
+    Function to load confirmed genders from a JSON file.
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read().strip()
+            if not content:
+                raise FileNotFoundError
+            data = json.loads(content)
+            confirmed_genders = {character["Original_Name"]: character["Original_Gender"] for character in data["Characters"]}
+        print(f"Confirmed genders loaded from {file_path}")
+    except FileNotFoundError:
+        confirmed_genders = {}
+        print(f"No confirmed genders file found or file is empty. Starting with an empty dictionary.")
+    return confirmed_genders
+
+def clean_name(name):
+    """
+    Function to clean the name by removing any leading numbers and periods.
+    """
+    return re.sub(r'^\d+\.\s*', '', name).strip()
+
 def main():
+    # TODO: Clean up chunking problems with some improvements
+    # DONE 1. Chunks end on a word boundary not a sentence boundary
+    # DONE 2. Chunks are saved in the log file in a way that is hard to read, breaking formatting of the text
+    # DONE 3. Characters and not saved in a way that allows for the regendering of the entire text after one user decision about the gender of each character, the current version asks for a new gender each time
+    # 4. Successive chunks are not referencing the same character list and asking the user for input each time
+    # 5. The user is not given the option to change the name of the character when changing the gender
+    # 6. Gender descriptions are not consistent when identifying characters consider providing a framework to make matching easier
+    # 7. Update inputs to be simple selects vs. free form typing
+    # 8. Remove array objects storiing roles and rely on the JSON source of truth
+    # 9. Chunking is producing an error where characters are changing gender when the user wants to keep them the same
+
     # Load the input text from a file or user input. Change input to test different scenarios.
     # input_text = load_input_text("input_one_character.txt") # one character test
     # input_text = load_input_text("input_two_characters_related.txt") # two related characters test
@@ -212,12 +282,14 @@ def main():
         return
     print("Input text loaded.")  # Debug print
 
-    # TODO: Clean up chunking problems
-    # 1. Chunks end on a word boundary not a sentence boundary — DONE!
-    # 2. Chunks are saved in the log file in a way that is hard to read, breaking formatting of the text
-    # 3. Chunks are not processed in a way that allows for the regendering of the entire text
-    # 4. Characters and not saved in a way that allows for the regendering of the entire text after one user decision about the gender of each character, the current version asks for a new gender each time
-    # 5. Chunking is producing an error where characters are changing gender when the user wants to keep them the same
+    # Reset the character_roles_genders.json file to start fresh with each test run
+    with open("character_roles_genders.json", 'w', encoding='utf-8') as file:
+        json.dump({"Characters": []}, file, ensure_ascii=False, indent=4)
+    print("character_roles_genders.json reset to empty.")
+
+    # Load confirmed genders from the JSON file
+    confirmed_genders = load_confirmed_genders()
+    print("Confirmed genders loaded.")  # Debug print
 
     # Chunk the input text
     chunks = chunk_text(input_text)
@@ -235,12 +307,22 @@ def main():
         if roles_info:
             print("Detected Roles and Genders:")
             print(roles_info)
-            all_roles_info.append(roles_info)
+            all_roles_info.append(roles_info) # Can delete this variable, probably used for log but needs to reference the JSON file
+
+            # Update the JSON file with the identified characters, roles, and genders on first chunk
+            if i == 0:
+                create_character_roles_genders_json(roles_info)
+                print("JSON role file created.")  # Debug print
+                confirmed_genders = load_confirmed_genders()
 
             # Confirm roles and genders with the user
-            confirmed_roles = confirm_roles(roles_info).splitlines()
+            confirmed_roles = confirm_roles(roles_info, confirmed_genders).splitlines()
             print("Roles confirmed.")  # Debug print
             all_confirmed_roles.append(confirmed_roles)
+
+            # Update the JSON file with confirmed roles and genders
+            update_character_roles_genders_json(confirmed_roles)
+            confirmed_genders = load_confirmed_genders()
 
             # Regender the text using GPT with confirmed roles
             regendered_text = regender_text_gpt(chunk, confirmed_roles)
