@@ -8,6 +8,9 @@ from datetime import datetime
 import json
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import re
+# Add to your imports
+from colorama import init, Fore, Back, Style
+init(autoreset=True)  # Initialize colorama
 
 # Initialize the OpenAI client with your API key
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -44,6 +47,19 @@ GENDER_CATEGORIES = {
     }
 }
 
+# Add this utility function for consistent status messages
+def print_status(message, status_type="info"):
+    """
+    Print formatted status messages.
+    """
+    symbols = {
+        "info": f"{Fore.BLUE}ℹ{Style.RESET_ALL}",
+        "success": f"{Fore.GREEN}✓{Style.RESET_ALL}",
+        "warning": f"{Fore.YELLOW}⚠{Style.RESET_ALL}",
+        "error": f"{Fore.RED}✗{Style.RESET_ALL}"
+    }
+    print(f" {symbols.get(status_type, symbols['info'])} {message}")
+
 def standardize_gender(gender_text):
     """
     Map various gender descriptions to standard categories.
@@ -68,22 +84,25 @@ def standardize_gender(gender_text):
 
 def get_user_gender_choice(character, current_gender):
     """
-    Enhanced gender selection interface that also handles name changes.
+    Enhanced gender selection interface with colored formatting.
     """
-    print(f"\nCharacter: {character}")
-    current_category, current_label = standardize_gender(current_gender)
-    print(f"Current gender: {current_label}")
+    print(f"\n{Fore.CYAN}╭─ Character: {Fore.WHITE}{character} {Fore.YELLOW}({current_gender}){Style.RESET_ALL}")
+    print(f"{Fore.CYAN}├─ Select Gender:{Style.RESET_ALL}")
     
-    print("\nOptions:")
-    for i, (key, data) in enumerate(GENDER_CATEGORIES.items(), 1):
-        if key != 'UNK':  # Don't show UNK as an explicit option
-            print(f"{i}. {data['label']}")
-    print("Enter to keep current")
+    # Display options in a compact, colored format
+    options = [
+        f"{Fore.GREEN}1{Style.RESET_ALL} Male",
+        f"{Fore.MAGENTA}2{Style.RESET_ALL} Female",
+        f"{Fore.BLUE}3{Style.RESET_ALL} Non-binary",
+        f"{Fore.YELLOW}↵{Style.RESET_ALL} Keep current"
+    ]
+    print(f"{Fore.CYAN}│  {Style.RESET_ALL}" + " | ".join(options))
+    print(f"{Fore.CYAN}╰─{Style.RESET_ALL}", end=" ")
     
-    choice = input("Select option (1-3, or Enter to keep current): ").strip()
+    choice = input().strip()
     
-    if not choice:  # Keep current
-        return current_label, character
+    if not choice:
+        return current_gender, character
         
     try:
         choice_idx = int(choice) - 1
@@ -92,15 +111,19 @@ def get_user_gender_choice(character, current_gender):
             selected_key = category_keys[choice_idx]
             selected_gender = GENDER_CATEGORIES[selected_key]['label']
             
-            # Ask for new name if gender changed
-            if selected_gender.lower() != current_label.lower():
-                print(f"\nSuggested names for {selected_gender} version of {character}:")
-                suggested_name = get_gpt_response(
+            if selected_gender.lower() != current_gender.lower():
+                print(f"\n{Fore.CYAN}╭─ Name Suggestions:{Style.RESET_ALL}")
+                suggested_names = get_gpt_response(
                     f"Suggest three {selected_gender.lower()} versions of the name '{character}'. "
                     f"Provide only the names separated by commas, no explanation."
-                )
-                print(f"Suggestions: {suggested_name}")
-                new_name = input(f"Enter new name for {character} (press Enter to keep current name): ").strip()
+                ).split(',')
+                suggested_names = [name.strip() for name in suggested_names]
+                
+                # Display suggestions in a colored, inline format
+                print(f"{Fore.CYAN}│  {Style.RESET_ALL}" + 
+                      " | ".join(f"{Fore.YELLOW}{name}{Style.RESET_ALL}" for name in suggested_names))
+                print(f"{Fore.CYAN}╰─{Style.RESET_ALL}", end=" ")
+                new_name = input("Enter name (↵ to keep current): ").strip()
                 if new_name:
                     return selected_gender, new_name
             
@@ -108,7 +131,7 @@ def get_user_gender_choice(character, current_gender):
     except ValueError:
         pass
         
-    return current_label, character
+    return current_gender, character
 
 def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, delay=5):
     """
@@ -311,21 +334,27 @@ def extract_characters_from_chunk(chunk):
 
 def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
     """
-    Updated version to handle name mappings across chunks.
+    Updated processing with enhanced visual feedback.
     """
     all_regendered_text = []
     name_mappings = {}
     
+    total_chunks = len(chunks)
+    
     for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
-        print(f"\nProcessing chunk {i+1}/{len(chunks)}")
-        print(f"Characters in this chunk: {', '.join(context['characters'])}")
+        # Progress indicator
+        progress = f"{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL}"
+        print(f"\n{progress} Processing chunk...")
         
-        # Only ask for gender confirmation for new characters
+        if context['characters']:
+            chars = ", ".join(f"{Fore.YELLOW}{c}{Style.RESET_ALL}" for c in context['characters'])
+            print(f"└─ Characters found: {chars}")
+        
         new_characters = context['characters'] - set(confirmed_genders.keys())
         if new_characters:
-            print(f"\nNew characters detected: {', '.join(new_characters)}")
+            new_chars = ", ".join(f"{Fore.GREEN}{c}{Style.RESET_ALL}" for c in new_characters)
+            print(f"└─ New characters found: {new_chars}")
             
-            # Detect roles for new characters only
             roles_info = detect_roles_gpt(chunk)
             if roles_info:
                 confirmed_roles, chunk_name_mappings = confirm_new_characters(
@@ -334,19 +363,17 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
                 name_mappings.update(chunk_name_mappings)
                 update_character_roles_genders_json(confirmed_roles)
         
-        # Use all confirmed characters for regendering
+        # Rest of the processing...
         all_confirmed_roles = []
         for character in context['all_characters_so_far']:
             if character in confirmed_genders:
                 role_info = get_character_role_from_json(character)
                 if role_info:
-                    # Use new name if available
                     current_name = name_mappings.get(character, character)
                     all_confirmed_roles.append(
                         f"{current_name} - {role_info['role']} - {role_info['gender']}"
                     )
         
-        # Regender the chunk using all confirmed character information
         regendered_chunk = regender_text_gpt(
             chunk, '\n'.join(all_confirmed_roles), name_mappings
         )
