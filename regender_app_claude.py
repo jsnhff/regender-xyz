@@ -66,7 +66,7 @@ def standardize_gender(gender_text):
 
 def get_user_gender_choice(character, current_gender):
     """
-    Structured gender selection interface with standardized options.
+    Enhanced gender selection interface that also handles name changes.
     """
     print(f"\nCharacter: {character}")
     current_category, current_label = standardize_gender(current_gender)
@@ -81,18 +81,32 @@ def get_user_gender_choice(character, current_gender):
     choice = input("Select option (1-3, or Enter to keep current): ").strip()
     
     if not choice:  # Keep current
-        return current_label
+        return current_label, character
         
     try:
         choice_idx = int(choice) - 1
         category_keys = [k for k in GENDER_CATEGORIES.keys() if k != 'UNK']
         if 0 <= choice_idx < len(category_keys):
             selected_key = category_keys[choice_idx]
-            return GENDER_CATEGORIES[selected_key]['label']
+            selected_gender = GENDER_CATEGORIES[selected_key]['label']
+            
+            # Ask for new name if gender changed
+            if selected_gender.lower() != current_label.lower():
+                print(f"\nSuggested names for {selected_gender} version of {character}:")
+                suggested_name = get_gpt_response(
+                    f"Suggest three {selected_gender.lower()} versions of the name '{character}'. "
+                    f"Provide only the names separated by commas, no explanation."
+                )
+                print(f"Suggestions: {suggested_name}")
+                new_name = input(f"Enter new name for {character} (press Enter to keep current name): ").strip()
+                if new_name:
+                    return selected_gender, new_name
+            
+            return selected_gender, character
     except ValueError:
         pass
         
-    return current_label  # If invalid input, keep current
+    return current_label, character
 
 def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, delay=5):
     """
@@ -179,12 +193,16 @@ def update_character_roles_genders_json(confirmed_roles, file_path="character_ro
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
     print(f"Updated character roles and genders saved to {file_path}")
 
-def regender_text_gpt(input_text, confirmed_roles):
+def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
     """
-    Updated version to include pronoun information in the prompt.
+    Updated version to handle explicit name changes.
     """
-    # Extract gender information for the prompt
+    if name_mappings is None:
+        name_mappings = {}
+        
     gender_guidelines = []
+    name_instructions = []
+    
     for role in confirmed_roles.splitlines():
         parts = role.split(" - ")
         if len(parts) == 3:
@@ -193,14 +211,17 @@ def regender_text_gpt(input_text, confirmed_roles):
             if category_key in GENDER_CATEGORIES:
                 pronouns = GENDER_CATEGORIES[category_key]['pronouns']
                 gender_guidelines.append(f"{character}: {gender} (pronouns: {'/'.join(pronouns)})")
+    
+    # Add explicit name change instructions
+    for old_name, new_name in name_mappings.items():
+        name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
 
     prompt = (
-        f"Regender the following text:\n\n"
-        f"{input_text}\n\n"
-        f"Character genders and pronouns:\n"
-        f"{chr(10).join(gender_guidelines)}\n\n"
-        f"Roles and genders:\n"
-        f"{confirmed_roles}"
+        f"Regender the following text, following these rules exactly:\n\n"
+        f"1. Name changes (apply these first and consistently):\n{chr(10).join(name_instructions)}\n\n"
+        f"2. Character genders and pronouns:\n{chr(10).join(gender_guidelines)}\n\n"
+        f"3. Maintain absolute consistency in names and pronouns throughout the text.\n\n"
+        f"Text to regender:\n{input_text}"
     )
     
     response = get_gpt_response(prompt)
@@ -288,9 +309,10 @@ def extract_characters_from_chunk(chunk):
 
 def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
     """
-    Process chunks while maintaining character consistency using the confirmed genders.
+    Updated version to handle name mappings across chunks.
     """
     all_regendered_text = []
+    name_mappings = {}
     
     for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
         print(f"\nProcessing chunk {i+1}/{len(chunks)}")
@@ -304,7 +326,10 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
             # Detect roles for new characters only
             roles_info = detect_roles_gpt(chunk)
             if roles_info:
-                confirmed_roles = confirm_new_characters(roles_info, confirmed_genders, new_characters)
+                confirmed_roles, chunk_name_mappings = confirm_new_characters(
+                    roles_info, confirmed_genders, new_characters
+                )
+                name_mappings.update(chunk_name_mappings)
                 update_character_roles_genders_json(confirmed_roles)
         
         # Use all confirmed characters for regendering
@@ -313,19 +338,27 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
             if character in confirmed_genders:
                 role_info = get_character_role_from_json(character)
                 if role_info:
-                    all_confirmed_roles.append(f"{character} - {role_info['role']} - {role_info['gender']}")
+                    # Use new name if available
+                    current_name = name_mappings.get(character, character)
+                    all_confirmed_roles.append(
+                        f"{current_name} - {role_info['role']} - {role_info['gender']}"
+                    )
         
         # Regender the chunk using all confirmed character information
-        regendered_chunk = regender_text_gpt(chunk, '\n'.join(all_confirmed_roles))
+        regendered_chunk = regender_text_gpt(
+            chunk, '\n'.join(all_confirmed_roles), name_mappings
+        )
         all_regendered_text.append(regendered_chunk)
     
     return '\n'.join(all_regendered_text)
 
 def confirm_new_characters(roles_info, confirmed_genders, new_characters):
     """
-    Updated version to use standardized gender categories.
+    Updated version to handle both gender and name changes.
     """
     confirmed_roles = []
+    name_mappings = {}  # Store character name changes
+    
     for role in roles_info.splitlines():
         parts = role.split(" - ")
         if len(parts) != 3:
@@ -335,16 +368,17 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
         character = clean_name(character)
         
         if character in new_characters:
-            # Use standardized interface for gender selection
-            standardized_gender = get_user_gender_choice(character, gender)
+            # Get both gender and possible name change
+            standardized_gender, new_name = get_user_gender_choice(character, gender)
             confirmed_genders[character] = standardized_gender
+            if new_name != character:
+                name_mappings[character] = new_name
+                character = new_name
         
         current_gender = confirmed_genders.get(character, gender)
-        # Standardize the gender before adding to confirmed roles
-        category_key, standard_label = standardize_gender(current_gender)
-        confirmed_roles.append(f"{character} - {role_desc} - {standard_label}")
+        confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
     
-    return confirmed_roles
+    return confirmed_roles, name_mappings
 
 def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
     """
