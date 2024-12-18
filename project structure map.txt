@@ -1,0 +1,23 @@
+project/
+├── __init__.py
+├── main.py                 # Entry point
+├── config/
+│   ├── __init__.py
+│   ├── constants.py        # GENDER_CATEGORIES and other constants
+│   └── settings.py         # API keys, file paths, etc.
+├── core/
+│   ├── __init__.py
+│   ├── text_processor.py   # Text chunking and processing
+│   └── gender_analyzer.py  # Gender detection and standardization
+├── ui/
+│   ├── __init__.py
+│   ├── cli.py             # CLI interface components
+│   └── formatting.py       # Color formatting and display utilities
+├── utils/
+│   ├── __init__.py
+│   ├── file_handler.py    # File operations
+│   ├── api_client.py      # OpenAI API interactions
+│   └── logger.py          # Logging functionality
+└── models/
+    ├── __init__.py
+    └── character.py       # Character data structures and operations
