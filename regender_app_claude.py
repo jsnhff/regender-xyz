@@ -9,7 +9,7 @@ import json
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import re
 # Add to your imports
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 init(autoreset=True)  # Initialize colorama
 
 # Initialize the OpenAI client with your API key
@@ -416,12 +416,6 @@ def regender_text_gpt(input_text, confirmed_roles, name_mappings=None, timestamp
     
     return response
 
-def highlight_changes(original_text, regendered_text):
-    """
-    Function to highlight changes between original and regendered text.
-    """
-    return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
-
 def log_output(original_text, updated_text, events_list=None, json_path="character_roles_genders.json", timestamp=None):
     """
     Enhanced logging function that links to debug logs.
@@ -524,12 +518,6 @@ def write_debug_log(events, timestamp):
         f.write('\n'.join(events))
     
     return debug_file
-
-def create_highlighted_xml_log(file_path, highlighted_text):
-    """
-    Function to create an XML log of highlighted changes.
-    """
-    pass
 
 def load_input_text(file_path):
     """
@@ -787,8 +775,8 @@ def main():
         return
 
     # Load and process the text
-    # input_text = process_large_text_file("test_samples/input_nickname_test.txt")
-    input_text = process_large_text_file("test_samples/pride_and_prejudice_chapter_1_short.txt")
+    input_text = process_large_text_file("test_samples/input_nickname_test.txt")
+    # input_text = process_large_text_file("test_samples/pride_and_prejudice_chapter_1_short.txt")
     if not input_text:
         print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
