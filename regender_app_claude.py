@@ -120,7 +120,7 @@ def get_user_gender_choice(character, current_gender):
     """
     Enhanced gender selection interface with colored formatting.
     """
-    print(f"\n{Fore.CYAN}╭─ Character: {Fore.WHITE}{character} {Fore.YELLOW}({current_gender}){Style.RESET_ALL}")
+    print(f"\n{Fore.CYAN}╭─ Character: {Fore.WHITE}{character} {Fore.YELLOW}({current_gender.strip()}){Style.RESET_ALL}")
     print(f"{Fore.CYAN}├─ Select Gender:{Style.RESET_ALL}")
     
     # Display options in a compact, colored format
