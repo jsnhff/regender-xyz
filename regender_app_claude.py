@@ -292,31 +292,45 @@ def highlight_changes(original_text, regendered_text):
     """
     return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
 
-def log_output(original_text, updated_text, json_path="character_roles_genders.json"):
+def log_output(original_text, updated_text, events_list=None, json_path="character_roles_genders.json"):
     """
-    Function to log the output with clear sections for:
-    1. Original text
-    2. Updated text
-    3. Character roles and genders from JSON
+    Enhanced logging function with character counts and event tracking.
     """
     if not os.path.exists("logs"):
         os.makedirs("logs")
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join("logs", f"log_{timestamp}.txt")
-
-    # Create section separator
     separator = "\n" + "="*80 + "\n"
 
+    # Calculate character statistics
+    orig_count = len(original_text)
+    updated_count = len(updated_text)
+    diff_count = abs(orig_count - updated_count)
+    
+    # Create statistics summary
+    stats_summary = (
+        "CHARACTER STATISTICS\n"
+        "====================\n"
+        f"Original text character count: {orig_count:,}\n"
+        f"Updated text character count: {updated_count:,}\n"
+        f"Difference in characters: {diff_count:,}\n"
+    )
+
     try:
-        # Read the JSON file
         with open(json_path, 'r', encoding='utf-8') as json_file:
             character_data = json.load(json_file)
+            char_count = len(character_data.get("Characters", []))
+            stats_summary += f"Total named characters processed: {char_count}\n"
     except Exception as e:
         character_data = {"Characters": [], "error": str(e)}
 
     # Write all sections to the log file
     with open(file_path, 'w', encoding='utf-8') as file:
+        # Write statistics first
+        file.write(stats_summary)
+        file.write(separator)
+
         # Original text section
         file.write("ORIGINAL TEXT")
         file.write(separator)
@@ -333,6 +347,16 @@ def log_output(original_text, updated_text, json_path="character_roles_genders.j
         file.write("CHARACTER ROLES AND GENDERS")
         file.write(separator)
         file.write(json.dumps(character_data, indent=4))
+        file.write(separator)
+
+        # Processing events section
+        file.write("PROCESSING EVENTS")
+        file.write(separator)
+        if events_list:
+            for event in events_list:
+                file.write(f"- {event}\n")
+        else:
+            file.write("No notable events recorded during processing.\n")
         file.write(separator)
 
     print(f"{Fore.GREEN}✓ Log file created: {Fore.YELLOW}{file_path}{Style.RESET_ALL}")
@@ -553,6 +577,9 @@ def main():
     
     # Show application banner
     print_banner()
+
+    # Create an events list at the start to track events in the log file
+    events = []
     
     # Check API connection
     if not check_openai_api_key():
@@ -587,7 +614,7 @@ def main():
     # Log results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = f"logs/log_{timestamp}.txt"
-    log_output(input_text, combined_regendered_text)
+    log_output(input_text, combined_regendered_text, events)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
     # print(f"{Fore.BLUE}ℹ Output saved to: {Fore.YELLOW}{log_file}{Style.RESET_ALL}")
 
