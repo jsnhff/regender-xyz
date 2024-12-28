@@ -267,34 +267,47 @@ def update_character_roles_genders_json(confirmed_roles, file_path="character_ro
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
     print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
 
-def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
+def regender_text_gpt(input_text, confirmed_roles, name_mappings=None, timestamp=None):
     """
-    Updated version to handle explicit name changes and proper pronoun regendering.
+    Updated version with linked debug logging.
     """
     if name_mappings is None:
         name_mappings = {}
         
     gender_guidelines = []
     name_instructions = []
+    debug_events = []  # Collect debug events
     
-    # First, create clear instructions about pronouns and gender
+    # Debug log the initial state
+    debug_events.append(f"\nDEBUG - Starting regender_text_gpt")
+    debug_events.append(f"Input confirmed_roles:\n{confirmed_roles}")
+    debug_events.append(f"Input name_mappings:\n{name_mappings}")
+    
+    # Process each role and build instructions
     for role in confirmed_roles.splitlines():
         parts = role.split(" - ")
         if len(parts) == 3:
             character, role_desc, gender = parts
             category_key, _ = standardize_gender(gender)
+            debug_events.append(f"\nDEBUG - Processing character: {character}")
+            debug_events.append(f"  Role: {role_desc}")
+            debug_events.append(f"  Gender: {gender}")
+            debug_events.append(f"  Category: {category_key}")
+            
             if category_key in GENDER_CATEGORIES:
                 pronouns = GENDER_CATEGORIES[category_key]['pronouns']
-                # Create more explicit pronoun instructions
+                debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
+                
                 gender_guidelines.append(
                     f"{character} ({gender}):\n"
                     f"- Use pronouns: {'/'.join(pronouns)}\n"
                     f"- Replace she/her/hers with {'/'.join(pronouns)} if referring to {character}"
                 )
     
-    # Add explicit name change instructions
+    # Log name changes
     for old_name, new_name in name_mappings.items():
         name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
+        debug_events.append(f"\nDEBUG - Name change: {old_name} → {new_name}")
 
     prompt = (
         f"Regender the following text exactly as specified:\n\n"
@@ -309,7 +322,16 @@ def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
         f"Return only the regendered text, no explanations."
     )
     
-    response = get_gpt_response(prompt, temperature=0.1)  # Lower temperature for more consistent output
+    debug_events.append("\nDEBUG - Final prompt to GPT:")
+    debug_events.append(prompt)
+    
+    response = get_gpt_response(prompt, temperature=0.1)
+    debug_events.append("\nDEBUG - GPT Response:")
+    debug_events.append(response)
+    
+    # Write to linked debug log
+    write_debug_log(debug_events, timestamp)
+    
     return response
 
 def highlight_changes(original_text, regendered_text):
@@ -318,15 +340,19 @@ def highlight_changes(original_text, regendered_text):
     """
     return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
 
-def log_output(original_text, updated_text, events_list=None, json_path="character_roles_genders.json"):
+def log_output(original_text, updated_text, events_list=None, json_path="character_roles_genders.json", timestamp=None):
     """
-    Enhanced logging function with character counts and event tracking.
+    Enhanced logging function that links to debug logs.
     """
     if not os.path.exists("logs"):
         os.makedirs("logs")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Use provided timestamp or create new one
+    if timestamp is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
     file_path = os.path.join("logs", f"log_{timestamp}.txt")
+    debug_file_path = os.path.join("logs", f"debug_{timestamp}.txt")
     separator = "\n" + "="*80 + "\n"
 
     # Calculate character statistics
@@ -353,8 +379,12 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
 
     # Write all sections to the log file
     with open(file_path, 'w', encoding='utf-8') as file:
-        # Write log version first
-        file.write("~LOGGING v1.0\n\n")
+        # Write log version and linked files first
+        file.write("~LOGGING v1.1\n\n")
+        file.write("LINKED FILES\n")
+        file.write("============\n")
+        file.write(f"Main Log: log_{timestamp}.txt\n")
+        file.write(f"Debug Log: debug_{timestamp}.txt\n\n")
 
         # Write statistics
         file.write(stats_summary)
@@ -388,8 +418,30 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
             file.write("No notable events recorded during processing.\n")
         file.write(separator)
 
-    print(f"{Fore.GREEN}✓ Log file created: {Fore.YELLOW}{file_path}{Style.RESET_ALL}")
-    return file_path
+    print(f"{Fore.GREEN}✓ Log files created:")
+    print(f"  {Fore.YELLOW}Main: log_{timestamp}.txt")
+    print(f"  {Fore.YELLOW}Debug: debug_{timestamp}.txt{Style.RESET_ALL}")
+    return timestamp  # Return timestamp for use in debug logging
+
+def write_debug_log(events, timestamp):
+    """
+    Write debug events to a linked debug log file.
+    """
+    debug_file = f"logs/debug_{timestamp}.txt"
+    with open(debug_file, 'w', encoding='utf-8') as f:
+        # Write header with linked files
+        f.write("~DEBUG LOGGING v1.1\n\n")
+        f.write("LINKED FILES\n")
+        f.write("============\n")
+        f.write(f"Main Log: log_{timestamp}.txt\n")
+        f.write(f"Debug Log: debug_{timestamp}.txt\n\n")
+        
+        # Write debug events
+        f.write("DEBUG EVENTS\n")
+        f.write("============\n")
+        f.write('\n'.join(events))
+    
+    return debug_file
 
 def create_highlighted_xml_log(file_path, highlighted_text):
     """
@@ -459,9 +511,9 @@ def extract_characters_from_chunk(chunk):
     
     return characters
 
-def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
+def process_chunks_with_context(chunks, character_contexts, confirmed_genders, timestamp):
     """
-    Updated processing with enhanced visual feedback.
+    Updated processing with timestamp for logging.
     """
     all_regendered_text = []
     name_mappings = {}
@@ -507,7 +559,10 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
                     )
         
         regendered_chunk = regender_text_gpt(
-            chunk, '\n'.join(all_confirmed_roles), name_mappings
+            chunk,
+            '\n'.join(all_confirmed_roles),
+            name_mappings,
+            timestamp
         )
         all_regendered_text.append(regendered_chunk)
     
@@ -649,6 +704,8 @@ def main():
 
     # Create an events list at the start to track events in the log file
     events = []
+    # Create timestamp for log files
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # Check API connection
     if not check_openai_api_key():
@@ -678,12 +735,16 @@ def main():
     print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
 
     # Process chunks, with events
-    combined_regendered_text, events = process_chunks_with_context(chunks, character_contexts, confirmed_genders)
+    combined_regendered_text, events = process_chunks_with_context(
+        chunks,
+        character_contexts,
+        confirmed_genders,
+        timestamp
+    )
 
     # Log results
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = f"logs/log_{timestamp}.txt"
-    log_output(input_text, combined_regendered_text, events)
+    log_output(input_text, combined_regendered_text, events, timestamp=timestamp)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
 
 if __name__ == "__main__":
