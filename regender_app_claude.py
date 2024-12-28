@@ -59,10 +59,10 @@ def print_banner():
     banner = f"""
 {Fore.CYAN}╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃  {Fore.WHITE}⚡ regender.xyz ⚡{Fore.CYAN}                      
-┃  {Fore.YELLOW}transforming gender in open source books{Fore.CYAN}     
-┃  {Fore.MAGENTA}[ Version  ]{Fore.CYAN}                      
+┃  {Fore.YELLOW}~ transforming gender in open source books ~{Fore.CYAN}     
+┃  {Fore.MAGENTA}[ Version 0.1.0 ]{Fore.CYAN}                      
 ┃                                           
-┃  {Fore.WHITE}✧{Fore.BLUE} Gender Analysis {Fore.WHITE}✧{Fore.GREEN} Name Processing {Fore.WHITE}✧{Fore.CYAN}       
+┃  {Fore.WHITE}✧{Fore.BLUE} gender analysis {Fore.WHITE}✧{Fore.GREEN} gender processing {Fore.WHITE}✧{Fore.CYAN}       
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Style.RESET_ALL}
 """
     print(banner)
@@ -269,7 +269,7 @@ def update_character_roles_genders_json(confirmed_roles, file_path="character_ro
 
 def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
     """
-    Updated version to handle explicit name changes.
+    Updated version to handle explicit name changes and proper pronoun regendering.
     """
     if name_mappings is None:
         name_mappings = {}
@@ -277,6 +277,7 @@ def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
     gender_guidelines = []
     name_instructions = []
     
+    # First, create clear instructions about pronouns and gender
     for role in confirmed_roles.splitlines():
         parts = role.split(" - ")
         if len(parts) == 3:
@@ -284,21 +285,31 @@ def regender_text_gpt(input_text, confirmed_roles, name_mappings=None):
             category_key, _ = standardize_gender(gender)
             if category_key in GENDER_CATEGORIES:
                 pronouns = GENDER_CATEGORIES[category_key]['pronouns']
-                gender_guidelines.append(f"{character}: {gender} (pronouns: {'/'.join(pronouns)})")
+                # Create more explicit pronoun instructions
+                gender_guidelines.append(
+                    f"{character} ({gender}):\n"
+                    f"- Use pronouns: {'/'.join(pronouns)}\n"
+                    f"- Replace she/her/hers with {'/'.join(pronouns)} if referring to {character}"
+                )
     
     # Add explicit name change instructions
     for old_name, new_name in name_mappings.items():
         name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
 
     prompt = (
-        f"Regender the following text, following these rules exactly:\n\n"
-        f"1. Name changes (apply these first and consistently):\n{chr(10).join(name_instructions)}\n\n"
-        f"2. Character genders and pronouns:\n{chr(10).join(gender_guidelines)}\n\n"
-        f"3. Maintain absolute consistency in names and pronouns throughout the text.\n\n"
-        f"Text to regender:\n{input_text}"
+        f"Regender the following text exactly as specified:\n\n"
+        f"1. Name changes (apply these first and exactly):\n{chr(10).join(name_instructions)}\n\n"
+        f"2. Character pronouns (apply these consistently):\n{chr(10).join(gender_guidelines)}\n\n"
+        f"3. Important rules:\n"
+        f"- Apply name changes first, then handle pronouns\n"
+        f"- Be thorough: check every pronoun and name reference\n"
+        f"- Maintain story flow and readability\n"
+        f"- Keep other character references unchanged\n\n"
+        f"Text to regender:\n{input_text}\n\n"
+        f"Return only the regendered text, no explanations."
     )
     
-    response = get_gpt_response(prompt)
+    response = get_gpt_response(prompt, temperature=0.1)  # Lower temperature for more consistent output
     return response
 
 def highlight_changes(original_text, regendered_text):
