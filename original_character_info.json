@@ -1,0 +1,12 @@
+{
+    "Elizabeth": {
+        "name": "Elizabeth",
+        "role": "Doctor",
+        "gender": "Female"
+    },
+    "Nurse": {
+        "name": "Nurse",
+        "role": "Nurse",
+        "gender": "Female"
+    }
+}
