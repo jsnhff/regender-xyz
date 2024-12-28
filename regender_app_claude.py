@@ -292,9 +292,12 @@ def highlight_changes(original_text, regendered_text):
     """
     return '\n'.join(difflib.unified_diff(original_text.splitlines(), regendered_text.splitlines()))
 
-def log_output(*args):
+def log_output(original_text, updated_text, json_path="character_roles_genders.json"):
     """
-    Function to log the output to a file with a unique name in the logs folder.
+    Function to log the output with clear sections for:
+    1. Original text
+    2. Updated text
+    3. Character roles and genders from JSON
     """
     if not os.path.exists("logs"):
         os.makedirs("logs")
@@ -302,10 +305,38 @@ def log_output(*args):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join("logs", f"log_{timestamp}.txt")
 
-    with open(file_path, 'w') as file:
-        for arg in args:
-            file.write(str(arg) + "\n\n")
-    print(f"Output logged to {file_path}")
+    # Create section separator
+    separator = "\n" + "="*80 + "\n"
+
+    try:
+        # Read the JSON file
+        with open(json_path, 'r', encoding='utf-8') as json_file:
+            character_data = json.load(json_file)
+    except Exception as e:
+        character_data = {"Characters": [], "error": str(e)}
+
+    # Write all sections to the log file
+    with open(file_path, 'w', encoding='utf-8') as file:
+        # Original text section
+        file.write("ORIGINAL TEXT")
+        file.write(separator)
+        file.write(original_text)
+        file.write(separator)
+
+        # Updated text section
+        file.write("UPDATED TEXT")
+        file.write(separator)
+        file.write(updated_text)
+        file.write(separator)
+
+        # Character roles and genders section
+        file.write("CHARACTER ROLES AND GENDERS")
+        file.write(separator)
+        file.write(json.dumps(character_data, indent=4))
+        file.write(separator)
+
+    print(f"{Fore.GREEN}✓ Log file created: {Fore.YELLOW}{file_path}{Style.RESET_ALL}")
+    return file_path
 
 def create_highlighted_xml_log(file_path, highlighted_text):
     """
@@ -558,7 +589,7 @@ def main():
     log_file = f"logs/log_{timestamp}.txt"
     log_output(input_text, combined_regendered_text)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
-    print(f"{Fore.BLUE}ℹ Output saved to: {Fore.YELLOW}{log_file}{Style.RESET_ALL}")
+    # print(f"{Fore.BLUE}ℹ Output saved to: {Fore.YELLOW}{log_file}{Style.RESET_ALL}")
 
 if __name__ == "__main__":
     main()
