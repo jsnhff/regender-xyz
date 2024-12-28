@@ -207,12 +207,34 @@ def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, de
 
 def detect_roles_gpt(input_text):
     """
-    Function to use gpt-4o-mini to identify roles, genders, and character details in the input text.
+    Function to detect character roles and store original info immediately.
     """
+    # No change: Get roles from GPT
     prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender. Arrange the results in a numbered list."
     response = get_gpt_response(prompt)
     lines = response.split('\n')
     character_list = [line for line in lines if " - " in line]
+    
+    # NEW: Store original info right when we first see it
+    original_info = {}
+    for line in character_list:
+        parts = line.split(" - ")
+        if len(parts) == 3:
+            original_name, role, gender = parts
+            original_name = clean_name(original_name)
+            original_info[original_name] = {
+                "name": original_name,    # This is the truly original name
+                "role": role,
+                "gender": gender.strip()  # Clean up any whitespace
+            }
+    
+    # NEW: Save original info immediately
+    try:
+        with open("original_character_info.json", 'w', encoding='utf-8') as f:
+            json.dump(original_info, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"{Fore.YELLOW}Warning: Could not save original character info: {e}{Style.RESET_ALL}")
+    
     return '\n'.join(character_list)
 
 def create_character_roles_genders_json(roles_info, file_path="character_roles_genders.json"):
@@ -235,80 +257,140 @@ def create_character_roles_genders_json(roles_info, file_path="character_roles_g
         json.dump({"Characters": characters}, file, ensure_ascii=False, indent=4)
     print(f"Character roles and genders saved to {file_path}")
 
-def update_character_roles_genders_json(confirmed_roles, file_path="character_roles_genders.json"):
+def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
     """
-    Updated version to use standardized gender categories.
+    Updated version to use original character information.
     """
+    # NEW: Initialize name_mappings if None
+    if name_mappings is None:
+        name_mappings = {}
+
+    # No change: Load existing JSON data
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
     except FileNotFoundError:
         data = {"Characters": []}
 
+    # NEW: Load original character information
+    try:
+        with open("original_character_info.json", 'r', encoding='utf-8') as f:
+            original_info = json.load(f)
+    except FileNotFoundError:
+        original_info = {}
+
+    # No change: Initialize updated characters list
     updated_characters = []
+    
+    # No change: Process each confirmed role
     for role in confirmed_roles:
         parts = role.split(" - ")
         if len(parts) == 3:
             new_name, role_desc, gender = parts
             new_name = clean_name(new_name)
-            # Standardize the gender
+            
+            # NEW: Look up original character information
+            original_character = None
+            for orig_name, orig_data in original_info.items():
+                if new_name in [orig_name, name_mappings.get(orig_name)]:
+                    original_character = orig_data
+                    break
+            
+            # No change: Get gender category
             category_key, standard_label = standardize_gender(gender)
-            updated_characters.append({
-                "Original_Name": new_name,
-                "Original_Role": role_desc,
-                "Original_Gender": gender,
+            
+            # NEW: Create character entry using original info when available
+            character_entry = {
+                "Original_Name": original_character["name"] if original_character else new_name,
+                "Original_Role": original_character["role"] if original_character else role_desc,
+                "Original_Gender": original_character["gender"] if original_character else gender,
                 "Updated_Name": new_name,
                 "Updated_Role": role_desc,
                 "Updated_Gender": standard_label,
                 "Gender_Category": category_key
-            })
+            }
+            updated_characters.append(character_entry)
 
+    # No change: Save updated data
+    data["Characters"] = updated_characters
     with open(file_path, 'w', encoding='utf-8') as file:
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
     print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
 
+# NEW: Entire function is new
+def save_original_character_info(info, file_path="original_character_info.json"):
+    """
+    Save the original character information to a separate JSON file.
+    """
+    try:
+        # Try to load existing data
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+        except FileNotFoundError:
+            existing_data = {}
+        
+        # Update with new info, but don't overwrite existing entries
+        for name, data in info.items():
+            if name not in existing_data:
+                existing_data[name] = data
+        
+        # Write updated data back to file
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(existing_data, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"{Fore.YELLOW}Warning: Could not save original character info: {e}{Style.RESET_ALL}")
+
 def regender_text_gpt(input_text, confirmed_roles, name_mappings=None, timestamp=None):
     """
-    Updated version with linked debug logging.
+    Updated version to process all characters from JSON.
     """
     if name_mappings is None:
         name_mappings = {}
         
     gender_guidelines = []
     name_instructions = []
-    debug_events = []  # Collect debug events
+    debug_events = []
     
-    # Debug log the initial state
     debug_events.append(f"\nDEBUG - Starting regender_text_gpt")
-    debug_events.append(f"Input confirmed_roles:\n{confirmed_roles}")
-    debug_events.append(f"Input name_mappings:\n{name_mappings}")
     
-    # Process each role and build instructions
-    for role in confirmed_roles.splitlines():
-        parts = role.split(" - ")
-        if len(parts) == 3:
-            character, role_desc, gender = parts
-            category_key, _ = standardize_gender(gender)
-            debug_events.append(f"\nDEBUG - Processing character: {character}")
-            debug_events.append(f"  Role: {role_desc}")
-            debug_events.append(f"  Gender: {gender}")
-            debug_events.append(f"  Category: {category_key}")
+    # Load current character data from JSON
+    try:
+        with open("character_roles_genders.json", 'r', encoding='utf-8') as f:
+            char_data = json.load(f)
+            debug_events.append(f"Loaded character data from JSON:")
+            debug_events.append(json.dumps(char_data, indent=2))
+    except Exception as e:
+        debug_events.append(f"Error loading character data: {str(e)}")
+        char_data = {"Characters": []}
+    
+    # Process all characters from JSON
+    for char in char_data["Characters"]:
+        character = char["Updated_Name"]
+        gender = char["Updated_Gender"]
+        gender_category = char["Gender_Category"]
+        
+        debug_events.append(f"\nDEBUG - Processing character: {character}")
+        debug_events.append(f"  Gender: {gender}")
+        debug_events.append(f"  Category: {gender_category}")
+        
+        if gender_category in GENDER_CATEGORIES:
+            pronouns = GENDER_CATEGORIES[gender_category]['pronouns']
+            debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
             
-            if category_key in GENDER_CATEGORIES:
-                pronouns = GENDER_CATEGORIES[category_key]['pronouns']
-                debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
-                
-                gender_guidelines.append(
-                    f"{character} ({gender}):\n"
-                    f"- Use pronouns: {'/'.join(pronouns)}\n"
-                    f"- Replace she/her/hers with {'/'.join(pronouns)} if referring to {character}"
-                )
+            # Create detailed pronoun instructions
+            gender_guidelines.append(
+                f"{character} ({gender}):\n"
+                f"- Use pronouns: {'/'.join(pronouns)}\n"
+                f"- Replace any she/her/hers with {'/'.join(pronouns)} when referring to {character}"
+            )
     
-    # Log name changes
+    # Add name change instructions
     for old_name, new_name in name_mappings.items():
         name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
         debug_events.append(f"\nDEBUG - Name change: {old_name} → {new_name}")
 
+    # Create the prompt
     prompt = (
         f"Regender the following text exactly as specified:\n\n"
         f"1. Name changes (apply these first and exactly):\n{chr(10).join(name_instructions)}\n\n"
@@ -351,8 +433,8 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
     if timestamp is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    file_path = os.path.join("logs", f"log_{timestamp}.txt")
-    debug_file_path = os.path.join("logs", f"debug_{timestamp}.txt")
+    file_path = os.path.join("logs", f"{timestamp}_regender.log")
+    debug_file_path = os.path.join("logs", f"{timestamp}_debug.log")
     separator = "\n" + "="*80 + "\n"
 
     # Calculate character statistics
@@ -383,8 +465,8 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
         file.write("~LOGGING v1.1\n\n")
         file.write("LINKED FILES\n")
         file.write("============\n")
-        file.write(f"Main Log: log_{timestamp}.txt\n")
-        file.write(f"Debug Log: debug_{timestamp}.txt\n\n")
+        file.write(f"Main Log: {timestamp}_regender.log\n")
+        file.write(f"Debug Log: {timestamp}_debug.log\n\n")
 
         # Write statistics
         file.write(stats_summary)
@@ -419,22 +501,22 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
         file.write(separator)
 
     print(f"{Fore.GREEN}✓ Log files created:")
-    print(f"  {Fore.YELLOW}Main: log_{timestamp}.txt")
-    print(f"  {Fore.YELLOW}Debug: debug_{timestamp}.txt{Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}Main: {timestamp}_regender.log")
+    print(f"  {Fore.YELLOW}Debug: {timestamp}_debug.log{Style.RESET_ALL}")
     return timestamp  # Return timestamp for use in debug logging
 
 def write_debug_log(events, timestamp):
     """
     Write debug events to a linked debug log file.
     """
-    debug_file = f"logs/debug_{timestamp}.txt"
+    debug_file = f"logs/{timestamp}_debug.log"
     with open(debug_file, 'w', encoding='utf-8') as f:
         # Write header with linked files
         f.write("~DEBUG LOGGING v1.1\n\n")
         f.write("LINKED FILES\n")
         f.write("============\n")
-        f.write(f"Main Log: log_{timestamp}.txt\n")
-        f.write(f"Debug Log: debug_{timestamp}.txt\n\n")
+        f.write(f"Main Log: {timestamp}_regender.log\n")
+        f.write(f"Debug Log: {timestamp}_debug.log\n\n")
         
         # Write debug events
         f.write("DEBUG EVENTS\n")
@@ -545,7 +627,7 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders, t
                 )
                 all_events.extend(new_events)  # Add the new events to our collection
                 name_mappings.update(chunk_name_mappings)
-                update_character_roles_genders_json(confirmed_roles)
+                update_character_roles_genders_json(confirmed_roles, name_mappings)
         
         # Rest of the processing...
         all_confirmed_roles = []
@@ -574,13 +656,11 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
     Process new characters to confirm their genders and possible name changes.
     Returns: (confirmed_roles, name_mappings, events)
     """
-    # No change: Initialize our return values
     confirmed_roles = []
     name_mappings = {}
     events = []
     
     for role in roles_info.splitlines():
-        # No change: Split the role info into parts
         parts = role.split(" - ")
         if len(parts) != 3:
             continue
@@ -589,46 +669,41 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
         character = clean_name(character)
         
         if character in new_characters:
+            # Store original information before any changes
+            original_name = character
+            original_gender = gender
+            
             # No change: Your existing nice event formatting
             events.append(f"Found new character: {character} ({role_desc})")
 
-            # NEW: Get three values instead of two from get_user_gender_choice
-            # Old: standardized_gender, new_name = get_user_gender_choice(...)
-            # New: Added gender_category to track M/F/NB explicitly
+            # Get gender choice and possible new name
             standardized_gender, new_name, gender_category = get_user_gender_choice(character, gender)
-            
-            # No change: Store the gender in confirmed_genders
             confirmed_genders[character] = standardized_gender
             
-            # No change: Your existing event logging
             events.append(f"  -> Gender set to: {standardized_gender}")
 
-            # No change: Handle name changes and logging
+            # Handle name changes and logging
             if new_name != character:
                 name_mappings[character] = new_name
                 character = new_name
                 events.append(f"  -> Character renamed to: {new_name}")
             
-            # NEW: Create a detailed role entry dictionary
-            # This replaces the simple string format with more detailed tracking
+            # Create role entry with correct original and updated fields
             role_entry = {
-                "Original_Name": character,
+                "Original_Name": original_name,       # Store initial name
                 "Original_Role": role_desc,
-                "Original_Gender": standardized_gender,  # NEW: Using standardized value
-                "Updated_Name": new_name if new_name != character else character,
+                "Original_Gender": original_gender,   # Store initial gender
+                "Updated_Name": new_name if new_name != original_name else original_name,
                 "Updated_Role": role_desc,
-                "Updated_Gender": standardized_gender,  # NEW: Using standardized value
-                "Gender_Category": gender_category      # NEW: Explicitly track category
+                "Updated_Gender": standardized_gender,
+                "Gender_Category": gender_category
             }
             
-            # NEW: Format the role string using standardized values
             confirmed_roles.append(f"{character} - {role_desc} - {standardized_gender}")
         else:
-            # No change: Handle existing characters
             current_gender = confirmed_genders.get(character, gender)
             confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
     
-    # No change: Return our three values
     return confirmed_roles, name_mappings, events
 
 def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
@@ -712,7 +787,8 @@ def main():
         return
 
     # Load and process the text
-    input_text = process_large_text_file("test_samples/input_nickname_test.txt")
+    # input_text = process_large_text_file("test_samples/input_nickname_test.txt")
+    input_text = process_large_text_file("test_samples/pride_and_prejudice_chapter_1_short.txt")
     if not input_text:
         print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
@@ -742,8 +818,9 @@ def main():
         timestamp
     )
 
-    # Log results
-    log_file = f"logs/log_{timestamp}.txt"
+    # Log results with descriptive file names
+    log_file = f"logs/{timestamp}_regender.log"
+    debug_file = f"logs/{timestamp}_debug.log"
     log_output(input_text, combined_regendered_text, events, timestamp=timestamp)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
 
