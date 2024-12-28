@@ -327,7 +327,10 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
 
     # Write all sections to the log file
     with open(file_path, 'w', encoding='utf-8') as file:
-        # Write statistics first
+        # Write log version first
+        file.write("~LOGGING v1.0\n\n")
+
+        # Write statistics
         file.write(stats_summary)
         file.write(separator)
 
