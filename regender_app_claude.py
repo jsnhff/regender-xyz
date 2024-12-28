@@ -119,11 +119,13 @@ def standardize_gender(gender_text):
 def get_user_gender_choice(character, current_gender):
     """
     Enhanced gender selection interface with colored formatting.
+    Returns tuple of (selected_gender, new_name, gender_category).
     """
+    # No change: Your existing nice CLI formatting
     print(f"\n{Fore.CYAN}╭─ Character: {Fore.WHITE}{character} {Fore.YELLOW}({current_gender.strip()}){Style.RESET_ALL}")
     print(f"{Fore.CYAN}├─ Select Gender:{Style.RESET_ALL}")
     
-    # Display options in a compact, colored format
+    # No change: Your existing menu display
     options = [
         f"{Fore.GREEN}1{Style.RESET_ALL} Male",
         f"{Fore.MAGENTA}2{Style.RESET_ALL} Female",
@@ -136,16 +138,25 @@ def get_user_gender_choice(character, current_gender):
     choice = input().strip()
     
     if not choice:
-        return current_gender, character
+        # NEW: When keeping current gender, standardize it and return all three values
+        # Old: return current_gender, character
+        category_key, standard_label = standardize_gender(current_gender)
+        return standard_label, character, category_key
         
     try:
         choice_idx = int(choice) - 1
-        category_keys = [k for k in GENDER_CATEGORIES.keys() if k != 'UNK']
+        # NEW: Explicit mapping of menu choices to gender categories
+        # This ensures we always use the correct category keys
+        category_keys = ['M', 'F', 'NB']  # Maps 1->M, 2->F, 3->NB
+        
         if 0 <= choice_idx < len(category_keys):
+            # NEW: Get the category key based on user's choice
             selected_key = category_keys[choice_idx]
+            # NEW: Get the standard label for this category (Male/Female/Non-binary)
             selected_gender = GENDER_CATEGORIES[selected_key]['label']
             
             if selected_gender.lower() != current_gender.lower():
+                # No change: Your existing name suggestion UI
                 print(f"\n{Fore.CYAN}╭─ Name Suggestions:{Style.RESET_ALL}")
                 suggested_names = get_gpt_response(
                     f"Suggest three {selected_gender.lower()} versions of the name '{character}'. "
@@ -153,19 +164,23 @@ def get_user_gender_choice(character, current_gender):
                 ).split(',')
                 suggested_names = [name.strip() for name in suggested_names]
                 
-                # Display suggestions in a colored, inline format
                 print(f"{Fore.CYAN}│  {Style.RESET_ALL}" + 
                       " | ".join(f"{Fore.YELLOW}{name}{Style.RESET_ALL}" for name in suggested_names))
                 print(f"{Fore.CYAN}╰─{Style.RESET_ALL}", end=" ")
                 new_name = input("Enter name (↵ to keep current): ").strip()
+                
                 if new_name:
-                    return selected_gender, new_name
+                    # NEW: Return all three values (gender label, new name, category)
+                    return selected_gender, new_name, selected_key
             
-            return selected_gender, character
+            # NEW: Return all three values (gender label, same name, category)
+            return selected_gender, character, selected_key
     except ValueError:
         pass
         
-    return current_gender, character
+    # NEW: If anything goes wrong, standardize current gender and return all three values
+    category_key, standard_label = standardize_gender(current_gender)
+    return standard_label, character, category_key
 
 def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, delay=5):
     """
@@ -490,13 +505,16 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
 
 def confirm_new_characters(roles_info, confirmed_genders, new_characters):
     """
-    Updated version to handle both gender and name changes.
+    Process new characters to confirm their genders and possible name changes.
+    Returns: (confirmed_roles, name_mappings, events)
     """
+    # No change: Initialize our return values
     confirmed_roles = []
-    name_mappings = {}  # Store character name changes
-    events = []  # Initialize events list
+    name_mappings = {}
+    events = []
     
     for role in roles_info.splitlines():
+        # No change: Split the role info into parts
         parts = role.split(" - ")
         if len(parts) != 3:
             continue
@@ -505,25 +523,46 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
         character = clean_name(character)
         
         if character in new_characters:
-            # Add discovery event
+            # No change: Your existing nice event formatting
             events.append(f"Found new character: {character} ({role_desc})")
 
-            # Get both gender and possible name change
-            standardized_gender, new_name = get_user_gender_choice(character, gender)
+            # NEW: Get three values instead of two from get_user_gender_choice
+            # Old: standardized_gender, new_name = get_user_gender_choice(...)
+            # New: Added gender_category to track M/F/NB explicitly
+            standardized_gender, new_name, gender_category = get_user_gender_choice(character, gender)
+            
+            # No change: Store the gender in confirmed_genders
             confirmed_genders[character] = standardized_gender
             
-            # Add gender assignment event
+            # No change: Your existing event logging
             events.append(f"  -> Gender set to: {standardized_gender}")
 
+            # No change: Handle name changes and logging
             if new_name != character:
                 name_mappings[character] = new_name
                 character = new_name
-                # Add renaming event
                 events.append(f"  -> Character renamed to: {new_name}")
-        
-        current_gender = confirmed_genders.get(character, gender)
-        confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
+            
+            # NEW: Create a detailed role entry dictionary
+            # This replaces the simple string format with more detailed tracking
+            role_entry = {
+                "Original_Name": character,
+                "Original_Role": role_desc,
+                "Original_Gender": standardized_gender,  # NEW: Using standardized value
+                "Updated_Name": new_name if new_name != character else character,
+                "Updated_Role": role_desc,
+                "Updated_Gender": standardized_gender,  # NEW: Using standardized value
+                "Gender_Category": gender_category      # NEW: Explicitly track category
+            }
+            
+            # NEW: Format the role string using standardized values
+            confirmed_roles.append(f"{character} - {role_desc} - {standardized_gender}")
+        else:
+            # No change: Handle existing characters
+            current_gender = confirmed_genders.get(character, gender)
+            confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
     
+    # No change: Return our three values
     return confirmed_roles, name_mappings, events
 
 def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
