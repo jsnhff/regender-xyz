@@ -462,9 +462,10 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
             
             roles_info = detect_roles_gpt(chunk)
             if roles_info:
-                confirmed_roles, chunk_name_mappings = confirm_new_characters(
+                confirmed_roles, chunk_name_mappings, new_events = confirm_new_characters(
                     roles_info, confirmed_genders, new_characters
                 )
+                all_events.extend(new_events)  # Add the new events to our collection
                 name_mappings.update(chunk_name_mappings)
                 update_character_roles_genders_json(confirmed_roles)
         
@@ -493,6 +494,7 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
     """
     confirmed_roles = []
     name_mappings = {}  # Store character name changes
+    events = []  # Initialize events list
     
     for role in roles_info.splitlines():
         parts = role.split(" - ")
@@ -503,17 +505,26 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
         character = clean_name(character)
         
         if character in new_characters:
+            # Add discovery event
+            events.append(f"Found new character: {character} ({role_desc})")
+
             # Get both gender and possible name change
             standardized_gender, new_name = get_user_gender_choice(character, gender)
             confirmed_genders[character] = standardized_gender
+            
+            # Add gender assignment event
+            events.append(f"  -> Gender set to: {standardized_gender}")
+
             if new_name != character:
                 name_mappings[character] = new_name
                 character = new_name
+                # Add renaming event
+                events.append(f"  -> Character renamed to: {new_name}")
         
         current_gender = confirmed_genders.get(character, gender)
         confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
     
-    return confirmed_roles, name_mappings
+    return confirmed_roles, name_mappings, events
 
 def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
     """
