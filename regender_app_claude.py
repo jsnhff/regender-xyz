@@ -528,7 +528,7 @@ def main():
         return
 
     # Load and process the text
-    input_text = process_large_text_file("input_3_chunk_story_1000.txt")
+    input_text = process_large_text_file("input_nickname_test.txt")
     if not input_text:
         print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
