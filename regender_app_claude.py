@@ -436,10 +436,14 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
     """
     all_regendered_text = []
     name_mappings = {}
+    all_events = []  # Initialize events list
     
     total_chunks = len(chunks)
     
     for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
+        # Add basic chunk processing event
+        all_events.append(f"Processing chunk {i+1} of {total_chunks}")
+
         # Progress indicator
         progress = f"{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL}"
         print(f"\n{progress} Processing chunk...")
@@ -477,7 +481,8 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
         )
         all_regendered_text.append(regendered_chunk)
     
-    return '\n'.join(all_regendered_text)
+    combined_regendered_text = '\n'.join(all_regendered_text)
+    return combined_regendered_text, all_events
 
 def confirm_new_characters(roles_info, confirmed_genders, new_characters):
     """
@@ -608,15 +613,14 @@ def main():
     print(f"{Fore.GREEN}└─ Split into {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
     print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
 
-    # Process chunks
-    combined_regendered_text = process_chunks_with_context(chunks, character_contexts, confirmed_genders)
+    # Process chunks, with events
+    combined_regendered_text, events = process_chunks_with_context(chunks, character_contexts, confirmed_genders)
 
     # Log results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = f"logs/log_{timestamp}.txt"
     log_output(input_text, combined_regendered_text, events)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
-    # print(f"{Fore.BLUE}ℹ Output saved to: {Fore.YELLOW}{log_file}{Style.RESET_ALL}")
 
 if __name__ == "__main__":
     main()
