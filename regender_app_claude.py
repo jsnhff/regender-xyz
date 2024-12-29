@@ -237,26 +237,6 @@ def detect_roles_gpt(input_text):
     
     return '\n'.join(character_list)
 
-def create_character_roles_genders_json(roles_info, file_path="character_roles_genders.json"):
-    """
-    Function to create a JSON file with character roles and genders.
-    """
-    roles = [line.split(". ", 1)[1] if ". " in line else line for line in roles_info.splitlines()]
-    characters = []
-    for role in roles:
-        parts = role.split(" - ")
-        if len(parts) == 3:
-            character, role_desc, gender = parts
-            characters.append({
-                "Original_Name": character,
-                "Original_Role": role_desc,
-                "Original_Gender": gender
-            })
-
-    with open(file_path, 'w', encoding='utf-8') as file:
-        json.dump({"Characters": characters}, file, ensure_ascii=False, indent=4)
-    print(f"Character roles and genders saved to {file_path}")
-
 def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
     """
     Updated version to use original character information.
@@ -497,7 +477,6 @@ def log_output(original_text, updated_text, events_list=None, json_path="charact
     print(f"{Fore.GREEN}✓ Log files created:")
     print(f"  {Fore.YELLOW}Main: {timestamp}_regender.log")
     print(f"  {Fore.YELLOW}Debug: {timestamp}_debug.log{Style.RESET_ALL}")
-    return timestamp  # Return timestamp for use in debug logging
 
 def write_debug_log(events, timestamp):
     """
@@ -776,7 +755,7 @@ def main():
 
     # Load and process the text
     input_text = process_large_text_file("test_samples/input_nickname_test.txt")
-    # input_text = process_large_text_file("test_samples/pride_and_prejudice_chapter_1_short.txt")
+
     if not input_text:
         print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
