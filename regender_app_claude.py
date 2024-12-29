@@ -239,24 +239,6 @@ def update_character_roles_genders_json(confirmed_roles, name_mappings=None, fil
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
     print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
 
-def save_original_character_info(info, file_path="original_character_info.json"):
-    """Save original character information to JSON."""
-    try:
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                existing_data = json.load(f)
-        except FileNotFoundError:
-            existing_data = {}
-        
-        for name, data in info.items():
-            if name not in existing_data:
-                existing_data[name] = data
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(existing_data, f, indent=4, ensure_ascii=False)
-    except Exception as e:
-        print(f"{Fore.YELLOW}Warning: Could not save original character info: {e}{Style.RESET_ALL}")
-
 def regender_text_gpt(input_text, confirmed_roles, name_mappings=None, timestamp=None):
     """Process text with gender and name changes."""
     if name_mappings is None:
