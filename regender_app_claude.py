@@ -1,8 +1,5 @@
-# TODO: TBD working with Claude
-
 import os
 import time
-import difflib
 from openai import OpenAI
 from datetime import datetime
 import json
