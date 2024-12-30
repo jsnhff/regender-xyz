@@ -1,12 +1,57 @@
 {
-    "Elizabeth": {
-        "name": "Elizabeth",
-        "role": "Doctor",
+    "Young mother": {
+        "name": "Young mother",
+        "role": "Mother",
         "gender": "Female"
     },
-    "Nurse": {
-        "name": "Nurse",
-        "role": "Nurse",
+    "Baby boy": {
+        "name": "Baby boy",
+        "role": "Child",
+        "gender": "Male"
+    },
+    "Professor Helen Williams": {
+        "name": "Professor Helen Williams",
+        "role": "Academic (Marine Biologist)",
+        "gender": "Female"
+    },
+    "Ship's captain": {
+        "name": "Ship's captain",
+        "role": "Captain",
+        "gender": "Male"
+    },
+    "Captain's wife": {
+        "name": "Captain's wife",
+        "role": "Wife",
+        "gender": "Female"
+    },
+    "Teenage daughter": {
+        "name": "Teenage daughter",
+        "role": "Daughter",
+        "gender": "Female"
+    },
+    "Lucy": {
+        "name": "Lucy",
+        "role": "Friend/Acquaintance",
+        "gender": "Female"
+    },
+    "Housekeeper": {
+        "name": "Housekeeper",
+        "role": "Housekeeper",
+        "gender": "Female"
+    },
+    "Cook's assistants": {
+        "name": "Cook's assistants",
+        "role": "Assistants",
+        "gender": "Gender not specified (plural)"
+    },
+    "Head chambermaid": {
+        "name": "Head chambermaid",
+        "role": "Supervisor",
+        "gender": "Female"
+    },
+    "Stable master's wife": {
+        "name": "Stable master's wife",
+        "role": "Wife",
         "gender": "Female"
     }
 }
