@@ -600,7 +600,7 @@ def main():
     if not check_openai_api_key():
         return
 
-    input_text = process_large_text_file("test_samples/input_nickname_test.txt")
+    input_text = process_large_text_file("test_samples/input_complex_titles_roles.txt")
 
     if not input_text:
         print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
