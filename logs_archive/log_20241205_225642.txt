@@ -1,0 +1,26 @@
+Sam and Lily walked through the forest, the towering trees casting long shadows on the path. Sam carried a small backpack, his pace steady and deliberate. Lily followed close, her sketchpad clutched tightly as her eyes darted to the flowers and ferns lining the trail. The forest felt alive around them, each step accompanied by the soft crunch of leaves underfoot.
+
+The path wound deeper into the woods, where the air grew cooler and the light dimmed. At a clearing, a beam of sunlight pierced the canopy, illuminating their way. Sam paused, a faint smile on his face. Together, the brother and sister stepped forward, knowing they were close to home.
+
+1. Sam - Brother - Male  
+2. Lily - Sister - Female  
+
+Samantha - Brother - female
+Liam - Sister - male
+
+Samantha and Liam walked through the forest, the towering trees casting long shadows on the path. Samantha carried a small backpack, her pace steady and deliberate. Liam followed close, his sketchpad clutched tightly as his eyes darted to the flowers and ferns lining the trail. The forest felt alive around them, each step accompanied by the soft crunch of leaves underfoot.
+
+The path wound deeper into the woods, where the air grew cooler and the light dimmed. At a clearing, a beam of sunlight pierced the canopy, illuminating their way. Samantha paused, a faint smile on her face. Together, the sister and brother stepped forward, knowing they were close to home.
+
+--- 
+
++++ 
+
+@@ -1,3 +1,3 @@
+
+-Sam and Lily walked through the forest, the towering trees casting long shadows on the path. Sam carried a small backpack, his pace steady and deliberate. Lily followed close, her sketchpad clutched tightly as her eyes darted to the flowers and ferns lining the trail. The forest felt alive around them, each step accompanied by the soft crunch of leaves underfoot.
++Samantha and Liam walked through the forest, the towering trees casting long shadows on the path. Samantha carried a small backpack, her pace steady and deliberate. Liam followed close, his sketchpad clutched tightly as his eyes darted to the flowers and ferns lining the trail. The forest felt alive around them, each step accompanied by the soft crunch of leaves underfoot.
+ 
+-The path wound deeper into the woods, where the air grew cooler and the light dimmed. At a clearing, a beam of sunlight pierced the canopy, illuminating their way. Sam paused, a faint smile on his face. Together, the brother and sister stepped forward, knowing they were close to home.
++The path wound deeper into the woods, where the air grew cooler and the light dimmed. At a clearing, a beam of sunlight pierced the canopy, illuminating their way. Samantha paused, a faint smile on her face. Together, the sister and brother stepped forward, knowing they were close to home.
+

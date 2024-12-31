@@ -1,0 +1,47 @@
+Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
+
+“Wait, Sam!” she said, stopping to draw a wildflower. Sam sighed but waited. As a brother, he felt responsible. 
+
+When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted. 
+
+At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
+
+Lily nodded, her sketchpad tucked away. They had found their way.
+
+1. Sam - Brother - Male  
+2. Lily - Artist/Sketcher - Female  
+
+Samantha - Brother - female
+Leo - Artist/Sketcher - male
+
+Samantha and Leo walked through the forest, the trees rising tall around them. Samantha carried a small backpack, her steps steady and sure. Leo held a sketchpad, his eyes darting to every flower and tree.
+
+“Wait, Samantha!” he said, stopping to draw a wildflower. Samantha sighed but waited. As a sister, she felt responsible.
+
+When he finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted.
+
+At a clearing, sunlight broke through the canopy. Samantha smiled. “We’re close.”
+
+Leo nodded, his sketchpad tucked away. They had found their way.
+
+--- 
+
++++ 
+
+@@ -1,9 +1,9 @@
+
+-Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
++Samantha and Leo walked through the forest, the trees rising tall around them. Samantha carried a small backpack, her steps steady and sure. Leo held a sketchpad, his eyes darting to every flower and tree.
+ 
+-“Wait, Sam!” she said, stopping to draw a wildflower. Sam sighed but waited. As a brother, he felt responsible. 
++“Wait, Samantha!” he said, stopping to draw a wildflower. Samantha sighed but waited. As a sister, she felt responsible.
+ 
+-When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted. 
++When he finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted.
+ 
+-At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
++At a clearing, sunlight broke through the canopy. Samantha smiled. “We’re close.”
+ 
+-Lily nodded, her sketchpad tucked away. They had found their way.
++Leo nodded, his sketchpad tucked away. They had found their way.
+

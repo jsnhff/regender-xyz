@@ -1,0 +1,58 @@
+~LOGGING v1.1
+
+LINKED FILES
+============
+Main Log: log_20241227_234001.txt
+Debug Log: debug_20241227_234001.txt
+
+CHARACTER STATISTICS
+====================
+Original text character count: 285
+Updated text character count: 272
+Difference in characters: 13
+Total named characters processed: 2
+
+================================================================================
+ORIGINAL TEXT
+================================================================================
+Elizabeth sat at her desk, reviewing patient files. Everyone at the hospital called her "Bee" - a nickname from her residency days when she worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Elizabeth grabbed her stethoscope.
+================================================================================
+UPDATED TEXT
+================================================================================
+Eli sat at his desk, reviewing patient files. Everyone at the hospital called him "Bee" - a nickname from his residency days when he worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Eli grabbed his stethoscope.
+================================================================================
+CHARACTER ROLES AND GENDERS
+================================================================================
+{
+    "Characters": [
+        {
+            "Original_Name": "Eli",
+            "Original_Role": "Doctor",
+            "Original_Gender": "Male",
+            "Updated_Name": "Eli",
+            "Updated_Role": "Doctor",
+            "Updated_Gender": "Male",
+            "Gender_Category": "M"
+        },
+        {
+            "Original_Name": "Nurse",
+            "Original_Role": "Nurse",
+            "Original_Gender": "Female",
+            "Updated_Name": "Nurse",
+            "Updated_Role": "Nurse",
+            "Updated_Gender": "Female",
+            "Gender_Category": "F"
+        }
+    ]
+}
+================================================================================
+PROCESSING EVENTS
+================================================================================
+- Processing chunk 1 of 1
+- Found new character: Elizabeth (Doctor)
+-   -> Gender set to: Male
+-   -> Character renamed to: Eli
+- Found new character: Nurse (Nurse)
+-   -> Gender set to: Female
+
+================================================================================

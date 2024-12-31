@@ -1,0 +1,47 @@
+Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
+
+“Wait, Sam!” she said, stopping to draw a wildflower. Sam sighed but waited. As a brother, he felt responsible. 
+
+When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted. 
+
+At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
+
+Lily nodded, her sketchpad tucked away. They had found their way.
+
+1. Sam - Brother - Male  
+2. Lily - Artist/Sister - Female  
+
+Ethan - Brother - male
+Lila - Artist/Sister - female
+
+Ethan and Lila walked through the forest, the trees rising tall around them. Ethan carried a small backpack, his steps steady and sure. Lila held a sketchpad, her eyes darting to every flower and tree.
+
+“Wait, Ethan!” she said, stopping to draw a wildflower. Ethan sighed but waited. As a brother, he felt responsible.
+
+When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted.
+
+At a clearing, sunlight broke through the canopy. Ethan smiled. “We’re close.”
+
+Lila nodded, her sketchpad tucked away. They had found their way.
+
+--- 
+
++++ 
+
+@@ -1,9 +1,9 @@
+
+-Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
++Ethan and Lila walked through the forest, the trees rising tall around them. Ethan carried a small backpack, his steps steady and sure. Lila held a sketchpad, her eyes darting to every flower and tree.
+ 
+-“Wait, Sam!” she said, stopping to draw a wildflower. Sam sighed but waited. As a brother, he felt responsible. 
++“Wait, Ethan!” she said, stopping to draw a wildflower. Ethan sighed but waited. As a brother, he felt responsible.
+ 
+-When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted. 
++When she finished, they continued together, their path winding deeper into the woods. The air grew cooler, and the forest quieted.
+ 
+-At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
++At a clearing, sunlight broke through the canopy. Ethan smiled. “We’re close.”
+ 
+-Lily nodded, her sketchpad tucked away. They had found their way.
++Lila nodded, her sketchpad tucked away. They had found their way.
+

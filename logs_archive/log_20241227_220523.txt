@@ -1,0 +1,33 @@
+ORIGINAL TEXT
+================================================================================
+Elizabeth sat at her desk, reviewing patient files. Everyone at the hospital called her "Bee" - a nickname from her residency days when she worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Elizabeth grabbed her stethoscope.
+================================================================================
+UPDATED TEXT
+================================================================================
+Eli sat at his desk, reviewing patient files. Everyone at the hospital called him "Bee" - a nickname from his residency days when he worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Eli grabbed his stethoscope.
+================================================================================
+CHARACTER ROLES AND GENDERS
+================================================================================
+{
+    "Characters": [
+        {
+            "Original_Name": "Eli",
+            "Original_Role": "Doctor",
+            "Original_Gender": "Female  ",
+            "Updated_Name": "Eli",
+            "Updated_Role": "Doctor",
+            "Updated_Gender": "Female",
+            "Gender_Category": "F"
+        },
+        {
+            "Original_Name": "Nurse",
+            "Original_Role": "Nurse",
+            "Original_Gender": "Male",
+            "Updated_Name": "Nurse",
+            "Updated_Role": "Nurse",
+            "Updated_Gender": "Male",
+            "Gender_Category": "M"
+        }
+    ]
+}
+================================================================================

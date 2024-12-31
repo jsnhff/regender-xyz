@@ -1,0 +1,48 @@
+~DEBUG LOGGING v1.1
+
+LINKED FILES
+============
+Main Log: log_None.txt
+Debug Log: debug_None.txt
+
+DEBUG EVENTS
+============
+
+DEBUG - Starting regender_text_gpt
+Input confirmed_roles:
+Nurse - Nurse - Female
+Input name_mappings:
+{'Elizabeth': 'Eli'}
+
+DEBUG - Processing character: Nurse
+  Role: Nurse
+  Gender: Female
+  Category: F
+  Pronouns to use: she/her/hers
+
+DEBUG - Name change: Elizabeth → Eli
+
+DEBUG - Final prompt to GPT:
+Regender the following text exactly as specified:
+
+1. Name changes (apply these first and exactly):
+Replace all instances of 'Elizabeth' with 'Eli'
+
+2. Character pronouns (apply these consistently):
+Nurse (Female):
+- Use pronouns: she/her/hers
+- Replace she/her/hers with she/her/hers if referring to Nurse
+
+3. Important rules:
+- Apply name changes first, then handle pronouns
+- Be thorough: check every pronoun and name reference
+- Maintain story flow and readability
+- Keep other character references unchanged
+
+Text to regender:
+Elizabeth sat at her desk, reviewing patient files. Everyone at the hospital called her "Bee" - a nickname from her residency days when she worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Elizabeth grabbed her stethoscope.
+
+Return only the regendered text, no explanations.
+
+DEBUG - GPT Response:
+Eli sat at her desk, reviewing patient files. Everyone at the hospital called her "Bee" - a nickname from her residency days when she worked as efficiently as a honeybee. "Dr. Bee!" called a nurse from the doorway. "Your next patient is ready." Eli grabbed her stethoscope.

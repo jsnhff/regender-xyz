@@ -1,0 +1,55 @@
+Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
+
+Behind them, their cousin Jake trailed, whistling softly as he tossed a pebble from hand to hand. Nearby, their aunt Clara paused to adjust her sunhat, scanning the trail ahead with a protective eye. Grandpa Henry walked beside her, his sturdy walking stick thudding against the dirt path. 
+
+“Almost there,” Clara called softly, glancing at her husband, Tom, who carried a basket filled with snacks. Together, they moved through the quiet woods, the group a mix of laughter and steady footsteps.
+
+At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
+
+Lily nodded, her sketchpad tucked away. Jake grinned, Grandpa Henry chuckled, and Clara sighed with relief. They had found their way.
+
+1. Sam - Cousin - Male  
+2. Lily - Cousin - Female  
+3. Jake - Cousin - Male  
+4. Clara - Aunt - Female  
+5. Henry - Grandpa - Male  
+6. Tom - Husband - Male  
+
+Samantha - Cousin - female
+Liam - Cousin - male
+Jade - Cousin - female
+Cyrus - Aunt - male
+Harriet - Grandpa - female
+Tara - Husband - female
+
+Samantha and Liam walked through the forest, the trees rising tall around them. Samantha carried a small backpack, her steps steady and sure. Liam held a sketchpad, his eyes darting to every flower and tree.
+
+Behind them, their cousin Jade trailed, whistling softly as she tossed a pebble from hand to hand. Nearby, their uncle Cyrus paused to adjust his sunhat, scanning the trail ahead with a protective eye. Grandma Harriet walked beside him, her sturdy walking stick thudding against the dirt path.
+
+“Almost there,” Cyrus called softly, glancing at his wife, Tara, who carried a basket filled with snacks. Together, they moved through the quiet woods, the group a mix of laughter and steady footsteps.
+
+At a clearing, sunlight broke through the canopy. Samantha smiled. “We’re close.”
+
+Liam nodded, his sketchpad tucked away. Jade grinned, Grandma Harriet chuckled, and Cyrus sighed with relief. They had found their way.
+
+--- 
+
++++ 
+
+@@ -1,9 +1,9 @@
+
+-Sam and Lily walked through the forest, the trees rising tall around them. Sam carried a small backpack, his steps steady and sure. Lily held a sketchpad, her eyes darting to every flower and tree. 
++Samantha and Liam walked through the forest, the trees rising tall around them. Samantha carried a small backpack, her steps steady and sure. Liam held a sketchpad, his eyes darting to every flower and tree.
+ 
+-Behind them, their cousin Jake trailed, whistling softly as he tossed a pebble from hand to hand. Nearby, their aunt Clara paused to adjust her sunhat, scanning the trail ahead with a protective eye. Grandpa Henry walked beside her, his sturdy walking stick thudding against the dirt path. 
++Behind them, their cousin Jade trailed, whistling softly as she tossed a pebble from hand to hand. Nearby, their uncle Cyrus paused to adjust his sunhat, scanning the trail ahead with a protective eye. Grandma Harriet walked beside him, her sturdy walking stick thudding against the dirt path.
+ 
+-“Almost there,” Clara called softly, glancing at her husband, Tom, who carried a basket filled with snacks. Together, they moved through the quiet woods, the group a mix of laughter and steady footsteps.
++“Almost there,” Cyrus called softly, glancing at his wife, Tara, who carried a basket filled with snacks. Together, they moved through the quiet woods, the group a mix of laughter and steady footsteps.
+ 
+-At a clearing, sunlight broke through the canopy. Sam smiled. “We’re close.”
++At a clearing, sunlight broke through the canopy. Samantha smiled. “We’re close.”
+ 
+-Lily nodded, her sketchpad tucked away. Jake grinned, Grandpa Henry chuckled, and Clara sighed with relief. They had found their way.
++Liam nodded, his sketchpad tucked away. Jade grinned, Grandma Harriet chuckled, and Cyrus sighed with relief. They had found their way.
+
