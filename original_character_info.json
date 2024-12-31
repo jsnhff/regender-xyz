@@ -1,57 +1,204 @@
 {
-    "Young mother": {
-        "name": "Young mother",
-        "role": "Mother",
-        "gender": "Female"
-    },
-    "Baby boy": {
-        "name": "Baby boy",
-        "role": "Child",
-        "gender": "Male"
-    },
-    "Professor Helen Williams": {
-        "name": "Professor Helen Williams",
-        "role": "Academic (Marine Biologist)",
-        "gender": "Female"
-    },
-    "Ship's captain": {
-        "name": "Ship's captain",
-        "role": "Captain",
-        "gender": "Male"
-    },
-    "Captain's wife": {
-        "name": "Captain's wife",
-        "role": "Wife",
-        "gender": "Female"
-    },
-    "Teenage daughter": {
-        "name": "Teenage daughter",
-        "role": "Daughter",
-        "gender": "Female"
-    },
-    "Lucy": {
-        "name": "Lucy",
-        "role": "Friend/Acquaintance",
-        "gender": "Female"
-    },
-    "Housekeeper": {
-        "name": "Housekeeper",
-        "role": "Housekeeper",
-        "gender": "Female"
-    },
-    "Cook's assistants": {
-        "name": "Cook's assistants",
-        "role": "Assistants",
-        "gender": "Gender not specified (plural)"
-    },
-    "Head chambermaid": {
-        "name": "Head chambermaid",
-        "role": "Supervisor",
-        "gender": "Female"
-    },
-    "Stable master's wife": {
-        "name": "Stable master's wife",
-        "role": "Wife",
-        "gender": "Female"
-    }
+    "Characters": [
+        {
+            "Original_Name": "Unknown Young Mother",
+            "Updated_Name": "Unknown Young Mother",
+            "Original_Role": "mother",
+            "Updated_Role": "mother",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "sister of Professor Helen Williams, mother of a baby boy"
+        },
+        {
+            "Original_Name": "Professor Helen Williams",
+            "Updated_Name": "Professor Helen Williams",
+            "Original_Role": "professor",
+            "Updated_Role": "professor",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "Professor"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "sister of the young mother"
+        },
+        {
+            "Original_Name": "Ship's Captain",
+            "Updated_Name": "Ship's Captain",
+            "Original_Role": "captain",
+            "Updated_Role": "captain",
+            "Original_Gender": "male",
+            "Updated_Gender": "male",
+            "Gender_Category": "M",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "Captain"
+            ],
+            "Pronouns": [
+                "he",
+                "his"
+            ],
+            "Relations": "husband of the captain's wife"
+        },
+        {
+            "Original_Name": "Captain's Wife",
+            "Updated_Name": "Captain's Wife",
+            "Original_Role": "wife of the captain",
+            "Updated_Role": "wife of the captain",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "wife of the Ship's Captain, mother of their teenage daughter"
+        },
+        {
+            "Original_Name": "Teenage Daughter",
+            "Updated_Name": "Teenage Daughter",
+            "Original_Role": "daughter",
+            "Updated_Role": "daughter",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "daughter of the Ship's Captain and Captain's Wife"
+        },
+        {
+            "Original_Name": "Lucy",
+            "Updated_Name": "Lucy",
+            "Original_Role": "friend",
+            "Updated_Role": "friend",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "friend of the Teenage Daughter"
+        },
+        {
+            "Original_Name": "Housekeeper",
+            "Updated_Name": "Housekeeper",
+            "Original_Role": "housekeeper",
+            "Updated_Role": "housekeeper",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "None"
+        },
+        {
+            "Original_Name": "Cook's Assistants",
+            "Updated_Name": "Cook's Assistants",
+            "Original_Role": "assistants",
+            "Updated_Role": "assistants",
+            "Original_Gender": "Unknown (plural)",
+            "Updated_Gender": "Unknown (plural)",
+            "Gender_Category": "UNK",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "they",
+                "them"
+            ],
+            "Relations": "None"
+        },
+        {
+            "Original_Name": "Head Chambermaid",
+            "Updated_Name": "Head Chambermaid",
+            "Original_Role": "head chambermaid",
+            "Updated_Role": "head chambermaid",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "None"
+        },
+        {
+            "Original_Name": "Stable Master's Wife",
+            "Updated_Name": "Stable Master's Wife",
+            "Original_Role": "wife of the stable master",
+            "Updated_Role": "wife of the stable master",
+            "Original_Gender": "female",
+            "Updated_Gender": "female",
+            "Gender_Category": "F",
+            "Nicknames": [
+                "None"
+            ],
+            "Titles": [
+                "None"
+            ],
+            "Pronouns": [
+                "she",
+                "her"
+            ],
+            "Relations": "wife of the stable master"
+        }
+    ]
 }
