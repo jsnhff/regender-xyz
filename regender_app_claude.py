@@ -387,18 +387,40 @@ def write_debug_log(events, timestamp):
     return debug_file
 
 def load_input_text(file_path):
-    """Load input text file with status feedback."""
+    """Load input text file with enhanced validation and feedback.
+    
+    Args:
+        file_path (str): Path to the input text file
+        
+    Returns:
+        tuple: (content, status_message)
+            - content: The text content if successful, None if failed
+            - status_message: A user-friendly status message about the operation
+    """
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
-            print(f"{Fore.GREEN}✓ Loaded: {Fore.BLUE}{file_path}{Style.RESET_ALL}")
-            return content
+            
+            # Basic validation
+            if not content.strip():
+                return None, f"{Fore.RED}✗ File is empty: {file_path}{Style.RESET_ALL}"
+                
+            # Success message with file stats
+            word_count = len(content.split())
+            char_count = len(content)
+            status = (
+                f"{Fore.GREEN}✓ Successfully loaded: {Fore.BLUE}{file_path}{Style.RESET_ALL}\n"
+                f"  └─ {Fore.YELLOW}{word_count:,}{Style.RESET_ALL} words, "
+                f"{Fore.YELLOW}{char_count:,}{Style.RESET_ALL} characters"
+            )
+            return content, status
+            
     except FileNotFoundError:
-        print(f"{Fore.RED}✗ File not found: {file_path}{Style.RESET_ALL}")
-        return None
+        return None, f"{Fore.RED}✗ File not found: {file_path}{Style.RESET_ALL}"
+    except UnicodeDecodeError:
+        return None, f"{Fore.RED}✗ File encoding error. Please ensure the file is UTF-8 encoded: {file_path}{Style.RESET_ALL}"
     except Exception as e:
-        print(f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}")
-        return None
+        return None, f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}"
 
 def improved_chunk_text(text, max_tokens=1000):
     """Split text into chunks while preserving context."""
@@ -566,26 +588,6 @@ def load_confirmed_genders(file_path="character_roles_genders.json"):
         print(f"No confirmed genders file found or file is empty. Starting with an empty dictionary.")
     return confirmed_genders
 
-def load_large_text_file(file_path):
-    """Load large text files in chunks to manage memory."""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            while True:
-                chunk = file.read(1024 * 4)
-                if not chunk:
-                    break
-                yield chunk
-    except Exception as e:
-        print(f"Error reading larger file {file_path}: {e}")
-        return
-
-def process_large_text_file(file_path):
-    """Process text file in manageable chunks."""
-    text = ""
-    for chunk in load_large_text_file(file_path):
-        text += chunk
-    return text
-
 def clean_name(name):
     """Remove leading numbers and periods from names."""
     return re.sub(r'^\d+\.\s*', '', name).strip()
@@ -600,10 +602,10 @@ def main():
     if not check_openai_api_key():
         return
 
-    input_text = process_large_text_file("test_samples/input_complex_titles_roles.txt")
+    input_text, status_message = load_input_text("test_samples/input_complex_titles_roles.txt")
+    print(status_message)
 
     if not input_text:
-        print(f"{Fore.RED}✗ Failed to load input text.{Style.RESET_ALL}")
         return
     
     print(f"\n{Fore.CYAN}┌─ Initializing...{Style.RESET_ALL}")
