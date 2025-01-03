@@ -452,17 +452,32 @@ def improved_chunk_text(text, max_tokens=1000):
     chunks = text_splitter.split_text(text)
     print(f"{Fore.GREEN}├─ Created {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
     
-    # Show preview of each chunk
-    print(f"{Fore.CYAN}├─ Chunk previews:{Style.RESET_ALL}")
+    # Show preview of each chunk with boundary analysis
+    print(f"{Fore.CYAN}├─ Chunk previews and boundaries:{Style.RESET_ALL}")
     for i, chunk in enumerate(chunks):
         # Get first and last 50 characters of chunk
         start = chunk[:50].replace('\n', '↵')
         end = chunk[-50:].replace('\n', '↵')
         
-        # Show chunk size and previews
-        print(f"│  Chunk {i + 1}: {Fore.YELLOW}{len(chunk):,}{Style.RESET_ALL} chars")
-        print(f"│  └─ Start: {Fore.WHITE}{start}...{Style.RESET_ALL}")
-        print(f"│  └─ End: {Fore.WHITE}...{end}{Style.RESET_ALL}")
+        # Analyze chunk boundaries
+        start_boundary = "⚡ Paragraph" if chunk.startswith('\n\n') else \
+                        "✓ Sentence" if chunk[0] in '. \n' else \
+                        "⚠ Mid-word"
+        
+        end_boundary = "⚡ Paragraph" if chunk.endswith('\n\n') else \
+                      "✓ Sentence" if chunk[-1] in '.!?' else \
+                      "⚠ Mid-word"
+        
+        # Show chunk info with boundary markers
+        print(f"│  {Fore.CYAN}Chunk {i + 1}: {Fore.YELLOW}{len(chunk):,}{Style.RESET_ALL} chars")
+        print(f"│  ├─ Start ({start_boundary}): {Fore.WHITE}{start}...{Style.RESET_ALL}")
+        print(f"│  ├─ End ({end_boundary}): {Fore.WHITE}...{end}{Style.RESET_ALL}")
+        
+        # Show overlap with next chunk if not last chunk
+        if i < len(chunks) - 1:
+            overlap = find_overlap(chunk, chunks[i + 1])
+            if overlap:
+                print(f"│  └─ Overlap: {Fore.YELLOW}{len(overlap)}{Style.RESET_ALL} chars")
         print(f"│")
     
     # Process character contexts
@@ -483,6 +498,27 @@ def improved_chunk_text(text, max_tokens=1000):
     print(f"{Fore.CYAN}└─ Total unique characters: {Fore.YELLOW}{len(all_characters)}{Style.RESET_ALL}")
     
     return chunks, character_contexts
+
+def find_overlap(text1, text2, min_length=10):
+    """Find the overlapping text between two chunks.
+    
+    Args:
+        text1 (str): First text chunk
+        text2 (str): Second text chunk
+        min_length (int): Minimum length to consider as overlap
+        
+    Returns:
+        str: Overlapping text if found, empty string if none
+    """
+    # Get the shorter length between end of text1 and start of text2
+    search_length = min(200, min(len(text1), len(text2)))
+    
+    # Look for overlap
+    for i in range(search_length, min_length - 1, -1):
+        if text1[-i:] == text2[:i]:
+            return text1[-i:]
+    
+    return ""
 
 def extract_characters_from_chunk(chunk):
     """Extract character names from text chunk."""
