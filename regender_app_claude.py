@@ -452,6 +452,19 @@ def improved_chunk_text(text, max_tokens=1000):
     chunks = text_splitter.split_text(text)
     print(f"{Fore.GREEN}├─ Created {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
     
+    # Show preview of each chunk
+    print(f"{Fore.CYAN}├─ Chunk previews:{Style.RESET_ALL}")
+    for i, chunk in enumerate(chunks):
+        # Get first and last 50 characters of chunk
+        start = chunk[:50].replace('\n', '↵')
+        end = chunk[-50:].replace('\n', '↵')
+        
+        # Show chunk size and previews
+        print(f"│  Chunk {i + 1}: {Fore.YELLOW}{len(chunk):,}{Style.RESET_ALL} chars")
+        print(f"│  └─ Start: {Fore.WHITE}{start}...{Style.RESET_ALL}")
+        print(f"│  └─ End: {Fore.WHITE}...{end}{Style.RESET_ALL}")
+        print(f"│")
+    
     # Process character contexts
     character_contexts = []
     all_characters = set()
