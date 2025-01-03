@@ -780,6 +780,137 @@ def clean_name(name):
     """Remove leading numbers and periods from names."""
     return re.sub(r'^\d+\.\s*', '', name).strip()
 
+# Add this function right before the main() function, 
+# after log_character_mapping() and before main()
+
+def detect_all_characters(chunks, character_contexts, timestamp):
+    """Detect all characters across all chunks before any user interaction.
+    
+    Args:
+        chunks (list): List of text chunks
+        character_contexts (list): List of context dictionaries for each chunk
+        timestamp (str): Timestamp for logging
+        
+    Returns:
+        tuple: (all_characters, roles_by_character)
+            - all_characters: Set of all unique characters
+            - roles_by_character: Dict mapping characters to their roles
+    """
+    all_characters = set()
+    roles_by_character = {}
+    
+    print(f"\n{Fore.CYAN}Phase 1: Initial Character Detection{Style.RESET_ALL}")
+    
+    for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
+        if not context['character_info']['characters']:
+            continue
+            
+        print(f"\n{Fore.CYAN}[{i+1}/{len(chunks)}]{Style.RESET_ALL} Analyzing chunk...")
+        
+        # Get roles for this chunk
+        roles_info = detect_roles_gpt(chunk)
+        if roles_info:
+            for role in roles_info.splitlines():
+                parts = role.split(" - ")
+                if len(parts) == 3:
+                    character, role_desc, gender = parts
+                    character = clean_name(character)
+                    
+                    all_characters.add(character)
+                    if character not in roles_by_character:
+                        roles_by_character[character] = {
+                            'role': role_desc,
+                            'original_gender': gender,
+                            'appearances': []
+                        }
+                    
+                    roles_by_character[character]['appearances'].append(i)
+                    
+        # Show progress
+        print(f"└─ Found {Fore.YELLOW}{len(context['character_info']['characters'])}{Style.RESET_ALL} characters in chunk")
+    
+    print(f"\n{Fore.GREEN}✓ Character Detection Complete")
+    print(f"└─ Found {Fore.YELLOW}{len(all_characters)}{Style.RESET_ALL} unique characters")
+    
+    # Log the initial character detection results
+    detection_log = f"logs/{timestamp}_initial_detection.json"
+    with open(detection_log, 'w', encoding='utf-8') as f:
+        json.dump({
+            'all_characters': list(all_characters),
+            'roles_by_character': roles_by_character
+        }, f, indent=4)
+    print(f"└─ Detection results saved to: {Fore.YELLOW}{detection_log}{Style.RESET_ALL}")
+    
+    return all_characters, roles_by_character
+
+def handle_user_input_phase(all_characters, roles_by_character, timestamp):
+    """Handle all user input for character changes in a single phase.
+    
+    Args:
+        all_characters (set): Set of all unique characters
+        roles_by_character (dict): Dict mapping characters to their roles
+        timestamp (str): Timestamp for logging
+        
+    Returns:
+        tuple: (confirmed_genders, name_mappings)
+    """
+    print(f"\n{Fore.CYAN}┌─ Character Gender and Name Decisions{Style.RESET_ALL}")
+    print(f"├─ {Fore.YELLOW}{len(all_characters)}{Fore.CYAN} characters found{Style.RESET_ALL}")
+    
+    confirmed_genders = {}
+    name_mappings = {}
+    character_decisions = []
+    
+    # Sort characters by appearance count for prioritization
+    sorted_characters = sorted(
+        all_characters,
+        key=lambda x: len(roles_by_character[x]['appearances']),
+        reverse=True
+    )
+    
+    for idx, character in enumerate(sorted_characters, 1):
+        role_info = roles_by_character[character]
+        current_gender = role_info['original_gender']
+        
+        # Show character context
+        appearances = len(role_info['appearances'])
+        print(f"\n{Fore.CYAN}Character {idx}/{len(sorted_characters)}:{Style.RESET_ALL}")
+        print(f"└─ Name: {Fore.YELLOW}{character}{Style.RESET_ALL}")
+        print(f"   Role: {role_info['role']}")
+        print(f"   Current Gender: {current_gender}")
+        print(f"   Appearances: {appearances} chunks")
+        
+        # Get user decisions
+        standardized_gender, new_name, gender_category = get_user_gender_choice(
+            character, current_gender
+        )
+        
+        confirmed_genders[character] = standardized_gender
+        if new_name != character:
+            name_mappings[character] = new_name
+        
+        # Store decision for logging
+        character_decisions.append({
+            "original_name": character,
+            "new_name": new_name,
+            "original_gender": current_gender,
+            "new_gender": standardized_gender,
+            "role": role_info['role'],
+            "appearances": role_info['appearances']
+        })
+    
+    # Log all decisions
+    decisions_log = f"logs/{timestamp}_character_decisions.json"
+    with open(decisions_log, 'w', encoding='utf-8') as f:
+        json.dump({
+            "timestamp": timestamp,
+            "total_characters": len(all_characters),
+            "decisions": character_decisions
+        }, f, indent=4)
+    print(f"\n{Fore.GREEN}✓ Character decisions saved to: {decisions_log}{Style.RESET_ALL}")
+    
+    return confirmed_genders, name_mappings
+
 def main():
     print("\033[H\033[J", end="")
     print_banner()
@@ -790,33 +921,51 @@ def main():
     if not check_openai_api_key():
         return
 
+    # Phase 1: Initial Processing
+    print(f"\n{Fore.CYAN}┌─ Phase 1: Initial Processing{Style.RESET_ALL}")
     input_text, status_message = load_input_text("test_samples/input_complex_titles_roles.txt")
     print(status_message)
 
     if not input_text:
         return
     
-    print(f"\n{Fore.CYAN}┌─ Initializing...{Style.RESET_ALL}")
-    
+    # Initialize character database
     with open("character_roles_genders.json", 'w', encoding='utf-8') as file:
         json.dump({"Characters": []}, file, ensure_ascii=False, indent=4)
     print(f"{Fore.GREEN}├─ Reset character database{Style.RESET_ALL}")
 
-    confirmed_genders = load_confirmed_genders()
-    print(f"{Fore.GREEN}├─ Loaded character profiles{Style.RESET_ALL}")
-
+    # Split text into chunks
     chunks, character_contexts = improved_chunk_text(input_text)
     print(f"{Fore.GREEN}└─ Split into {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
-    # print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
     
-    # Generate and save character mapping visualization
+    # Phase 2: Character Analysis
+    print(f"\n{Fore.CYAN}┌─ Phase 2: Character Analysis{Style.RESET_ALL}")
+    all_characters, roles_by_character = detect_all_characters(chunks, character_contexts, timestamp)
+    
+    # Generate character mapping visualization
     diagram_file, summary_file = log_character_mapping(character_contexts, timestamp)
     print(f"\n{Fore.CYAN}Character mapping generated:{Style.RESET_ALL}")
     print(f"└─ Diagram: {Fore.YELLOW}{diagram_file}{Style.RESET_ALL}")
     print(f"└─ Summary: {Fore.YELLOW}{summary_file}{Style.RESET_ALL}")
-    
-    print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
 
+    # Phase 3: User Input
+    print(f"\n{Fore.CYAN}┌─ Phase 3: User Input{Style.RESET_ALL}")
+    confirmed_genders, name_mappings = handle_user_input_phase(
+        all_characters, 
+        roles_by_character,
+        timestamp
+    )
+
+    # Update character database with confirmed changes
+    roles_info = []
+    for character in all_characters:
+        role_info = roles_by_character[character]
+        new_name = name_mappings.get(character, character)
+        roles_info.append(f"{new_name} - {role_info['role']} - {confirmed_genders[character]}")
+    update_character_roles_genders_json(roles_info, name_mappings)
+
+    # Phase 4: Sequential Transform
+    print(f"\n{Fore.CYAN}┌─ Phase 4: Text Transformation{Style.RESET_ALL}")
     combined_regendered_text, events = process_chunks_with_context(
         chunks,
         character_contexts,
@@ -824,8 +973,7 @@ def main():
         timestamp
     )
 
-    log_file = f"logs/{timestamp}_regender.log"
-    debug_file = f"logs/{timestamp}_debug.log"
+    # Output Results
     log_output(input_text, combined_regendered_text, events, timestamp=timestamp)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
 
