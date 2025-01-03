@@ -423,14 +423,36 @@ def load_input_text(file_path):
         return None, f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}"
 
 def improved_chunk_text(text, max_tokens=1000):
-    """Split text into chunks while preserving context."""
+    """Split text into chunks while preserving context, with visual feedback.
+    
+    Args:
+        text (str): Text to be split into chunks
+        max_tokens (int): Maximum size of each chunk
+        
+    Returns:
+        tuple: (chunks, character_contexts)
+    """
+    print(f"\n{Fore.CYAN}┌─ Starting text chunking process{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}├─ Text length: {Fore.YELLOW}{len(text):,}{Fore.CYAN} characters{Style.RESET_ALL}")
+    
+    # Create text splitter with visual feedback on settings
+    print(f"{Fore.CYAN}├─ Chunk settings:{Style.RESET_ALL}")
+    print(f"│  └─ Max size: {Fore.YELLOW}{max_tokens}{Style.RESET_ALL} tokens")
+    print(f"│  └─ Overlap : {Fore.YELLOW}200{Style.RESET_ALL} tokens")
+    
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=max_tokens,
         chunk_overlap=200,
         separators=["\n\n", "\n", ".", "!", "?", " "],
         keep_separator=True
     )
+    
+    # Split text and show progress
+    print(f"{Fore.CYAN}├─ Splitting text...{Style.RESET_ALL}")
     chunks = text_splitter.split_text(text)
+    print(f"{Fore.GREEN}├─ Created {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
+    
+    # Process character contexts
     character_contexts = []
     all_characters = set()
     
@@ -443,6 +465,9 @@ def improved_chunk_text(text, max_tokens=1000):
             'characters': characters_in_chunk,
             'all_characters_so_far': set(all_characters)
         })
+    
+    # Show final statistics
+    print(f"{Fore.CYAN}└─ Total unique characters: {Fore.YELLOW}{len(all_characters)}{Style.RESET_ALL}")
     
     return chunks, character_contexts
 
