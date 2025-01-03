@@ -463,13 +463,13 @@ def improved_chunk_text(text, max_tokens=1000):
         end = chunk[-50:].replace('\n', '↵')
         
         # Extract characters and update context
-        characters_in_chunk = extract_characters_from_chunk(chunk)
-        all_characters.update(characters_in_chunk)
+        character_info = extract_characters_from_chunk(chunk)
+        all_characters.update(character_info['characters'])
         
         # Store context for this chunk
         character_contexts.append({
             'chunk_index': i,
-            'characters': characters_in_chunk,
+            'character_info': character_info,
             'all_characters_so_far': set(all_characters)
         })
         
@@ -479,9 +479,15 @@ def improved_chunk_text(text, max_tokens=1000):
         print(f"│  ├─ End: {Fore.WHITE}...{end}{Style.RESET_ALL}")
         
         # Show characters found in chunk
-        if characters_in_chunk:
-            chars = ", ".join(sorted(characters_in_chunk))
+        if character_info['characters']:
+            chars = ", ".join(sorted(character_info['characters']))
             print(f"│  └─ Characters: {Fore.YELLOW}{chars}{Style.RESET_ALL}")
+            # Show character locations
+            for char in sorted(character_info['characters']):
+                locations = character_info['character_locations'][char]
+                if locations:
+                    pos_list = ", ".join(str(pos) for pos in locations)
+                    print(f"│     └─ {char} at positions: {pos_list}")
         print(f"│")
     
     # Show final statistics
@@ -490,18 +496,147 @@ def improved_chunk_text(text, max_tokens=1000):
     return chunks, character_contexts
 
 def extract_characters_from_chunk(chunk):
-    """Extract character names from text chunk."""
+    """Extract character names and their locations from text chunk."""
     roles_info = detect_roles_gpt(chunk)
-    characters = set()
+    character_info = {
+        'characters': set(),
+        'character_locations': {}
+    }
     
     if roles_info:
         for line in roles_info.splitlines():
             parts = line.split(" - ")
             if len(parts) >= 1:
                 character = clean_name(parts[0])
-                characters.add(character)
+                character_info['characters'].add(character)
+                
+                # Find all occurrences of the character name in the chunk
+                start_pos = 0
+                locations = []
+                while True:
+                    pos = chunk.find(character, start_pos)
+                    if pos == -1:
+                        break
+                    locations.append(pos)
+                    start_pos = pos + 1
+                    
+                character_info['character_locations'][character] = locations
     
-    return characters
+    return character_info
+
+def create_character_mapping_diagram(character_contexts):
+    """Create a Mermaid diagram showing character presence across chunks."""
+    
+    # Get unique characters across all chunks
+    all_characters = set()
+    for context in character_contexts:
+        all_characters.update(context['character_info']['characters'])
+    
+    # Start building Mermaid diagram
+    mermaid_lines = [
+        "graph TD",
+        "    subgraph Characters",
+    ]
+    
+    # Add character nodes
+    for char in sorted(all_characters):
+        char_id = char.replace(" ", "_").replace("/", "_")
+        mermaid_lines.append(f'        {char_id}["{char}"]')
+    
+    mermaid_lines.append("    end")
+    mermaid_lines.append("")
+    
+    # Create chunk subgraph
+    mermaid_lines.append("    subgraph ChunkIndex[\"Chunk Index\"]")
+    for i in range(len(character_contexts)):
+        mermaid_lines.append(
+            f'        C{i}["Chunk {i}<br/>'
+            f'[Paragraphs {i*2+1}-{i*2+2}]"]'
+        )
+    mermaid_lines.append("    end")
+    mermaid_lines.append("")
+    
+    # Create presence/absence markers and connections
+    for char in sorted(all_characters):
+        char_id = char.replace(" ", "_").replace("/", "_")
+        for i, context in enumerate(character_contexts):
+            present = char in context['character_info']['characters']
+            marker = "✓" if present else "×"
+            
+            # Create presence/absence node
+            node_id = f"{char_id}_{i}"
+            style_class = "present" if present else "absent"
+            mermaid_lines.append(f'    {node_id}["{marker}"]')
+            
+            # Connect character to marker
+            if i == 0:  # Direct connection for first chunk
+                mermaid_lines.append(f'    {char_id} --> {node_id}')
+            else:  # Dotted line for subsequent chunks
+                mermaid_lines.append(f'    {char_id} -.-> {node_id}')
+            
+            # Connect marker to chunk
+            mermaid_lines.append(f'    {node_id} --> C{i}')
+    
+    # Add styles
+    mermaid_lines.extend([
+        "",
+        "    style Lucy fill:#f9f,stroke:#333",
+        "    style Mrs fill:#f9f,stroke:#333",
+        "    style Professor fill:#f9f,stroke:#333",
+        "",
+        "    classDef present fill:#d4edda,stroke:#333",
+        "    classDef absent fill:#f8d7da,stroke:#333",
+        "    class " + ",".join([
+            f"{char.replace(' ', '_')}_{i}" 
+            for char in all_characters 
+            for i, context in enumerate(character_contexts)
+            if char in context['character_info']['characters']
+        ]) + " present",
+        "    class " + ",".join([
+            f"{char.replace(' ', '_')}_{i}"
+            for char in all_characters
+            for i, context in enumerate(character_contexts)
+            if char not in context['character_info']['characters']
+        ]) + " absent"
+    ])
+    
+    return "\n".join(mermaid_lines)
+
+def log_character_mapping(character_contexts, timestamp):
+    """Create a visualization of character presence in chunks and save to log."""
+    mermaid_diagram = create_character_mapping_diagram(character_contexts)
+    
+    # Save diagram to a file
+    diagram_file = f"logs/{timestamp}_character_mapping.mermaid"
+    with open(diagram_file, 'w', encoding='utf-8') as f:
+        f.write(mermaid_diagram)
+    
+    # Also create a text-based summary
+    summary_file = f"logs/{timestamp}_character_summary.txt"
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        f.write("CHARACTER PRESENCE SUMMARY\n")
+        f.write("=" * 25 + "\n\n")
+        
+        # Get all unique characters
+        all_characters = set()
+        for context in character_contexts:
+            all_characters.update(context['character_info']['characters'])
+        
+        # Write summary for each character
+        for char in sorted(all_characters):
+            f.write(f"\nCharacter: {char}\n")
+            f.write("-" * (len(char) + 10) + "\n")
+            
+            for i, context in enumerate(character_contexts):
+                char_info = context['character_info']
+                if char in char_info['characters']:
+                    locations = char_info['character_locations'].get(char, [])
+                    f.write(f"Chunk {i}: Present at positions {locations}\n")
+                else:
+                    f.write(f"Chunk {i}: Not present\n")
+            f.write("\n")
+    
+    return diagram_file, summary_file
 
 def process_chunks_with_context(chunks, character_contexts, confirmed_genders, timestamp):
     """Process text chunks while maintaining character context."""
@@ -512,15 +647,25 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders, t
     total_chunks = len(chunks)
     
     for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
+        # Skip chunks with no characters to regender
+        if not context['character_info']['characters']:
+            all_regendered_text.append(chunk)
+            all_events.append(f"Skipping chunk {i+1} - No characters to regender")
+            print(f"\n{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL} Skipping chunk (no characters)")
+            continue
+            
         all_events.append(f"Processing chunk {i+1} of {total_chunks}")
         progress = f"{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL}"
         print(f"\n{progress} Processing chunk...")
         
-        if context['characters']:
-            chars = ", ".join(f"{Fore.YELLOW}{c}{Style.RESET_ALL}" for c in context['characters'])
-            print(f"└─ Characters found: {chars}")
+        # Show character locations in chunk
+        for char, locations in context['character_info']['character_locations'].items():
+            mention_count = len(locations)
+            chars = f"{Fore.YELLOW}{char}{Style.RESET_ALL}"
+            positions = ", ".join(str(pos) for pos in locations)
+            print(f"└─ Found {chars} {mention_count} times at positions: {positions}")
         
-        new_characters = context['characters'] - set(confirmed_genders.keys())
+        new_characters = context['character_info']['characters'] - set(confirmed_genders.keys())
         if new_characters:
             new_chars = ", ".join(f"{Fore.GREEN}{c}{Style.RESET_ALL}" for c in new_characters)
             print(f"└─ New characters found: {new_chars}")
@@ -591,7 +736,7 @@ def confirm_new_characters(roles_info, confirmed_genders, new_characters):
                 "Updated_Name": new_name if new_name != original_name else original_name,
                 "Updated_Role": role_desc,
                 "Updated_Gender": standardized_gender,
-                "Gender_Category": gender_category
+                "Gender_Category": gender_category,
             }
             
             confirmed_roles.append(f"{character} - {role_desc} - {standardized_gender}")
@@ -662,6 +807,14 @@ def main():
 
     chunks, character_contexts = improved_chunk_text(input_text)
     print(f"{Fore.GREEN}└─ Split into {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
+    # print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
+    
+    # Generate and save character mapping visualization
+    diagram_file, summary_file = log_character_mapping(character_contexts, timestamp)
+    print(f"\n{Fore.CYAN}Character mapping generated:{Style.RESET_ALL}")
+    print(f"└─ Diagram: {Fore.YELLOW}{diagram_file}{Style.RESET_ALL}")
+    print(f"└─ Summary: {Fore.YELLOW}{summary_file}{Style.RESET_ALL}")
+    
     print(f"\n{Fore.CYAN}Starting character analysis...{Style.RESET_ALL}\n")
 
     combined_regendered_text, events = process_chunks_with_context(
