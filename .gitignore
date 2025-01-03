@@ -3,6 +3,7 @@ logs/
 
 # Character JSON
 character_roles_genders.json
+original_character_info.json
 
 # Byte-compiled files
 __pycache__/
