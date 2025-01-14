@@ -1,29 +1,36 @@
-# regender.xyz - v0.1.0
+#!/usr/bin/env python3
+"""
+regender.xyz - A tool for transforming gender representation in literature
+Version: 0.1.0
 
+This application processes text to detect characters and their genders,
+allowing users to transform gender representation while preserving narrative coherence.
+"""
+
+# Standard library imports
 import os
 import time
-from openai import OpenAI
-from datetime import datetime
 import json
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 import re
+from datetime import datetime
+import sys
+
+# Third-party imports
+from openai import OpenAI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from colorama import init, Fore, Style
+
+# Initialize colorama
 init(autoreset=True)
 
+#------------------------------------------------------------------------------
+# Configuration
+#------------------------------------------------------------------------------
+
+# OpenAI client setup
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-def check_openai_api_key():
-    """Verify OpenAI API key with styled output."""
-    try:
-        client.models.list()
-        print(f"{Fore.GREEN}✓ API connection established{Style.RESET_ALL}")
-        return True
-    except Exception as e:
-        print(f"{Fore.RED}✗ API Error: Please check your OpenAI API key{Style.RESET_ALL}")
-        return False
-
-check_openai_api_key()
-
+# Gender categories and their associated terms
 GENDER_CATEGORIES = {
     'M': {
         'label': 'Male',
@@ -46,6 +53,10 @@ GENDER_CATEGORIES = {
         'pronouns': ['they', 'them', 'theirs']
     }
 }
+
+#------------------------------------------------------------------------------
+# UI/Output Helpers
+#------------------------------------------------------------------------------
 
 def print_banner():
     """Print application banner with proper alignment."""
@@ -76,6 +87,102 @@ def print_status(message, status_type="info"):
         "error": f"{Fore.RED}✗{Style.RESET_ALL}"
     }
     print(f" {symbols.get(status_type, symbols['info'])} {message}")
+
+#------------------------------------------------------------------------------
+# OpenAI API Interaction
+#------------------------------------------------------------------------------
+
+def check_openai_api_key():
+    """Verify OpenAI API key with styled output."""
+    try:
+        client.models.list()
+        print(f"{Fore.GREEN}✓ API connection established{Style.RESET_ALL}")
+        return True
+    except Exception as e:
+        print(f"{Fore.RED}✗ API Error: Please check your OpenAI API key{Style.RESET_ALL}")
+        return False
+
+def get_gpt_response(prompt, model="gpt-4o", temperature=0.7, retries=3, delay=5):
+    """Interact with OpenAI API with retry mechanism."""
+    attempt = 0
+    while attempt < retries:
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=500,
+                temperature=temperature
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"Error: {e}")
+            attempt += 1
+            time.sleep(delay)
+    return "Error: Unable to get response after multiple attempts"
+
+#------------------------------------------------------------------------------
+# Character Detection
+#------------------------------------------------------------------------------
+
+def detect_roles_gpt(input_text):
+    """Detect and store character roles and original info."""
+    prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender. Arrange the results in a numbered list."
+    response = get_gpt_response(prompt)
+    lines = response.split('\n')
+    character_list = [line for line in lines if " - " in line]
+    
+    original_info = {}
+    for line in character_list:
+        parts = line.split(" - ")
+        if len(parts) == 3:
+            original_name, role, gender = parts
+            original_name = clean_name(original_name)
+            original_info[original_name] = {
+                "name": original_name,
+                "role": role,
+                "gender": gender.strip()
+            }
+    
+    try:
+        with open("original_character_info.json", 'w', encoding='utf-8') as f:
+            json.dump(original_info, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"{Fore.YELLOW}Warning: Could not save original character info: {e}{Style.RESET_ALL}")
+    
+    return '\n'.join(character_list)
+
+def extract_characters_from_chunk(chunk):
+    """Extract character names and their locations from text chunk."""
+    roles_info = detect_roles_gpt(chunk)
+    character_info = {
+        'characters': set(),
+        'character_locations': {}
+    }
+    
+    if roles_info:
+        for line in roles_info.splitlines():
+            parts = line.split(" - ")
+            if len(parts) >= 1:
+                character = clean_name(parts[0])
+                character_info['characters'].add(character)
+                
+                # Find all occurrences of the character name in the chunk
+                start_pos = 0
+                locations = []
+                while True:
+                    pos = chunk.find(character, start_pos)
+                    if pos == -1:
+                        break
+                    locations.append(pos)
+                    start_pos = pos + 1
+                    
+                character_info['character_locations'][character] = locations
+    
+    return character_info
+
+#------------------------------------------------------------------------------
+# Gender Processing
+#------------------------------------------------------------------------------
 
 def standardize_gender(gender_text):
     """Map gender descriptions to standard categories."""
@@ -145,293 +252,12 @@ def get_user_gender_choice(character, current_gender):
     category_key, standard_label = standardize_gender(current_gender)
     return standard_label, character, category_key
 
-def get_gpt_response(prompt, model="gpt-4o-mini", temperature=0.7, retries=3, delay=5):
-    """Interact with OpenAI API with retry mechanism."""
-    attempt = 0
-    while attempt < retries:
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=500,
-                temperature=temperature
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            print(f"Error: {e}")
-            attempt += 1
-            time.sleep(delay)
-    return "Error: Unable to get response after multiple attempts"
-
-def detect_roles_gpt(input_text):
-    """Detect and store character roles and original info."""
-    prompt = f"Identify all the characters, their roles, and their genders in the following text:\n\n{input_text}\n\nProvide the results in a structured format like: Character - Role - Gender. Arrange the results in a numbered list."
-    response = get_gpt_response(prompt)
-    lines = response.split('\n')
-    character_list = [line for line in lines if " - " in line]
-    
-    original_info = {}
-    for line in character_list:
-        parts = line.split(" - ")
-        if len(parts) == 3:
-            original_name, role, gender = parts
-            original_name = clean_name(original_name)
-            original_info[original_name] = {
-                "name": original_name,
-                "role": role,
-                "gender": gender.strip()
-            }
-    
-    try:
-        with open("original_character_info.json", 'w', encoding='utf-8') as f:
-            json.dump(original_info, f, indent=4, ensure_ascii=False)
-    except Exception as e:
-        print(f"{Fore.YELLOW}Warning: Could not save original character info: {e}{Style.RESET_ALL}")
-    
-    return '\n'.join(character_list)
-
-def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
-    """Update character information JSON with new data."""
-    if name_mappings is None:
-        name_mappings = {}
-
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        data = {"Characters": []}
-
-    try:
-        with open("original_character_info.json", 'r', encoding='utf-8') as f:
-            original_info = json.load(f)
-    except FileNotFoundError:
-        original_info = {}
-
-    updated_characters = []
-    
-    for role in confirmed_roles:
-        parts = role.split(" - ")
-        if len(parts) == 3:
-            new_name, role_desc, gender = parts
-            new_name = clean_name(new_name)
-            
-            original_character = None
-            for orig_name, orig_data in original_info.items():
-                if new_name in [orig_name, name_mappings.get(orig_name)]:
-                    original_character = orig_data
-                    break
-            
-            category_key, standard_label = standardize_gender(gender)
-            
-            character_entry = {
-                "Original_Name": original_character["name"] if original_character else new_name,
-                "Original_Role": original_character["role"] if original_character else role_desc,
-                "Original_Gender": original_character["gender"] if original_character else gender,
-                "Updated_Name": new_name,
-                "Updated_Role": role_desc,
-                "Updated_Gender": standard_label,
-                "Gender_Category": category_key
-            }
-            updated_characters.append(character_entry)
-
-    data["Characters"] = updated_characters
-    with open(file_path, 'w', encoding='utf-8') as file:
-        json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
-    print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
-
-def regender_text_gpt(input_text, confirmed_roles, name_mappings=None, timestamp=None):
-    """Process text with gender and name changes."""
-    if name_mappings is None:
-        name_mappings = {}
-    
-    gender_guidelines = []
-    name_instructions = []
-    debug_events = []
-    
-    debug_events.append(f"\nDEBUG - Starting regender_text_gpt")
-    
-    try:
-        with open("character_roles_genders.json", 'r', encoding='utf-8') as f:
-            char_data = json.load(f)
-            debug_events.append(f"Loaded character data from JSON:")
-            debug_events.append(json.dumps(char_data, indent=2))
-    except Exception as e:
-        debug_events.append(f"Error loading character data: {str(e)}")
-        char_data = {"Characters": []}
-    
-    for char in char_data["Characters"]:
-        character = char["Updated_Name"]
-        gender = char["Updated_Gender"]
-        gender_category = char["Gender_Category"]
-        
-        debug_events.append(f"\nDEBUG - Processing character: {character}")
-        debug_events.append(f"  Gender: {gender}")
-        debug_events.append(f"  Category: {gender_category}")
-        
-        if gender_category in GENDER_CATEGORIES:
-            pronouns = GENDER_CATEGORIES[gender_category]['pronouns']
-            debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
-            
-            gender_guidelines.append(
-                f"{character} ({gender}):\n"
-                f"- Use pronouns: {'/'.join(pronouns)}\n"
-                f"- Replace any she/her/hers with {'/'.join(pronouns)} when referring to {character}"
-            )
-    
-    for old_name, new_name in name_mappings.items():
-        name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
-        debug_events.append(f"\nDEBUG - Name change: {old_name} → {new_name}")
-
-    prompt = (
-        f"Regender the following text exactly as specified:\n\n"
-        f"1. Name changes (apply these first and exactly):\n{chr(10).join(name_instructions)}\n\n"
-        f"2. Character pronouns (apply these consistently):\n{chr(10).join(gender_guidelines)}\n\n"
-        f"3. Important rules:\n"
-        f"- Apply name changes first, then handle pronouns\n"
-        f"- Be thorough: check every pronoun and name reference\n"
-        f"- Maintain story flow and readability\n"
-        f"- Keep other character references unchanged\n\n"
-        f"Text to regender:\n{input_text}\n\n"
-        f"Return only the regendered text, no explanations."
-    )
-    
-    debug_events.append("\nDEBUG - Final prompt to GPT:")
-    debug_events.append(prompt)
-    
-    response = get_gpt_response(prompt, temperature=0.1)
-    debug_events.append("\nDEBUG - GPT Response:")
-    debug_events.append(response)
-    
-    write_debug_log(debug_events, timestamp)
-    
-    return response
-
-def log_output(original_text, updated_text, events_list=None, json_path="character_roles_genders.json", timestamp=None):
-    """Write detailed log files with processing results."""
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
-
-    if timestamp is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    file_path = os.path.join("logs", f"{timestamp}_regender.log")
-    debug_file_path = os.path.join("logs", f"{timestamp}_debug.log")
-    separator = "\n" + "="*80 + "\n"
-
-    orig_count = len(original_text)
-    updated_count = len(updated_text)
-    diff_count = abs(orig_count - updated_count)
-    
-    stats_summary = (
-        "CHARACTER STATISTICS\n"
-        "====================\n"
-        f"Original text character count: {orig_count:,}\n"
-        f"Updated text character count: {updated_count:,}\n"
-        f"Difference in characters: {diff_count:,}\n"
-    )
-
-    try:
-        with open(json_path, 'r', encoding='utf-8') as json_file:
-            character_data = json.load(json_file)
-            char_count = len(character_data.get("Characters", []))
-            stats_summary += f"Total named characters processed: {char_count}\n"
-    except Exception as e:
-        character_data = {"Characters": [], "error": str(e)}
-
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write("~LOGGING v1.1\n\n")
-        file.write("LINKED FILES\n")
-        file.write("============\n")
-        file.write(f"Main Log: {timestamp}_regender.log\n")
-        file.write(f"Debug Log: {timestamp}_debug.log\n\n")
-        file.write(stats_summary)
-        file.write(separator)
-        file.write("ORIGINAL TEXT")
-        file.write(separator)
-        file.write(original_text)
-        file.write(separator)
-        file.write("UPDATED TEXT")
-        file.write(separator)
-        file.write(updated_text)
-        file.write(separator)
-        file.write("CHARACTER ROLES AND GENDERS")
-        file.write(separator)
-        file.write(json.dumps(character_data, indent=4))
-        file.write(separator)
-        file.write("PROCESSING EVENTS")
-        file.write(separator)
-        if events_list:
-            for event in events_list:
-                file.write(f"- {event}\n")
-        else:
-            file.write("No notable events recorded during processing.\n")
-        file.write(separator)
-
-    print(f"{Fore.GREEN}✓ Log files created:")
-    print(f"  {Fore.YELLOW}Main: {timestamp}_regender.log")
-    print(f"  {Fore.YELLOW}Debug: {timestamp}_debug.log{Style.RESET_ALL}")
-
-def write_debug_log(events, timestamp):
-    """Write debug events to a linked debug log file."""
-    debug_file = f"logs/{timestamp}_debug.log"
-    with open(debug_file, 'w', encoding='utf-8') as f:
-        f.write("~DEBUG LOGGING v1.1\n\n")
-        f.write("LINKED FILES\n")
-        f.write("============\n")
-        f.write(f"Main Log: {timestamp}_regender.log\n")
-        f.write(f"Debug Log: {timestamp}_debug.log\n\n")
-        f.write("DEBUG EVENTS\n")
-        f.write("============\n")
-        f.write('\n'.join(events))
-    
-    return debug_file
-
-def load_input_text(file_path):
-    """Load input text file with enhanced validation and feedback.
-    
-    Args:
-        file_path (str): Path to the input text file
-        
-    Returns:
-        tuple: (content, status_message)
-            - content: The text content if successful, None if failed
-            - status_message: A user-friendly status message about the operation
-    """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-            
-            # Basic validation
-            if not content.strip():
-                return None, f"{Fore.RED}✗ File is empty: {file_path}{Style.RESET_ALL}"
-                
-            # Success message with file stats
-            word_count = len(content.split())
-            char_count = len(content)
-            status = (
-                f"{Fore.GREEN}✓ Successfully loaded: {Fore.BLUE}{file_path}{Style.RESET_ALL}\n"
-                f"  └─ {Fore.YELLOW}{word_count:,}{Style.RESET_ALL} words, "
-                f"{Fore.YELLOW}{char_count:,}{Style.RESET_ALL} characters"
-            )
-            return content, status
-            
-    except FileNotFoundError:
-        return None, f"{Fore.RED}✗ File not found: {file_path}{Style.RESET_ALL}"
-    except UnicodeDecodeError:
-        return None, f"{Fore.RED}✗ File encoding error. Please ensure the file is UTF-8 encoded: {file_path}{Style.RESET_ALL}"
-    except Exception as e:
-        return None, f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}"
+#------------------------------------------------------------------------------
+# Text Processing
+#------------------------------------------------------------------------------
 
 def improved_chunk_text(text, max_tokens=1000):
-    """Split text into chunks while preserving context, using LangChain's features.
-    
-    Args:
-        text (str): Text to be split into chunks
-        max_tokens (int): Maximum size of each chunk
-        
-    Returns:
-        tuple: (chunks, character_contexts)
-    """
+    """Split text into chunks while preserving context."""
     print(f"\n{Fore.CYAN}┌─ Starting text chunking process{Style.RESET_ALL}")
     print(f"{Fore.CYAN}├─ Text length: {Fore.YELLOW}{len(text):,}{Fore.CYAN} characters{Style.RESET_ALL}")
     
@@ -495,293 +321,109 @@ def improved_chunk_text(text, max_tokens=1000):
     
     return chunks, character_contexts
 
-def extract_characters_from_chunk(chunk):
-    """Extract character names and their locations from text chunk."""
-    roles_info = detect_roles_gpt(chunk)
-    character_info = {
-        'characters': set(),
-        'character_locations': {}
-    }
+#------------------------------------------------------------------------------
+# File I/O and Logging
+#------------------------------------------------------------------------------
+
+def load_input_text(file_path):
+    """Load input text file with enhanced validation and feedback.
     
-    if roles_info:
-        for line in roles_info.splitlines():
-            parts = line.split(" - ")
-            if len(parts) >= 1:
-                character = clean_name(parts[0])
-                character_info['characters'].add(character)
+    Args:
+        file_path (str): Path to the input text file
+        
+    Returns:
+        tuple: (content, status_message)
+            - content: The text content if successful, None if failed
+            - status_message: A user-friendly status message about the operation
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            
+            # Basic validation
+            if not content.strip():
+                return None, f"{Fore.RED}✗ File is empty: {file_path}{Style.RESET_ALL}"
                 
-                # Find all occurrences of the character name in the chunk
-                start_pos = 0
-                locations = []
-                while True:
-                    pos = chunk.find(character, start_pos)
-                    if pos == -1:
-                        break
-                    locations.append(pos)
-                    start_pos = pos + 1
-                    
-                character_info['character_locations'][character] = locations
-    
-    return character_info
+            # Success message with file stats
+            word_count = len(content.split())
+            char_count = len(content)
+            status = (
+                f"{Fore.GREEN}✓ Successfully loaded: {Fore.BLUE}{file_path}{Style.RESET_ALL}\n"
+                f"  └─ {Fore.YELLOW}{word_count:,}{Style.RESET_ALL} words, "
+                f"{Fore.YELLOW}{char_count:,}{Style.RESET_ALL} characters"
+            )
+            return content, status
+            
+    except FileNotFoundError:
+        return None, f"{Fore.RED}✗ File not found: {file_path}{Style.RESET_ALL}"
+    except UnicodeDecodeError:
+        return None, f"{Fore.RED}✗ File encoding error. Please ensure the file is UTF-8 encoded: {file_path}{Style.RESET_ALL}"
+    except Exception as e:
+        return None, f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}"
 
-def create_character_mapping_diagram(character_contexts):
-    """Create a Mermaid diagram showing character presence across chunks."""
+def log_output(original_text, processed_result, timestamp=None):
+    """Log original and processed text to files."""
+    if timestamp is None:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Get unique characters across all chunks
-    all_characters = set()
-    for context in character_contexts:
-        all_characters.update(context['character_info']['characters'])
+    # Unpack the tuple if it's a tuple, otherwise use the text directly
+    processed_text = processed_result[0] if isinstance(processed_result, tuple) else processed_result
     
-    # Start building Mermaid diagram
-    mermaid_lines = [
-        "graph TD",
-        "    subgraph Characters",
-    ]
+    # Log original text
+    with open(f"logs/original_{timestamp}.txt", "w", encoding="utf-8") as file:
+        file.write(original_text)
     
-    # Add character nodes
-    for char in sorted(all_characters):
-        char_id = char.replace(" ", "_").replace("/", "_")
-        mermaid_lines.append(f'        {char_id}["{char}"]')
+    # Log processed text
+    with open(f"logs/processed_{timestamp}.txt", "w", encoding="utf-8") as file:
+        file.write(processed_text)
     
-    mermaid_lines.append("    end")
-    mermaid_lines.append("")
-    
-    # Create chunk subgraph
-    mermaid_lines.append("    subgraph ChunkIndex[\"Chunk Index\"]")
-    for i in range(len(character_contexts)):
-        mermaid_lines.append(
-            f'        C{i}["Chunk {i}<br/>'
-            f'[Paragraphs {i*2+1}-{i*2+2}]"]'
-        )
-    mermaid_lines.append("    end")
-    mermaid_lines.append("")
-    
-    # Create presence/absence markers and connections
-    for char in sorted(all_characters):
-        char_id = char.replace(" ", "_").replace("/", "_")
-        for i, context in enumerate(character_contexts):
-            present = char in context['character_info']['characters']
-            marker = "✓" if present else "×"
-            
-            # Create presence/absence node
-            node_id = f"{char_id}_{i}"
-            style_class = "present" if present else "absent"
-            mermaid_lines.append(f'    {node_id}["{marker}"]')
-            
-            # Connect character to marker
-            if i == 0:  # Direct connection for first chunk
-                mermaid_lines.append(f'    {char_id} --> {node_id}')
-            else:  # Dotted line for subsequent chunks
-                mermaid_lines.append(f'    {char_id} -.-> {node_id}')
-            
-            # Connect marker to chunk
-            mermaid_lines.append(f'    {node_id} --> C{i}')
-    
-    # Add styles
-    mermaid_lines.extend([
-        "",
-        "    style Lucy fill:#f9f,stroke:#333",
-        "    style Mrs fill:#f9f,stroke:#333",
-        "    style Professor fill:#f9f,stroke:#333",
-        "",
-        "    classDef present fill:#d4edda,stroke:#333",
-        "    classDef absent fill:#f8d7da,stroke:#333",
-        "    class " + ",".join([
-            f"{char.replace(' ', '_')}_{i}" 
-            for char in all_characters 
-            for i, context in enumerate(character_contexts)
-            if char in context['character_info']['characters']
-        ]) + " present",
-        "    class " + ",".join([
-            f"{char.replace(' ', '_')}_{i}"
-            for char in all_characters
-            for i, context in enumerate(character_contexts)
-            if char not in context['character_info']['characters']
-        ]) + " absent"
-    ])
-    
-    return "\n".join(mermaid_lines)
+    # Create diff if original text exists
+    if original_text:
+        create_diff(original_text, processed_text, timestamp)
+        
+    print(f"\n{Fore.GREEN}✓ Output logged to logs/processed_{timestamp}.txt{Style.RESET_ALL}")
 
-def log_character_mapping(character_contexts, timestamp):
-    """Create a visualization of character presence in chunks and save to log."""
-    mermaid_diagram = create_character_mapping_diagram(character_contexts)
-    
-    # Save diagram to a file
-    diagram_file = f"logs/{timestamp}_character_mapping.mermaid"
-    with open(diagram_file, 'w', encoding='utf-8') as f:
-        f.write(mermaid_diagram)
-    
-    # Also create a text-based summary
-    summary_file = f"logs/{timestamp}_character_summary.txt"
-    with open(summary_file, 'w', encoding='utf-8') as f:
-        f.write("CHARACTER PRESENCE SUMMARY\n")
+def create_diff(original_text, processed_text, timestamp):
+    # Create diff file
+    diff_file = f"logs/diff_{timestamp}.txt"
+    with open(diff_file, 'w', encoding='utf-8') as f:
+        f.write("DIFFERENCE SUMMARY\n")
         f.write("=" * 25 + "\n\n")
         
-        # Get all unique characters
-        all_characters = set()
-        for context in character_contexts:
-            all_characters.update(context['character_info']['characters'])
+        # Calculate differences
+        original_lines = original_text.splitlines()
+        processed_lines = processed_text.splitlines()
+        diff_lines = []
         
-        # Write summary for each character
-        for char in sorted(all_characters):
-            f.write(f"\nCharacter: {char}\n")
-            f.write("-" * (len(char) + 10) + "\n")
-            
-            for i, context in enumerate(character_contexts):
-                char_info = context['character_info']
-                if char in char_info['characters']:
-                    locations = char_info['character_locations'].get(char, [])
-                    f.write(f"Chunk {i}: Present at positions {locations}\n")
-                else:
-                    f.write(f"Chunk {i}: Not present\n")
-            f.write("\n")
-    
-    return diagram_file, summary_file
-
-def process_chunks_with_context(chunks, character_contexts, confirmed_genders, timestamp):
-    """Process text chunks while maintaining character context."""
-    all_regendered_text = []
-    name_mappings = {}
-    all_events = []
-    
-    total_chunks = len(chunks)
-    
-    for i, (chunk, context) in enumerate(zip(chunks, character_contexts)):
-        # Skip chunks with no characters to regender
-        if not context['character_info']['characters']:
-            all_regendered_text.append(chunk)
-            all_events.append(f"Skipping chunk {i+1} - No characters to regender")
-            print(f"\n{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL} Skipping chunk (no characters)")
-            continue
-            
-        all_events.append(f"Processing chunk {i+1} of {total_chunks}")
-        progress = f"{Fore.CYAN}[{i+1}/{total_chunks}]{Style.RESET_ALL}"
-        print(f"\n{progress} Processing chunk...")
+        for i, (orig_line, proc_line) in enumerate(zip(original_lines, processed_lines)):
+            if orig_line != proc_line:
+                diff_lines.append(f"Line {i+1}:")
+                diff_lines.append(f"  Original: {orig_line}")
+                diff_lines.append(f"  Processed: {proc_line}")
+                diff_lines.append("")
         
-        # Show character locations in chunk
-        for char, locations in context['character_info']['character_locations'].items():
-            mention_count = len(locations)
-            chars = f"{Fore.YELLOW}{char}{Style.RESET_ALL}"
-            positions = ", ".join(str(pos) for pos in locations)
-            print(f"└─ Found {chars} {mention_count} times at positions: {positions}")
-        
-        new_characters = context['character_info']['characters'] - set(confirmed_genders.keys())
-        if new_characters:
-            new_chars = ", ".join(f"{Fore.GREEN}{c}{Style.RESET_ALL}" for c in new_characters)
-            print(f"└─ New characters found: {new_chars}")
-            
-            roles_info = detect_roles_gpt(chunk)
-            if roles_info:
-                confirmed_roles, chunk_name_mappings, new_events = confirm_new_characters(
-                    roles_info, confirmed_genders, new_characters
-                )
-                all_events.extend(new_events)
-                name_mappings.update(chunk_name_mappings)
-                update_character_roles_genders_json(confirmed_roles, name_mappings)
-        
-        all_confirmed_roles = []
-        for character in context['all_characters_so_far']:
-            if character in confirmed_genders:
-                role_info = get_character_role_from_json(character)
-                if role_info:
-                    current_name = name_mappings.get(character, character)
-                    all_confirmed_roles.append(
-                        f"{current_name} - {role_info['role']} - {role_info['gender']}"
-                    )
-        
-        regendered_chunk = regender_text_gpt(
-            chunk,
-            '\n'.join(all_confirmed_roles),
-            name_mappings,
-            timestamp
-        )
-        all_regendered_text.append(regendered_chunk)
+        f.write("\n".join(diff_lines))
     
-    combined_regendered_text = '\n'.join(all_regendered_text)
-    return combined_regendered_text, all_events
+    print(f"\n{Fore.GREEN}✓ Diff logged to {diff_file}{Style.RESET_ALL}")
 
-def confirm_new_characters(roles_info, confirmed_genders, new_characters):
-    """Process and confirm gender choices for new characters."""
-    confirmed_roles = []
-    name_mappings = {}
-    events = []
+def write_debug_log(events, timestamp):
+    """Write debug events to a linked debug log file."""
+    debug_file = f"logs/{timestamp}_debug.log"
+    with open(debug_file, 'w', encoding='utf-8') as f:
+        f.write("~DEBUG LOGGING v1.1\n\n")
+        f.write("LINKED FILES\n")
+        f.write("============\n")
+        f.write(f"Main Log: {timestamp}_regender.log\n")
+        f.write(f"Debug Log: {timestamp}_debug.log\n\n")
+        f.write("DEBUG EVENTS\n")
+        f.write("============\n")
+        f.write('\n'.join(events))
     
-    for role in roles_info.splitlines():
-        parts = role.split(" - ")
-        if len(parts) != 3:
-            continue
-            
-        character, role_desc, gender = parts
-        character = clean_name(character)
-        
-        if character in new_characters:
-            original_name = character
-            original_gender = gender
-            
-            events.append(f"Found new character: {character} ({role_desc})")
-            standardized_gender, new_name, gender_category = get_user_gender_choice(character, gender)
-            confirmed_genders[character] = standardized_gender
-            
-            events.append(f"  -> Gender set to: {standardized_gender}")
+    return debug_file
 
-            if new_name != character:
-                name_mappings[character] = new_name
-                character = new_name
-                events.append(f"  -> Character renamed to: {new_name}")
-            
-            role_entry = {
-                "Original_Name": original_name,
-                "Original_Role": role_desc,
-                "Original_Gender": original_gender,
-                "Updated_Name": new_name if new_name != original_name else original_name,
-                "Updated_Role": role_desc,
-                "Updated_Gender": standardized_gender,
-                "Gender_Category": gender_category,
-            }
-            
-            confirmed_roles.append(f"{character} - {role_desc} - {standardized_gender}")
-        else:
-            current_gender = confirmed_genders.get(character, gender)
-            confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
-    
-    return confirmed_roles, name_mappings, events
-
-def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
-    """Get character data from JSON storage."""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            data = json.load(file)
-            for char in data["Characters"]:
-                if clean_name(char["Original_Name"]) == character_name:
-                    return {
-                        "role": char["Original_Role"],
-                        "gender": char["Updated_Gender"] if "Updated_Gender" in char else char["Original_Gender"]
-                    }
-    except (FileNotFoundError, json.JSONDecodeError):
-        return None
-    return None
-
-def load_confirmed_genders(file_path="character_roles_genders.json"):
-    """Load saved gender information from JSON."""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read().strip()
-            if not content:
-                raise FileNotFoundError
-            data = json.loads(content)
-            confirmed_genders = {character["Original_Name"]: character["Original_Gender"] for character in data["Characters"]}
-        print(f"{Fore.GREEN}├─ Confirmed genders loaded from {file_path}{Style.RESET_ALL}")
-    except FileNotFoundError:
-        confirmed_genders = {}
-        print(f"No confirmed genders file found or file is empty. Starting with an empty dictionary.")
-    return confirmed_genders
-
-def clean_name(name):
-    """Remove leading numbers and periods from names."""
-    return re.sub(r'^\d+\.\s*', '', name).strip()
-
-# Add this function right before the main() function, 
-# after log_character_mapping() and before main()
+#------------------------------------------------------------------------------
+# Main Application Logic
+#------------------------------------------------------------------------------
 
 def detect_all_characters(chunks, character_contexts, timestamp):
     """Detect all characters across all chunks before any user interaction.
@@ -810,8 +452,8 @@ def detect_all_characters(chunks, character_contexts, timestamp):
         # Get roles for this chunk
         roles_info = detect_roles_gpt(chunk)
         if roles_info:
-            for role in roles_info.splitlines():
-                parts = role.split(" - ")
+            for line in roles_info.splitlines():
+                parts = line.split(" - ")
                 if len(parts) == 3:
                     character, role_desc, gender = parts
                     character = clean_name(character)
@@ -911,70 +553,392 @@ def handle_user_input_phase(all_characters, roles_by_character, timestamp):
     
     return confirmed_genders, name_mappings
 
-def main():
-    print("\033[H\033[J", end="")
-    print_banner()
-
-    events = []
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+def process_chunks_with_context(chunks, character_contexts, confirmed_genders, timestamp):
+    """Process text chunks while maintaining character context."""
+    print(f"\n{Fore.CYAN}┌─ Starting text transformation{Style.RESET_ALL}")
     
+    combined_text = ""
+    events = []
+    
+    for i, (chunk, context) in enumerate(zip(chunks, character_contexts), 1):
+        print(f"{Fore.CYAN}├─ Processing chunk {i}/{len(chunks)}{Style.RESET_ALL}")
+        
+        # Transform this chunk
+        transformed_chunk = regender_text_gpt(
+            chunk,
+            confirmed_genders,
+            timestamp=timestamp
+        )
+        
+        combined_text += transformed_chunk
+        
+        if i < len(chunks):
+            print(f"{Fore.CYAN}│{Style.RESET_ALL}")
+    
+    print(f"{Fore.GREEN}└─ Text transformation complete{Style.RESET_ALL}")
+    return combined_text
+
+def confirm_new_characters(roles_info, confirmed_genders, new_characters):
+    """Process and confirm gender choices for new characters."""
+    confirmed_roles = []
+    name_mappings = {}
+    events = []
+    
+    for role in roles_info.splitlines():
+        parts = role.split(" - ")
+        if len(parts) != 3:
+            continue
+            
+        character, role_desc, gender = parts
+        character = clean_name(character)
+        
+        if character in new_characters:
+            original_name = character
+            original_gender = gender
+            
+            events.append(f"Found new character: {character} ({role_desc})")
+            standardized_gender, new_name, gender_category = get_user_gender_choice(character, gender)
+            confirmed_genders[character] = standardized_gender
+            
+            events.append(f"  -> Gender set to: {standardized_gender}")
+
+            if new_name != character:
+                name_mappings[character] = new_name
+                character = new_name
+                events.append(f"  -> Character renamed to: {new_name}")
+            
+            role_entry = {
+                "Original_Name": original_name,
+                "Original_Role": role_desc,
+                "Original_Gender": original_gender,
+                "Updated_Name": new_name if new_name != original_name else original_name,
+                "Updated_Role": role_desc,
+                "Updated_Gender": standardized_gender,
+                "Gender_Category": gender_category,
+            }
+            
+            confirmed_roles.append(f"{character} - {role_desc} - {standardized_gender}")
+        else:
+            current_gender = confirmed_genders.get(character, gender)
+            confirmed_roles.append(f"{character} - {role_desc} - {current_gender}")
+    
+    return confirmed_roles, name_mappings, events
+
+def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
+    """Get character data from JSON storage."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            for char in data["Characters"]:
+                if clean_name(char["Original_Name"]) == character_name:
+                    return {
+                        "role": char["Original_Role"],
+                        "gender": char["Updated_Gender"] if "Updated_Gender" in char else char["Original_Gender"]
+                    }
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+    return None
+
+def load_confirmed_genders(file_path="character_roles_genders.json"):
+    """Load saved gender information from JSON."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read().strip()
+            if not content:
+                raise FileNotFoundError
+            data = json.loads(content)
+            confirmed_genders = {character["Original_Name"]: character["Original_Gender"] for character in data["Characters"]}
+        print(f"{Fore.GREEN}├─ Confirmed genders loaded from {file_path}{Style.RESET_ALL}")
+    except FileNotFoundError:
+        confirmed_genders = {}
+        print(f"No confirmed genders file found or file is empty. Starting with an empty dictionary.")
+    return confirmed_genders
+
+def clean_name(name):
+    """Remove leading numbers and periods from names."""
+    return re.sub(r'^\d+\.\s*', '', name).strip()
+
+def regender_text_gpt(input_text, confirmed_genders, name_mappings=None, timestamp=None):
+    """Process text with gender and name changes."""
+    if name_mappings is None:
+        name_mappings = {}
+    
+    gender_guidelines = []
+    name_instructions = []
+    debug_events = []
+    
+    debug_events.append(f"\nDEBUG - Starting regender_text_gpt")
+    
+    try:
+        with open("character_roles_genders.json", 'r', encoding='utf-8') as f:
+            char_data = json.load(f)
+            debug_events.append(f"Loaded character data from JSON:")
+            debug_events.append(json.dumps(char_data, indent=2))
+    except Exception as e:
+        debug_events.append(f"Error loading character data: {str(e)}")
+        char_data = {"Characters": []}
+    
+    for char in char_data["Characters"]:
+        character = char["Updated_Name"]
+        gender = char["Updated_Gender"]
+        gender_category = char["Gender_Category"]
+        
+        debug_events.append(f"\nDEBUG - Processing character: {character}")
+        debug_events.append(f"  Gender: {gender}")
+        debug_events.append(f"  Category: {gender_category}")
+        
+        if gender_category in GENDER_CATEGORIES:
+            pronouns = GENDER_CATEGORIES[gender_category]['pronouns']
+            debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
+            
+            gender_guidelines.append(
+                f"{character} ({gender}):\n"
+                f"- Use pronouns: {'/'.join(pronouns)}\n"
+                f"- Replace any she/her/hers with {'/'.join(pronouns)} when referring to {character}"
+            )
+    
+    for old_name, new_name in name_mappings.items():
+        name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
+        debug_events.append(f"\nDEBUG - Name change: {old_name} → {new_name}")
+
+    prompt = (
+        f"Regender the following text exactly as specified:\n\n"
+        f"1. Name changes (apply these first and exactly):\n{chr(10).join(name_instructions)}\n\n"
+        f"2. Character pronouns (apply these consistently):\n{chr(10).join(gender_guidelines)}\n\n"
+        f"3. Important rules:\n"
+        f"- Apply name changes first, then handle pronouns\n"
+        f"- Be thorough: check every pronoun and name reference\n"
+        f"- Maintain story flow and readability\n"
+        f"- Keep other character references unchanged\n\n"
+        f"Text to regender:\n{input_text}\n\n"
+        f"Return only the regendered text, no explanations."
+    )
+    
+    debug_events.append("\nDEBUG - Final prompt to GPT:")
+    debug_events.append(prompt)
+    
+    response = get_gpt_response(prompt, temperature=0.1)
+    debug_events.append("\nDEBUG - GPT Response:")
+    debug_events.append(response)
+    
+    write_debug_log(debug_events, timestamp)
+    
+    return response
+
+def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
+    """Update character information JSON with new data."""
+    if name_mappings is None:
+        name_mappings = {}
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = {"Characters": []}
+
+    try:
+        with open("original_character_info.json", 'r', encoding='utf-8') as f:
+            original_info = json.load(f)
+    except FileNotFoundError:
+        original_info = {}
+
+    updated_characters = []
+    
+    for role in confirmed_roles:
+        parts = role.split(" - ")
+        if len(parts) == 3:
+            new_name, role_desc, gender = parts
+            new_name = clean_name(new_name)
+            
+            original_character = None
+            for orig_name, orig_data in original_info.items():
+                if new_name in [orig_name, name_mappings.get(orig_name)]:
+                    original_character = orig_data
+                    break
+            
+            category_key, standard_label = standardize_gender(gender)
+            
+            character_entry = {
+                "Original_Name": original_character["name"] if original_character else new_name,
+                "Original_Role": original_character["role"] if original_character else role_desc,
+                "Original_Gender": original_character["gender"] if original_character else gender,
+                "Updated_Name": new_name,
+                "Updated_Role": role_desc,
+                "Updated_Gender": standard_label,
+                "Gender_Category": category_key
+            }
+            updated_characters.append(character_entry)
+
+    data["Characters"] = updated_characters
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
+    print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
+
+def log_character_mapping(character_contexts, timestamp):
+    """Create a visualization of character presence in chunks and save to log."""
+    mermaid_diagram = create_character_mapping_diagram(character_contexts)
+    
+    # Save diagram to a file
+    diagram_file = f"logs/{timestamp}_character_mapping.mermaid"
+    with open(diagram_file, 'w', encoding='utf-8') as f:
+        f.write(mermaid_diagram)
+    
+    # Also create a text-based summary
+    summary_file = f"logs/{timestamp}_character_summary.txt"
+    with open(summary_file, 'w', encoding='utf-8') as f:
+        f.write("CHARACTER PRESENCE SUMMARY\n")
+        f.write("=" * 25 + "\n\n")
+        
+        # Get all unique characters
+        all_characters = set()
+        for context in character_contexts:
+            all_characters.update(context['character_info']['characters'])
+        
+        # Write summary for each character
+        for char in sorted(all_characters):
+            f.write(f"\nCharacter: {char}\n")
+            f.write("-" * (len(char) + 10) + "\n")
+            
+            for i, context in enumerate(character_contexts):
+                char_info = context['character_info']
+                if char in char_info['characters']:
+                    locations = char_info['character_locations'].get(char, [])
+                    f.write(f"Chunk {i}: Present at positions {locations}\n")
+                else:
+                    f.write(f"Chunk {i}: Not present\n")
+            f.write("\n")
+    
+    return diagram_file, summary_file
+
+def create_character_mapping_diagram(character_contexts):
+    """Create a Mermaid diagram showing character presence across chunks."""
+    
+    # Get unique characters across all chunks
+    all_characters = set()
+    for context in character_contexts:
+        all_characters.update(context['character_info']['characters'])
+    
+    # Start building Mermaid diagram
+    mermaid_lines = [
+        "graph TD",
+        "    subgraph Characters",
+    ]
+    
+    # Add character nodes
+    for char in sorted(all_characters):
+        char_id = char.replace(" ", "_").replace("/", "_")
+        mermaid_lines.append(f'        {char_id}["{char}"]')
+    
+    mermaid_lines.append("    end")
+    mermaid_lines.append("")
+    
+    # Create chunk subgraph
+    mermaid_lines.append("    subgraph ChunkIndex[\"Chunk Index\"]")
+    for i in range(len(character_contexts)):
+        mermaid_lines.append(
+            f'        C{i}["Chunk {i}<br/>'
+            f'[Paragraphs {i*2+1}-{i*2+2}]"]'
+        )
+    mermaid_lines.append("    end")
+    mermaid_lines.append("")
+    
+    # Create presence/absence markers and connections
+    for char in sorted(all_characters):
+        char_id = char.replace(" ", "_").replace("/", "_")
+        for i, context in enumerate(character_contexts):
+            present = char in context['character_info']['characters']
+            marker = "✓" if present else "×"
+            
+            # Create presence/absence node
+            node_id = f"{char_id}_{i}"
+            style_class = "present" if present else "absent"
+            mermaid_lines.append(f'    {node_id}["{marker}"]')
+            
+            # Connect character to marker
+            if i == 0:  # Direct connection for first chunk
+                mermaid_lines.append(f'    {char_id} --> {node_id}')
+            else:  # Dotted line for subsequent chunks
+                mermaid_lines.append(f'    {char_id} -.-> {node_id}')
+            
+            # Connect marker to chunk
+            mermaid_lines.append(f'    {node_id} --> C{i}')
+    
+    # Add styles
+    mermaid_lines.extend([
+        "",
+        "    style Lucy fill:#f9f,stroke:#333",
+        "    style Mrs fill:#f9f,stroke:#333",
+        "    style Professor fill:#f9f,stroke:#333",
+        "",
+        "    classDef present fill:#d4edda,stroke:#333",
+        "    classDef absent fill:#f8d7da,stroke:#333",
+        "    class " + ",".join([
+            f"{char.replace(' ', '_')}_{i}" 
+            for char in all_characters 
+            for i, context in enumerate(character_contexts)
+            if char in context['character_info']['characters']
+        ]) + " present",
+        "    class " + ",".join([
+            f"{char.replace(' ', '_')}_{i}"
+            for char in all_characters
+            for i, context in enumerate(character_contexts)
+            if char not in context['character_info']['characters']
+        ]) + " absent"
+    ])
+    
+    return "\n".join(mermaid_lines)
+
+#------------------------------------------------------------------------------
+# Main Application Function
+#------------------------------------------------------------------------------
+
+def main():
+    """Main application entry point."""
+    print_startup_sequence()
+    
+    # Check API connection
     if not check_openai_api_key():
         return
-
-    # Phase 1: Initial Processing
-    print(f"\n{Fore.CYAN}┌─ Phase 1: Initial Processing{Style.RESET_ALL}")
-    input_text, status_message = load_input_text("test_samples/input_complex_titles_roles.txt")
-    print(status_message)
-
-    if not input_text:
+    
+    # Get input file from command line
+    if len(sys.argv) != 2:
+        print(f"{Fore.RED}✗ Please provide an input file path{Style.RESET_ALL}")
+        print(f"Usage: python {sys.argv[0]} input_file.txt")
         return
     
-    # Initialize character database
-    with open("character_roles_genders.json", 'w', encoding='utf-8') as file:
-        json.dump({"Characters": []}, file, ensure_ascii=False, indent=4)
-    print(f"{Fore.GREEN}├─ Reset character database{Style.RESET_ALL}")
-
-    # Split text into chunks
-    chunks, character_contexts = improved_chunk_text(input_text)
-    print(f"{Fore.GREEN}└─ Split into {Fore.YELLOW}{len(chunks)}{Fore.GREEN} chunks{Style.RESET_ALL}")
+    input_file = sys.argv[1]
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Phase 2: Character Analysis
-    print(f"\n{Fore.CYAN}┌─ Phase 2: Character Analysis{Style.RESET_ALL}")
-    all_characters, roles_by_character = detect_all_characters(chunks, character_contexts, timestamp)
+    # Load and validate input text
+    content, status = load_input_text(input_file)
+    if not content:
+        print(status)
+        return
+    print(status)
     
-    # Generate character mapping visualization
-    diagram_file, summary_file = log_character_mapping(character_contexts, timestamp)
-    print(f"\n{Fore.CYAN}Character mapping generated:{Style.RESET_ALL}")
-    print(f"└─ Diagram: {Fore.YELLOW}{diagram_file}{Style.RESET_ALL}")
-    print(f"└─ Summary: {Fore.YELLOW}{summary_file}{Style.RESET_ALL}")
-
-    # Phase 3: User Input
-    print(f"\n{Fore.CYAN}┌─ Phase 3: User Input{Style.RESET_ALL}")
+    # Create logs directory if it doesn't exist
+    os.makedirs("logs", exist_ok=True)
+    
+    # Process text in chunks
+    chunks, character_contexts = improved_chunk_text(content)
+    
+    # Detect all characters before user interaction
+    all_characters, roles_by_character = detect_all_characters(
+        chunks, character_contexts, timestamp
+    )
+    
+    # Handle all user input in a single phase
     confirmed_genders, name_mappings = handle_user_input_phase(
-        all_characters, 
-        roles_by_character,
-        timestamp
+        all_characters, roles_by_character, timestamp
     )
-
-    # Update character database with confirmed changes
-    roles_info = []
-    for character in all_characters:
-        role_info = roles_by_character[character]
-        new_name = name_mappings.get(character, character)
-        roles_info.append(f"{new_name} - {role_info['role']} - {confirmed_genders[character]}")
-    update_character_roles_genders_json(roles_info, name_mappings)
-
-    # Phase 4: Sequential Transform
-    print(f"\n{Fore.CYAN}┌─ Phase 4: Text Transformation{Style.RESET_ALL}")
-    combined_regendered_text, events = process_chunks_with_context(
-        chunks,
-        character_contexts,
-        confirmed_genders,
-        timestamp
+    
+    # Process chunks with confirmed changes
+    updated_text = process_chunks_with_context(
+        chunks, character_contexts, confirmed_genders, timestamp
     )
-
-    # Output Results
-    log_output(input_text, combined_regendered_text, events, timestamp=timestamp)
+    
+    # Log results
+    log_output(content, updated_text, timestamp=timestamp)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
 
 if __name__ == "__main__":
