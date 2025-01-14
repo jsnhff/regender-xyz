@@ -256,19 +256,25 @@ def get_user_gender_choice(character, current_gender):
 # Text Processing
 #------------------------------------------------------------------------------
 
-def improved_chunk_text(text, max_tokens=1000):
-    """Split text into chunks while preserving context."""
+def improved_chunk_text(text, max_tokens=80000):
+    """Split text into chunks while preserving context.
+    
+    With GPT-4's 128k context window, we use chunks of 80k tokens to leave room for:
+    - System prompts and instructions (~10k tokens)
+    - Response space (up to 16k tokens)
+    - Safety margin (~22k tokens)
+    """
     print(f"\n{Fore.CYAN}┌─ Starting text chunking process{Style.RESET_ALL}")
     print(f"{Fore.CYAN}├─ Text length: {Fore.YELLOW}{len(text):,}{Fore.CYAN} characters{Style.RESET_ALL}")
     
-    # Create text splitter with LangChain defaults
+    # Create text splitter with larger chunks and overlap
     print(f"{Fore.CYAN}├─ Chunk settings:{Style.RESET_ALL}")
     print(f"│  └─ Max size: {Fore.YELLOW}{max_tokens}{Style.RESET_ALL} tokens")
-    print(f"│  └─ Overlap : {Fore.YELLOW}200{Style.RESET_ALL} tokens")
+    print(f"│  └─ Overlap : {Fore.YELLOW}1000{Style.RESET_ALL} tokens")  # Increased overlap for better context
     
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=max_tokens,
-        chunk_overlap=200,
+        chunk_overlap=1000,  # Increased from 200 to 1000
         length_function=len,
         is_separator_regex=False
     )
@@ -662,68 +668,21 @@ def regender_text_gpt(input_text, confirmed_genders, name_mappings=None, timesta
     """Process text with gender and name changes."""
     if name_mappings is None:
         name_mappings = {}
-    
-    gender_guidelines = []
-    name_instructions = []
-    debug_events = []
-    
-    debug_events.append(f"\nDEBUG - Starting regender_text_gpt")
-    
+        
     try:
-        with open("character_roles_genders.json", 'r', encoding='utf-8') as f:
-            char_data = json.load(f)
-            debug_events.append(f"Loaded character data from JSON:")
-            debug_events.append(json.dumps(char_data, indent=2))
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Updated model name
+            messages=[
+                {"role": "system", "content": "You are a literary text transformation assistant. Your task is to carefully transform character genders while preserving the narrative flow, tone, and literary quality of the text."},
+                {"role": "user", "content": f"Transform this text by changing character genders as specified. Preserve all literary qualities, narrative flow, and maintain consistent pronouns and gender references throughout:\n\nCharacter Gender Map:\n{json.dumps(confirmed_genders, indent=2)}\n\nText to Transform:\n{input_text}"}
+            ],
+            max_tokens=16000,  # Set to maximum allowed output tokens
+            temperature=0.7
+        )
+        return response.choices[0].message.content
     except Exception as e:
-        debug_events.append(f"Error loading character data: {str(e)}")
-        char_data = {"Characters": []}
-    
-    for char in char_data["Characters"]:
-        character = char["Updated_Name"]
-        gender = char["Updated_Gender"]
-        gender_category = char["Gender_Category"]
-        
-        debug_events.append(f"\nDEBUG - Processing character: {character}")
-        debug_events.append(f"  Gender: {gender}")
-        debug_events.append(f"  Category: {gender_category}")
-        
-        if gender_category in GENDER_CATEGORIES:
-            pronouns = GENDER_CATEGORIES[gender_category]['pronouns']
-            debug_events.append(f"  Pronouns to use: {'/'.join(pronouns)}")
-            
-            gender_guidelines.append(
-                f"{character} ({gender}):\n"
-                f"- Use pronouns: {'/'.join(pronouns)}\n"
-                f"- Replace any she/her/hers with {'/'.join(pronouns)} when referring to {character}"
-            )
-    
-    for old_name, new_name in name_mappings.items():
-        name_instructions.append(f"Replace all instances of '{old_name}' with '{new_name}'")
-        debug_events.append(f"\nDEBUG - Name change: {old_name} → {new_name}")
-
-    prompt = (
-        f"Regender the following text exactly as specified:\n\n"
-        f"1. Name changes (apply these first and exactly):\n{chr(10).join(name_instructions)}\n\n"
-        f"2. Character pronouns (apply these consistently):\n{chr(10).join(gender_guidelines)}\n\n"
-        f"3. Important rules:\n"
-        f"- Apply name changes first, then handle pronouns\n"
-        f"- Be thorough: check every pronoun and name reference\n"
-        f"- Maintain story flow and readability\n"
-        f"- Keep other character references unchanged\n\n"
-        f"Text to regender:\n{input_text}\n\n"
-        f"Return only the regendered text, no explanations."
-    )
-    
-    debug_events.append("\nDEBUG - Final prompt to GPT:")
-    debug_events.append(prompt)
-    
-    response = get_gpt_response(prompt, temperature=0.1)
-    debug_events.append("\nDEBUG - GPT Response:")
-    debug_events.append(response)
-    
-    write_debug_log(debug_events, timestamp)
-    
-    return response
+        print(f"{Fore.RED}Error in regender_text_gpt: {str(e)}{Style.RESET_ALL}")
+        return input_text
 
 def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
     """Update character information JSON with new data."""
