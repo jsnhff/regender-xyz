@@ -1,5 +1,7 @@
-# Logs folder
-logs/
+# Archived & Samples folders
+_project_archive/
+logs/_archive/
+samples/
 
 # Character JSON
 character_roles_genders.json

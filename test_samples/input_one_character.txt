@@ -1,1 +1,0 @@
-Amidst the darkened village, Prince Leo carried a lantern, its soft glow guiding his steps. Shadows loomed, but he moved on, unafraid. As a brother and a son, he felt responsible. At the ancient oak, he placed the lantern down. Its light spread, revealing a hidden path. Leo smiled, knowing he’d found the way home.
