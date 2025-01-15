@@ -7,18 +7,22 @@ This application processes text to detect characters and their genders,
 allowing users to transform gender representation while preserving narrative coherence.
 """
 
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
+
 # Standard library imports
-import os
-import time
 import json
+import os
 import re
-from datetime import datetime
 import sys
+import time
+from datetime import datetime
 
 # Third-party imports
-from openai import OpenAI
+from colorama import Fore, Style, init
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from colorama import init, Fore, Style
+from openai import OpenAI
 
 # Initialize colorama
 init(autoreset=True)
@@ -79,45 +83,72 @@ def print_startup_sequence():
     print(f"{Fore.CYAN}│{Style.RESET_ALL}")
 
 def print_status(message, status_type="info"):
-    """Print formatted status messages."""
-    symbols = {
-        "info": f"{Fore.BLUE}ℹ{Style.RESET_ALL}",
-        "success": f"{Fore.GREEN}✓{Style.RESET_ALL}",
-        "warning": f"{Fore.YELLOW}⚠{Style.RESET_ALL}",
-        "error": f"{Fore.RED}✗{Style.RESET_ALL}"
+    """Print formatted status messages with color coding.
+    
+    Args:
+        message (str): The message to display
+        status_type (str, optional): Type of status - "info", "success", "error", "warning".
+            Defaults to "info"
+    """
+    status_colors = {
+        "info": Fore.CYAN,
+        "success": Fore.GREEN,
+        "error": Fore.RED,
+        "warning": Fore.YELLOW
     }
-    print(f" {symbols.get(status_type, symbols['info'])} {message}")
+    color = status_colors.get(status_type, Fore.WHITE)
+    print(f"{color}{message}{Style.RESET_ALL}")
 
 #------------------------------------------------------------------------------
 # OpenAI API Interaction
 #------------------------------------------------------------------------------
 
 def check_openai_api_key():
-    """Verify OpenAI API key with styled output."""
+    """Verify OpenAI API key is set and valid.
+    
+    Returns:
+        bool: True if API key is valid, False otherwise
+    """
+    if not os.environ.get("OPENAI_API_KEY"):
+        print(f"{Fore.RED}✗ Error: OPENAI_API_KEY environment variable not set{Style.RESET_ALL}")
+        return False
+    
     try:
         client.models.list()
-        print(f"{Fore.GREEN}✓ API connection established{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}✓ API key verified{Style.RESET_ALL}")
         return True
-    except Exception as e:
+    except Exception:
         print(f"{Fore.RED}✗ API Error: Please check your OpenAI API key{Style.RESET_ALL}")
         return False
 
 def get_gpt_response(prompt, model="gpt-4o", temperature=0.7, retries=3, delay=5):
-    """Interact with OpenAI API with retry mechanism."""
+    """Interact with OpenAI API with retry mechanism.
+    
+    Args:
+        prompt (str): The input prompt for GPT
+        model (str, optional): Model to use. Defaults to "gpt-4o"
+        temperature (float, optional): Response randomness. Defaults to 0.7
+        retries (int, optional): Number of retry attempts. Defaults to 3
+        delay (int, optional): Delay between retries in seconds. Defaults to 5
+    
+    Returns:
+        str: The model's response text, or error message if all retries fail
+    """
     attempt = 0
     while attempt < retries:
         try:
             response = client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=500,
+                max_tokens=16000,
                 temperature=temperature
             )
             return response.choices[0].message.content
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"{Fore.RED}Error: {e}{Style.RESET_ALL}")
             attempt += 1
-            time.sleep(delay)
+            if attempt < retries:
+                time.sleep(delay)
     return "Error: Unable to get response after multiple attempts"
 
 #------------------------------------------------------------------------------
@@ -441,6 +472,62 @@ def write_debug_log(events, timestamp):
         f.write('\n'.join(events))
     
     return debug_file
+
+#------------------------------------------------------------------------------
+# JSON Handling
+#------------------------------------------------------------------------------
+
+def update_character_roles_genders_json(confirmed_roles, name_mappings=None, file_path="character_roles_genders.json"):
+    """Update character information JSON with new data."""
+    if name_mappings is None:
+        name_mappings = {}
+    
+    updated_characters = []
+    
+    for char_name, info in confirmed_roles.items():
+        new_name = name_mappings.get(char_name, char_name)
+        
+        character_entry = {
+            "Original_Name": char_name,
+            "Original_Role": info.get("role", ""),
+            "Original_Gender": info.get("original_gender", ""),
+            "Updated_Name": new_name,
+            "Updated_Role": info.get("role", ""),
+            "Updated_Gender": info.get("gender", ""),
+            "Gender_Category": standardize_gender(info.get("gender", ""))
+        }
+        updated_characters.append(character_entry)
+    
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
+    print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
+
+def get_character_role_from_json(character_name, file_path="character_roles_genders.json"):
+    """Get character data from JSON storage."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            for char in data.get("Characters", []):
+                if char["Updated_Name"] == character_name:
+                    return {
+                        "role": char["Updated_Role"],
+                        "gender": char["Updated_Gender"]
+                    }
+    except Exception:
+        return None
+    return None
+
+def load_confirmed_genders(file_path="character_roles_genders.json"):
+    """Load saved gender information from JSON."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            return {
+                char["Updated_Name"]: char["Updated_Gender"]
+                for char in data.get("Characters", [])
+            }
+    except Exception:
+        return {}
 
 #------------------------------------------------------------------------------
 # Main Application Logic
