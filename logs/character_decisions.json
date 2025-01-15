@@ -1,0 +1,35 @@
+{
+    "total_characters": 3,
+    "decisions": [
+        {
+            "original_name": "Professor Sarah Chen",
+            "new_name": "Professor Samuel Chen",
+            "original_gender": "Female",
+            "new_gender": "Male",
+            "role": "University professor and researcher",
+            "appearances": [
+                0
+            ]
+        },
+        {
+            "original_name": "Lucy Chen",
+            "new_name": "Lucas Chen",
+            "original_gender": "Female",
+            "new_gender": "Male",
+            "role": "Daughter of Sarah Chen and botanist-in-training",
+            "appearances": [
+                0
+            ]
+        },
+        {
+            "original_name": "Mr. Thompson",
+            "new_name": "Mr. Thompson",
+            "original_gender": "Male",
+            "new_gender": "Male",
+            "role": "Greenhouse keeper",
+            "appearances": [
+                0
+            ]
+        }
+    ]
+}
