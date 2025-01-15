@@ -367,31 +367,38 @@ def load_input_text(file_path):
     except Exception as e:
         return None, f"{Fore.RED}✗ Error loading file: {str(e)}{Style.RESET_ALL}"
 
-def log_output(original_text, processed_result, timestamp=None):
-    """Log original and processed text to files."""
-    if timestamp is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+def log_output(original_text, processed_result):
+    """Log original and processed text to files.
+    
+    Writes three files for the current run:
+    - logs/original.txt: The input text
+    - logs/processed.txt: The transformed text
+    - logs/diff.txt: Differences between original and processed
+    """
+    # Ensure logs directory exists
+    os.makedirs("logs", exist_ok=True)
     
     # Unpack the tuple if it's a tuple, otherwise use the text directly
     processed_text = processed_result[0] if isinstance(processed_result, tuple) else processed_result
     
     # Log original text
-    with open(f"logs/original_{timestamp}.txt", "w", encoding="utf-8") as file:
+    with open("logs/original.txt", "w", encoding="utf-8") as file:
         file.write(original_text)
     
     # Log processed text
-    with open(f"logs/processed_{timestamp}.txt", "w", encoding="utf-8") as file:
+    with open("logs/processed.txt", "w", encoding="utf-8") as file:
         file.write(processed_text)
     
     # Create diff if original text exists
     if original_text:
-        create_diff(original_text, processed_text, timestamp)
+        create_diff(original_text, processed_text)
         
-    print(f"\n{Fore.GREEN}✓ Output logged to logs/processed_{timestamp}.txt{Style.RESET_ALL}")
+    print(f"\n{Fore.GREEN}✓ Output logged to logs/processed.txt{Style.RESET_ALL}")
 
-def create_diff(original_text, processed_text, timestamp):
+def create_diff(original_text, processed_text):
+    """Create a diff between original and processed text."""
     # Create diff file
-    diff_file = f"logs/diff_{timestamp}.txt"
+    diff_file = "logs/diff.txt"
     with open(diff_file, 'w', encoding='utf-8') as f:
         f.write("DIFFERENCE SUMMARY\n")
         f.write("=" * 25 + "\n\n")
@@ -399,8 +406,13 @@ def create_diff(original_text, processed_text, timestamp):
         # Calculate differences
         original_lines = original_text.splitlines()
         processed_lines = processed_text.splitlines()
-        diff_lines = []
         
+        # Handle cases where line counts differ
+        max_lines = max(len(original_lines), len(processed_lines))
+        original_lines.extend([''] * (max_lines - len(original_lines)))
+        processed_lines.extend([''] * (max_lines - len(processed_lines)))
+        
+        diff_lines = []
         for i, (orig_line, proc_line) in enumerate(zip(original_lines, processed_lines)):
             if orig_line != proc_line:
                 diff_lines.append(f"Line {i+1}:")
@@ -408,9 +420,12 @@ def create_diff(original_text, processed_text, timestamp):
                 diff_lines.append(f"  Processed: {proc_line}")
                 diff_lines.append("")
         
-        f.write("\n".join(diff_lines))
+        if diff_lines:
+            f.write("\n".join(diff_lines))
+        else:
+            f.write("No differences found between original and processed text.")
     
-    print(f"\n{Fore.GREEN}✓ Diff logged to {diff_file}{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}✓ Diff logged to {diff_file}{Style.RESET_ALL}")
 
 def write_debug_log(events, timestamp):
     """Write debug events to a linked debug log file."""
@@ -431,13 +446,12 @@ def write_debug_log(events, timestamp):
 # Main Application Logic
 #------------------------------------------------------------------------------
 
-def detect_all_characters(chunks, character_contexts, timestamp):
+def detect_all_characters(chunks, character_contexts):
     """Detect all characters across all chunks before any user interaction.
     
     Args:
         chunks (list): List of text chunks
         character_contexts (list): List of context dictionaries for each chunk
-        timestamp (str): Timestamp for logging
         
     Returns:
         tuple: (all_characters, roles_by_character)
@@ -481,7 +495,7 @@ def detect_all_characters(chunks, character_contexts, timestamp):
     print(f"└─ Found {Fore.YELLOW}{len(all_characters)}{Style.RESET_ALL} unique characters")
     
     # Log the initial character detection results
-    detection_log = f"logs/{timestamp}_initial_detection.json"
+    detection_log = "logs/initial_detection.json"
     with open(detection_log, 'w', encoding='utf-8') as f:
         json.dump({
             'all_characters': list(all_characters),
@@ -491,13 +505,12 @@ def detect_all_characters(chunks, character_contexts, timestamp):
     
     return all_characters, roles_by_character
 
-def handle_user_input_phase(all_characters, roles_by_character, timestamp):
+def handle_user_input_phase(all_characters, roles_by_character):
     """Handle all user input for character changes in a single phase.
     
     Args:
         all_characters (set): Set of all unique characters
         roles_by_character (dict): Dict mapping characters to their roles
-        timestamp (str): Timestamp for logging
         
     Returns:
         tuple: (confirmed_genders, name_mappings)
@@ -548,10 +561,9 @@ def handle_user_input_phase(all_characters, roles_by_character, timestamp):
         })
     
     # Log all decisions
-    decisions_log = f"logs/{timestamp}_character_decisions.json"
+    decisions_log = "logs/character_decisions.json"
     with open(decisions_log, 'w', encoding='utf-8') as f:
         json.dump({
-            "timestamp": timestamp,
             "total_characters": len(all_characters),
             "decisions": character_decisions
         }, f, indent=4)
@@ -559,7 +571,7 @@ def handle_user_input_phase(all_characters, roles_by_character, timestamp):
     
     return confirmed_genders, name_mappings
 
-def process_chunks_with_context(chunks, character_contexts, confirmed_genders, timestamp):
+def process_chunks_with_context(chunks, character_contexts, confirmed_genders):
     """Process text chunks while maintaining character context."""
     print(f"\n{Fore.CYAN}┌─ Starting text transformation{Style.RESET_ALL}")
     
@@ -572,8 +584,7 @@ def process_chunks_with_context(chunks, character_contexts, confirmed_genders, t
         # Transform this chunk
         transformed_chunk = regender_text_gpt(
             chunk,
-            confirmed_genders,
-            timestamp=timestamp
+            confirmed_genders
         )
         
         combined_text += transformed_chunk
@@ -664,7 +675,7 @@ def clean_name(name):
     """Remove leading numbers and periods from names."""
     return re.sub(r'^\d+\.\s*', '', name).strip()
 
-def regender_text_gpt(input_text, confirmed_genders, name_mappings=None, timestamp=None):
+def regender_text_gpt(input_text, confirmed_genders, name_mappings=None):
     """Process text with gender and name changes."""
     if name_mappings is None:
         name_mappings = {}
@@ -733,17 +744,17 @@ def update_character_roles_genders_json(confirmed_roles, name_mappings=None, fil
         json.dump({"Characters": updated_characters}, file, ensure_ascii=False, indent=4)
     print(f"\n{Fore.GREEN}✓ Updated character roles and genders saved to {file_path}{Style.RESET_ALL}")
 
-def log_character_mapping(character_contexts, timestamp):
+def log_character_mapping(character_contexts):
     """Create a visualization of character presence in chunks and save to log."""
     mermaid_diagram = create_character_mapping_diagram(character_contexts)
     
     # Save diagram to a file
-    diagram_file = f"logs/{timestamp}_character_mapping.mermaid"
+    diagram_file = "logs/character_mapping.mermaid"
     with open(diagram_file, 'w', encoding='utf-8') as f:
         f.write(mermaid_diagram)
     
     # Also create a text-based summary
-    summary_file = f"logs/{timestamp}_character_summary.txt"
+    summary_file = "logs/character_summary.txt"
     with open(summary_file, 'w', encoding='utf-8') as f:
         f.write("CHARACTER PRESENCE SUMMARY\n")
         f.write("=" * 25 + "\n\n")
@@ -866,7 +877,6 @@ def main():
         return
     
     input_file = sys.argv[1]
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # Load and validate input text
     content, status = load_input_text(input_file)
@@ -883,21 +893,21 @@ def main():
     
     # Detect all characters before user interaction
     all_characters, roles_by_character = detect_all_characters(
-        chunks, character_contexts, timestamp
+        chunks, character_contexts
     )
     
     # Handle all user input in a single phase
     confirmed_genders, name_mappings = handle_user_input_phase(
-        all_characters, roles_by_character, timestamp
+        all_characters, roles_by_character
     )
     
     # Process chunks with confirmed changes
     updated_text = process_chunks_with_context(
-        chunks, character_contexts, confirmed_genders, timestamp
+        chunks, character_contexts, confirmed_genders
     )
     
     # Log results
-    log_output(content, updated_text, timestamp=timestamp)
+    log_output(content, updated_text)
     print(f"\n{Fore.GREEN}✓ Processing complete!{Style.RESET_ALL}")
 
 if __name__ == "__main__":
