@@ -1,7 +1,7 @@
 """Character analysis module for identifying and profiling characters in text."""
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, NamedTuple
+from typing import Dict, List, Optional, NamedTuple, Tuple
 import re
 import json
 from pathlib import Path
@@ -37,16 +37,15 @@ class Character:
     
     def add_mention(self, start: int, end: int, text: str, full_text: str, mention_type: str = 'name') -> None:
         """Add a mention with its surrounding context."""
-        # Extract surrounding context (simplified to use a fixed window)
-        context_start = max(0, start - 50)
-        context_end = min(len(full_text), end + 50)
+        # Get sentence bounds
+        context_start, context_end = find_sentence_bounds(full_text, start)
         context = full_text[context_start:context_end].strip()
         
         mention = Mention(start, end, text, context, mention_type)
         if mention not in self.mentions:
             # Insert maintaining order by position
             self.mentions.insert(next((i for i, m in enumerate(self.mentions) 
-                                    if m.start > start), len(self.mentions)), mention)
+                                if m.start > start), len(self.mentions)), mention)
     
     def add_variant(self, variant: str) -> None:
         """Add a name variant if it's not already recorded."""
@@ -75,13 +74,111 @@ class Character:
             name_variants=data['name_variants']
         )
 
+def find_sentence_bounds(text: str, pos: int, max_context: int = 200) -> Tuple[int, int]:
+    """Find the start and end of sentence(s) containing position pos.
+    
+    Args:
+        text: The full text to search in
+        pos: The position to find context for
+        max_context: Maximum characters of context (default: 200)
+    
+    Returns:
+        Tuple of (start, end) positions that capture the context
+    """
+    # Common sentence endings and honorifics
+    end_markers = {'.', '!', '?'}
+    # Pre-compile honorific checks for efficiency
+    honorific_endings = '|'.join(h + '.' for h in ['mr', 'mrs', 'ms', 'dr', 'prof', 'rev', 'sr', 'jr'])
+    honorific_pattern = re.compile(f'({honorific_endings})$', re.IGNORECASE)
+    
+    def is_sentence_end(pos: int) -> bool:
+        """Check if position is a true sentence end."""
+        if pos >= len(text) or text[pos] not in end_markers:
+            return False
+            
+        # Look back for honorific
+        prev_word_end = text.rfind(' ', max(0, pos-10), pos) + 1
+        if honorific_pattern.search(text[prev_word_end:pos+1]):
+            return False
+        
+        # Must be followed by space/quote and capital, or end of text
+        after = pos + 1
+        while after < len(text) and text[after] in ' \t\n"\'':
+            after += 1
+        return after >= len(text) or text[after].isupper()
+    
+    # Look backwards for sentence start
+    start = pos
+    while start > 0:
+        # Stop at previous sentence end or paragraph break
+        if is_sentence_end(start - 1) or \
+           (start > 1 and text[start-2:start] == '\n\n'):
+            break
+        start -= 1
+    
+    # Clean up start (skip whitespace and quotes)
+    while start < len(text) and text[start] in ' \t\n"\'':
+        start += 1
+    
+    # Look forwards for sentence end
+    end = pos
+    while end < len(text):
+        # Check context size
+        if end - start >= max_context:
+            # Complete dialogue if we're in the middle of one
+            quote_count = text[start:end].count('"')
+            if quote_count % 2 == 1:
+                next_quote = text.find('"', end)
+                if next_quote != -1 and next_quote - start < max_context + 50:
+                    end = next_quote + 1
+            break
+            
+        # Stop at sentence end
+        if is_sentence_end(end):
+            end += 1
+            # Include one more sentence if it's short
+            next_end = end
+            while next_end < len(text) and text[next_end] in ' \t\n"\'':
+                next_end += 1
+            next_sentence_end = next_end
+            while next_sentence_end < len(text):
+                if is_sentence_end(next_sentence_end):
+                    if next_sentence_end - end < 50:  # Short enough to include
+                        end = next_sentence_end + 1
+                    break
+                next_sentence_end += 1
+            break
+        
+        end += 1
+    
+    # Clean up end (include closing punctuation but trim trailing space)
+    while end > start and text[end-1] in ' \t\n':
+        end -= 1
+    
+    return start, end
+
+def add_mention(character: Character, start: int, end: int, text: str, full_text: str, mention_type: str = 'name') -> None:
+    """Add a mention with its surrounding context using sentence boundaries."""
+    # Get sentence bounds
+    context_start, context_end = find_sentence_bounds(full_text, start)
+    context = full_text[context_start:context_end].strip()
+    
+    mention = Mention(start, end, text, context, mention_type)
+    if mention not in character.mentions:
+        # Insert maintaining order by position
+        character.mentions.insert(next((i for i, m in enumerate(character.mentions) 
+                                if m.start > start), len(character.mentions)), mention)
+
 class CharacterData(BaseModel):
     canonical_name: str
-    role: str
-    gender: str
-    name_variants: List[str]
-    pronouns: List[str]
-    possessives: List[str]
+    role: Optional[str] = None
+    gender: Optional[str] = None
+    name_variants: List[str] = []
+    pronouns: List[str] = []
+    possessives: List[str] = []
+
+class GPTResponse(BaseModel):
+    characters: List[CharacterData]
 
 def clean_name(name: str) -> str:
     """Remove leading numbers, periods, and clean up whitespace."""
@@ -137,12 +234,11 @@ Here's the text:
     response = get_gpt_response(prompt, client)
     
     try:
-        data = json.loads(response)
+        data = GPTResponse.parse_raw(response)
         characters = {}
         
-        for char_data in data["characters"]:
-            char_data = CharacterData(**char_data)
-            # Create character with canonical name
+        # First pass: Create characters and process name mentions
+        for char_data in data.characters:
             main_name = clean_name(char_data.canonical_name)
             character = Character(
                 name=main_name,
@@ -150,7 +246,7 @@ Here's the text:
                 gender=char_data.gender
             )
             
-            # Process all references to this character
+            # Process name variations first
             for variant in set(char_data.name_variants) | {main_name}:
                 variant = clean_name(variant)
                 if variant:
@@ -160,18 +256,58 @@ Here's the text:
                         character.add_mention(pos, pos + len(variant), variant, text, 'name')
                         pos += len(variant)
             
-            # Track pronouns and possessives
-            for mention_type, words in [
-                ('pronoun', char_data.pronouns),
-                ('possessive', char_data.possessives)
-            ]:
-                for word in words:
-                    pos = 0
-                    while (pos := text.find(word, pos)) != -1:
-                        character.add_mention(pos, pos + len(word), word, text, mention_type)
-                        pos += len(word)
-            
             characters[main_name] = character
+
+        # Second pass: Process pronouns with proximity-based attribution
+        for char_data in data.characters:
+            character = characters[clean_name(char_data.canonical_name)]
+            
+            # Group pronouns by gender
+            male_pronouns = {'he', 'him', 'his', 'himself'}
+            female_pronouns = {'she', 'her', 'hers', 'herself'}
+            neutral_pronouns = {'they', 'them', 'their', 'theirs', 'themselves'}
+            
+            # Determine character's pronoun set based on gender
+            if character.gender and 'male' in character.gender.lower():
+                valid_pronouns = male_pronouns
+            elif character.gender and 'female' in character.gender.lower():
+                valid_pronouns = female_pronouns
+            else:
+                valid_pronouns = neutral_pronouns
+            
+            # Process pronouns and possessives together
+            all_refs = set(char_data.pronouns) | set(char_data.possessives)
+            for word in all_refs:
+                if word.lower() not in valid_pronouns:
+                    continue
+                    
+                pos = 0
+                while (pos := text.find(word, pos)) != -1:
+                    # Find nearest preceding name mention
+                    nearest_char = None
+                    min_distance = float('inf')
+                    
+                    for char in characters.values():
+                        # Only consider characters of matching gender
+                        if not char.gender or not character.gender or \
+                           ('male' in char.gender.lower()) != ('male' in character.gender.lower()):
+                            continue
+                            
+                        # Find the most recent name mention before this pronoun
+                        for mention in char.mentions:
+                            if mention.mention_type == 'name' and mention.end <= pos:
+                                distance = pos - mention.end
+                                if distance < min_distance:
+                                    min_distance = distance
+                                    nearest_char = char
+                    
+                    # Only attribute pronoun if this character is the nearest match
+                    # and within reasonable distance (200 chars)
+                    if nearest_char == character and min_distance < 200:
+                        mention_type = 'possessive' if word.lower() in {'his', 'her', 'their', 'hers', 'theirs'} else 'pronoun'
+                        character.add_mention(pos, pos + len(word), word, text, mention_type)
+                    
+                    pos += len(word)
             
         return characters
     except Exception as e:
