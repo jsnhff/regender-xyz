@@ -6,12 +6,46 @@ Version: 0.1.0
 
 import os
 import sys
+import shutil
 from pathlib import Path
 from typing import Optional, Tuple
-from character_analysis import (
-    find_characters, Mention, 
-    save_character_analysis, load_character_analysis
-)
+from datetime import datetime, timedelta
+import jsonschema
+import json
+from openai import OpenAI
+from character_analysis import Mention
+
+# Initialize OpenAI client (will use OPENAI_API_KEY from environment)
+openai_client = OpenAI()
+
+# Project paths
+PROJECT_ROOT = Path(__file__).parent
+CACHE_DIR = PROJECT_ROOT / '.cache'
+SCHEMA_PATH = PROJECT_ROOT / 'character_analysis.schema.json'
+
+# Ensure cache directory exists
+CACHE_DIR.mkdir(exist_ok=True)
+
+def clean_old_cache(max_age_hours: int = 24) -> None:
+    """Remove cache files older than specified hours."""
+    if not CACHE_DIR.exists():
+        return
+        
+    cutoff = datetime.now() - timedelta(hours=max_age_hours)
+    for cache_file in CACHE_DIR.glob('*.json'):
+        if cache_file.stat().st_mtime < cutoff.timestamp():
+            cache_file.unlink()
+
+def validate_analysis_json(data: dict) -> bool:
+    """Validate analysis data against schema."""
+    try:
+        with open(SCHEMA_PATH) as f:
+            schema = json.load(f)
+        jsonschema.validate(data, schema)
+        return True
+    except Exception as e:
+        print(f"Validation error: {e}")
+        return False
 
 def load_text(file_path: str) -> Tuple[Optional[str], str]:
     """Load and validate input text file."""
@@ -81,21 +115,22 @@ def main():
         
     print(message)
     
-    # Determine analysis file path
-    analysis_file = Path(input_file).with_suffix('.characters.json')
-    characters = {}
+    # Clean old cache files
+    clean_old_cache()
     
-    # Try to load existing analysis
-    if analysis_file.exists():
-        print(f"\nLoading existing character analysis from {analysis_file}")
-        characters = load_character_analysis(str(analysis_file))
+    # Use hash of file content for cache filename
+    from hashlib import sha256
+    content_hash = sha256(content.encode()).hexdigest()[:12]
+    cache_file = CACHE_DIR / f"analysis_{content_hash}.json"
     
-    # Perform new analysis if needed
-    if not characters:
-        print("\nPerforming character analysis...")
-        characters = find_characters(content)
-        save_character_analysis(characters, str(analysis_file))
-        print(f"Analysis saved to {analysis_file}")
+    # Perform new analysis
+    print("\nPerforming character analysis...")
+    from character_analysis import find_characters, save_character_analysis
+    characters = find_characters(content, openai_client)
+    
+    # Save analysis results (overwriting if exists)
+    save_character_analysis(characters, str(cache_file))
+    print(f"Analysis saved to {cache_file}")
     
     # Display results
     print(f"\nFound {len(characters)} characters:")

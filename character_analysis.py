@@ -3,13 +3,11 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, NamedTuple
 import re
-import os
 import json
 from pathlib import Path
 from datetime import datetime
 from openai import OpenAI
-
-client = OpenAI()
+from pydantic import BaseModel, validator
 
 class Mention(NamedTuple):
     """Represents a single mention of a character in text."""
@@ -21,7 +19,7 @@ class Mention(NamedTuple):
     
     def to_dict(self) -> dict:
         """Convert mention to dictionary for JSON serialization."""
-        return dict(self._asdict())  # Use built-in NamedTuple method
+        return dict(self._asdict())
     
     @classmethod
     def from_dict(cls, data: dict) -> 'Mention':
@@ -38,15 +36,7 @@ class Character:
     name_variants: List[str] = field(default_factory=list)
     
     def add_mention(self, start: int, end: int, text: str, full_text: str, mention_type: str = 'name') -> None:
-        """Add a mention with its surrounding context.
-        
-        Args:
-            start: Start position in text
-            end: End position in text
-            text: The actual mention text
-            full_text: The complete text for extracting context
-            mention_type: Type of mention ('name', 'pronoun', 'possessive')
-        """
+        """Add a mention with its surrounding context."""
         # Extract surrounding context (simplified to use a fixed window)
         context_start = max(0, start - 50)
         context_end = min(len(full_text), end + 50)
@@ -85,11 +75,19 @@ class Character:
             name_variants=data['name_variants']
         )
 
+class CharacterData(BaseModel):
+    canonical_name: str
+    role: str
+    gender: str
+    name_variants: List[str]
+    pronouns: List[str]
+    possessives: List[str]
+
 def clean_name(name: str) -> str:
     """Remove leading numbers, periods, and clean up whitespace."""
-    return ' '.join(name.strip().split())  # Simpler way to normalize whitespace
+    return ' '.join(name.strip().split())
 
-def get_gpt_response(prompt: str) -> str:
+def get_gpt_response(prompt: str, client: OpenAI) -> str:
     """Get response from GPT model."""
     try:
         response = client.chat.completions.create(
@@ -102,7 +100,7 @@ def get_gpt_response(prompt: str) -> str:
         print(f"Error getting GPT response: {e}")
         return ""
 
-def find_characters(text: str) -> Dict[str, Character]:
+def find_characters(text: str, client: OpenAI) -> Dict[str, Character]:
     """Find characters in the text using AI."""
     prompt = f"""Analyze this text and identify all characters. For each character, provide:
 1. Their canonical name (most complete form used)
@@ -136,23 +134,24 @@ Here's the text:
 
 {text}"""
 
-    response = get_gpt_response(prompt)
+    response = get_gpt_response(prompt, client)
     
     try:
         data = json.loads(response)
         characters = {}
         
         for char_data in data["characters"]:
+            char_data = CharacterData(**char_data)
             # Create character with canonical name
-            main_name = clean_name(char_data["canonical_name"])
+            main_name = clean_name(char_data.canonical_name)
             character = Character(
                 name=main_name,
-                role=char_data.get("role"),
-                gender=char_data.get("gender")
+                role=char_data.role,
+                gender=char_data.gender
             )
             
             # Process all references to this character
-            for variant in set(char_data.get("name_variants", [])) | {main_name}:
+            for variant in set(char_data.name_variants) | {main_name}:
                 variant = clean_name(variant)
                 if variant:
                     character.add_variant(variant)
@@ -163,8 +162,8 @@ Here's the text:
             
             # Track pronouns and possessives
             for mention_type, words in [
-                ('pronoun', char_data.get("pronouns", [])),
-                ('possessive', char_data.get("possessives", []))
+                ('pronoun', char_data.pronouns),
+                ('possessive', char_data.possessives)
             ]:
                 for word in words:
                     pos = 0
@@ -193,16 +192,3 @@ def save_character_analysis(characters: Dict[str, Character], output_file: str) 
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
-def load_character_analysis(input_file: str) -> Dict[str, Character]:
-    """Load character analysis results from a JSON file."""
-    try:
-        with open(input_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return {
-            name: Character.from_dict(char_data)
-            for name, char_data in data['characters'].items()
-        }
-    except Exception as e:
-        print(f"Error loading character analysis: {e}")
-        return {}

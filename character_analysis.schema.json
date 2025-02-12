@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["characters", "metadata"],
+  "properties": {
+    "characters": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "required": ["name", "mentions", "name_variants"],
+          "properties": {
+            "name": { "type": "string" },
+            "gender": { "type": ["string", "null"] },
+            "role": { "type": ["string", "null"] },
+            "mentions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["start", "end", "text", "context", "mention_type"],
+                "properties": {
+                  "start": { "type": "integer", "minimum": 0 },
+                  "end": { "type": "integer", "minimum": 0 },
+                  "text": { "type": "string" },
+                  "context": { "type": "string" },
+                  "mention_type": {
+                    "type": "string",
+                    "enum": ["name", "pronoun", "possessive"]
+                  }
+                }
+              }
+            },
+            "name_variants": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["version", "timestamp", "character_count"],
+      "properties": {
+        "version": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "character_count": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
