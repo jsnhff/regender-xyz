@@ -1,26 +1,26 @@
 {
     "all_characters": [
-        "Professor Sarah Chen",
         "Lucy Chen",
-        "Mr. Thompson"
+        "Mr. Thompson",
+        "Professor Sarah Chen"
     ],
     "roles_by_character": {
         "Professor Sarah Chen": {
-            "role": "University professor and researcher",
+            "role": "University Professor and Researcher",
             "original_gender": "Female",
             "appearances": [
                 0
             ]
         },
         "Lucy Chen": {
-            "role": "Daughter of Sarah Chen and botanist-in-training",
+            "role": "Daughter of Professor Sarah Chen and Young Botanist-in-Training",
             "original_gender": "Female",
             "appearances": [
                 0
             ]
         },
         "Mr. Thompson": {
-            "role": "Greenhouse keeper",
+            "role": "Greenhouse Keeper",
             "original_gender": "Male",
             "appearances": [
                 0
