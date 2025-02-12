@@ -6,46 +6,64 @@ Version: 0.1.0
 
 import os
 import sys
+from pathlib import Path
 from typing import Optional, Tuple
-from character_analysis import find_characters
+from character_analysis import (
+    find_characters, Mention, 
+    save_character_analysis, load_character_analysis
+)
 
 def load_text(file_path: str) -> Tuple[Optional[str], str]:
-    """Load input text file with validation.
-    
-    Args:
-        file_path (str): Path to the input text file
-        
-    Returns:
-        tuple: (content, status_message)
-            - content: The text content if successful, None if failed
-            - status_message: A user-friendly status message
-    """
+    """Load and validate input text file."""
     try:
         if not os.path.exists(file_path):
             return None, f"Error: File '{file_path}' not found"
         
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read().strip()
             
-        if not content.strip():
+        if not content:
             return None, f"Error: File '{file_path}' is empty"
             
         return content, "File loaded successfully"
     except Exception as e:
         return None, f"Error reading file: {str(e)}"
 
+def print_mention_group(mentions: list[Mention], group_type: str) -> None:
+    """Print a group of mentions with sample contexts."""
+    if not mentions:
+        return
+        
+    print(f"\n{group_type.title()} mentions ({len(mentions)}):")
+    # Show up to 3 examples
+    for mention in mentions[:3]:
+        print(f"  {mention.text:>10}: ...{mention.context}...")
+    if len(mentions) > 3:
+        print(f"  ... and {len(mentions) - 3} more {group_type} mentions ...")
+
 def print_character_info(name: str, character) -> None:
-    """Print detailed information about a character."""
+    """Print character information in a clean, organized format."""
     print(f"\nCharacter: {name}")
     print("-" * 60)
     print(f"Role: {character.role or 'Unknown'}")
     print(f"Gender: {character.gender or 'Unknown'}")
-    print(f"Mentions: {len(character.mentions)} times")
+    
     if character.name_variants:
-        print("Name variations found:")
-        for variant in character.name_variants:
-            if variant != name:  # Don't show canonical name in variants
+        variants = [v for v in character.name_variants if v != name]
+        if variants:
+            print("\nName variations:")
+            for variant in variants:
                 print(f"  - {variant}")
+    
+    # Group mentions by type
+    mention_groups = {}
+    for mention in character.mentions:
+        mention_groups.setdefault(mention.mention_type, []).append(mention)
+    
+    print(f"\nTotal mentions: {len(character.mentions)}")
+    for mention_type, mentions in mention_groups.items():
+        print_mention_group(mentions, mention_type)
+    
     print("-" * 60)
 
 def main():
@@ -63,10 +81,23 @@ def main():
         
     print(message)
     
-    # Find characters in the text
-    characters = find_characters(content)
+    # Determine analysis file path
+    analysis_file = Path(input_file).with_suffix('.characters.json')
+    characters = {}
     
-    # Print found characters and their information
+    # Try to load existing analysis
+    if analysis_file.exists():
+        print(f"\nLoading existing character analysis from {analysis_file}")
+        characters = load_character_analysis(str(analysis_file))
+    
+    # Perform new analysis if needed
+    if not characters:
+        print("\nPerforming character analysis...")
+        characters = find_characters(content)
+        save_character_analysis(characters, str(analysis_file))
+        print(f"Analysis saved to {analysis_file}")
+    
+    # Display results
     print(f"\nFound {len(characters)} characters:")
     for name, character in characters.items():
         print_character_info(name, character)
