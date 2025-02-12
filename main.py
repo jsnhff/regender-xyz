@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Text Transformer - A tool for transforming gender representation in literature
+regender.xyz - A tool for transforming gender representation in literature
 Version: 0.1.0
 """
 
