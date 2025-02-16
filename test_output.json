@@ -1,0 +1,513 @@
+{
+  "Mr. Bennet": {
+    "name": "Mr. Bennet",
+    "gender": "male",
+    "role": "husband to Mrs. Bennet and father to their daughters",
+    "mentions": [
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 309,
+        "end": 311,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 399,
+        "end": 409,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 403,
+        "end": 409,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 417,
+        "end": 420,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "him",
+        "start": 429,
+        "end": 432,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 498,
+        "end": 508,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 502,
+        "end": 508,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 522,
+        "end": 524,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 629,
+        "end": 639,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 633,
+        "end": 639,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 1261,
+        "end": 1263,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 1459,
+        "end": 1469,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 1463,
+        "end": 1469,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 1480,
+        "end": 1483,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 1555,
+        "end": 1558,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 1592,
+        "end": 1595,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 3272,
+        "end": 3274,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 3390,
+        "end": 3400,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 3394,
+        "end": 3400,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 707,
+        "end": 710,
+        "confidence": 0.8999999999999999
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bennet",
+        "start": 4030,
+        "end": 4040,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bennet",
+        "start": 4034,
+        "end": 4040,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 4194,
+        "end": 4197,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 4214,
+        "end": 4217,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Mrs. Bennet": {
+    "name": "Mrs. Bennet",
+    "gender": "female",
+    "role": "wife to Mr. Bennet and mother to their daughters",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Her",
+        "start": 4230,
+        "end": 4233,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "she",
+        "start": 4357,
+        "end": 4360,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "she",
+        "start": 4379,
+        "end": 4382,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "her",
+        "start": 4424,
+        "end": 4427,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Mrs. Long": {
+    "name": "Mrs. Long",
+    "gender": "female",
+    "role": "a neighbor who informs the Bennets about Netherfield Park",
+    "mentions": [
+      {
+        "type": "pronoun",
+        "text": "she",
+        "start": 557,
+        "end": 560,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mrs. Long",
+        "start": 567,
+        "end": 576,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "she",
+        "start": 601,
+        "end": 604,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mrs. Long",
+        "start": 854,
+        "end": 863,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Mr. Morris": {
+    "name": "Mr. Morris",
+    "gender": "male",
+    "role": "the agent through whom Netherfield Park is let",
+    "mentions": [
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 1061,
+        "end": 1063,
+        "confidence": 0.9
+      },
+      {
+        "type": "name",
+        "text": "Mr. Morris",
+        "start": 1076,
+        "end": 1086,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Morris",
+        "start": 1080,
+        "end": 1086,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 959,
+        "end": 961,
+        "confidence": 0.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 1105,
+        "end": 1107,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 1161,
+        "end": 1164,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 1233,
+        "end": 1236,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Mr. Bingley": {
+    "name": "Mr. Bingley",
+    "gender": "male",
+    "role": "a wealthy young man from the north of England, new tenant of Netherfield Park",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Bingley",
+        "start": 1246,
+        "end": 1253,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 1774,
+        "end": 1776,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bingley",
+        "start": 1956,
+        "end": 1967,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bingley",
+        "start": 1960,
+        "end": 1967,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bingley",
+        "start": 2332,
+        "end": 2343,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Bingley",
+        "start": 2336,
+        "end": 2343,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "him",
+        "start": 2711,
+        "end": 2714,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 2349,
+        "end": 2351,
+        "confidence": 0.9
+      },
+      {
+        "type": "name",
+        "text": "Mr. Bingley",
+        "start": 2777,
+        "end": 2788,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "him",
+        "start": 1759,
+        "end": 1762,
+        "confidence": 0.0
+      },
+      {
+        "type": "name",
+        "text": "Bingley",
+        "start": 2781,
+        "end": 2788,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "him",
+        "start": 2864,
+        "end": 2867,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "his",
+        "start": 2892,
+        "end": 2895,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "he",
+        "start": 2915,
+        "end": 2917,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Sir William Lucas": {
+    "name": "Sir William Lucas",
+    "gender": "male",
+    "role": "neighbor and acquaintance of the Bennet family",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Sir William",
+        "start": 2523,
+        "end": 2534,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Lady Lucas": {
+    "name": "Lady Lucas",
+    "gender": "female",
+    "role": "wife to Sir William Lucas",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Lady Lucas",
+        "start": 2539,
+        "end": 2549,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Lizzy": {
+    "name": "Lizzy",
+    "gender": "female",
+    "role": "daughter of Mr. and Mrs. Bennet, not as handsome as Jane nor as good-humoured as Lydia",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Lizzy",
+        "start": 2989,
+        "end": 2994,
+        "confidence": 1.0
+      },
+      {
+        "type": "name",
+        "text": "Lizzy",
+        "start": 3035,
+        "end": 3040,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "her",
+        "start": 3192,
+        "end": 3195,
+        "confidence": 1.0
+      },
+      {
+        "type": "pronoun",
+        "text": "she",
+        "start": 3092,
+        "end": 3095,
+        "confidence": 0.0
+      },
+      {
+        "type": "name",
+        "text": "Lizzy",
+        "start": 3331,
+        "end": 3336,
+        "confidence": 1.0
+      },
+      {
+        "type": "possessive",
+        "text": "her",
+        "start": 3374,
+        "end": 3377,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Jane": {
+    "name": "Jane",
+    "gender": "female",
+    "role": "daughter of Mr. and Mrs. Bennet, considered more handsome than Lizzy",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Jane",
+        "start": 3123,
+        "end": 3127,
+        "confidence": 1.0
+      }
+    ]
+  },
+  "Lydia": {
+    "name": "Lydia",
+    "gender": "female",
+    "role": "daughter of Mr. and Mrs. Bennet, considered more good-humoured than Lizzy",
+    "mentions": [
+      {
+        "type": "name",
+        "text": "Lydia",
+        "start": 3158,
+        "end": 3163,
+        "confidence": 1.0
+      }
+    ]
+  }
+}

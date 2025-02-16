@@ -14,6 +14,8 @@ import jsonschema
 import json
 from openai import OpenAI
 from character_analysis import Mention
+import math
+from dataclasses import dataclass
 
 # Initialize OpenAI client (will use OPENAI_API_KEY from environment)
 openai_client = OpenAI()
@@ -99,6 +101,37 @@ def print_character_info(name: str, character) -> None:
         print_mention_group(mentions, mention_type)
     
     print("-" * 60)
+
+@dataclass
+class BookAnalysisConfig:
+    """Configuration for book analysis."""
+    model_name: str = "gpt-4o-mini-2024-07-18"
+    max_tokens_per_chunk: int = 50_000  # Smaller chunks for faster processing
+    overlap_tokens: int = 5_000
+    min_chapter_confidence: float = 0.8
+    max_chapter_size_ratio: float = 3.0
+    max_chunks_per_book: int = 10
+    cost_per_1k_tokens: float = 0.01
+    max_output_tokens: int = 16_000  # Safe margin below 16,384 limit
+    
+    def estimate_cost(self, total_tokens: int) -> float:
+        """Estimate processing cost for a book."""
+        chunks = math.ceil(total_tokens / self.max_tokens_per_chunk)
+        chunks = min(chunks, self.max_chunks_per_book)
+        total_tokens_with_overlap = total_tokens + (chunks - 1) * self.overlap_tokens
+        return (total_tokens_with_overlap / 1000) * self.cost_per_1k_tokens
+
+def process_book(file_path: str, config: BookAnalysisConfig = None) -> None:
+    """Process a book file with the given configuration."""
+    config = config or BookAnalysisConfig()
+    
+    with open(file_path, 'r') as f:
+        text = f.read()
+        
+    analyzer = BookAnalyzer(config)
+    chunks = analyzer.create_chunks(text)
+    
+    # Process chunks...
 
 def main():
     """Main application entry point."""

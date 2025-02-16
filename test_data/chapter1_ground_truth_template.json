@@ -1,0 +1,149 @@
+{
+  "characters": {
+    "Mr. Bennet": {
+      "gender": "male",
+      "role": "father of five daughters, husband to Mrs. Bennet",
+      "variants": [
+        "Mr. Bennet",
+        "my dear"
+      ],
+      "variant_mentions": [
+        {
+          "text": "my dear",
+          "start": 395,
+          "end": 402,
+          "context": "My dear Mr. Bennet," said his lady",
+          "in_dialog": true,
+          "speaker": "Mrs. Bennet"
+        },
+        {
+          "text": "my dear",
+          "start": 1455,
+          "end": 1462,
+          "context": "My dear Mr. Bennet," replied his wife",
+          "in_dialog": true,
+          "speaker": "Mrs. Bennet"
+        }
+      ],
+      "relationships": {
+        "Mrs. Bennet": "wife",
+        "Elizabeth": "daughter",
+        "Jane": "daughter",
+        "Lydia": "daughter"
+      },
+      "mentions": [
+        {
+          "type": "name",
+          "text": "Mr. Bennet",
+          "start": 0,
+          "end": 0,
+          "context": "surrounding text for verification"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 399,
+          "end": 409,
+          "context": "My dear Mr. Bennet," said his lady to him one day",
+          "dialog_attribution": "said his lady"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 498,
+          "end": 508,
+          "context": "Mr. Bennet replied that he had not"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 629,
+          "end": 639,
+          "context": "Mr. Bennet made no answer"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 1459,
+          "end": 1469,
+          "context": "My dear Mr. Bennet," replied his wife",
+          "dialog_attribution": "replied his wife"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 3390,
+          "end": 3400,
+          "context": "Mr. Bennet was so odd a mixture of quick parts"
+        },
+        {
+          "text": "Mr. Bennet",
+          "start": 4030,
+          "end": 4040,
+          "context": "Mr. Bennet, how can you abuse your own children"
+        }
+      ],
+      "pronouns": [
+        {
+          "text": "he",
+          "start": 0,
+          "end": 0,
+          "context": "surrounding text",
+          "refers_to": "previous mention for verification"
+        },
+        {
+          "text": "his",
+          "start": 417,
+          "end": 420,
+          "context": "said his lady to him one day",
+          "refers_to": "Mr. Bennet"
+        },
+        {
+          "text": "him",
+          "start": 429,
+          "end": 432,
+          "context": "said his lady to him one day",
+          "refers_to": "Mr. Bennet"
+        },
+        {
+          "text": "he",
+          "start": 522,
+          "end": 524,
+          "context": "replied that he had not",
+          "refers_to": "Mr. Bennet"
+        },
+        {
+          "text": "his",
+          "start": 1480,
+          "end": 1483,
+          "context": "replied his wife",
+          "refers_to": "Mr. Bennet"
+        },
+        {
+          "text": "his",
+          "start": 4194,
+          "end": 4197,
+          "context": "to make his wife understand his character",
+          "refers_to": "Mr. Bennet"
+        },
+        {
+          "text": "his",
+          "start": 4214,
+          "end": 4217,
+          "context": "to make his wife understand his character",
+          "refers_to": "Mr. Bennet"
+        }
+      ],
+      "dialog": [
+        {
+          "text": "actual speech",
+          "start": 0,
+          "end": 0,
+          "attribution": "said/replied/etc",
+          "attribution_position": "before/after"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "chapter": 1,
+    "annotator": "your name",
+    "date": "YYYY-MM-DD",
+    "notes": "Any special cases or ambiguities noted during annotation"
+  }
+}
