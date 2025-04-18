@@ -216,45 +216,15 @@ def main() -> int:
     # Handle cache disabling if requested
     if hasattr(args, 'no_cache') and args.no_cache:
         try:
+            # Instead of trying to rename directories, we'll set an environment variable
+            # that our caching decorator can check to bypass the cache
             import os
-            import shutil
-            cache_dir = Path(".cache")
-            if cache_dir.exists():
-                # Instead of renaming, we'll temporarily move the contents to a backup directory
-                temp_cache_dir = Path(".cache_disabled")
-                
-                # Create temp directory if it doesn't exist
-                if not temp_cache_dir.exists():
-                    temp_cache_dir.mkdir(exist_ok=True)
-                
-                # Register cleanup function that properly handles both directories
-                import atexit
-                
-                def restore_cache():
-                    try:
-                        if temp_cache_dir.exists() and cache_dir.exists():
-                            # If both directories exist at exit, merge them
-                            for item in temp_cache_dir.iterdir():
-                                target = cache_dir / item.name
-                                if not target.exists():
-                                    if item.is_dir():
-                                        shutil.copytree(item, target)
-                                    else:
-                                        shutil.copy2(item, target)
-                            # Remove the temp directory after merging
-                            shutil.rmtree(temp_cache_dir)
-                        elif temp_cache_dir.exists() and not cache_dir.exists():
-                            # If only temp exists, rename it back
-                            os.rename(temp_cache_dir, cache_dir)
-                    except Exception as e:
-                        print(f"Warning: Error restoring cache: {e}")
-                
-                # Register the cleanup function
-                atexit.register(restore_cache)
-                
-                # Temporarily disable the cache by renaming
-                os.rename(cache_dir, Path(".cache_temp"))
-                os.rename(Path(".cache_temp"), temp_cache_dir)
+            os.environ['REGENDER_DISABLE_CACHE'] = '1'
+            print("Cache disabled for this run")
+            
+            # Register cleanup function to unset the environment variable at exit
+            import atexit
+            atexit.register(lambda: os.environ.pop('REGENDER_DISABLE_CACHE', None))
         except Exception as e:
             print(f"Warning: Could not disable cache: {e}")
     
