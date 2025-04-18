@@ -15,6 +15,13 @@ from utils import (
     cache_result, safe_api_call, APIError, FileError
 )
 
+# Import pronoun validator
+try:
+    from pronoun_validator import validate_transformed_text
+    VALIDATOR_AVAILABLE = True
+except ImportError:
+    VALIDATOR_AVAILABLE = False
+
 # Transformation types
 TRANSFORM_TYPES = {
     "feminine": {
@@ -87,6 +94,10 @@ def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tu
     3. Keep proper names but change pronouns referring to them
     4. Maintain the original writing style and flow
     5. Be thorough - don't miss any gendered references
+    6. Pay special attention to possessive pronouns in relationship contexts (e.g., 'his wife' → 'her wife' when the subject is feminine)
+    7. Ensure complete consistency in pronoun usage throughout the text
+    8. Double-check all instances of 'his', 'her', 'him', 'she', 'he' to ensure they match the intended gender
+    9. Return your response as a valid JSON object
     """
     
     user_prompt = f"""
@@ -94,7 +105,7 @@ def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tu
     Make these specific changes:
     {chr(10).join(f"{i+1}. Change {change}" for i, change in enumerate(transform_info['changes']))}
     
-    Return your response in this exact format:
+    Return your response as a json object in this exact format:
     {{
         "text": "<the transformed text>",
         "changes": ["Changed X to Y", ...]
@@ -227,6 +238,22 @@ def transform_text_file(file_path: str, transform_type: str, output_path: str = 
     print("\nChanges made:")
     for change in changes:
         print(f"- {change}")
+    
+    # Apply pronoun validator if available
+    if VALIDATOR_AVAILABLE:
+        print("\nRunning pronoun consistency validation...")
+        corrected_text, corrections = validate_transformed_text(transformed, transform_type)
+        
+        if corrections:
+            print(f"Found {len(corrections)} pronoun inconsistencies:")
+            for i, correction in enumerate(corrections, 1):
+                print(f"- Changed '{correction['original']}' to '{correction['corrected']}'")
+            # Update the transformed text with corrections
+            transformed = corrected_text
+            # Add the corrections to the changes list
+            changes.extend([f"Fixed pronoun: '{c['original']}' to '{c['corrected']}'" for c in corrections])
+        else:
+            print("No pronoun inconsistencies found.")
     
     # Verify transformation
     missed = verify_transformation(transformed, transform_type, model)
