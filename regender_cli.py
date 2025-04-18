@@ -99,9 +99,22 @@ def transform_command(args) -> int:
         if hasattr(args, 'interactive') and args.interactive and INTERACTIVE_MODE_AVAILABLE:
             print("\n=== Interactive Mode Enabled ===")
             # If we have an analysis file from a previous step, use it
-            analysis_file = args.file.replace('.txt', '.analysis.json')
-            if not os.path.exists(analysis_file):
-                analysis_file = None
+            analysis_file = None
+            possible_analysis_files = [
+                args.file.replace('.txt', '.analysis.json'),
+                args.file.replace('.txt', '_analysis.json'),
+                os.path.basename(args.file).replace('.txt', '.analysis.json'),
+                os.path.basename(args.file).replace('.txt', '_analysis.json')
+            ]
+            
+            for file_path in possible_analysis_files:
+                if os.path.exists(file_path):
+                    analysis_file = file_path
+                    print(f"Found character analysis file: {analysis_file}")
+                    break
+            
+            if not analysis_file:
+                print("No character analysis file found. Running in limited interactive mode.")
             
             options = interactive_transformation_setup(analysis_file)
             if options:
