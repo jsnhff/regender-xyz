@@ -40,8 +40,16 @@ class PronounValidator:
             ]
         else:  # neutral
             self.possessive_checks = [
-                (r"(his|her) (spouse|partner)", r"their \2", "possessive for neutral subject with partner"),
-                (r"(his|her) (child|children|family)", r"their \2", "possessive for neutral subject with relation")
+                (r"his spouse", r"their spouse", "possessive for neutral subject with partner"),
+                (r"her spouse", r"their spouse", "possessive for neutral subject with partner"),
+                (r"his partner", r"their partner", "possessive for neutral subject with partner"),
+                (r"her partner", r"their partner", "possessive for neutral subject with partner"),
+                (r"his child", r"their child", "possessive for neutral subject with relation"),
+                (r"her child", r"their child", "possessive for neutral subject with relation"),
+                (r"his children", r"their children", "possessive for neutral subject with relation"),
+                (r"her children", r"their children", "possessive for neutral subject with relation"),
+                (r"his family", r"their family", "possessive for neutral subject with relation"),
+                (r"her family", r"their family", "possessive for neutral subject with relation")
             ]
     
     def validate_and_correct(self, text: str) -> Tuple[str, List[Dict]]:
