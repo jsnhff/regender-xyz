@@ -173,6 +173,11 @@ def cache_result(cache_dir: str = ".cache"):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
+            # Check if cache is disabled via environment variable
+            if os.environ.get('REGENDER_DISABLE_CACHE') == '1':
+                # Skip cache and call the original function directly
+                return func(*args, **kwargs)
+            
             # Create cache directory if it doesn't exist
             cache_path = Path(cache_dir)
             cache_path.mkdir(parents=True, exist_ok=True)
