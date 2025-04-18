@@ -50,7 +50,7 @@ TRANSFORM_TYPES = {
     },
     "neutral": {
         "name": "Gender-neutral",
-        "description": "Transform text to use gender-neutral language",
+        "description": "Transform text to use gender-neutral language with Mx. as the title",
         "changes": [
             "'Mr./Ms./Mrs./Miss' to 'Mx.'", 
             "'he/she' to 'they'",
@@ -105,6 +105,9 @@ def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tu
     {transform_info['description']}.
     Make these specific changes:
     {chr(10).join(f"{i+1}. Change {change}" for i, change in enumerate(transform_info['changes']))}
+    
+    IMPORTANT: If this is a neutral transformation, replace all instances of Mr., Mrs., Ms., and Miss with Mx. 
+    For example: "Mr. Bennet" should become "Mx. Bennet" NOT just "Bennet".
     
     Return your response as a json object in this exact format:
     {{
