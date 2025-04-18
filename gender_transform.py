@@ -97,7 +97,8 @@ def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tu
     6. Pay special attention to possessive pronouns in relationship contexts (e.g., 'his wife' → 'her wife' when the subject is feminine)
     7. Ensure complete consistency in pronoun usage throughout the text
     8. Double-check all instances of 'his', 'her', 'him', 'she', 'he' to ensure they match the intended gender
-    9. Return your response as a valid JSON object
+    9. For neutral transformations, replace 'Mr./Mrs./Ms./Miss' with 'Mx.' rather than removing titles completely
+    10. Return your response as a valid JSON object
     """
     
     user_prompt = f"""
