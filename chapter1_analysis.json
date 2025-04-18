@@ -1,0 +1,91 @@
+{
+  "characters": {
+    "Mr. Bennet": {
+      "name": "Mr. Bennet",
+      "gender": "male",
+      "role": "Father of the Bennet daughters, husband to Mrs. Bennet",
+      "mentions": [
+        {
+          "start": 401,
+          "end": 411,
+          "text": "Mr. Bennet",
+          "context": "\u201cMy dear Mr. Bennet,\u201d said his lady to him one day, \u201chave you heard that Netherfield Park is let at last?\u201d",
+          "mention_type": "name"
+        },
+        {
+          "start": 468,
+          "end": 471,
+          "text": "his",
+          "context": "\u201cMy dear Mr. Bennet,\u201d said his lady to him one day, \u201chave you heard that Netherfield Park is let at last?\u201d",
+          "mention_type": "possessive"
+        },
+        {
+          "start": 512,
+          "end": 514,
+          "text": "he",
+          "context": "Mr. Bennet replied that he had not.",
+          "mention_type": "pronoun"
+        },
+        {
+          "start": 557,
+          "end": 559,
+          "text": "he",
+          "context": "Mr. Bennet made no answer.",
+          "mention_type": "pronoun"
+        },
+        {
+          "start": 1026,
+          "end": 1036,
+          "text": "Mr. Bennet",
+          "context": "\u201cMy dear Mr. Bennet,\u201d replied his wife, \u201chow can you be so tiresome? You must know that I am thinking of his marrying one of them.\u201d",
+          "mention_type": "name"
+        },
+        {
+          "start": 1050,
+          "end": 1053,
+          "text": "his",
+          "context": "\u201cMy dear Mr. Bennet,\u201d replied his wife, \u201chow can you be so tiresome? You must know that I am thinking of his marrying one of them.\u201d",
+          "mention_type": "possessive"
+        },
+        {
+          "start": 2041,
+          "end": 2051,
+          "text": "Mr. Bennet",
+          "context": "\u201cMr. Bennet, how can you abuse your own children in such a way? You take delight in vexing me. You have no compassion on my poor nerves.\u201d",
+          "mention_type": "name"
+        },
+        {
+          "start": 2159,
+          "end": 2161,
+          "text": "it",
+          "context": "\u201cIt will be no use to us, if twenty such should come, since you will not visit them.\u201d",
+          "mention_type": "pronoun"
+        },
+        {
+          "start": 2251,
+          "end": 2261,
+          "text": "Mr. Bennet",
+          "context": "Mr. Bennet was so odd a mixture of quick parts, sarcastic humour, reserve, and caprice, that the experience of three-and-twenty years had been insufficient to make his wife understand his character.",
+          "mention_type": "name"
+        },
+        {
+          "start": 2351,
+          "end": 2354,
+          "text": "his",
+          "context": "Mr. Bennet was so odd a mixture of quick parts, sarcastic humour, reserve, and caprice, that the experience of three-and-twenty years had been insufficient to make his wife understand his character.",
+          "mention_type": "possessive"
+        }
+      ],
+      "name_variants": [
+        "Mr. Bennet",
+        "he",
+        "his"
+      ]
+    }
+  },
+  "metadata": {
+    "version": "0.1.0",
+    "timestamp": "2025-02-16T23:34:12.537475",
+    "character_count": 1
+  }
+}
