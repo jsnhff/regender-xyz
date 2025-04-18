@@ -97,6 +97,9 @@ MIT
 
 ## TODOs
 
+- [x] Fix OpenAI API JSON format compatibility issue
+- [x] Improve pronoun consistency in gender transformations
+- [x] Add post-processing validation for relationship possessives
 - [ ] Add support for custom prompts and instructions
 - [ ] Implement batch processing for multiple files
 - [ ] Add support for character relationship analysis
@@ -106,3 +109,5 @@ MIT
 - [ ] Implement progress bars for long-running operations
 - [ ] Add support for more output formats (EPUB, PDF, etc.)
 - [ ] Create a configuration file for persistent settings
+- [ ] Expand pronoun validator to handle more edge cases
+- [ ] Add option to disable pronoun validation for performance
