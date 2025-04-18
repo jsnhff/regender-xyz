@@ -52,7 +52,7 @@ TRANSFORM_TYPES = {
         "name": "Gender-neutral",
         "description": "Transform text to use gender-neutral language",
         "changes": [
-            "'Mr./Ms./Mrs./Miss' to name only", 
+            "'Mr./Ms./Mrs./Miss' to 'Mx.'", 
             "'he/she' to 'they'",
             "'him/her' to 'them'",
             "'his/her' to 'their'",
@@ -212,7 +212,7 @@ def verify_transformation(text: str, target_gender: str, model: str = "gpt-4") -
     except json.JSONDecodeError as e:
         raise APIError(f"Failed to parse verification response as JSON: {e}")
 
-def transform_text_file(file_path: str, transform_type: str, output_path: str = None, model: str = "gpt-4") -> Tuple[str, List[str]]:
+def transform_text_file(file_path: str, transform_type: str, output_path: str = None, model: str = "gpt-4", **options) -> Tuple[str, List[str]]:
     """Transform gender representation in a text file.
     
     Args:
@@ -234,6 +234,16 @@ def transform_text_file(file_path: str, transform_type: str, output_path: str = 
     
     # Transform text
     transformed, changes = transform_gender(text, transform_type, model)
+    
+    # Apply character name customizations if provided
+    character_customizations = options.get('character_customizations', {})
+    if character_customizations:
+        print("\nApplying character name customizations...")
+        for original_name, new_name in character_customizations.items():
+            if original_name in transformed:
+                transformed = transformed.replace(original_name, new_name)
+                changes.append(f"Customized character: '{original_name}' → '{new_name}'")
+                print(f"- Changed '{original_name}' to '{new_name}'")
     
     print("\nChanges made:")
     for change in changes:

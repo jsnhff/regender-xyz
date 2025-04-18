@@ -18,6 +18,13 @@ from utils import (
     APIError, FileError, ReGenderError
 )
 
+# Import interactive CLI module (if available)
+try:
+    from interactive_cli import interactive_transformation_setup
+    INTERACTIVE_MODE_AVAILABLE = True
+except ImportError:
+    INTERACTIVE_MODE_AVAILABLE = False
+
 # Configuration
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -86,7 +93,21 @@ def transform_command(args) -> int:
     
     try:
         print(f"Transforming text file: {args.file}")
-        transform_text_file(args.file, args.type, args.output, args.model)
+        
+        # Interactive mode setup
+        options = {}
+        if hasattr(args, 'interactive') and args.interactive and INTERACTIVE_MODE_AVAILABLE:
+            print("\n=== Interactive Mode Enabled ===")
+            # If we have an analysis file from a previous step, use it
+            analysis_file = args.file.replace('.txt', '.analysis.json')
+            if not os.path.exists(analysis_file):
+                analysis_file = None
+            
+            options = interactive_transformation_setup(analysis_file)
+            if options:
+                print("\nApplying custom options to transformation...")
+        
+        transform_text_file(args.file, args.type, args.output, args.model, **options)
         return 0
     except ReGenderError as e:
         print(f"Error: {e}")
@@ -147,6 +168,7 @@ def main() -> int:
     common_args = argparse.ArgumentParser(add_help=False)
     common_args.add_argument("-m", "--model", default=DEFAULT_MODEL, help=f"OpenAI model to use (default: {DEFAULT_MODEL})")
     common_args.add_argument("--no-cache", action="store_true", help="Disable caching of API responses")
+    common_args.add_argument("-i", "--interactive", action="store_true", help="Enable interactive mode for customization")
     
     # Analyze command
     analyze_parser = subparsers.add_parser("analyze", help="Analyze characters in text", parents=[common_args])
