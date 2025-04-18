@@ -97,9 +97,14 @@ MIT
 
 ## TODOs
 
+### Completed
 - [x] Fix OpenAI API JSON format compatibility issue
 - [x] Improve pronoun consistency in gender transformations
 - [x] Add post-processing validation for relationship possessives
+- [x] Implement and test gender-neutral transformation
+- [x] Fix pronoun validator patterns for neutral transformation
+
+### Next Steps
 - [ ] Add support for custom prompts and instructions
 - [ ] Implement batch processing for multiple files
 - [ ] Add support for character relationship analysis
@@ -111,3 +116,35 @@ MIT
 - [ ] Create a configuration file for persistent settings
 - [ ] Expand pronoun validator to handle more edge cases
 - [ ] Add option to disable pronoun validation for performance
+- [ ] Create a simple web interface for the tool
+- [ ] Develop visualizations for comparing original and transformed texts
+- [ ] Implement comparative analysis between different transformation types
+
+## Benchmark Test Cases
+
+The following test cases represent increasing levels of complexity for evaluating the system's performance, focusing on Pride and Prejudice and other public domain works:
+
+### Level 1: Basic Transformation
+- [x] Pride and Prejudice Chapter 1 (feminine transformation)
+- [x] Pride and Prejudice Chapter 1 (neutral transformation)
+- [ ] Pride and Prejudice Chapter 1 (masculine transformation)
+
+### Level 2: Intermediate Complexity
+- [ ] Pride and Prejudice Chapters 2-3 (all transformation types)
+- [ ] Pride and Prejudice dialogue-heavy scene
+- [ ] Pride and Prejudice character introduction scene
+
+### Level 3: Advanced Challenges
+- [ ] Pride and Prejudice full chapter with multiple characters and relationships
+- [ ] Pride and Prejudice ball scene (complex social interactions)
+- [ ] Pride and Prejudice proposal scene (emotional content)
+
+### Level 4: Extended Tests
+- [ ] Pride and Prejudice Volume 1 (multiple chapters)
+- [ ] Complete Pride and Prejudice novel
+- [ ] Jane Austen's Emma (first chapter)
+
+### Level 5: Comprehensive Tests (Project Gutenberg Works)
+- [ ] Charles Dickens' A Tale of Two Cities (selected chapters)
+- [ ] Charlotte Brontë's Jane Eyre (selected chapters)
+- [ ] Mary Shelley's Frankenstein (selected chapters)
