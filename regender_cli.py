@@ -25,6 +25,17 @@ try:
 except ImportError:
     INTERACTIVE_MODE_AVAILABLE = False
 
+# Import CLI visuals module (if available)
+try:
+    from cli_visuals import (
+        print_fancy_banner, print_section_header, print_success, 
+        print_warning, print_error, print_info, GenderSpinner,
+        run_with_spinner, Colors
+    )
+    CLI_VISUALS_AVAILABLE = True
+except ImportError:
+    CLI_VISUALS_AVAILABLE = False
+
 # Configuration
 DEFAULT_MODEL = "gpt-4.1-mini"
 
@@ -38,14 +49,22 @@ def check_openai_api_key() -> bool:
         get_openai_client()
         return True
     except APIError as e:
-        print(f"Error: {e}")
-        print("Please set your OpenAI API key with:")
-        print("  export OPENAI_API_KEY='your-api-key'")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error: {e}")
+            print_info("Please set your OpenAI API key with:")
+            print(f"  {Colors.BRIGHT_GREEN}export OPENAI_API_KEY='your-api-key'{Colors.RESET}")
+        else:
+            print(f"Error: {e}")
+            print("Please set your OpenAI API key with:")
+            print("  export OPENAI_API_KEY='your-api-key'")
         return False
 
 def print_banner():
     """Print application banner."""
-    banner = """
+    if CLI_VISUALS_AVAILABLE:
+        print_fancy_banner()
+    else:
+        banner = """
 ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃  ⚡ regender-xyz ⚡                      
 ┃  ~ transforming gender in literature ~     
@@ -54,7 +73,7 @@ def print_banner():
 ┃  ✧ character analysis ✧ gender transformation ✧       
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
-    print(banner)
+        print(banner)
 
 def analyze_command(args) -> int:
     """Handle the analyze command.
@@ -69,14 +88,31 @@ def analyze_command(args) -> int:
         return 1
     
     try:
-        print(f"Analyzing text file: {args.file}")
-        analyze_text_file(args.file, args.output, args.model)
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header(f"Character Analysis")
+            print_info(f"Analyzing text file: {args.file}")
+            
+            # Run analysis with spinner
+            def run_analysis():
+                return analyze_text_file(args.file, args.output, args.model)
+            
+            run_with_spinner(run_analysis, "Analyzing text for characters", "neutral")
+        else:
+            print(f"Analyzing text file: {args.file}")
+            analyze_text_file(args.file, args.output, args.model)
+            
         return 0
     except ReGenderError as e:
-        print(f"Error: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
         return 1
     except Exception as e:
-        print(f"Unexpected error: {type(e).__name__}: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Unexpected error: {type(e).__name__}: {e}")
+        else:
+            print(f"Unexpected error: {type(e).__name__}: {e}")
         return 1
 
 def transform_command(args) -> int:
@@ -92,12 +128,24 @@ def transform_command(args) -> int:
         return 1
     
     try:
-        print(f"Transforming text file: {args.file}")
+        transform_type = args.type
+        transform_info = TRANSFORM_TYPES.get(transform_type, {})
+        transform_name = transform_info.get('name', transform_type.capitalize())
+        
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header(f"{transform_name} Transformation")
+            print_info(f"Transforming text file: {args.file}")
+        else:
+            print(f"Transforming text file: {args.file}")
         
         # Interactive mode setup
         options = {}
         if hasattr(args, 'interactive') and args.interactive and INTERACTIVE_MODE_AVAILABLE:
-            print("\n=== Interactive Mode Enabled ===")
+            if CLI_VISUALS_AVAILABLE:
+                print_section_header("Interactive Mode")
+            else:
+                print("\n=== Interactive Mode Enabled ===")
+                
             # If we have an analysis file from a previous step, use it
             analysis_file = None
             possible_analysis_files = [
@@ -110,23 +158,47 @@ def transform_command(args) -> int:
             for file_path in possible_analysis_files:
                 if os.path.exists(file_path):
                     analysis_file = file_path
-                    print(f"Found character analysis file: {analysis_file}")
+                    if CLI_VISUALS_AVAILABLE:
+                        print_success(f"Found character analysis file: {analysis_file}")
+                    else:
+                        print(f"Found character analysis file: {analysis_file}")
                     break
             
             if not analysis_file:
-                print("No character analysis file found. Running in limited interactive mode.")
+                if CLI_VISUALS_AVAILABLE:
+                    print_warning("No character analysis file found. Running in limited interactive mode.")
+                else:
+                    print("No character analysis file found. Running in limited interactive mode.")
             
             options = interactive_transformation_setup(analysis_file)
             if options:
-                print("\nApplying custom options to transformation...")
+                if CLI_VISUALS_AVAILABLE:
+                    print_info("Applying custom options to transformation...")
+                else:
+                    print("\nApplying custom options to transformation...")
         
-        transform_text_file(args.file, args.type, args.output, args.model, **options)
+        # Run transformation with spinner if visuals available
+        if CLI_VISUALS_AVAILABLE:
+            def run_transform():
+                return transform_text_file(args.file, args.type, args.output, args.model, **options)
+            
+            message = f"Applying {transform_name} transformation"
+            run_with_spinner(run_transform, message, transform_type)
+        else:
+            transform_text_file(args.file, args.type, args.output, args.model, **options)
+            
         return 0
     except ReGenderError as e:
-        print(f"Error: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
         return 1
     except Exception as e:
-        print(f"Unexpected error: {type(e).__name__}: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Unexpected error: {type(e).__name__}: {e}")
+        else:
+            print(f"Unexpected error: {type(e).__name__}: {e}")
         return 1
 
 def pipeline_command(args) -> int:
@@ -142,24 +214,65 @@ def pipeline_command(args) -> int:
         return 1
     
     try:
-        print(f"Running full pipeline on: {args.file}")
+        transform_type = args.type
+        transform_info = TRANSFORM_TYPES.get(transform_type, {})
+        transform_name = transform_info.get('name', transform_type.capitalize())
+        
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header("Full Pipeline")
+            print_info(f"Running full pipeline on: {args.file}")
+        else:
+            print(f"Running full pipeline on: {args.file}")
         
         # First analyze the text
-        print("\n=== Step 1: Character Analysis ===")
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header("Step 1: Character Analysis")
+        else:
+            print("\n=== Step 1: Character Analysis ===")
+            
         analysis_output = args.output.replace(".txt", ".analysis.json") if args.output else None
-        analysis = analyze_text_file(args.file, analysis_output, args.model)
+        
+        # Run analysis with spinner if visuals available
+        if CLI_VISUALS_AVAILABLE:
+            def run_analysis():
+                return analyze_text_file(args.file, analysis_output, args.model)
+            
+            analysis = run_with_spinner(run_analysis, "Analyzing text for characters", "neutral")
+        else:
+            analysis = analyze_text_file(args.file, analysis_output, args.model)
         
         # Then transform the text
-        print("\n=== Step 2: Gender Transformation ===")
-        transform_text_file(args.file, args.type, args.output, args.model)
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header(f"Step 2: {transform_name} Transformation")
+        else:
+            print("\n=== Step 2: Gender Transformation ===")
         
-        print("\nPipeline completed successfully!")
+        # Run transformation with spinner if visuals available
+        if CLI_VISUALS_AVAILABLE:
+            def run_transform():
+                return transform_text_file(args.file, args.type, args.output, args.model)
+            
+            message = f"Applying {transform_name} transformation"
+            run_with_spinner(run_transform, message, transform_type)
+        else:
+            transform_text_file(args.file, args.type, args.output, args.model)
+        
+        if CLI_VISUALS_AVAILABLE:
+            print_success("\nPipeline completed successfully!")
+        else:
+            print("\nPipeline completed successfully!")
         return 0
     except ReGenderError as e:
-        print(f"Error: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
         return 1
     except Exception as e:
-        print(f"Unexpected error: {type(e).__name__}: {e}")
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Unexpected error: {type(e).__name__}: {e}")
+        else:
+            print(f"Unexpected error: {type(e).__name__}: {e}")
         return 1
 
 def main() -> int:
