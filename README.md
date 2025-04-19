@@ -95,59 +95,47 @@ python regender_cli.py pipeline pride_and_prejudice_chapter_1_full.txt -t neutra
 
 MIT
 
-## TODOs
+## Roadmap & Milestones
 
-### Completed
-- [x] Fix OpenAI API JSON format compatibility issue
-- [x] Improve pronoun consistency in gender transformations
-- [x] Add post-processing validation for relationship possessives
-- [x] Implement and test gender-neutral transformation
-- [x] Fix pronoun validator patterns for neutral transformation
-- [x] Add "razzle-dazzle" CLI visuals with colorful output and animations
-- [x] Implement gender-themed animated spinners with transformation indicators
-- [x] Create textural progress bars for transformation visualization
+### Release 1: Complete Pride and Prejudice (Uniform Gender Swap)
+- **Goal:** Transform the entire text of Pride and Prejudice by uniformly swapping all gendered language (pronouns, titles, etc.), with no character-specific choices. Keep it simple and consistent for the whole book.
+- **Testing Plan:**
+  - [ ] Run gender swap transformation on the full novel text
+  - [ ] Spot-check key scenes (opening, ball, proposal)
+  - [ ] Validate pronoun, title, and relationship consistency throughout
+  - [ ] Prepare print-ready manuscript for book design with Matt Bucknall
+- **Milestone:** Print-ready version for book design collaboration
 
-### Next Steps
-- [ ] Implement masculine transformation for complete transformation set
-- [ ] Add support for custom prompts and instructions
-- [ ] Implement batch processing for multiple files
-- [ ] Add support for character relationship analysis
-- [ ] Create visualization tools for character networks
-- [ ] Improve handling of complex literary devices (metaphors, etc.)
-- [ ] Add unit tests for core functionality
-- [ ] Add support for more output formats (EPUB, PDF, etc.)
-- [ ] Create a configuration file for persistent settings
-- [ ] Expand pronoun validator to handle more edge cases
-- [ ] Add option to disable pronoun validation for performance
-- [ ] Create a simple web interface for the tool
-- [ ] Develop visualizations for comparing original and transformed texts
-- [ ] Implement comparative analysis between different transformation types
+### Release 2: Website & Open Source Launch
+- **Goal:** Launch a public website to open source the uniform gender-swapped version and sell print-on-demand copies.
+- **Testing Plan:**
+  - [ ] Website displays transformed book and project info
+  - [ ] Print-on-demand integration works (test order flow)
+  - [ ] Repo/documentation for public collaboration
 
-## Benchmark Test Cases
+### Release 3: Feature Improvements & Expansion
+- **Goal:** Add advanced features and support for more books.
+- **Testing Plan:**
+  - [ ] Character-specific naming/gender choice
+  - [ ] Interactive transformation options
+  - [ ] Test on additional public domain works (Emma, Jane Eyre, etc.)
+  - [ ] Enhanced validation, analytics, and visualization tools
 
-The following test cases represent increasing levels of complexity for evaluating the system's performance, focusing on Pride and Prejudice and other public domain works:
+---
 
-### Level 1: Basic Transformation
-- [x] Pride and Prejudice Chapter 1 (feminine transformation)
-- [x] Pride and Prejudice Chapter 1 (neutral transformation with Mx. titles)
-- [ ] Pride and Prejudice Chapter 1 (masculine transformation)
+## Completed
 
-### Level 2: Intermediate Complexity
-- [ ] Pride and Prejudice Chapters 2-3 (all transformation types)
-- [ ] Pride and Prejudice dialogue-heavy scene
-- [ ] Pride and Prejudice character introduction scene
-
-### Level 3: Advanced Challenges
-- [ ] Pride and Prejudice full chapter with multiple characters and relationships
-- [ ] Pride and Prejudice ball scene (complex social interactions)
-- [ ] Pride and Prejudice proposal scene (emotional content)
-
-### Level 4: Extended Tests
-- [ ] Pride and Prejudice Volume 1 (multiple chapters)
-- [ ] Complete Pride and Prejudice novel
-- [ ] Jane Austen's Emma (first chapter)
-
-### Level 5: Comprehensive Tests (Project Gutenberg Works)
-- [ ] Charles Dickens' A Tale of Two Cities (selected chapters)
-- [ ] Charlotte Brontë's Jane Eyre (selected chapters)
-- [ ] Mary Shelley's Frankenstein (selected chapters)
+- [x] **Third major rewrite:** Streamlined the codebase with a CLI-first focus and improved architecture ([77f59c0], [74505b6], [54d31a1])
+- [x] Archived and cleaned up legacy versions, moving old code to `/archive` ([74505b6], [54d31a1])
+- [x] Created project README and initial documentation ([5d623d5], [1ba486a])
+- [x] Set up project structure and repository
+- [x] Implemented main CLI entry point (`regender_cli.py`)
+- [x] Implemented core character analysis and gender transformation modules
+- [x] Added pronoun validator for transformation consistency
+- [x] Added support for gender-neutral transformation with Mx. titles
+- [x] Added post-processing validation for relationship possessives
+- [x] Added colorful CLI visuals and animations
+- [x] Implemented gender-themed animated spinners and progress bars
+- [x] Fixed OpenAI API JSON format compatibility issue
+- [x] Improved pronoun consistency in gender transformations
+- [x] Fixed pronoun validator patterns for neutral transformation
