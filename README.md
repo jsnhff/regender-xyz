@@ -20,6 +20,9 @@ This tool uses AI to identify characters in text and transform gender representa
 
 - Python 3.9+
 - OpenAI API key (set as environment variable `OPENAI_API_KEY`)
+- **Recommended Model:** GPT-4.1 ChatGPT (1 million token context window, 32,768 token output limit)
+  - See [GPT-4.1 Prompting Guide](https://cookbook.openai.com/examples/gpt4-1_prompting_guide) for best practices
+  - Check [OpenAI's official announcements](https://openai.com/) for the most current specifications
 
 ## Installation
 
@@ -68,6 +71,10 @@ Run both analysis and transformation in one command:
 python regender_cli.py pipeline path/to/your/text.txt --type feminine
 ```
 
+With GPT-4.1's large context window, you can process the full text of a novel (up to 1 million tokens) in a single call, as long as the output does not exceed 32,768 tokens.
+- **Recommended Model:** GPT-4.1 ChatGPT (1M token context window, ~36K output token limit)
+  - See [OpenAI API documentation](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo) for current specs and limits.
+
 Options:
 - `-t, --type`: Type of transformation to apply (feminine, masculine, neutral)
 - `-o, --output`: Specify output file for transformed text
@@ -100,6 +107,7 @@ MIT
 ### Release 1: Complete Pride and Prejudice (Uniform Gender Swap)
 - **Goal:** Transform the entire text of Pride and Prejudice by uniformly swapping all gendered language (pronouns, titles, etc.), with no character-specific choices. Keep it simple and consistent for the whole book.
 - **Testing Plan:**
+  - [x] Fix JSON parsing error in API response handling ("Unterminated string starting at: line 2 column 11")
   - [ ] Run gender swap transformation on the full novel text
   - [ ] Spot-check key scenes (opening, ball, proposal)
   - [ ] Validate pronoun, title, and relationship consistency throughout
