@@ -111,6 +111,7 @@ Output valid JSON only."""
     
     response = client.chat.completions.create(
         model=model,
+        response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
