@@ -51,6 +51,9 @@ class Colors:
 class GenderSpinner:
     """Animated spinner that visually represents gender transformation."""
     
+    # Class-level variable to track the current active spinner
+    current_spinner = None
+    
     def __init__(self, message: str = "Processing", delay: float = 0.08, transform_type: str = "feminine"):
         """Initialize the spinner.
         
@@ -64,9 +67,10 @@ class GenderSpinner:
         self.transform_type = transform_type
         self.running = False
         self.spinner_thread = None
+        self.last_drawn_line = ""
         
-        # Use a single color for all spinners regardless of gender type
-        self.color = Colors.BRIGHT_WHITE
+        # Use green color for the star to match the text
+        self.color = Colors.BRIGHT_GREEN
         
         # Star animation frames - more visible than dots12
         self.frames = ["✶", "✸", "✹", "✺", "✹", "✷"]
@@ -80,13 +84,22 @@ class GenderSpinner:
             for frame in self.frames:
                 if not self.running:
                     break
-                # Minimal and sleek design with star at the front
-                write(f"\r{self.color}{frame}{Colors.RESET} {self.message}")
+                # Clear the line and redraw the spinner
+                spinner_text = f"{self.color}{frame}{Colors.RESET} {Colors.BRIGHT_GREEN}{self.message}{Colors.RESET}"
+                write("\r" + " " * 80 + "\r" + spinner_text)
+                self.last_drawn_line = spinner_text
                 flush()
                 time.sleep(self.delay)
     
     def start(self):
         """Start the spinner animation."""
+        # Stop any existing spinner
+        if GenderSpinner.current_spinner and GenderSpinner.current_spinner.running:
+            GenderSpinner.current_spinner.stop()
+        
+        # Set this as the current spinner
+        GenderSpinner.current_spinner = self
+        
         if not self.running:
             self.running = True
             self.spinner_thread = threading.Thread(target=self._spin)
@@ -98,6 +111,10 @@ class GenderSpinner:
         self.running = False
         if self.spinner_thread:
             self.spinner_thread.join()
+        
+        # Clear the current spinner reference
+        if GenderSpinner.current_spinner == self:
+            GenderSpinner.current_spinner = None
 
 
 class ProgressBar:
@@ -153,14 +170,14 @@ class ProgressBar:
 
 def print_fancy_banner():
     """Print a minimal and sleek banner for the application."""
-    banner = f"""
-{Colors.BRIGHT_CYAN}╭───────────────────────────────────────────────╮{Colors.RESET}
-{Colors.BRIGHT_CYAN}│{Colors.RESET}  {Colors.BOLD}{Colors.BRIGHT_WHITE}regender-xyz{Colors.RESET}                          
-{Colors.BRIGHT_CYAN}│{Colors.RESET}  {Colors.ITALIC}transforming gender in literature{Colors.RESET}         
-{Colors.BRIGHT_CYAN}│{Colors.RESET}  v0.3.0                          
-{Colors.BRIGHT_CYAN}╰───────────────────────────────────────────────╯{Colors.RESET}
-"""    
-    print(banner)
+    print(
+        f"\n{Colors.RESET}"
+        f"╭───────────────────────────────────────────────╮\n"
+        f"│  {Colors.BOLD}regender-xyz{Colors.RESET}                          \n"
+        f"│  {Colors.ITALIC}transforming gender in literature{Colors.RESET}         \n"
+        f"│  {Colors.BRIGHT_BLACK}v0.3.1{Colors.RESET}                          \n"
+        f"╰───────────────────────────────────────────────╯\n"
+    )
 
 
 def print_section_header(title: str):
@@ -223,16 +240,42 @@ def run_with_spinner(func: Callable, message: str = "Processing", transform_type
     Returns:
         The return value of the function
     """
+    # Create a new spinner with the specified message
     spinner = GenderSpinner(message, transform_type=transform_type)
     spinner.start()
+    start_time = time.time()
+    
     try:
+        # Run the function with the provided arguments
         result = func(*args, **kwargs)
+        elapsed_time = time.time() - start_time
+        
+        # Clear the line before showing completion
+        sys.stdout.write("\r" + " " * 80)
+        
         # Replace the star with a checkmark at the front
-        sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✓{Colors.RESET} {spinner.message}")
+        sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✓ {spinner.message}{Colors.RESET}")
         sys.stdout.flush()
         print()  # Now move to the next line
+        
+        # For long-running processes, show the total time taken
+        if elapsed_time > 10:  # Only show for processes that took more than 10 seconds
+            minutes = int(elapsed_time // 60)
+            seconds = int(elapsed_time % 60)
+            print_info(f"Completed in {minutes}m {seconds}s")
+            
         return result
+    except Exception as e:
+        # Clear the line before showing error
+        sys.stdout.write("\r" + " " * 80)
+        
+        # Replace the star with an X at the front to indicate failure
+        sys.stdout.write(f"\r{Colors.BRIGHT_RED}✗ {spinner.message}{Colors.RESET}")
+        sys.stdout.flush()
+        print()  # Now move to the next line
+        raise e
     finally:
+        # Always stop the spinner when done
         spinner.stop()
 
 
@@ -272,6 +315,141 @@ def simulate_pipeline():
     print_success("Pipeline completed successfully!")
 
 
+def simulate_novel_transformation():
+    """Simulate a novel transformation run with the new colored logging format."""
+    # Import ColoredFormatter-like functionality directly to avoid circular imports
+    class Colors:
+        RESET = "\033[0m"
+        WHITE = "\033[37m"        # White for regular text
+        BRIGHT_WHITE = "\033[97m" # Bright white for emphasis
+        BRIGHT_BLACK = "\033[90m"  # Dark gray for timestamps
+        GREEN = "\033[32m"        # Green for INFO
+        YELLOW = "\033[33m"       # Yellow for WARNING
+        RED = "\033[31m"          # Red for ERROR
+        BRIGHT_RED = "\033[91m"   # Bright red for CRITICAL
+        BRIGHT_GREEN = "\033[92m" # Bright green for success
+        CYAN = "\033[36m"         # Cyan for DEBUG
+    
+    print_section_header("Full Novel Transformation")
+    print_info("Processing novel: pride_and_prejudice_full.txt")
+    print_info("Transformation type: Gender-neutral")
+    print_info("Output file: output/neutral_pride_and_prejudice.txt")
+    print_info("Chapters per chunk: 5")
+    print_info("Debug directory: debug_full")
+    
+    print(f"\n{Colors.YELLOW}This operation will process the entire novel and may take a significant amount of time.{Colors.RESET}")
+    confirm = input(f"Do you want to proceed? (y/n): ")
+    if confirm.lower() not in ["y", "yes"]:
+        print_info("Operation cancelled by user")
+        return
+    
+    # Simulate identifying chapters
+    print(f"{Colors.WHITE}✓ Starting transformation of pride_and_prejudice_full.txt with type: neutral{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:15]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Using model: gpt-4.1-mini, chapters per chunk: 5{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:15]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Loaded text file: 755922 characters{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:16]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Identifying chapters in the text...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:16]{Colors.RESET}")
+    
+    # Show the spinner for a moment
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✶{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and continue with log messages
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.flush()
+    
+    print(f"{Colors.WHITE}✓ Identifying chapters using AI...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:16]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Sending chapter identification request to gpt-4.1-mini...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:17]{Colors.RESET}")
+    
+    # Show the spinner again
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✸{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and continue with log messages
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.flush()
+    
+    print(f"{Colors.WHITE}✓ Successfully identified 61 chapters{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:25]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Identified 61 chapters in 8.27 seconds{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:25]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Chapter 1: Chapter I - 3900 chars{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:25]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Chapter 2: Chapter II - 4200 chars{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:25]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Chapter 3: Chapter III - 5100 chars{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:25]{Colors.RESET}")
+    
+    # Simulate character analysis
+    print(f"{Colors.WHITE}✓ Analyzing characters in the full text...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:42:26]{Colors.RESET}")
+    
+    # Show the spinner again
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✹{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and continue with log messages
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.flush()
+    
+    print(f"{Colors.WHITE}✓ Identified 24 characters in 63.72 seconds{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:30]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Character: Mr. Bennet, Gender: male, Role: Father of the Bennet family{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:30]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Character: Mrs. Bennet, Gender: female, Role: Mother of the Bennet family{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:30]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Character: Elizabeth, Gender: female, Role: Second eldest Bennet daughter{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:30]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Processing 13 chunks of approximately 5 chapters each{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:31]{Colors.RESET}")
+    
+    # Chunk 1
+    print(f"{Colors.WHITE}✓ Processing chunk 1/13: 21707 characters (7.7% complete){Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:31]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Sending transformation request to gpt-4.1-mini...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:32]{Colors.RESET}")
+    
+    # Show the spinner again
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✺{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and continue with log messages
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.flush()
+    
+    print(f"{Colors.WHITE}✓ Successfully transformed text with 87 changes{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Chunk 1 processed in 20.17 seconds with 87 changes{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Estimated time remaining: 4m 22s{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Change 1: Changed 'Mr.' to 'Mx.'{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Change 2: Changed 'Mrs.' to 'Mx.'{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Change 3: Changed 'he/she' to 'they'{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Change 4: Changed 'him/her' to 'them'{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Change 5: Changed 'his/her' to 'their'{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ ... and 82 more changes{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:52]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Processing chunk 2/13: 19845 characters (15.4% complete){Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:53]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Estimated time remaining: 4m 01s{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:53]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Sending transformation request to gpt-4.1-mini...{Colors.RESET} {Colors.BRIGHT_BLACK}[16:43:53]{Colors.RESET}")
+    
+    # Show the spinner again
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✹{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and continue with log messages
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.flush()
+    
+    print(f"{Colors.WHITE}✓ Successfully transformed text with 92 changes{Colors.RESET} {Colors.BRIGHT_BLACK}[16:44:15]{Colors.RESET}")
+    print(f"{Colors.WHITE}✓ Chunk 2 processed in 22.31 seconds with 92 changes{Colors.RESET} {Colors.BRIGHT_BLACK}[16:44:15]{Colors.RESET}")
+    
+    # Show the final spinner
+    sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}✷{Colors.RESET} {Colors.BRIGHT_GREEN}Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    time.sleep(1)
+    
+    # Clear the spinner line and show completion
+    sys.stdout.write("\r" + " " * 80 + "\r")
+    sys.stdout.write(f"{Colors.BRIGHT_GREEN}✓ Transforming novel to gender-neutral{Colors.RESET}")
+    sys.stdout.flush()
+    print()
+    
+    print_info("Completed in 5m 42s")
+    print_success("Novel transformation completed successfully!")
+    print_info("Made 1247 changes")
+    print_info("Transformed text saved to output/neutral_pride_and_prejudice.txt")
+    print_info("Debug files saved to debug_full")
+
+
 if __name__ == "__main__":
     # Demo
     print_fancy_banner()
@@ -287,47 +465,41 @@ if __name__ == "__main__":
     print("\nFeminine transformation spinner:")
     spinner = GenderSpinner("Transforming to feminine", transform_type="feminine")
     spinner.start()
-    time.sleep(5)
+    time.sleep(2)
     spinner.stop()
     print(f"\n{Colors.BRIGHT_GREEN}✓ Feminine transformation complete{Colors.RESET}")
     
     print("\nMasculine transformation spinner:")
     spinner = GenderSpinner("Transforming to masculine", transform_type="masculine")
     spinner.start()
-    time.sleep(5)
+    time.sleep(2)
     spinner.stop()
     print(f"\n{Colors.BRIGHT_GREEN}✓ Masculine transformation complete{Colors.RESET}")
     
     print("\nNeutral transformation spinner:")
     spinner = GenderSpinner("Transforming to neutral", transform_type="neutral")
     spinner.start()
-    time.sleep(5)
+    time.sleep(2)
     spinner.stop()
     print(f"\n{Colors.BRIGHT_GREEN}✓ Neutral transformation complete{Colors.RESET}")
     
     print("\nDemonstrating editing progress bars:")
     
-    print("\nEditing progress bar 1:")
-    bar = ProgressBar(total=100, transform_type="feminine")
-    for i in range(101):
-        bar.update(i)
-        time.sleep(0.03)
-    bar.finish()
-    
-    print("\nEditing progress bar 2:")
-    bar = ProgressBar(total=100, transform_type="masculine")
-    for i in range(101):
-        bar.update(i)
-        time.sleep(0.03)
-    bar.finish()
-    
-    print("\nEditing progress bar 3:")
+    print("\nEditing progress bar:")
     bar = ProgressBar(total=100, transform_type="neutral")
     for i in range(101):
         bar.update(i)
-        time.sleep(0.03)
+        time.sleep(0.01)
     bar.finish()
     
-    # Run simulated pipeline to show full design
-    print("\n")
-    simulate_pipeline()
+    # Choose which demo to run
+    demo_choice = input("\nSelect demo (1=Pipeline, 2=Novel Transformation): ")
+    
+    if demo_choice == "2":
+        # Run simulated novel transformation to show new logging format
+        print("\n")
+        simulate_novel_transformation()
+    else:
+        # Run simulated pipeline to show basic design
+        print("\n")
+        simulate_pipeline()

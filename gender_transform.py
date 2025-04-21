@@ -141,6 +141,88 @@ def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tu
     except KeyError as e:
         raise APIError(f"Missing required field in API response: {e}")
 
+
+@safe_api_call
+@cache_result()
+def transform_gender_with_context(text: str, transform_type: str, character_context: str, model: str = "gpt-4") -> Tuple[str, List[str]]:
+    """Transform text to use specified gender pronouns and references with character context.
+    
+    Args:
+        text: The text to transform
+        transform_type: Type of transformation (feminine, masculine, neutral)
+        character_context: Context about characters in the text
+        model: The OpenAI model to use
+        
+    Returns:
+        Tuple containing (transformed_text, list_of_changes)
+        
+    Raises:
+        ValueError: If the transform type is invalid
+        APIError: If there's an issue with the API call
+    """
+    if transform_type not in TRANSFORM_TYPES:
+        raise ValueError(f"Invalid transform type: {transform_type}. "  
+                         f"Must be one of: {', '.join(TRANSFORM_TYPES.keys())}")
+    
+    client = get_openai_client()
+    transform_info = TRANSFORM_TYPES[transform_type]
+    
+    system_prompt = f"""
+    You are an expert at gender transformation in literature.
+    Your task is to transform text to use {transform_info['name'].lower()} pronouns and gender references.
+    Follow these rules:
+    1. Change character gender references appropriately
+    2. Adjust all gendered terms consistently
+    3. Keep proper names but change pronouns referring to them
+    4. Maintain the original writing style and flow
+    5. Be thorough - don't miss any gendered references
+    6. Pay special attention to possessive pronouns in relationship contexts (e.g., 'his wife' → 'her wife' when the subject is feminine)
+    7. Ensure complete consistency in pronoun usage throughout the text
+    8. Double-check all instances of 'his', 'her', 'him', 'she', 'he' to ensure they match the intended gender
+    9. For neutral transformations, replace 'Mr./Mrs./Ms./Miss' with 'Mx.' rather than removing titles completely
+    10. Return your response as a valid JSON object
+    """
+    
+    user_prompt = f"""
+    {transform_info['description']}.
+    Make these specific changes:
+    {chr(10).join(f"{i+1}. Change {change}" for i, change in enumerate(transform_info['changes']))}
+    
+    IMPORTANT: If this is a neutral transformation, replace all instances of Mr., Mrs., Ms., and Miss with Mx. 
+    For example: "Mr. Bennet" should become "Mx. Bennet" NOT just "Bennet".
+    
+    Use the following character information to guide your transformation:
+    {character_context}
+    
+    Here is the text to transform:
+    
+    {text}
+    
+    Return a JSON object with these fields:
+    1. "text": The transformed text
+    2. "changes": A list of specific changes made (e.g., "Changed 'Mr. Darcy' to 'Ms. Darcy'")
+    """
+    
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        temperature=0.2,
+        response_format={"type": "json_object"}
+    )
+    
+    try:
+        result = json.loads(response.choices[0].message.content)
+        if 'text' not in result or 'changes' not in result:
+            raise APIError("API response missing required fields: 'text' and/or 'changes'")
+        return result['text'], result['changes']
+    except json.JSONDecodeError as e:
+        raise APIError(f"Failed to parse API response as JSON: {e}")
+    except KeyError as e:
+        raise APIError(f"Missing required field in API response: {e}")
+
 @safe_api_call
 @cache_result()
 def verify_transformation(text: str, target_gender: str, model: str = "gpt-4") -> List[Dict[str, str]]:

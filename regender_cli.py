@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 regender-xyz - A CLI tool for transforming gender representation in literature
-Version: 0.3.0
+Version: 0.3.1
 """
 
 import os
@@ -17,6 +17,7 @@ from utils import (
     get_openai_client, load_text_file, save_text_file,
     APIError, FileError, ReGenderError
 )
+from large_text_transform import transform_large_text
 
 # Import interactive CLI module (if available)
 try:
@@ -68,7 +69,7 @@ def print_banner():
 ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃  ⚡ regender-xyz ⚡                      
 ┃  ~ transforming gender in literature ~     
-┃  [ Version 0.3.0 ]                      
+┃  [ Version 0.3.1 ]                      
 ┃                                           
 ┃  ✧ character analysis ✧ gender transformation ✧       
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -187,6 +188,122 @@ def transform_command(args) -> int:
         else:
             transform_text_file(args.file, args.type, args.output, args.model, **options)
             
+        return 0
+    except ReGenderError as e:
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
+        return 1
+    except Exception as e:
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Unexpected error: {type(e).__name__}: {e}")
+        else:
+            print(f"Unexpected error: {type(e).__name__}: {e}")
+        return 1
+
+def novel_command(args) -> int:
+    """Handle the novel command for processing full novels.
+    
+    Args:
+        args: Command-line arguments
+        
+    Returns:
+        Exit code (0 for success, 1 for error)
+    """
+    if not check_openai_api_key():
+        return 1
+    
+    try:
+        transform_type = args.type
+        transform_info = TRANSFORM_TYPES.get(transform_type, {})
+        
+        if not transform_info:
+            if CLI_VISUALS_AVAILABLE:
+                print_error(f"Invalid transformation type: {transform_type}")
+            else:
+                print(f"Error: Invalid transformation type: {transform_type}")
+            return 1
+        
+        # Set default output path if not provided
+        if not args.output:
+            input_path = Path(args.file)
+            output_dir = Path("output")
+            output_dir.mkdir(exist_ok=True)
+            args.output = str(output_dir / f"{transform_type}_{input_path.stem}.txt")
+        
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header(f"Full Novel Transformation")
+            print_info(f"Processing novel: {args.file}")
+            print_info(f"Transformation type: {transform_info['name']}")
+            print_info(f"Output file: {args.output}")
+            print_info(f"Chapters per chunk: {args.chapters_per_chunk}")
+            print_info(f"Debug directory: {args.debug_dir}")
+            
+            # Confirm before proceeding with full novel transformation
+            if not args.yes:
+                print(f"\n{Colors.BRIGHT_YELLOW}This operation will process the entire novel and may take a significant amount of time.{Colors.RESET}")
+                confirm = input(f"Do you want to proceed? (y/n): ")
+                if confirm.lower() not in ["y", "yes"]:
+                    print_info("Operation cancelled by user")
+                    return 0
+            
+            # Create debug directory if it doesn't exist
+            debug_dir = Path(args.debug_dir)
+            debug_dir.mkdir(exist_ok=True)
+            
+            # Run transformation with spinner
+            def run_novel_transform():
+                return transform_large_text(
+                    args.file, 
+                    transform_type, 
+                    args.output, 
+                    args.model,
+                    args.chapters_per_chunk,
+                    args.debug_dir
+                )
+            
+            transformed_text, changes = run_with_spinner(
+                run_novel_transform, 
+                f"Transforming novel to {transform_info['name'].lower()}", 
+                transform_type
+            )
+            
+            print_success(f"\nNovel transformation completed successfully!")
+            print_info(f"Made {len(changes)} changes")
+            print_info(f"Transformed text saved to {args.output}")
+            print_info(f"Debug files saved to {args.debug_dir}")
+        else:
+            print(f"Processing novel: {args.file}")
+            print(f"Transformation type: {transform_info['name']}")
+            print(f"Output file: {args.output}")
+            
+            # Confirm before proceeding with full novel transformation
+            if not args.yes:
+                print("\nThis operation will process the entire novel and may take a significant amount of time.")
+                confirm = input("Do you want to proceed? (y/n): ")
+                if confirm.lower() not in ["y", "yes"]:
+                    print("Operation cancelled by user")
+                    return 0
+            
+            # Create debug directory if it doesn't exist
+            debug_dir = Path(args.debug_dir)
+            debug_dir.mkdir(exist_ok=True)
+            
+            transformed_text, changes = transform_large_text(
+                args.file, 
+                transform_type, 
+                args.output, 
+                args.model,
+                args.chapters_per_chunk,
+                args.debug_dir
+            )
+            
+            print(f"\nNovel transformation completed successfully!")
+            print(f"Made {len(changes)} changes")
+            print(f"Transformed text saved to {args.output}")
+            print(f"Debug files saved to {args.debug_dir}")
+        
         return 0
     except ReGenderError as e:
         if CLI_VISUALS_AVAILABLE:
@@ -323,6 +440,33 @@ def main() -> int:
     )
     pipeline_parser.add_argument("-o", "--output", help="Path to save the transformed text")
     
+    # Novel command (for processing full novels)
+    novel_parser = subparsers.add_parser("novel", help="Process a full novel with chapter-based chunking", parents=[common_args])
+    novel_parser.add_argument("file", help="Path to the novel file to process")
+    novel_parser.add_argument(
+        "-t", "--type", 
+        choices=list(TRANSFORM_TYPES.keys()), 
+        default="neutral",
+        help="Type of transformation to apply"
+    )
+    novel_parser.add_argument("-o", "--output", help="Path to save the transformed novel")
+    novel_parser.add_argument(
+        "-c", "--chapters-per-chunk", 
+        type=int, 
+        default=5,
+        help="Number of chapters to process in each chunk"
+    )
+    novel_parser.add_argument(
+        "-d", "--debug-dir", 
+        default="debug",
+        help="Directory to save debug files"
+    )
+    novel_parser.add_argument(
+        "-y", "--yes",
+        action="store_true",
+        help="Skip confirmation prompt and proceed immediately"
+    )
+    
     # Parse arguments
     args = parser.parse_args()
     
@@ -349,6 +493,8 @@ def main() -> int:
             return transform_command(args)
         elif args.command == "pipeline":
             return pipeline_command(args)
+        elif args.command == "novel":
+            return novel_command(args)
         else:
             parser.print_help()
             return 0

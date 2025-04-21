@@ -112,6 +112,11 @@ MIT
   - [ ] Spot-check key scenes (opening, ball, proposal)
   - [ ] Validate pronoun, title, and relationship consistency throughout
   - [ ] Prepare print-ready manuscript for book design with Matt Bucknall
+- **Critical Fixes Needed:**
+  - [ ] Fix file writing logic to collect all transformed chunks in memory and write once at the end
+  - [ ] Improve chapter boundary handling to ensure complete novel transformation
+  - [ ] Implement full novel verification step using GPT-4.1's 1M token context window
+  - [ ] Add validation to ensure consistent character representation throughout the novel
 - **Milestone:** Print-ready version for book design collaboration
 
 ### Release 2: Website & Open Source Launch
