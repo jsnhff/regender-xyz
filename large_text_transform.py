@@ -11,8 +11,10 @@ import math
 import time
 import logging
 import traceback
+import re
 from typing import Dict, List, Tuple, Any
 from datetime import datetime
+from collections import defaultdict
 
 # Import local modules
 import cli_visuals
@@ -40,7 +42,7 @@ class ColoredFormatter(logging.Formatter):
     # Format strings for different log levels
     FORMATS = {
         logging.DEBUG: CYAN + "✓ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET,
-        logging.INFO: WHITE + "✓ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET,
+        logging.INFO: BRIGHT_BLACK + "✓ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET,
         logging.WARNING: YELLOW + "⚠ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET,
         logging.ERROR: RED + "✗ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET,
         logging.CRITICAL: BRIGHT_RED + "✗ %(message)s" + RESET + BRIGHT_BLACK + " [%(asctime)s]" + RESET
@@ -108,74 +110,331 @@ def setup_logging(log_dir="logs"):
     return logger
 
 
-def identify_chapters(text: str, model: str = "gpt-4.1-mini") -> List[Dict]:
-    """Use the AI to identify chapters in a text.
+def identify_chapter_titles(text: str, model: str = "gpt-4.1-mini") -> List[Dict[str, Any]]:
+    """Identify chapter titles in the text using AI with regex validation.
+    
+    Uses AI to identify chapter titles and their positions, then validates with regex.
+    This allows for more flexible chapter title detection while maintaining accuracy.
+    
+    Args:
+        text: The text to process
+        model: The model to use for AI analysis
+        
+    Returns:
+        List of dicts with chapter info including:
+        - title: The chapter title
+        - position: Position in text where title appears
+        - length: Length of the chapter
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("Starting AI-based chapter title identification...")
+    
+    system_prompt = """You are an expert at analyzing literary texts.
+    Your task is to identify ALL chapter titles in the given text.
+    
+    Rules for chapter identification:
+    1. Look for clear chapter markers like "Chapter X", "CHAPTER X", etc.
+    2. Include the exact title as it appears in the text
+    3. Note the character position where each title appears
+    4. Distinguish between actual chapter titles and table of contents entries
+    5. Handle variations in formatting (e.g., "Chapter I" vs "CHAPTER ONE")
+    6. Be thorough - don't miss any chapters
+    7. Ignore false positives like chapter mentions in the text body
+    
+    IMPORTANT: You must return a JSON array of objects, not a JSON object.
+    Each object in the array should have:
+    - title: The exact chapter title as it appears
+    - position: Character position where it appears
+    """
+    
+    user_prompt = f"""Please identify all chapter titles in this text.
+    Return ONLY a JSON array of chapter title objects.
+    Each object should have 'title' and 'position' fields.
+    
+    Example format:
+    [
+        {{"title": "Chapter I", "position": 1234}},
+        {{"title": "CHAPTER II", "position": 5678}}
+    ]
+    
+    Text to analyze:
+    {text}"""
+    
+    try:
+        # Get response from AI
+        client = get_openai_client()
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0
+        )
+        
+        # Parse AI response
+        result = json.loads(response.choices[0].message.content)
+        if not isinstance(result, list):
+            logger.warning("AI response not in expected format")
+            return []
+            
+        # Validate each identified title with regex
+        title_patterns = [
+            r"(?:Chapter|CHAPTER)\s+[IVXLCDMivxlcdm]+\.?",  # Roman numerals with optional period
+            r"(?:Chapter|CHAPTER)\s+\d+\.?",                 # Arabic numerals with optional period
+            r"(?:Chapter|CHAPTER)\s+[A-Za-z]+\.?",           # Spelled out numbers with optional period
+            r"\[Illustration:\s*Chapter\s+[IVXLCDMivxlcdm]+\.?\]",  # Illustration markers with Roman numerals
+            r"\[Illustration:\s*Chapter\s+\d+\.?\]",         # Illustration markers with Arabic numerals
+            r"\[Illustration:\s*Chapter\s+[A-Za-z]+\.?\]"    # Illustration markers with spelled out numbers
+        ]
+        
+        validated_chapters = []
+        for chapter in result:
+            title = chapter.get('title', '')
+            position = chapter.get('position', -1)
+            
+            # Skip invalid entries
+            if not title or position < 0:
+                continue
+                
+            # Verify title exists at the specified position
+            text_at_pos = text[max(0, position-20):position+len(title)+20]
+            if title not in text_at_pos:
+                logger.warning(f"Title '{title}' not found at specified position {position}")
+                continue
+                
+            # Validate with regex patterns
+            if any(re.match(pattern, title) for pattern in title_patterns):
+                validated_chapters.append({
+                    'title': title,
+                    'position': position,
+                    'length': 0  # Will be calculated later
+                })
+                logger.info(f"Validated title '{title}' at position {position}")
+            else:
+                logger.warning(f"Title '{title}' failed regex validation")
+        
+        # Sort chapters by position
+        validated_chapters.sort(key=lambda x: x['position'])
+        
+        # Calculate chapter lengths
+        for i in range(len(validated_chapters) - 1):
+            validated_chapters[i]['length'] = validated_chapters[i + 1]['position'] - validated_chapters[i]['position']
+        
+        # Last chapter goes to end of text
+        if validated_chapters:
+            validated_chapters[-1]['length'] = len(text) - validated_chapters[-1]['position']
+            
+        # Log results
+        logger.info(f"Found {len(validated_chapters)} validated chapters")
+        for i, chapter in enumerate(validated_chapters[:5]):
+            logger.info(f"Chapter {i+1}: {chapter['title']} - {chapter['length']} chars")
+            
+        return validated_chapters
+        
+    except Exception as e:
+        logger.error(f"Error in chapter title identification: {e}")
+        logger.error(traceback.format_exc())
+        return []
+
+
+def locate_chapter_boundaries(text: str, chapter_titles: List[str]) -> List[Tuple[int, int]]:
+    """Locate the start and end positions of each chapter in the text.
+    
+    Args:
+        text: The text to analyze
+        chapter_titles: List of chapter titles to find
+    
+    Returns:
+        List of (start, end) tuples for each chapter
+    """
+    logger = logging.getLogger(__name__)
+    logger.info(f"Searching for boundaries of {len(chapter_titles)} chapters")
+    
+    # Initialize boundaries list
+    boundaries = []
+    
+    # Create a regex pattern that matches any of the chapter titles
+    # Escape special characters in titles and join with OR operator
+    escaped_titles = [re.escape(title) for title in chapter_titles]
+    pattern = '|'.join(escaped_titles)
+    
+    # Find all matches of chapter titles
+    matches = list(re.finditer(pattern, text))
+    
+    if not matches:
+        logger.warning("No chapter titles found in text")
+        return []
+    
+    # Create a mapping of title to all its positions
+    title_positions = defaultdict(list)
+    for match in matches:
+        title = match.group(0)
+        title_positions[title].append(match.start())
+    
+    # Log any titles that appear multiple times
+    for title, positions in title_positions.items():
+        if len(positions) > 1:
+            logger.warning(f"Title '{title}' appears {len(positions)} times at positions {positions}")
+    
+    # Process each chapter
+    for i, title in enumerate(chapter_titles):
+        positions = title_positions.get(title, [])
+        
+        if not positions:
+            logger.warning(f"Title not found in text: '{title}'")
+            continue
+            
+        # Use the first occurrence if multiple exist
+        start = positions[0]
+        
+        # End is either the start of the next chapter or the end of text
+        end = len(text)
+        if i < len(chapter_titles) - 1:
+            next_title = chapter_titles[i + 1]
+            next_positions = title_positions.get(next_title, [])
+            if next_positions:
+                end = next_positions[0]
+        
+        boundaries.append((start, end))
+        logger.info(f"Chapter '{title}': {start} to {end} ({end - start} characters)")
+    
+    # Validate boundaries
+    if boundaries:
+        logger.info(f"Found {len(boundaries)} chapter boundaries")
+        # Check for overlaps
+        for i in range(len(boundaries) - 1):
+            if boundaries[i][1] > boundaries[i + 1][0]:
+                logger.warning(f"Overlap detected between chapters {i} and {i + 1}")
+    else:
+        logger.warning("No chapter boundaries found")
+    
+    return boundaries
+
+
+def find_chapters_in_text(text: str, chapter_info: Dict[str, Any]) -> List[Dict]:
+    """Find all chapters in the text using identified patterns.
     
     Args:
         text: The full text to analyze
-        model: The OpenAI model to use
+        chapter_info: Dictionary with chapter pattern information
         
     Returns:
-        List of dictionaries with chapter info: 
-        [{"title": "Chapter I", "start_index": 309, "end_index": 1200}, ...]
+        List of dictionaries with chapter info
     """
     logger = logging.getLogger()
-    logger.info("Identifying chapters using AI...")
+    logger.info("Finding chapters in text using patterns...")
     
-    client = get_openai_client()
+    # Get patterns from the chapter info
+    regex_patterns = chapter_info.get("regex_patterns", [])
+    sample_matches = chapter_info.get("sample_matches", [])
     
-    system_prompt = """
-    You are an expert at analyzing literary text structure.
-    Your task is to identify the chapters in this book and their boundaries.
-    Ignore illustrations, front matter, and other non-chapter content.
-    """
+    # If we have sample matches but no regex patterns, create patterns from the samples
+    if not regex_patterns and sample_matches:
+        import re
+        regex_patterns = [re.escape(sample) for sample in sample_matches]
     
-    user_prompt = f"""
-    Analyze this text and identify all chapters.
-    For each chapter, provide:
-    1. The chapter title (e.g., "Chapter I", "Chapter II", etc.)
-    2. The approximate start position (character index)
-    3. The approximate end position (character index)
+    # If we still don't have patterns, use default patterns for common chapter formats
+    if not regex_patterns:
+        logger.warning("No patterns found, using default chapter patterns")
+        regex_patterns = [
+            r"Chapter\s+[IVXLCDMivxlcdm]+\.?",  # Chapter I, Chapter II, etc.
+            r"CHAPTER\s+[IVXLCDMivxlcdm]+\.?",  # CHAPTER I, CHAPTER II, etc.
+            r"Chapter\s+\d+\.?",  # Chapter 1, Chapter 2, etc.
+            r"CHAPTER\s+\d+\.?",  # CHAPTER 1, CHAPTER 2, etc.
+            r"Chapter\s+[A-Za-z]+\.?",  # Chapter One, Chapter Two, etc.
+            r"CHAPTER\s+[A-Za-z]+\.?"  # CHAPTER One, CHAPTER Two, etc.
+        ]
     
-    Return your response as a JSON object with this structure:
-    {{
-      "chapters": [
-        {{"title": "Chapter I", "start_index": X, "end_index": Y}},
-        {{"title": "Chapter II", "start_index": Y+1, "end_index": Z}},
-        ...
-      ]
-    }}
+    # Combine all patterns into one regex
+    import re
+    combined_pattern = "|".join(f"({pattern})" for pattern in regex_patterns)
     
-    Text to analyze:
-    {text}
-    """
+    # Find all matches in the text
+    matches = list(re.finditer(combined_pattern, text))
     
-    logger.info(f"Sending chapter identification request to {model}...")
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0
-    )
+    if not matches:
+        logger.warning(f"No chapter markers found using patterns: {regex_patterns}")
+        # Fallback: try to find any chapter-like patterns
+        fallback_pattern = r"(?:Chapter|CHAPTER)\s+.{1,10}"
+        matches = list(re.finditer(fallback_pattern, text))
     
-    try:
-        result = json.loads(response.choices[0].message.content)
-        chapters = result.get("chapters", [])
+    if not matches:
+        logger.warning("No chapter markers found. Using fallback chunking.")
+        # Fallback: divide text into roughly equal chunks
+        chunk_size = 10000  # 10K chars per chunk
+        num_chunks = max(1, len(text) // chunk_size)
+        chunk_size = len(text) // num_chunks
         
-        # Validate chapter structure
-        for chapter in chapters:
-            if not all(key in chapter for key in ["title", "start_index", "end_index"]):
-                raise ValueError(f"Invalid chapter structure: {chapter}")
-        
-        logger.info(f"Successfully identified {len(chapters)} chapters")
+        chapters = []
+        for i in range(num_chunks):
+            start_idx = i * chunk_size
+            end_idx = start_idx + chunk_size if i < num_chunks - 1 else len(text)
+            chapters.append({
+                "title": f"Section {i+1}",
+                "start_index": start_idx,
+                "end_index": end_idx
+            })
         return chapters
-    except (json.JSONDecodeError, KeyError, ValueError) as e:
-        error_msg = f"Failed to parse chapter identification response: {e}"
-        logger.error(error_msg)
-        raise APIError(error_msg)
+    
+    logger.info(f"Found {len(matches)} potential chapter markers")
+    
+    # Process each match to create chapter boundaries
+    chapters = []
+    for i, match in enumerate(matches):
+        title = text[match.start():match.end()]
+        start_index = match.start()
+        
+        # For all but the last chapter, end at the start of the next chapter
+        if i < len(matches) - 1:
+            end_index = matches[i + 1].start()
+        else:
+            end_index = len(text)
+        
+        chapters.append({
+            "title": title,
+            "start_index": start_index,
+            "end_index": end_index
+        })
+    
+    # Validate chapter sizes
+    MIN_CHAPTER_SIZE = 1000  # Minimum chapter size in characters
+    small_chapters = [i for i, ch in enumerate(chapters) if ch['end_index'] - ch['start_index'] < MIN_CHAPTER_SIZE]
+    
+    if small_chapters:
+        logger.warning(f"Found {len(small_chapters)} chapters smaller than {MIN_CHAPTER_SIZE} characters")
+        
+        # Merge small chapters with the next chapter
+        new_chapters = []
+        skip_indices = set()
+        
+        for i, chapter in enumerate(chapters):
+            if i in skip_indices:
+                continue
+                
+            if i in small_chapters and i < len(chapters) - 1:
+                # Merge with next chapter
+                merged_chapter = {
+                    "title": f"{chapter['title']} + {chapters[i+1]['title']}",
+                    "start_index": chapter['start_index'],
+                    "end_index": chapters[i+1]['end_index']
+                }
+                new_chapters.append(merged_chapter)
+                skip_indices.add(i+1)
+            else:
+                new_chapters.append(chapter)
+        
+        chapters = new_chapters
+    
+    logger.info(f"Located {len(chapters)} chapters with boundaries")
+    
+    # Log chapter sizes
+    for i, chapter in enumerate(chapters[:5]):  # Log first 5 chapters
+        size = chapter['end_index'] - chapter['start_index']
+        logger.info(f"Chapter {i+1}: {chapter['title']} - {size} characters")
+    
+    return chapters
 
 
 def format_character_context(character_list):
@@ -364,7 +623,7 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
     start_time = time.time()
     
     # Create a spinner for the transformation process
-    spinner_message = f"Transforming novel to {transform_type}"
+    spinner_message = "Processing..."
     spinner = cli_visuals.GenderSpinner(spinner_message, transform_type=transform_type)
     
     try:
@@ -378,27 +637,37 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
         
         logger.info(f"Loaded text file: {len(text)} characters")
         
-        # Identify chapters in the text
+        # Identify chapters using our hybrid approach
         logger.info("Identifying chapters in the text...")
-        logger.info("Identifying chapters using AI...")
         
-        # Start spinner for chapter identification
+        # Step 1: Use AI to identify chapter titles
         spinner.start()
-        logger.info(f"Sending chapter identification request to {model}...")
+        logger.info(f"Identifying chapter titles using {model}...")
         
-        chapters = identify_chapters(text, model=model)
+        chapter_titles = identify_chapter_titles(text, model=model)
         
-        # Log chapter information
         # Clear spinner line before logging
         sys.stdout.write("\r" + " " * 80 + "\r")
         sys.stdout.flush()
         
-        logger.info(f"Successfully identified {len(chapters)} chapters")
-        logger.info(f"Identified {len(chapters)} chapters in {(time.time() - start_time):.2f} seconds")
+        logger.info(f"Successfully identified {len(chapter_titles)} chapter titles")
+        
+        # Step 2: Use regex to locate chapter boundaries
+        spinner.start()
+        logger.info("Locating chapter boundaries in text...")
+        
+        boundaries = locate_chapter_boundaries(text, chapter_titles)
+        
+        # Clear spinner line before logging
+        sys.stdout.write("\r" + " " * 80 + "\r")
+        sys.stdout.flush()
+        
+        logger.info(f"Successfully identified {len(boundaries)} chapter boundaries")
+        logger.info(f"Identified {len(boundaries)} chapters in {(time.time() - start_time):.2f} seconds")
         
         # Log a few sample chapters
-        for i, chapter in enumerate(chapters[:3]):
-            logger.info(f"Chapter {i+1}: {chapter['title']} - {chapter['end_index'] - chapter['start_index']} chars")
+        for i, (start, end) in enumerate(boundaries[:5]):
+            logger.info(f"Chapter {i+1}: {start} to {end} ({end - start} characters)")
         
         # Analyze characters in the full text
         logger.info("Analyzing characters in the full text...")
@@ -434,7 +703,7 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
             logger.info(f"Character: {character['name']}, Gender: {character['gender']}, Role: {character['role']}")
         
         # Process the text in chunks of chapters
-        total_chunks = math.ceil(len(chapters) / chapters_per_chunk)
+        total_chunks = math.ceil(len(boundaries) / chapters_per_chunk)
         
         logger.info(f"Processing {total_chunks} chunks of approximately {chapters_per_chunk} chapters each")
         
@@ -442,16 +711,22 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
         debug_info = []
         total_changes = 0
         
-        # Process each chunk
+        # Process chapters in chunks
         for chunk_idx in range(total_chunks):
-            chunk_start = chunk_idx * chapters_per_chunk
-            chunk_end = min(chunk_start + chapters_per_chunk, len(chapters))
-            chunk_chapters = chapters[chunk_start:chunk_end]
+            chunk_start_time = time.time()
+            start_chapter = chunk_idx * chapters_per_chunk
+            end_chapter = min(start_chapter + chapters_per_chunk, len(boundaries))
+            
+            # Calculate progress percentage
+            progress_pct = (chunk_idx / total_chunks) * 100
+            
+            # Get the chapters for this chunk
+            chunk_chapters = boundaries[start_chapter:end_chapter]
             
             # Combine the chapters in this chunk
             chunk_text = ""
-            for chapter in chunk_chapters:
-                chapter_text = text[chapter['start_index']:chapter['end_index']]
+            for start, end in chunk_chapters:
+                chapter_text = text[start:end]
                 chunk_text += chapter_text
             
             # Calculate progress
@@ -484,12 +759,21 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
             character_context = format_character_context(character_list)
             
             # Transform the chunk with character context
-            chunk_result, changes = transform_gender_with_context(
-                chunk_text, 
-                transform_type, 
-                character_context,
-                model
-            )
+            try:
+                chunk_result, changes = transform_gender_with_context(
+                    chunk_text, 
+                    transform_type, 
+                    character_context,
+                    model
+                )
+            except Exception as e:
+                logger.error(f"Error transforming chunk {chunk_idx+1}: {e}")
+                # Save the problematic chunk for debugging
+                error_path = os.path.join(debug_dir, f"error_chunk_{chunk_idx+1}.txt")
+                with open(error_path, 'w', encoding='utf-8') as f:
+                    f.write(chunk_text)
+                logger.info(f"Saved problematic chunk to {error_path}")
+                raise
             
             # Create debug info structure
             chunk_debug = {
@@ -522,14 +806,23 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
             transformed_text += chunk_result
             debug_info.append(chunk_debug)
             
-            # Save intermediate results
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(transformed_text)
+            # Log progress but don't write to file yet
+            logger.info(f"Added chunk {chunk_idx+1} to memory (total: {len(transformed_text)} characters)")
             
             # Save debug information
             debug_path = os.path.join(debug_dir, f"chunk_{chunk_idx+1}_debug.json")
             with open(debug_path, 'w', encoding='utf-8') as f:
                 json.dump(chunk_debug, f, indent=2)
+        
+        # Now write the complete transformed text to the output file
+        logger.info(f"Writing complete transformed text to {output_path} ({len(transformed_text)} characters)...")
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(transformed_text)
+            logger.info(f"Successfully wrote transformed text to {output_path}")
+        except Exception as e:
+            logger.error(f"Error writing to output file: {e}")
+            raise
         
         # Log completion
         total_time = time.time() - start_time
@@ -542,7 +835,7 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
         
         # Clear spinner line and show completion checkmark
         sys.stdout.write("\r" + " " * 80 + "\r")
-        sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}\u2713 {spinner_message}{Colors.RESET}")
+        sys.stdout.write(f"\r{Colors.BRIGHT_GREEN}\u2713 Processing complete{Colors.RESET}")
         sys.stdout.flush()
         print()  # Move to next line
         
@@ -552,7 +845,7 @@ def transform_large_text(file_path: str, transform_type: str, output_path: str =
         # Log completion information
         logger.info(f"Completed in {minutes}m {seconds}s")
         logger.info(f"Made {total_changes} changes")
-        logger.info(f"Transformed text saved to {output_path}")
+        logger.info(f"Transformed text saved to {output_path} ({len(transformed_text)} characters)")
         logger.info(f"Debug files saved to {debug_dir}")
         
         return transformed_text, debug_info

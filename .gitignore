@@ -12,6 +12,29 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.py.class
+*.py.bak
+*~
+*#
+.DS_Store
+
+# Debug and log files
+debug/
+debug_*/
+test_debug/
+logs/
+*.log
+
+# Temporary files
+*.bak
+*.tmp
+*.swp
+*~
+*#
+
+# Environment variables
+.env
+.env.*
+!.env.example
 
 # C extensions
 *.so
