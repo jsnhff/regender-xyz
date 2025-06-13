@@ -30,6 +30,7 @@ logs/
 *.swp
 *~
 *#
+*_working_backup.py
 
 # Environment variables
 .env
