@@ -4,10 +4,14 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI to identify characters in text and transform gender representation while preserving narrative coherence. It can perform character analysis, gender transformation, or both in a pipeline.
+This tool uses AI to identify characters in text and transform gender representation while preserving narrative coherence. It can perform character analysis, gender transformation, or both in a pipeline. Version 0.4.0 adds book preprocessing capabilities for cleaner text processing.
 
 ## Features
 
+- **Book Preprocessing** (NEW): Convert text books to clean JSON format
+  - Chapter detection and organization
+  - Artifact removal (brackets, formatting codes)
+  - Smart sentence splitting with dialogue handling
 - **Character Analysis**: Identify characters, their gender, and mentions in text
 - **Gender Transformation**: Transform text using different gender representations
   - Feminine transformation (male → female)
@@ -39,6 +43,20 @@ export OPENAI_API_KEY='your-api-key'
 ```
 
 ## Usage
+
+### Book Preprocessing (NEW)
+
+Convert a text book to clean JSON format for better processing:
+
+```bash
+python regender_cli.py preprocess path/to/book.txt
+```
+
+Options:
+- `-o, --output`: Specify output JSON file (default: book_clean.json)
+- `--verify`: Create verification file by recreating text from JSON
+- `--no-fix-sentences`: Skip splitting embedded dialogues
+- `-q, --quiet`: Suppress progress messages
 
 ### Character Analysis
 
