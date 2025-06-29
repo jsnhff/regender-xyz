@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 regender-xyz - A CLI tool for transforming gender representation in literature
-Version: 0.3.1
+Version: 0.4.0
 """
 
 import os
@@ -18,6 +18,13 @@ from utils import (
     APIError, FileError, ReGenderError
 )
 from large_text_transform import transform_large_text
+
+# Import book processing integration
+try:
+    from book_to_json import BookProcessorIntegration, process_book_to_json
+    BOOK_PROCESSOR_AVAILABLE = True
+except ImportError:
+    BOOK_PROCESSOR_AVAILABLE = False
 
 # Import interactive CLI module (if available)
 try:
@@ -69,12 +76,109 @@ def print_banner():
 ╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ┃  ⚡ regender-xyz ⚡                      
 ┃  ~ transforming gender in literature ~     
-┃  [ Version 0.3.1 ]                      
+┃  [ Version 0.4.0 ]                      
 ┃                                           
 ┃  ✧ character analysis ✧ gender transformation ✧       
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
         print(banner)
+
+def preprocess_command(args) -> int:
+    """Handle the preprocess command for cleaning books to JSON.
+    
+    Args:
+        args: Command-line arguments
+        
+    Returns:
+        Exit code (0 for success, 1 for error)
+    """
+    if not BOOK_PROCESSOR_AVAILABLE:
+        if CLI_VISUALS_AVAILABLE:
+            print_error("Book preprocessing module not available")
+        else:
+            print("Error: Book preprocessing module not available")
+        return 1
+    
+    try:
+        if CLI_VISUALS_AVAILABLE:
+            print_section_header("Book Preprocessing")
+            print_info(f"Preprocessing book: {args.file}")
+        else:
+            print(f"Preprocessing book: {args.file}")
+        
+        # Check if input file exists
+        if not os.path.exists(args.file):
+            if CLI_VISUALS_AVAILABLE:
+                print_error(f"Input file not found: {args.file}")
+            else:
+                print(f"Error: Input file not found: {args.file}")
+            return 1
+        
+        # Set default output if not provided
+        if not args.output:
+            input_path = Path(args.file)
+            args.output = str(input_path.parent / f"{input_path.stem}_clean.json")
+        
+        # Create processor
+        processor = BookProcessorIntegration(verbose=not args.quiet)
+        
+        # Run preprocessing
+        if CLI_VISUALS_AVAILABLE:
+            def run_preprocessing():
+                return processor.process_book_to_json(
+                    args.file, 
+                    args.output,
+                    fix_long_sentences=not args.no_fix_sentences
+                )
+            
+            book_data = run_with_spinner(
+                run_preprocessing, 
+                "Processing book to clean JSON format", 
+                "neutral"
+            )
+        else:
+            book_data = processor.process_book_to_json(
+                args.file, 
+                args.output,
+                fix_long_sentences=not args.no_fix_sentences
+            )
+        
+        # Optionally recreate text to verify
+        if args.verify:
+            if CLI_VISUALS_AVAILABLE:
+                print_info("Verifying by recreating text from JSON...")
+            else:
+                print("Verifying by recreating text from JSON...")
+            
+            verify_file = args.output.replace('.json', '_recreated.txt')
+            processor.recreate_text_from_json(args.output, verify_file)
+            
+            if CLI_VISUALS_AVAILABLE:
+                print_success(f"Verification file saved to: {verify_file}")
+            else:
+                print(f"Verification file saved to: {verify_file}")
+        
+        if CLI_VISUALS_AVAILABLE:
+            print_success(f"\nPreprocessing completed successfully!")
+            print_info(f"Clean JSON saved to: {args.output}")
+            print_info(f"Total chapters: {book_data['statistics']['total_chapters']}")
+            print_info(f"Total sentences: {book_data['statistics']['total_sentences']:,}")
+            print_info(f"Total words: {book_data['statistics']['total_words']:,}")
+        else:
+            print(f"\nPreprocessing completed successfully!")
+            print(f"Clean JSON saved to: {args.output}")
+            print(f"Total chapters: {book_data['statistics']['total_chapters']}")
+            print(f"Total sentences: {book_data['statistics']['total_sentences']:,}")
+            print(f"Total words: {book_data['statistics']['total_words']:,}")
+        
+        return 0
+        
+    except Exception as e:
+        if CLI_VISUALS_AVAILABLE:
+            print_error(f"Error during preprocessing: {e}")
+        else:
+            print(f"Error during preprocessing: {e}")
+        return 1
 
 def analyze_command(args) -> int:
     """Handle the analyze command.
@@ -413,6 +517,18 @@ def main() -> int:
     common_args.add_argument("--no-cache", action="store_true", help="Disable caching of API responses")
     common_args.add_argument("-i", "--interactive", action="store_true", help="Enable interactive mode for customization")
     
+    # Preprocess command
+    if BOOK_PROCESSOR_AVAILABLE:
+        preprocess_parser = subparsers.add_parser("preprocess", help="Preprocess a book to clean JSON format")
+        preprocess_parser.add_argument("file", help="Path to the text file to preprocess")
+        preprocess_parser.add_argument("-o", "--output", help="Path to save the JSON output")
+        preprocess_parser.add_argument("--no-fix-sentences", action="store_true", 
+                                     help="Skip fixing long sentences with embedded dialogues")
+        preprocess_parser.add_argument("--verify", action="store_true", 
+                                     help="Create a verification file by recreating text from JSON")
+        preprocess_parser.add_argument("-q", "--quiet", action="store_true", 
+                                     help="Suppress progress messages")
+    
     # Analyze command
     analyze_parser = subparsers.add_parser("analyze", help="Analyze characters in text", parents=[common_args])
     analyze_parser.add_argument("file", help="Path to the text file to analyze")
@@ -487,7 +603,9 @@ def main() -> int:
     
     # Handle commands
     try:
-        if args.command == "analyze":
+        if args.command == "preprocess" and BOOK_PROCESSOR_AVAILABLE:
+            return preprocess_command(args)
+        elif args.command == "analyze":
             return analyze_command(args)
         elif args.command == "transform":
             return transform_command(args)
