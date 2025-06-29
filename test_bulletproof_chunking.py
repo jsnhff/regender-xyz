@@ -84,8 +84,10 @@ def python_pattern_detector(text: str) -> dict:
     patterns = [
         (r'CHAPTER [LXIVCDM]+\.?\s*$', 'CHAPTER + Roman (CHAPTER I, II, III...)'),
         (r'CHAPTER \d+\.?\s*$', 'CHAPTER + Number (CHAPTER 1, 2, 3...)'),
+        (r'CHAPTER \d+\..*', 'CHAPTER + Number + Title (CHAPTER 1. Title)'),  # NEW: Moby Dick pattern!
         (r'Chapter [LXIVCDM]+\.?\s*$', 'Chapter + Roman (Chapter I, II, III...)'),
         (r'Chapter \d+\.?\s*$', 'Chapter + Number (Chapter 1, 2, 3...)'),
+        (r'Chapter \d+\..*', 'Chapter + Number + Title (Chapter 1. Title)'),  # NEW: Alternative format
         (r'^[LXIVCDM]+\.\s*$', 'Roman only (I., II., III....)'),
         (r'^\d+\.\s*$', 'Number only (1., 2., 3....)'),
     ]
@@ -114,7 +116,16 @@ def python_pattern_detector(text: str) -> dict:
     # Estimate chapters per chunk (target ~15k tokens = ~60k chars)
     # Estimate: total_text / total_chapters = avg_chapter_size
     avg_chapter_size = len(text) // best_count if best_count > 0 else 10000
-    chapters_per_chunk = max(1, 60000 // avg_chapter_size)
+    
+    # Be more conservative with larger chapters
+    if avg_chapter_size > 10000:  # Large chapters like Moby Dick
+        target_chunk_size = 50000  # Smaller target for safety
+    else:
+        target_chunk_size = 60000  # Normal target
+        
+    chapters_per_chunk = max(1, target_chunk_size // avg_chapter_size)
+    
+    print(f"📊 Size analysis: avg_chapter={avg_chapter_size:,} chars, target_chunk={target_chunk_size:,}, chapters_per_chunk={chapters_per_chunk}")
     
     return {
         'chapter_regex': best_pattern,
@@ -179,19 +190,48 @@ def bulletproof_chunker(text: str, analysis: dict) -> list:
         
         chunk_text = text[chunk_start:chunk_end]  # Don't strip!
         
-        start_chapter_num = start_chapter_idx + 1
-        end_chapter_num = end_chapter_idx + 1
+        # BULLETPROOF SIZE CHECK - split if too large
+        MAX_CHUNK_SIZE = 80000  # 80k chars = ~20k tokens (safe for 32k output)
         
-        chunks.append({
-            'text': chunk_text,
-            'description': f'Chapters {start_chapter_num}-{end_chapter_num}',
-            'chapters': f'{start_chapter_num}-{end_chapter_num}',
-            'size': len(chunk_text),
-            'start_pos': chunk_start,
-            'end_pos': chunk_end
-        })
-        
-        print(f"✅ Chunk {len(chunks)}: Chapters {start_chapter_num}-{end_chapter_num} = {len(chunk_text):,} chars")
+        if len(chunk_text) > MAX_CHUNK_SIZE:
+            print(f"⚠️ Chunk too large ({len(chunk_text):,} chars), splitting...")
+            
+            # Split this group into smaller chunks (1 chapter each if needed)
+            for single_idx in range(start_chapter_idx, end_chapter_idx + 1):
+                single_start = chapter_matches[single_idx].start()
+                
+                if single_idx + 1 < actual_chapters:
+                    single_end = chapter_matches[single_idx + 1].start()
+                else:
+                    single_end = len(text)
+                
+                single_text = text[single_start:single_end]
+                single_num = single_idx + 1
+                
+                chunks.append({
+                    'text': single_text,
+                    'description': f'Chapter {single_num}',
+                    'chapters': f'{single_num}',
+                    'size': len(single_text),
+                    'start_pos': single_start,
+                    'end_pos': single_end
+                })
+                
+                print(f"✅ Split chunk {len(chunks)}: Chapter {single_num} = {len(single_text):,} chars")
+        else:
+            start_chapter_num = start_chapter_idx + 1
+            end_chapter_num = end_chapter_idx + 1
+            
+            chunks.append({
+                'text': chunk_text,
+                'description': f'Chapters {start_chapter_num}-{end_chapter_num}',
+                'chapters': f'{start_chapter_num}-{end_chapter_num}',
+                'size': len(chunk_text),
+                'start_pos': chunk_start,
+                'end_pos': chunk_end
+            })
+            
+            print(f"✅ Chunk {len(chunks)}: Chapters {start_chapter_num}-{end_chapter_num} = {len(chunk_text):,} chars")
     
     # VERIFY 100% COVERAGE
     total_chunk_size = sum(chunk['size'] for chunk in chunks)
@@ -247,62 +287,87 @@ def test_bulletproof_approach():
     print("🚀 TESTING BULLETPROOF CHUNKING APPROACH!")
     print("=" * 60)
     
-    # Load the full book
-    try:
-        with open('test_data/pride_and_prejudice_full.txt', 'r') as f:
-            full_text = f.read()
-    except FileNotFoundError:
-        print("❌ Test file not found!")
-        return False
+    # Test multiple books!
+    test_books = [
+        ('test_data/pride_and_prejudice_full.txt', 'Pride and Prejudice'),
+        ('test_data/moby_dick_full_text.txt', 'Moby Dick')
+    ]
     
-    print(f"📚 Loaded book: {len(full_text):,} characters")
+    all_success = True
     
-    # Step 1: Try AI analysis first
-    print("\n" + "="*60)
-    analysis = ai_chapter_analyzer(full_text)
-    
-    # Step 2: Fallback to Python if AI fails
-    if not analysis:
-        print("\n⚡ AI unavailable, using Python fallback...")
-        analysis = python_pattern_detector(full_text)
-    
-    if not analysis:
-        print("❌ Both AI and Python analysis failed!")
-        return False
-    
-    # Step 3: Create bulletproof chunks
-    print("\n" + "="*60)
-    chunks = bulletproof_chunker(full_text, analysis)
-    
-    if not chunks:
-        print("❌ Chunking failed!")
-        return False
-    
-    # Step 4: Analyze results
-    print("\n" + "="*60)
-    print("📋 FINAL CHUNK ANALYSIS:")
-    
-    for i, chunk in enumerate(chunks, 1):
-        size_tokens = chunk['size'] // 4  # Rough estimate
-        status = "✅ Perfect size"
+    for book_path, book_name in test_books:
+        print(f"\n{'='*80}")
+        print(f"🐋 TESTING: {book_name.upper()}")
+        print(f"{'='*80}")
         
-        if size_tokens > 25000:
-            status = "⚠️ Too large for 32k output"
-        elif size_tokens > 20000:
-            status = "⚠️ Close to limit"
+        try:
+            with open(book_path, 'r') as f:
+                full_text = f.read()
+        except FileNotFoundError:
+            print(f"❌ {book_name} test file not found!")
+            all_success = False
+            continue
         
-        print(f"   Chunk {i}: {chunk['size']:,} chars (~{size_tokens:,} tokens) - {chunk['description']} - {status}")
+        print(f"📚 Loaded {book_name}: {len(full_text):,} characters")
     
-    print(f"\n🎯 FINAL RESULT:")
-    print(f"   Total chunks: {len(chunks)}")
-    total_size = sum(chunk['size'] for chunk in chunks)
-    coverage = (total_size / len(full_text)) * 100
-    print(f"   Coverage: {coverage:.1f}%")
+        # Step 1: Try AI analysis first
+        print("\n" + "="*60)
+        analysis = ai_chapter_analyzer(full_text)
+        
+        # Step 2: Fallback to Python if AI fails
+        if not analysis:
+            print("\n⚡ AI unavailable, using Python fallback...")
+            analysis = python_pattern_detector(full_text)
+        
+        if not analysis:
+            print(f"❌ Both AI and Python analysis failed for {book_name}!")
+            all_success = False
+            continue
+        
+        # Step 3: Create bulletproof chunks
+        print("\n" + "="*60)
+        chunks = bulletproof_chunker(full_text, analysis)
+        
+        if not chunks:
+            print(f"❌ Chunking failed for {book_name}!")
+            all_success = False
+            continue
+        
+        # Step 4: Analyze results
+        print("\n" + "="*60)
+        print(f"📋 {book_name.upper()} CHUNK ANALYSIS:")
+        
+        too_large_count = 0
+        for i, chunk in enumerate(chunks, 1):
+            size_tokens = chunk['size'] // 4  # Rough estimate
+            status = "✅ Perfect size"
+            
+            if size_tokens > 25000:
+                status = "⚠️ Too large for 32k output"
+                too_large_count += 1
+            elif size_tokens > 20000:
+                status = "⚠️ Close to limit"
+            
+            print(f"   Chunk {i}: {chunk['size']:,} chars (~{size_tokens:,} tokens) - {chunk['description']} - {status}")
+        
+        print(f"\n🎯 {book_name.upper()} RESULT:")
+        print(f"   Total chunks: {len(chunks)}")
+        total_size = sum(chunk['size'] for chunk in chunks)
+        coverage = (total_size / len(full_text)) * 100
+        print(f"   Coverage: {coverage:.1f}%")
+        print(f"   Chunks too large: {too_large_count}")
+        
+        book_success = coverage >= 99.9 and too_large_count == 0
+        print(f"   Status: {'🏆 SUCCESS!' if book_success else '❌ NEEDS WORK'}")
+        
+        if not book_success:
+            all_success = False
     
-    success = coverage >= 99.9
-    print(f"   Status: {'🏆 SUCCESS - BILL IS BEATEN!' if success else '❌ NEEDS MORE WORK'}")
+    print(f"\n{'='*80}")
+    print(f"🎯 FINAL MULTI-BOOK RESULT:")
+    print(f"   All books successful: {'🏆 YES - BILL IS CRUSHED!' if all_success else '❌ MIXED RESULTS'}")
     
-    return success
+    return all_success
 
 if __name__ == "__main__":
     success = test_bulletproof_approach()
