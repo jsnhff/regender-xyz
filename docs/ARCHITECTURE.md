@@ -29,17 +29,23 @@ book_parser/
 - Smart fallback strategies
 
 ### 2. LLM Integration (`api_client.py`)
-Unified interface for multiple LLM providers.
+Unified interface for multiple LLM providers with automatic .env loading.
 
 **Supported Providers:**
 - OpenAI (GPT-4, GPT-4o, GPT-4o-mini)
-- Grok (grok-beta)
+- Grok (grok-beta, grok-3-mini-fast)
 
 **Key Classes:**
 - `BaseLLMClient` - Abstract base for providers
 - `OpenAIClient` - OpenAI implementation
 - `GrokClient` - Grok implementation  
 - `UnifiedLLMClient` - Auto-detecting wrapper
+
+**Features:**
+- Automatic .env file loading
+- Provider auto-detection
+- Unified API across providers
+- Graceful error handling
 
 ### 3. Transformation Pipeline
 
@@ -49,21 +55,20 @@ Unified interface for multiple LLM providers.
 - Provides context for accurate transformations
 
 #### Gender Transformation (`gender_transform.py`)
-- Original OpenAI-only implementation
+- Multi-provider implementation supporting OpenAI and Grok
 - Handles three transformation types:
   - Feminine (he→she)
   - Masculine (she→he)
   - Neutral (he/she→they)
-
-#### Multi-Provider Transform (`gender_transform_v2.py`)
-- Enhanced version supporting all LLM providers
-- Same transformation logic with provider flexibility
-- Backward compatible API
+- Provider selection via parameter or environment
+- Backward compatible with original API
 
 #### JSON-Based Processing (`json_transform.py`)
 - Chapter-by-chapter transformation
+- Intelligent token-based chunking
+- Model-aware optimization (via `token_utils.py`)
 - Progress tracking and error recovery
-- Optimized for large books
+- Optimized for large books with minimal API calls
 
 ### 4. CLI Interfaces
 
@@ -89,6 +94,17 @@ gutenberg_cli.py [download|process|pipeline|list] [options]
 - API client management
 - Caching system
 - Error handling
+
+#### Token Utils (`token_utils.py`)
+- Token estimation algorithms
+- Smart sentence chunking
+- Model-specific optimization
+- Cost estimation
+
+#### Model Configs (`model_configs.py`)
+- Context window definitions
+- Default chunk sizes per model
+- Model capability tracking
 
 #### Gutenberg Utils (`gutenberg_utils/`)
 - Book downloading from Project Gutenberg
@@ -145,10 +161,11 @@ regender-xyz/
 │
 # Core modules
 ├── api_client.py       # Multi-provider LLM support
+├── model_configs.py    # Model-specific configurations
+├── token_utils.py      # Token counting and chunking
 ├── analyze_characters.py
-├── gender_transform.py  # Original transformer
-├── gender_transform_v2.py # Multi-provider version
-├── json_transform.py
+├── gender_transform.py  # Multi-provider transformer
+├── json_transform.py    # Smart chunking processor
 ├── book_to_json.py
 ├── utils.py
 │
@@ -185,7 +202,11 @@ REGENDER_DEBUG=1
 - **Speed**: ~1-2 seconds per book
 
 ### LLM Processing
-- **Chunk Size**: 50 sentences
+- **Chunk Size**: Model-adaptive (30-100 sentences)
+  - grok-3-mini-fast: 30 sentences/chunk
+  - gpt-4o-mini: 75 sentences/chunk
+  - grok-beta: 100 sentences/chunk
+- **Token Awareness**: Estimates actual token usage
 - **Caching**: 24-hour response cache
 - **Concurrency**: Chapter-level parallelism possible
 
@@ -218,6 +239,8 @@ REGENDER_DEBUG=1
 
 ### Extension Points
 - Custom pattern definitions
-- Provider plugins
+- Provider plugins (add new LLM providers)
+- Model configurations (add new models)
 - Transformation rules engine
 - Output format plugins
+- Token counting improvements

@@ -1,18 +1,26 @@
 # regender-xyz
 
-A command-line tool for analyzing and transforming gender representation in literature.
+A command-line tool for analyzing and transforming gender representation in literature using multiple LLM providers.
 
 ## Overview
 
-This tool uses AI to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more.
+This tool uses AI (OpenAI or Grok) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
 
 ## Features
 
+- **Multi-Provider LLM Support**: Choose between OpenAI and Grok APIs
+  - Automatic provider detection based on available API keys
+  - Provider-specific model optimization
+  - Unified interface for seamless switching
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports 100+ book formats (English, French, German, plays, letters, etc.)
   - Smart chapter/section detection with pattern priority system
   - Artifact removal and intelligent sentence splitting
   - 100% success rate on Project Gutenberg collection
+- **Intelligent Token-Based Chunking**: Optimizes API usage for each model
+  - Adapts chunk size to model's context window
+  - Minimizes API calls while maintaining quality
+  - Special handling for models like grok-3-mini-fast
 - **Character Analysis**: Identify characters, their gender, and mentions in text
 - **Gender Transformation**: Transform text using different gender representations
   - Feminine transformation (male → female)
@@ -38,7 +46,7 @@ This tool uses AI to identify characters in text and transform gender representa
   - Grok API key (set as `GROK_API_KEY`)
 - **Supported Models:**
   - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
-  - Grok: grok-beta
+  - Grok: grok-beta, grok-3-mini-fast
 
 ## Installation
 
@@ -48,9 +56,9 @@ git clone https://github.com/yourusername/regender-xyz.git
 cd regender-xyz
 
 # Install dependencies
-pip install openai
-pip install requests  # For Grok API support
-pip install beautifulsoup4  # Optional: for better Gutenberg downloads
+pip install -r requirements.txt
+# Or manually:
+pip install openai requests beautifulsoup4 python-dotenv
 
 # Set up API keys (choose one or both)
 export OPENAI_API_KEY='your-openai-api-key'
@@ -75,7 +83,7 @@ The system now supports multiple LLM providers for flexibility and redundancy:
 
 3. **Test your configuration:**
    ```bash
-   python test_providers.py
+   python tests/test_providers.py
    ```
 
 ### Using Different Providers
@@ -180,13 +188,16 @@ regender-xyz/
 │   ├── download_gutenberg_books.py
 │   ├── process_all_gutenberg.py
 │   └── README.md       # Detailed utilities documentation
+├── api_client.py        # Unified LLM client (OpenAI/Grok)
+├── model_configs.py     # Model-specific configurations
+├── token_utils.py       # Token counting and smart chunking
 ├── regender_cli.py      # Main CLI entry point
 ├── regender_json_cli.py # JSON-based processing CLI
 ├── gutenberg_cli.py     # Simple Gutenberg download/process CLI
 ├── book_to_json.py      # Book preprocessing interface
 ├── analyze_characters.py # Character analysis
-├── gender_transform.py  # Gender transformation
-├── json_transform.py    # JSON-based transformation
+├── gender_transform.py  # Multi-provider gender transformation
+├── json_transform.py    # JSON-based transformation with smart chunking
 └── docs/               # Documentation
     ├── development/    # Parser development docs
     ├── maintenance/    # Cleanup and maintenance
@@ -216,11 +227,27 @@ See [gutenberg_utils/README.md](gutenberg_utils/README.md) for detailed document
 
 MIT
 
+## Recent Updates
+
+### v0.6.0 - Multi-Provider & Smart Chunking
+- ✅ Added Grok API support alongside OpenAI
+- ✅ Intelligent token-based chunking for optimal API usage
+- ✅ Model-specific optimizations (grok-3-mini-fast uses smaller chunks)
+- ✅ Unified API client with automatic provider detection
+- ✅ Consolidated gender_transform modules
+
+### v0.5.0 - Book Parser Overhaul
+- ✅ Modular parser architecture with 100% success rate
+- ✅ Support for 100+ book formats and languages
+- ✅ Pattern registry system with priorities
+
 ## Roadmap
 
 ### Release 1: Complete Novel Processing
 - [x] Advanced parser supporting 100+ book formats
 - [x] Clean JSON preprocessing pipeline
+- [x] Multi-provider LLM support (OpenAI & Grok)
+- [x] Smart token-based chunking
 - [ ] Full novel transformation with consistency
 - [ ] Print-ready output generation
 
@@ -230,6 +257,7 @@ MIT
 - [ ] Print-on-demand integration
 
 ### Release 3: Advanced Features
+- [ ] Additional LLM providers (Claude, Gemini)
 - [ ] Character-specific transformations
 - [ ] Interactive transformation options
 - [ ] Support for more languages

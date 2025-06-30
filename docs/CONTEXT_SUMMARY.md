@@ -12,9 +12,12 @@ Regender-XYZ is a comprehensive system for analyzing and transforming gender rep
 - **Performance**: ~1-2 seconds per book with deterministic output
 
 ### 2. Multi-Provider LLM Support
-- **Providers**: OpenAI (GPT-4, GPT-4o) and Grok (grok-beta)
+- **Providers**: 
+  - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
+  - Grok: grok-beta, grok-3-mini-fast
 - **Architecture**: Abstract base class with unified interface
-- **Configuration**: Environment-based with automatic provider detection
+- **Features**: Automatic .env loading, provider auto-detection
+- **Configuration**: Environment-based with smart defaults
 
 ### 3. Three CLI Interfaces
 - **Main CLI** (`regender_cli.py`): analyze, transform, pipeline, preprocess
@@ -66,7 +69,11 @@ UnifiedLLMClient (auto-detecting wrapper)
 - **Speed**: 1-2 seconds per book
 
 ### Transformation Pipeline
-- **Chunk Size**: 50 sentences per API call
+- **Smart Chunking**: Model-adaptive sizing
+  - grok-3-mini-fast: 30 sentences/chunk
+  - gpt-4o-mini: 75 sentences/chunk
+  - grok-beta: 100 sentences/chunk
+- **Token Awareness**: Estimates actual usage
 - **Caching**: 24-hour response cache
 - **Error Recovery**: Chapter-level with validation
 
@@ -82,10 +89,14 @@ docs/
 
 ## Recent Enhancements
 
-1. **Gutenberg Integration**: Download and process 100 books with one command
-2. **Multi-Provider Support**: Seamless switching between OpenAI and Grok
-3. **Modular Parser**: Replaced monolithic parser with extensible pattern system
-4. **Unified CLIs**: Consolidated functionality into three focused tools
+1. **Intelligent Token-Based Chunking**: Optimizes API calls per model
+2. **Consolidated gender_transform**: Single module for all providers
+3. **Enhanced Documentation**: Updated guides with chunking details
+4. **Automatic .env Loading**: No manual configuration needed
+5. **Model Configurations**: Centralized model capabilities
+6. **Gutenberg Integration**: Download and process 100 books with one command
+7. **Multi-Provider Support**: Seamless switching between OpenAI and Grok
+8. **Modular Parser**: 100% success rate on Gutenberg collection
 
 ## Configuration
 

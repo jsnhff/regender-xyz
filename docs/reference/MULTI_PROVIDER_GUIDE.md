@@ -1,6 +1,6 @@
-# Multi-Provider LLM Support Guide
+# Multi-Provider LLM Support Guide v2
 
-This guide explains how to use multiple LLM providers with regender-xyz.
+This guide explains how to use multiple LLM providers with regender-xyz. The system includes intelligent token-based chunking that adapts to each model's capabilities.
 
 ## Overview
 
@@ -8,18 +8,23 @@ The system supports multiple LLM providers to give you flexibility in:
 - **Cost optimization** - Choose the most cost-effective provider for your use case
 - **Performance** - Select models based on speed vs quality needs
 - **Redundancy** - Fallback to alternative providers if one is unavailable
-- **Experimentation** - Compare results across different models
+- **Smart chunking** - Automatic optimization based on model context windows
 
 ## Supported Providers
 
 ### OpenAI
-- **Models**: GPT-4, GPT-4o, GPT-4o-mini, GPT-3.5-turbo
+- **Models**: 
+  - GPT-4 (8k context) - 50 sentences/chunk
+  - GPT-4o (128k context) - 100 sentences/chunk - Recommended
+  - GPT-4o-mini (128k context) - 75 sentences/chunk - Cost-effective
 - **Strengths**: Mature API, excellent JSON mode, wide model selection
 - **API Key**: `OPENAI_API_KEY`
 
 ### Grok (X.AI)
-- **Models**: grok-beta
-- **Strengths**: Competitive performance, alternative perspective
+- **Models**: 
+  - grok-beta (131k context) - 100 sentences/chunk - High capacity
+  - grok-3-mini-fast (32k context) - 30 sentences/chunk - Fast processing
+- **Strengths**: Large context windows, competitive performance
 - **API Key**: `GROK_API_KEY`
 
 ## Configuration
@@ -32,63 +37,79 @@ export OPENAI_API_KEY='sk-...'
 
 # Grok
 export GROK_API_KEY='xai-...'
-export GROK_API_BASE_URL='https://api.x.ai/v1'  # Optional, defaults to this
+export GROK_API_BASE_URL='https://api.x.ai/v1'  # Optional
 
 # Default provider (optional)
 export LLM_PROVIDER='openai'  # or 'grok'
 ```
 
-### Method 2: .env File
+### Method 2: .env File (Recommended)
 
 1. Copy the example:
    ```bash
    cp .env.example .env
    ```
 
-2. Edit `.env`:
+2. Edit .env:
    ```env
+   # OpenAI Configuration
    OPENAI_API_KEY=sk-...
+   
+   # Grok Configuration
    GROK_API_KEY=xai-...
-   LLM_PROVIDER=openai
+   
+   # Provider Selection
+   LLM_PROVIDER=grok  # or openai
+   
+   # Model Overrides (optional)
+   GROK_MODEL=grok-3-mini-fast
    ```
 
-3. Load with python-dotenv:
-   ```python
-   from dotenv import load_dotenv
-   load_dotenv()
-   ```
+The system automatically loads .env files, no additional setup required!
 
-### Method 3: Direct API Initialization
+## Architecture
 
-```python
-from api_client import UnifiedLLMClient
+The multi-provider support is implemented through:
 
-# Use specific provider
-client = UnifiedLLMClient(provider="grok")
-
-# Auto-detect available provider
-client = UnifiedLLMClient()
-```
+1. **`api_client.py`** - Unified interface with auto .env loading
+2. **`gender_transform.py`** - Multi-provider transformation module
+3. **`token_utils.py`** - Intelligent chunking algorithms
+4. **`model_configs.py`** - Model-specific configurations
+5. **Provider clients** - OpenAIClient and GrokClient implementations
 
 ## Usage Examples
 
 ### Command Line
 
 ```bash
-# Use default provider
+# Use default provider (from environment)
 python regender_cli.py transform book.txt -t feminine
 
-# Use specific provider
+# Explicitly use Grok
 python regender_cli.py transform book.txt -t feminine --provider grok
 
 # Use specific model
-python regender_cli.py transform book.txt -t feminine --provider openai --model gpt-4
+python regender_cli.py transform book.txt -t feminine --provider openai --model gpt-4o-mini
+```
+
+### JSON Processing with Smart Chunking
+
+```bash
+# Automatic provider detection and model-optimized chunking
+python regender_json_cli.py book.json -t feminine -o output.json -v
+
+# With verbose mode, you'll see:
+# - Provider being used
+# - Model selected
+# - Chunk sizes per chapter
+# - Token estimates
 ```
 
 ### Python API
 
 ```python
-from gender_transform_v2 import transform_text_file
+from gender_transform import transform_text_file
+from api_client import UnifiedLLMClient
 
 # Use default provider
 result = transform_text_file(
@@ -97,175 +118,144 @@ result = transform_text_file(
     "feminine"
 )
 
-# Use specific provider
+# Explicitly use Grok with specific model
 result = transform_text_file(
     "input.txt",
     "output.txt",
     "feminine",
-    provider="grok"
+    provider="grok",
+    model="grok-3-mini-fast"
 )
 
-# Use specific model
-result = transform_text_file(
-    "input.txt",
-    "output.txt",
-    "feminine",
-    provider="openai",
-    model="gpt-4"
-)
-```
-
-## Provider Selection Logic
-
-The system selects a provider in this order:
-
-1. **Explicit provider parameter** - If you specify `--provider` or `provider=`
-2. **LLM_PROVIDER environment variable** - Your default preference
-3. **Auto-detection** - First available provider (checks OpenAI, then Grok)
-
-## Testing Your Configuration
-
-Run the test script to verify your setup:
-
-```bash
-python test_providers.py
-```
-
-Expected output:
-```
-LLM Provider Configuration Test
-==================================================
-
-Environment Variables:
-  OPENAI_API_KEY: Set
-  GROK_API_KEY: Set
-  LLM_PROVIDER: openai
-
-Available providers: openai, grok
-
-Testing auto-detection...
-✓ Auto-detected provider: openai
-
-Testing openai...
-✓ openai client initialized
-  Default model: gpt-4o-mini
-✓ Test completion successful
-  Response: Hello, World!
-  Model used: gpt-4o-mini
-
-Testing grok...
-✓ grok client initialized
-  Default model: grok-beta
-✓ Test completion successful
-  Response: Hello, World!
-  Model used: grok-beta
-```
-
-## Handling Errors
-
-### No API Keys Set
-```
-APIError: No LLM provider available. Set either OPENAI_API_KEY or GROK_API_KEY
-```
-
-**Solution**: Set at least one API key in your environment or .env file
-
-### Invalid API Key
-```
-APIError: OpenAI API error: Invalid API key provided
-```
-
-**Solution**: Check that your API key is correct and active
-
-### Provider Not Available
-```
-APIError: Provider grok is not properly configured
-```
-
-**Solution**: Ensure you have set the required environment variables for that provider
-
-## Cost Considerations
-
-Different providers and models have different costs:
-
-- **OpenAI GPT-4**: High quality, higher cost
-- **OpenAI GPT-4o-mini**: Good quality, lower cost
-- **Grok**: Competitive pricing, check current rates
-
-For large-scale processing, consider:
-1. Using cheaper models for initial processing
-2. Using expensive models only for complex cases
-3. Implementing caching to avoid repeated API calls
-
-## Advanced Usage
-
-### Custom Provider Implementation
-
-You can add support for additional providers by extending `BaseLLMClient`:
-
-```python
-from api_client import BaseLLMClient, APIResponse
-
-class ClaudeClient(BaseLLMClient):
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
-        # Initialize client...
-    
-    def complete(self, messages, model=None, temperature=0.0, response_format=None):
-        # Implement completion logic
-        pass
-    
-    def is_available(self):
-        return bool(self.api_key)
-    
-    def get_default_model(self):
-        return "claude-3-opus"
-```
-
-### Provider-Specific Features
-
-Some features may only be available with certain providers:
-
-- **JSON Mode**: Currently best supported by OpenAI
-- **Streaming**: Implementation varies by provider
-- **Function Calling**: Provider-specific implementations
-
-The system handles these differences transparently where possible.
-
-## Troubleshooting
-
-### Check Available Providers
-```python
-from api_client import UnifiedLLMClient
+# Check available providers
 providers = UnifiedLLMClient.list_available_providers()
 print(f"Available: {providers}")
 ```
 
-### Debug API Calls
-```bash
-# Enable debug logging
-export REGENDER_DEBUG=1
+## Performance Comparison
+
+| Provider | Model | Context | Chunks/4K sent | Speed | Cost | API Calls* |
+|----------|-------|---------|----------------|-------|------|------------|
+| OpenAI | GPT-4 | 8k | 50 sent | Slow | High | ~111 |
+| OpenAI | GPT-4o | 128k | 100 sent | Fast | Medium | ~69 |
+| OpenAI | GPT-4o-mini | 128k | 75 sent | Fastest | Low | ~79 |
+| Grok | grok-beta | 131k | 100 sent | Fast | Medium | ~69 |
+| Grok | grok-3-mini-fast | 32k | 30 sent | Fast | Low | ~158 |
+
+*API calls for Pride & Prejudice (4,029 sentences)
+
+## Smart Chunking System
+
+The system automatically optimizes chunk sizes based on:
+
+1. **Model context window** - Larger windows allow bigger chunks
+2. **Token estimation** - Prevents context overflow
+3. **Content analysis** - Adapts to sentence length
+4. **Safety margins** - Ensures reliable processing
+
+### Example: Chapter XVIII of Pride & Prejudice (137 sentences)
+
+- **grok-3-mini-fast**: 5 chunks (30, 30, 30, 30, 17 sentences)
+- **gpt-4o-mini**: 2 chunks (75, 62 sentences)
+- **grok-beta**: 2 chunks (100, 37 sentences)
+
+## Best Practices
+
+### Model Selection
+- **For large books**: Use gpt-4o or grok-beta (fewer API calls)
+- **For quick tests**: Use gpt-4o-mini or grok-3-mini-fast
+- **For quality**: Use gpt-4o (best balance)
+- **For cost**: Use gpt-4o-mini (most economical)
+
+### Configuration Tips
+1. Set `LLM_PROVIDER` in .env for consistency
+2. Use `.env` files instead of exporting variables
+3. Keep API keys secure - never commit them
+4. Test with small texts first
+
+### Monitoring
+- Use verbose mode (`-v`) to see chunk processing
+- Check logs for token usage estimates
+- Monitor API costs through provider dashboards
+
+### Error Handling
+```python
+from api_client import APIError
+
+try:
+    result = transform_text_file("book.txt", "output.txt", "feminine")
+except APIError as e:
+    print(f"API Error: {e}")
+    # Try fallback provider
 ```
 
-### Disable Caching for Testing
-```bash
-export REGENDER_DISABLE_CACHE=1
+## Troubleshooting
+
+### No provider available
+- Check API keys are set correctly
+- Verify .env file is in project root
+- Run `python tests/test_providers.py`
+
+### Context length exceeded
+- The smart chunking should prevent this
+- If it occurs, check for unusually long sentences
+- File an issue with details
+
+### Grok credits error
+- New Grok accounts need credits
+- Purchase at https://console.x.ai/
+- Check usage at the same URL
+
+### Different results between providers
+- This is normal - models have different styles
+- Test both to find your preference
+- Character context helps consistency
+
+## Advanced Features
+
+### Custom Chunk Sizes
+```python
+# Override automatic chunking
+from json_transform import transform_chapter
+
+# Force smaller chunks
+result = transform_chapter(
+    chapter, 
+    "feminine", 
+    character_context,
+    sentences_per_chunk=20  # Override
+)
 ```
 
-## Security Notes
+### Token Monitoring
+```python
+from token_utils import analyze_book_for_chunking
 
-- **Never commit API keys** to version control
-- Use `.env` files for local development
-- Use environment variables in production
-- Consider using key rotation for production systems
-- Monitor API usage to detect anomalies
+# Analyze before processing
+analysis = analyze_book_for_chunking(book_data, "gpt-4o-mini")
+print(f"Estimated API calls: {analysis['estimated_api_calls']}")
+print(f"Estimated tokens: {analysis['total_tokens']}")
+```
 
-## Future Providers
+### Provider Switching
+```python
+# Try primary, fallback to secondary
+providers = ["openai", "grok"]
+for provider in providers:
+    try:
+        result = transform_text_file(
+            "input.txt", "output.txt", "feminine",
+            provider=provider
+        )
+        break
+    except APIError:
+        continue
+```
 
-The system is designed to easily add support for:
-- Anthropic Claude
-- Google Gemini
-- Cohere
-- Local models (via Ollama, etc.)
+## Future Enhancements
 
-Contributions for additional providers are welcome!
+- Additional providers (Claude, Gemini)
+- Streaming support for real-time processing
+- Parallel chunk processing
+- Cost estimation before processing
+- Provider-specific optimizations
