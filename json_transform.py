@@ -15,6 +15,7 @@ import time
 # Import the unified API client
 from api_client import UnifiedLLMClient
 from model_configs import calculate_optimal_chunk_size, get_model_config
+from token_utils import smart_chunk_sentences, estimate_tokens
 
 # Import the multi-provider gender transformation logic  
 from gender_transform_v2 import transform_gender_with_context
@@ -167,34 +168,73 @@ def transform_chapter(
     transformed_sentences = []
     all_changes = []
     
-    # Process in chunks
-    for i in range(0, total_sentences, sentences_per_chunk):
-        chunk_end = min(i + sentences_per_chunk, total_sentences)
-        chunk = sentences[i:chunk_end]
-        
-        if verbose:
-            chunk_num = i//sentences_per_chunk + 1
-            total_chunks = (total_sentences + sentences_per_chunk - 1)//sentences_per_chunk
-            print(f"    Chunk {chunk_num}/{total_chunks} ({len(chunk)} sentences)", end='', flush=True)
-        
-        # Transform the chunk
-        transformed_chunk, changes = transform_sentences_chunk(
-            chunk, transform_type, character_context, model
+    # Use smart token-based chunking if chunk size not specified
+    if sentences_per_chunk is None:
+        chunks = smart_chunk_sentences(
+            sentences, 
+            model, 
+            character_context,
+            transform_type,
+            verbose=False
         )
         
-        # Adjust change indices to be chapter-relative
-        for change in changes:
-            change['sentence_index'] += i
-            change['chapter'] = chapter['number']
-        
-        transformed_sentences.extend(transformed_chunk)
-        all_changes.extend(changes)
-        
         if verbose:
-            print(f" ... {len(changes)} changes")
+            print(f"    Smart chunking: {len(chunks)} chunks for {total_sentences} sentences")
         
-        # Small delay to avoid rate limits
-        time.sleep(0.1)
+        # Process smart chunks
+        sentence_index = 0
+        for chunk_idx, chunk in enumerate(chunks):
+            if verbose:
+                chunk_tokens = sum(estimate_tokens(s) for s in chunk)
+                print(f"    Chunk {chunk_idx + 1}/{len(chunks)} ({len(chunk)} sentences, ~{chunk_tokens} tokens)", end='', flush=True)
+            
+            # Transform the chunk
+            transformed_chunk, changes = transform_sentences_chunk(
+                chunk, transform_type, character_context, model
+            )
+            
+            # Adjust change indices to be chapter-relative
+            for change in changes:
+                change['sentence_index'] += sentence_index
+                change['chapter'] = chapter['number']
+            
+            transformed_sentences.extend(transformed_chunk)
+            all_changes.extend(changes)
+            
+            if verbose:
+                print(f" ... {len(changes)} changes")
+            
+            sentence_index += len(chunk)
+            time.sleep(0.1)  # Rate limiting
+    else:
+        # Use fixed chunk size (legacy mode)
+        for i in range(0, total_sentences, sentences_per_chunk):
+            chunk_end = min(i + sentences_per_chunk, total_sentences)
+            chunk = sentences[i:chunk_end]
+            
+            if verbose:
+                chunk_num = i//sentences_per_chunk + 1
+                total_chunks = (total_sentences + sentences_per_chunk - 1)//sentences_per_chunk
+                print(f"    Chunk {chunk_num}/{total_chunks} ({len(chunk)} sentences)", end='', flush=True)
+        
+            # Transform the chunk
+            transformed_chunk, changes = transform_sentences_chunk(
+                chunk, transform_type, character_context, model
+            )
+            
+            # Adjust change indices to be chapter-relative
+            for change in changes:
+                change['sentence_index'] += i
+                change['chapter'] = chapter['number']
+            
+            transformed_sentences.extend(transformed_chunk)
+            all_changes.extend(changes)
+            
+            if verbose:
+                print(f" ... {len(changes)} changes")
+            
+            # Small delay to avoid rate limits
+            time.sleep(0.1)
     
     # Create transformed chapter
     transformed_chapter = chapter.copy()
