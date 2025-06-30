@@ -1,96 +1,97 @@
-# Context Summary - Book to JSON Processing Feature
+# Context Summary - Regender-XYZ System
 
-## What We Built
+## Overview
 
-We created a complete book preprocessing pipeline that converts text books (like Project Gutenberg files) into clean JSON format for the regender-xyz project.
+Regender-XYZ is a comprehensive system for analyzing and transforming gender representation in literature, featuring advanced book parsing, multi-provider LLM support, and flexible transformation pipelines.
 
-## Key Achievement
+## Key Achievements
 
-**Single consolidated module**: `book_to_json.py` (790 lines)
-- Previously 4 separate files, now all functionality in one place
-- Integrated into CLI as the `preprocess` command
-- No AI/OpenAI dependencies - uses pattern matching only
+### 1. Modular Book Parser (100% Success Rate)
+- **Location**: `book_parser/` module
+- **Capabilities**: Supports 100+ book formats including international languages, plays, letters
+- **Performance**: ~1-2 seconds per book with deterministic output
 
-## CLI Command
+### 2. Multi-Provider LLM Support
+- **Providers**: OpenAI (GPT-4, GPT-4o) and Grok (grok-beta)
+- **Architecture**: Abstract base class with unified interface
+- **Configuration**: Environment-based with automatic provider detection
+
+### 3. Three CLI Interfaces
+- **Main CLI** (`regender_cli.py`): analyze, transform, pipeline, preprocess
+- **JSON CLI** (`regender_json_cli.py`): Chapter-by-chapter processing
+- **Gutenberg CLI** (`gutenberg_cli.py`): Download and process Project Gutenberg books
+
+## CLI Commands
 
 ```bash
-python regender_cli.py preprocess test_data/pride_and_prejudice_full.txt
+# Preprocess any book to JSON
+python regender_cli.py preprocess book.txt
+
+# Transform with provider selection
+python regender_cli.py transform book.txt -t feminine --provider grok
+
+# Process Gutenberg collection
+python gutenberg_cli.py pipeline
+
+# JSON-based transformation
+python regender_json_cli.py book.json -t masculine -o output.json
 ```
 
-Creates: `test_data/pride_and_prejudice_full_clean.json`
+## Architecture Highlights
 
-## Features
-
-1. **Chapter Detection**
-   - 100% accuracy on Pride & Prejudice (61 chapters)
-   - Handles Roman numerals, Arabic numbers, word numbers
-   - Pattern priority to avoid false matches
-
-2. **Artifact Removal**
-   - Removes brackets, illustration markers, formatting codes
-   - Multi-pass cleaning strategy
-   - Context-aware processing
-
-3. **Sentence Splitting**
-   - Handles 47 common abbreviations (Mr., Mrs., etc.)
-   - Splits embedded dialogues (found and split 333 in P&P)
-   - Preserves dialogue structure with \n\n separators
-
-4. **Performance**
-   - < 1 second for full novels
-   - Deterministic output
-   - No external dependencies
-
-## Output Format
-
-```json
-{
-  "metadata": {
-    "title": "Pride and prejudice",
-    "author": "Jane Austen",
-    "source": "Project Gutenberg"
-  },
-  "chapters": [
-    {
-      "number": "I",
-      "title": "Chapter I.",
-      "sentences": ["...", "..."],
-      "sentence_count": 41,
-      "word_count": 847
-    }
-  ],
-  "statistics": {
-    "total_chapters": 61,
-    "total_sentences": 4397,
-    "total_words": 121486
-  }
-}
+### Pattern Registry System
+```
+book_parser/patterns/
+├── base.py          # Core enums and Pattern class
+├── registry.py      # Pattern management
+├── standard.py      # English patterns (120+ priority)
+├── international.py # French, German (120+ priority)
+└── plays.py        # Drama formats (100+ priority)
 ```
 
-## Test Results
+### Provider Architecture
+```python
+BaseLLMClient (abstract)
+├── OpenAIClient
+└── GrokClient
+     ↓
+UnifiedLLMClient (auto-detecting wrapper)
+```
 
-- **Pride & Prejudice**: 61 chapters, 4,397 sentences, 121,486 words ✓
-- **Moby Dick**: Chapter detection needs work (found only 3 instead of 135)
+## Performance Metrics
 
-## Documentation
+### Book Parser
+- **Success Rate**: 100% on 100 Gutenberg books
+- **Format Coverage**: 72 standard + 28 edge cases handled
+- **Speed**: 1-2 seconds per book
 
-All docs in `docs/` folder:
-- `README.md` - Quick start guide
-- `INTEGRATION_SUMMARY.md` - CLI integration details
-- `COMPREHENSIVE_PROJECT_SUMMARY.md` - Full technical details
-- `BOOK_FORMAT_LESSONS.md` - Learnings about different formats
+### Transformation Pipeline
+- **Chunk Size**: 50 sentences per API call
+- **Caching**: 24-hour response cache
+- **Error Recovery**: Chapter-level with validation
 
-## Git Status
+## Documentation Structure
 
-- Branch: `working-branch`
-- Last commit: "Add book-to-JSON preprocessing feature"
-- CLI version updated to 0.4.0
+```
+docs/
+├── development/     # Parser development guides
+├── maintenance/     # Cleanup and maintenance docs
+├── reference/       # Architecture and API docs
+└── *.md            # Legacy docs from book processing
+```
 
-## Known Limitations
+## Recent Enhancements
 
-- Some books with non-standard formats (like Moby Dick's "CHAPTER N. Title") need pattern improvements
-- Despite chapter detection issues, sentence processing remains accurate
+1. **Gutenberg Integration**: Download and process 100 books with one command
+2. **Multi-Provider Support**: Seamless switching between OpenAI and Grok
+3. **Modular Parser**: Replaced monolithic parser with extensible pattern system
+4. **Unified CLIs**: Consolidated functionality into three focused tools
 
-## Next Steps
+## Configuration
 
-The feature is complete and ready for use. The clean JSON output is perfect for gender transformation or any other text processing needs.
+```bash
+# API Keys (choose one or both)
+OPENAI_API_KEY=sk-...
+GROK_API_KEY=xai-...
+LLM_PROVIDER=openai  # or grok
+```

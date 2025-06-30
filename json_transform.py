@@ -12,11 +12,11 @@ import sys
 from datetime import datetime
 import time
 
-# Import OpenAI through utils
-from utils import get_openai_client
+# Import the unified API client
+from api_client import UnifiedLLMClient
 
-# Import the existing gender transformation logic  
-from gender_transform import transform_gender_with_context
+# Import the multi-provider gender transformation logic  
+from gender_transform_v2 import transform_gender_with_context
 from analyze_characters import analyze_characters
 
 # Progress indicators
@@ -85,18 +85,20 @@ Text to transform:
 Return the transformed text with the same [N] markers."""
 
     try:
-        client = get_openai_client()
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": "You are a precise text transformation assistant. Follow the transformation rules exactly."},
-                {"role": "user", "content": transform_prompt}
-            ],
-            temperature=0.1,
-            max_tokens=4000
-        )
+        # Use the unified client for multi-provider support
+        client = UnifiedLLMClient()
+        messages = [
+            {"role": "system", "content": "You are a precise text transformation assistant. Follow the transformation rules exactly."},
+            {"role": "user", "content": transform_prompt}
+        ]
         
-        transformed_text = response.choices[0].message.content.strip()
+        # The unified client returns APIResponse with content
+        response = client.complete(
+            messages=messages,
+            model=model,
+            temperature=0.1
+        )
+        transformed_text = response.content.strip()
         
         # Parse the transformed sentences
         transformed_sentences = []

@@ -1,103 +1,223 @@
-# regender-xyz Architecture
+# Regender-XYZ Architecture
 
 ## Overview
 
-The regender-xyz project processes books from Project Gutenberg, parsing them into structured JSON format and applying gender transformations. The system is designed for batch processing of large text collections.
+Regender-XYZ is a modular system for analyzing and transforming gender representation in literature. The architecture supports multiple LLM providers, advanced book parsing, and flexible transformation pipelines.
+
+## Core Components
+
+### 1. Book Parser Module (`book_parser/`)
+A modular parser achieving 100% success rate on Project Gutenberg texts.
+
+```
+book_parser/
+├── parser.py              # Main API: BookParser class
+├── patterns/
+│   ├── base.py           # Base pattern definitions
+│   ├── registry.py       # Pattern management system
+│   ├── standard.py       # English patterns (CHAPTER, Part, etc.)
+│   ├── international.py  # French, German patterns
+│   └── plays.py         # Drama patterns (ACT, SCENE)
+└── detectors/
+    └── section_detector.py # Smart section detection
+```
+
+**Key Features:**
+- Pattern-based chapter detection with priority system
+- Support for 100+ book formats
+- International language support
+- Smart fallback strategies
+
+### 2. LLM Integration (`api_client.py`)
+Unified interface for multiple LLM providers.
+
+**Supported Providers:**
+- OpenAI (GPT-4, GPT-4o, GPT-4o-mini)
+- Grok (grok-beta)
+
+**Key Classes:**
+- `BaseLLMClient` - Abstract base for providers
+- `OpenAIClient` - OpenAI implementation
+- `GrokClient` - Grok implementation  
+- `UnifiedLLMClient` - Auto-detecting wrapper
+
+### 3. Transformation Pipeline
+
+#### Character Analysis (`analyze_characters.py`)
+- Identifies characters and their genders
+- Tracks character mentions and relationships
+- Provides context for accurate transformations
+
+#### Gender Transformation (`gender_transform.py`)
+- Original OpenAI-only implementation
+- Handles three transformation types:
+  - Feminine (he→she)
+  - Masculine (she→he)
+  - Neutral (he/she→they)
+
+#### Multi-Provider Transform (`gender_transform_v2.py`)
+- Enhanced version supporting all LLM providers
+- Same transformation logic with provider flexibility
+- Backward compatible API
+
+#### JSON-Based Processing (`json_transform.py`)
+- Chapter-by-chapter transformation
+- Progress tracking and error recovery
+- Optimized for large books
+
+### 4. CLI Interfaces
+
+#### Main CLI (`regender_cli.py`)
+```bash
+regender_cli.py [analyze|transform|pipeline|preprocess] [options]
+```
+
+#### JSON CLI (`regender_json_cli.py`)
+```bash
+regender_json_cli.py input.json -t feminine -o output.json
+```
+
+#### Gutenberg CLI (`gutenberg_cli.py`)
+```bash
+gutenberg_cli.py [download|process|pipeline|list] [options]
+```
+
+### 5. Utilities
+
+#### Core Utils (`utils.py`)
+- File I/O operations
+- API client management
+- Caching system
+- Error handling
+
+#### Gutenberg Utils (`gutenberg_utils/`)
+- Book downloading from Project Gutenberg
+- Batch processing utilities
+- Format analysis tools
+
+## Data Flow
+
+```
+1. Input Stage
+   ├── Raw text file (.txt)
+   └── Pre-processed JSON
+
+2. Parsing Stage (book_parser/)
+   ├── Pattern matching
+   ├── Section detection
+   └── JSON generation
+
+3. Analysis Stage
+   ├── Character identification
+   └── Gender detection
+
+4. Transformation Stage
+   ├── Provider selection (OpenAI/Grok)
+   ├── Chunk processing
+   └── Validation
+
+5. Output Stage
+   ├── Transformed JSON
+   ├── Recreated text
+   └── Validation report
+```
 
 ## Directory Structure
 
 ```
 regender-xyz/
-├── gutenberg_texts/      # Raw text files from Gutenberg (84M)
-├── gutenberg_json/       # Processed JSON files (60M)
-├── clean_json_books/     # Sample clean JSON outputs
-├── docs/                 # Documentation
-├── logs/                 # Processing logs
-├── output/              # Transformation outputs
-└── tests/               # Test files
+├── book_parser/          # Modular parser (100% success rate)
+│   ├── patterns/        # Pattern definitions
+│   └── detectors/       # Detection logic
+├── gutenberg_utils/     # Gutenberg-specific tools
+│   ├── download_gutenberg_books.py
+│   ├── process_all_gutenberg.py
+│   └── common.py
+├── docs/               # Documentation
+│   ├── development/    # Development guides
+│   ├── maintenance/    # Maintenance docs
+│   └── reference/      # API references
+├── tests/              # Test suite
+├── gutenberg_texts/    # Downloaded texts (100 books)
+├── gutenberg_json/     # Processed JSONs
+├── logs/               # Processing logs
+├── .cache/             # API response cache
+│
+# Core modules
+├── api_client.py       # Multi-provider LLM support
+├── analyze_characters.py
+├── gender_transform.py  # Original transformer
+├── gender_transform_v2.py # Multi-provider version
+├── json_transform.py
+├── book_to_json.py
+├── utils.py
+│
+# CLI tools
+├── regender_cli.py
+├── regender_json_cli.py
+└── gutenberg_cli.py
 ```
 
-## Core Components
+## Configuration
 
-### 1. Book Downloading
-- `download_gutenberg_books.py`: Downloads books from Project Gutenberg
-- `collect_gutenberg_texts.py`: Organizes downloaded files
+### Environment Variables
+```bash
+# LLM Provider Configuration
+OPENAI_API_KEY=sk-...
+GROK_API_KEY=xai-...
+LLM_PROVIDER=openai  # or grok
 
-### 2. Book Parsing
-- `book_parser_v2.py`: Advanced parser supporting 20+ chapter formats
-- `book_to_clean_json.py`: Converts parsed books to clean JSON with sentence splitting
-- `book_processor.py`: Unified interface for book processing
-
-### 3. Gender Transformation
-- `gender_transform.py`: Core transformation engine
-- `json_transform.py`: JSON-based transformation pipeline
-- `claude_transform.py`: AI-powered transformation using Claude
-
-### 4. CLI Tools
-- `regender_cli.py`: Main command-line interface
-- `regender_json_cli.py`: JSON-specific CLI operations
-
-### 5. Analysis Tools
-- `analyze_book_formats.py`: Analyzes book format patterns
-- `analyze_characters.py`: Character gender analysis
-- `pronoun_validator.py`: Validates transformation accuracy
-
-## Processing Pipeline
-
-1. **Download**: Fetch books from Project Gutenberg
-2. **Parse**: Extract structure (chapters, metadata) from raw text
-3. **Clean**: Split into sentences and prepare for transformation
-4. **Transform**: Apply gender transformations
-5. **Validate**: Check transformation accuracy
-
-## Key Features
-
-- Handles 100+ Gutenberg books automatically
-- Detects 20+ chapter format patterns
-- 70% success rate for chapter detection
-- Processes 10M+ words efficiently
-- Modular design for easy extension
-
-## Data Formats
-
-### Input: Raw Text
-Plain text files from Project Gutenberg with various formatting styles.
-
-### Intermediate: Parsed JSON
-```json
-{
-  "metadata": {
-    "title": "Book Title",
-    "source_file": "filename.txt"
-  },
-  "chapters": [
-    {
-      "number": "1",
-      "title": "Chapter One",
-      "sentences": ["First sentence.", "Second sentence."],
-      "word_count": 500
-    }
-  ],
-  "statistics": {
-    "total_chapters": 20,
-    "total_sentences": 5000,
-    "total_words": 100000
-  }
-}
+# Optional Settings
+REGENDER_DISABLE_CACHE=1
+REGENDER_DEBUG=1
 ```
 
-### Output: Transformed Text
-Gender-transformed versions in JSON or reconstructed text format.
+### Provider Selection Logic
+1. Explicit parameter (`--provider`)
+2. Environment variable (`LLM_PROVIDER`)
+3. Auto-detection (first available)
 
-## Performance
+## Performance Characteristics
 
-- Processes 100 books in ~3 minutes
-- Average processing time: 1.8 seconds per book
-- Handles books from 3K to 900K+ words
+### Book Parser
+- **Success Rate**: 100% on Gutenberg collection
+- **Formats**: 100+ supported patterns
+- **Speed**: ~1-2 seconds per book
 
-## Extension Points
+### LLM Processing
+- **Chunk Size**: 50 sentences
+- **Caching**: 24-hour response cache
+- **Concurrency**: Chapter-level parallelism possible
 
-1. Add new chapter patterns in `book_parser_v2.py`
-2. Customize transformation rules in `gender_transform.py`
-3. Add new output formats in `assemble_book.py`
-4. Extend CLI commands in `regender_cli.py`
+## Error Handling
+
+### Graceful Degradation
+- Provider fallback on API errors
+- Chapter-level recovery
+- Validation warnings vs errors
+
+### Logging
+- Structured logs in `logs/`
+- API response caching in `.cache/`
+- Progress tracking for long operations
+
+## Security Considerations
+
+- API keys via environment variables only
+- No credentials in code or logs
+- `.env` files excluded from git
+- Secure credential storage recommended
+
+## Future Enhancements
+
+### Planned Features
+- Additional LLM providers (Claude, Gemini)
+- Streaming API support
+- Real-time transformation preview
+- Web interface
+
+### Extension Points
+- Custom pattern definitions
+- Provider plugins
+- Transformation rules engine
+- Output format plugins

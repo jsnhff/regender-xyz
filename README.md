@@ -25,6 +25,7 @@ This tool uses AI to identify characters in text and transform gender representa
 ## Documentation
 
 - **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
+- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok APIs
 - **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser
 - **[Development Docs](docs/development/)** - Parser development and improvements
 - **[Maintenance Docs](docs/maintenance/)** - System maintenance guides
@@ -32,8 +33,12 @@ This tool uses AI to identify characters in text and transform gender representa
 ## Requirements
 
 - Python 3.9+
-- OpenAI API key (set as environment variable `OPENAI_API_KEY`)
-- **Recommended Model:** GPT-4o or GPT-4 (large context windows)
+- API key for at least one LLM provider:
+  - OpenAI API key (set as `OPENAI_API_KEY`)
+  - Grok API key (set as `GROK_API_KEY`)
+- **Supported Models:**
+  - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
+  - Grok: grok-beta
 
 ## Installation
 
@@ -44,10 +49,49 @@ cd regender-xyz
 
 # Install dependencies
 pip install openai
+pip install requests  # For Grok API support
 pip install beautifulsoup4  # Optional: for better Gutenberg downloads
 
-# Set your OpenAI API key
-export OPENAI_API_KEY='your-api-key'
+# Set up API keys (choose one or both)
+export OPENAI_API_KEY='your-openai-api-key'
+export GROK_API_KEY='your-grok-api-key'
+
+# Optional: specify default provider
+export LLM_PROVIDER='openai'  # or 'grok'
+```
+
+## Multi-Provider LLM Support
+
+The system now supports multiple LLM providers for flexibility and redundancy:
+
+### Configure Providers
+
+1. **Copy the example configuration:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit .env with your API keys**
+
+3. **Test your configuration:**
+   ```bash
+   python test_providers.py
+   ```
+
+### Using Different Providers
+
+```bash
+# Use default provider (auto-detected or from LLM_PROVIDER env var)
+python regender_cli.py transform text.txt -t feminine
+
+# Explicitly use OpenAI
+python regender_cli.py transform text.txt -t feminine --provider openai
+
+# Explicitly use Grok
+python regender_cli.py transform text.txt -t feminine --provider grok
+
+# Use a specific model
+python regender_cli.py transform text.txt -t feminine --provider openai --model gpt-4
 ```
 
 ## Usage

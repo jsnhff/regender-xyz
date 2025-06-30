@@ -5,10 +5,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from openai import OpenAI
+from api_client import UnifiedLLMClient
 
 from utils import (
-    load_text_file, save_json_file, get_openai_client,
+    load_text_file, save_json_file,
     normalize_text, find_text_position, cache_result,
     safe_api_call, APIError, FileError
 )
@@ -45,12 +45,12 @@ def load_chapter(file_path: str) -> str:
 
 @safe_api_call
 @cache_result()
-def analyze_characters(text: str, model: str = "gpt-4") -> Dict[str, Any]:
+def analyze_characters(text: str, model: Optional[str] = None) -> Dict[str, Any]:
     """Analyze text to identify characters and their mentions.
     
     Args:
         text: The text to analyze
-        model: The OpenAI model to use
+        model: The model to use (optional, uses provider default if not specified)
         
     Returns:
         Dictionary containing character analysis
@@ -58,7 +58,7 @@ def analyze_characters(text: str, model: str = "gpt-4") -> Dict[str, Any]:
     Raises:
         APIError: If there's an issue with the API call
     """
-    client = get_openai_client()
+    client = UnifiedLLMClient()
     
     system_prompt = """You are a literary analysis assistant specialized in character identification.
 Your task is to identify characters and their mentions in text.
@@ -109,18 +109,21 @@ Output valid JSON only."""
 
     print("Analyzing text for character identification...")
     
-    response = client.chat.completions.create(
+    # Use the unified client to create completion
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
+    
+    response = client.complete(
+        messages=messages,
         model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0
+        temperature=0,
+        response_format={"type": "json_object"}
     )
     
-    # Parse response
-    content = response.choices[0].message.content
+    # Parse response - unified client returns APIResponse
+    content = response.content
     
     try:
         analysis = json.loads(content)

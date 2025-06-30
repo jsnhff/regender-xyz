@@ -145,6 +145,8 @@ def load_json_file(file_path: str) -> Dict:
 def get_openai_client() -> OpenAI:
     """Get an OpenAI client with proper error handling.
     
+    DEPRECATED: Use get_llm_client() for multi-provider support.
+    
     Returns:
         OpenAI client instance
         
@@ -159,6 +161,29 @@ def get_openai_client() -> OpenAI:
         return OpenAI(api_key=api_key)
     except Exception as e:
         raise APIError(f"Error initializing OpenAI client: {e}")
+
+
+def get_llm_client(provider: Optional[str] = None):
+    """Get a unified LLM client that supports multiple providers.
+    
+    Args:
+        provider: Optional provider name ('openai' or 'grok').
+                 If not specified, uses LLM_PROVIDER env var or auto-detects.
+    
+    Returns:
+        UnifiedLLMClient instance
+        
+    Raises:
+        APIError: If no provider is available or configured
+    """
+    try:
+        from api_client import UnifiedLLMClient
+        return UnifiedLLMClient(provider)
+    except ImportError:
+        # Fallback to OpenAI-only if api_client module not available
+        if provider and provider != "openai":
+            raise APIError(f"Provider {provider} not available without api_client module")
+        return get_openai_client()
 
 
 def cache_result(cache_dir: str = ".cache"):

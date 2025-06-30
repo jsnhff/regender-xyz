@@ -8,6 +8,11 @@ env/
 venv/
 ENV/
 
+# Environment files (contains API keys)
+.env
+.env.local
+.env.*.local
+
 # Large data directories (commented out - now tracked)
 # gutenberg_books/
 # gutenberg_texts/
