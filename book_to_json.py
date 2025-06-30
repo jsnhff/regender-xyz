@@ -47,6 +47,8 @@ class SectionType(Enum):
     CHAPTER = "chapter"
     EPILOGUE = "epilogue"
     APPENDIX = "appendix"
+    ETYMOLOGY = "etymology"
+    EXTRACTS = "extracts"
     UNKNOWN = "unknown"
 
 
@@ -396,8 +398,9 @@ def fix_long_sentences_with_dialogues(chapters: List[Dict[str, Any]], verbose: b
 class BookParser:
     """Main parser for converting books to canonical format"""
     
-    def __init__(self):
+    def __init__(self, verbose: bool = True):
         self.chapter_patterns = ChapterPatterns()
+        self.verbose = verbose
     
     def parse(self, text: str) -> CanonicalBook:
         """Parse text into canonical book format"""
@@ -486,11 +489,17 @@ class BookParser:
         content = text[start:end]
         sections = []
         
+        # First, check for special sections (TOC, ETYMOLOGY, etc.)
+        special_sections = self._find_special_sections(content, start)
+        
         # Find all chapter positions
         chapter_positions = self._find_chapter_positions(content, start)
         
-        if not chapter_positions:
-            # No chapters found - treat as single section
+        # Combine all positions
+        all_positions = special_sections + chapter_positions
+        
+        if not all_positions:
+            # No sections found - treat as single section
             sections.append(BookSection(
                 type=SectionType.UNKNOWN,
                 content=content,
@@ -501,13 +510,23 @@ class BookParser:
             return sections
         
         # Sort by position
-        chapter_positions.sort(key=lambda x: x[0])
+        all_positions.sort(key=lambda x: x[0])
+        
+        # Filter out any chapter markers that are within a TOC
+        filtered_positions = self._filter_toc_chapters(all_positions, text)
+        
+        # Debug: log filtering results
+        if self.verbose:
+            chapters_before = sum(1 for p in all_positions if p[1] == SectionType.CHAPTER)
+            chapters_after = sum(1 for p in filtered_positions if p[1] == SectionType.CHAPTER)
+            print(f"[DEBUG] Chapters before TOC filtering: {chapters_before}")
+            print(f"[DEBUG] Chapters after TOC filtering: {chapters_after}")
         
         # Create sections
-        for i, (pos, section_type, title, number) in enumerate(chapter_positions):
+        for i, (pos, section_type, title, number) in enumerate(filtered_positions):
             # Determine end position
-            if i < len(chapter_positions) - 1:
-                end_pos = chapter_positions[i + 1][0]
+            if i < len(filtered_positions) - 1:
+                end_pos = filtered_positions[i + 1][0]
             else:
                 end_pos = end
             
@@ -523,47 +542,144 @@ class BookParser:
                 number=str(number) if number else None
             ))
         
+        # Sort chapters by number (if they have numbers)
+        # Keep non-chapter sections in their original order
+        chapter_sections = [s for s in sections if s.type == SectionType.CHAPTER and s.number]
+        other_sections = [s for s in sections if s.type != SectionType.CHAPTER or not s.number]
+        
+        # Sort chapters by number
+        try:
+            # Try to sort numerically if possible
+            chapter_sections.sort(key=lambda s: int(s.number) if s.number.isdigit() else float('inf'))
+        except:
+            # Fallback to string sort
+            chapter_sections.sort(key=lambda s: s.number)
+        
+        # Combine: other sections first, then sorted chapters
+        sections = other_sections + chapter_sections
+        
         return sections
+    
+    def _find_special_sections(self, text: str, offset: int) -> List[Tuple[int, SectionType, str, Any]]:
+        """Find special sections like TOC, ETYMOLOGY, EXTRACTS"""
+        positions = []
+        
+        # Special section patterns
+        special_patterns = [
+            (r'^CONTENTS\.?$', SectionType.TOC, 'CONTENTS'),
+            (r'^ETYMOLOGY\.?$', SectionType.ETYMOLOGY, 'ETYMOLOGY'),
+            (r'^EXTRACTS\s*\(.*\)\.?$', SectionType.EXTRACTS, 'EXTRACTS'),
+            (r'^TABLE OF CONTENTS\.?$', SectionType.TOC, 'TABLE OF CONTENTS'),
+        ]
+        
+        # Use regex to find positions directly in the text
+        for pattern, section_type, title in special_patterns:
+            for match in re.finditer(pattern, text, re.MULTILINE):
+                positions.append((match.start() + offset, section_type, title, None))
+        
+        return positions
+    
+    def _filter_toc_chapters(self, positions: List[Tuple[int, SectionType, str, Any]], text: str) -> List[Tuple[int, SectionType, str, Any]]:
+        """Filter out chapter markers that are within a TOC section"""
+        filtered = []
+        
+        # Simple approach: find where chapters stop being close together
+        # In a TOC, chapters are listed one after another with minimal text between
+        # Real chapters have substantial content between them
+        
+        chapter_positions = [(p, t, title, n) for p, t, title, n in positions if t == SectionType.CHAPTER]
+        
+        if not chapter_positions:
+            return positions
+        
+        # Find the first "real" chapter by looking for one with substantial content after it
+        first_real_chapter_idx = None
+        
+        for i in range(len(chapter_positions)):
+            pos, _, title, _ = chapter_positions[i]
+            
+            # Get text after this chapter marker
+            if i + 1 < len(chapter_positions):
+                next_chapter_pos = chapter_positions[i + 1][0]
+                content_length = next_chapter_pos - pos
+            else:
+                # Last chapter - check if it has content
+                content_length = min(1000, len(text) - pos)
+            
+            # Extract the content
+            content = text[pos:pos + content_length]
+            lines = content.strip().split('\n')
+            
+            # Check if this has real content (not just the next chapter listing)
+            if len(lines) > 3:  # More than just title
+                # Remove title lines and check remaining content
+                content_after_title = '\n'.join(lines[2:]).strip()
+                
+                # Real content criteria:
+                # 1. Has substantial text (> 200 chars)
+                # 2. Doesn't immediately start with another chapter marker
+                # 3. Contains prose indicators (periods, lowercase starts, etc.)
+                if (len(content_after_title) > 200 and 
+                    not re.match(r'^CHAPTER', content_after_title) and
+                    re.search(r'[a-z]', content_after_title[:50])):  # Has lowercase (indicates prose)
+                    first_real_chapter_idx = i
+                    break
+        
+        if first_real_chapter_idx is None:
+            # Couldn't determine, keep all chapters
+            return positions
+        
+        # Get position of first real chapter
+        first_real_pos = chapter_positions[first_real_chapter_idx][0]
+        
+        if self.verbose:
+            print(f"[DEBUG] First real chapter at position {first_real_pos}")
+            print(f"[DEBUG] Filtering out {first_real_chapter_idx} TOC chapter entries")
+        
+        # Filter out chapters before the first real one, but keep all other sections
+        for pos, section_type, title, number in positions:
+            if section_type == SectionType.CHAPTER and pos < first_real_pos:
+                continue  # Skip TOC chapter entries
+            filtered.append((pos, section_type, title, number))
+        
+        return filtered
     
     def _find_chapter_positions(self, text: str, offset: int) -> List[Tuple[int, SectionType, str, Any]]:
         """Find all chapter positions in text"""
         positions = []
         
-        lines = text.split('\n')
-        current_pos = offset
-        
-        for line_num, line in enumerate(lines):
-            stripped = line.strip()
+        # Use multiline regex to find all chapter patterns
+        for pattern, pattern_type in self.chapter_patterns.PATTERNS:
+            # Add multiline flag to pattern
+            regex = re.compile('^' + pattern, re.MULTILINE)
             
-            # Check against all chapter patterns
-            for pattern, pattern_type in self.chapter_patterns.PATTERNS:
-                match = re.match(pattern, stripped)
-                if match:
-                    # Extract chapter number
-                    if 'titled' in pattern_type:
-                        number = match.group(1)
-                        title = stripped  # Full line as title
-                    else:
-                        number = match.group(1)
-                        title = stripped
-                    
-                    # Skip if in table of contents (multiple chapters in quick succession)
-                    if positions and (current_pos - positions[-1][0] < 200):
-                        # Likely TOC entry, skip
-                        continue
-                    
-                    positions.append((
-                        current_pos,
-                        SectionType.CHAPTER,
-                        title,
-                        number
-                    ))
-                    break  # Don't check other patterns
-            
-            # Update position
-            current_pos += len(line) + 1  # +1 for newline
+            for match in regex.finditer(text):
+                # Extract chapter number and title
+                if 'titled' in pattern_type:
+                    number = match.group(1)
+                    title = match.group(0).strip()
+                else:
+                    number = match.group(1)
+                    title = match.group(0).strip()
+                
+                # Calculate absolute position
+                abs_pos = match.start() + offset
+                
+                positions.append((abs_pos, SectionType.CHAPTER, title, number))
         
-        return positions
+        # Sort by position
+        positions.sort(key=lambda x: x[0])
+        
+        # Deduplicate chapters at the same position (different patterns matching same line)
+        deduped = []
+        seen_positions = set()
+        
+        for pos, section_type, title, number in positions:
+            if pos not in seen_positions:
+                seen_positions.add(pos)
+                deduped.append((pos, section_type, title, number))
+        
+        return deduped
 
 
 # ============================================================================
@@ -616,8 +732,16 @@ def process_book_to_json(
     
     # Parse chapters
     _log("Detecting chapters...")
-    parser = BookParser()
+    parser = BookParser(verbose=verbose)
     canonical_book = parser.parse(text)
+    
+    # Debug: show all sections found
+    section_types = {}
+    for s in canonical_book.sections:
+        section_types[s.type.value] = section_types.get(s.type.value, 0) + 1
+    
+    _log(f"Found sections: {section_types}")
+    
     chapter_count = sum(1 for s in canonical_book.sections if s.type == SectionType.CHAPTER)
     _log(f"Detected {chapter_count} chapters", "success")
     
@@ -772,19 +896,31 @@ class BookProcessorIntegration:
 
 if __name__ == "__main__":
     import sys
+    import argparse
     
-    if len(sys.argv) < 2:
-        print("Usage: python book_to_json.py <input_file> [output_file]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Convert book text to clean JSON format")
+    parser.add_argument("input_file", help="Input text file")
+    parser.add_argument("-o", "--output", help="Output JSON file", default=None)
+    parser.add_argument("-q", "--quiet", action="store_true", help="Suppress progress messages")
+    parser.add_argument("--no-fix-sentences", action="store_true", 
+                       help="Skip splitting embedded dialogues")
     
-    input_file = sys.argv[1]
-    output_file = sys.argv[2] if len(sys.argv) > 2 else None
+    args = parser.parse_args()
+    
+    input_file = args.input_file
+    output_file = args.output
     
     try:
-        book_data = process_book_to_json(input_file, output_file)
-        print(f"\nProcessed {book_data['statistics']['total_chapters']} chapters")
-        print(f"Total sentences: {book_data['statistics']['total_sentences']:,}")
-        print(f"Total words: {book_data['statistics']['total_words']:,}")
+        book_data = process_book_to_json(
+            input_file, 
+            output_file, 
+            fix_long_sentences=not args.no_fix_sentences,
+            verbose=not args.quiet
+        )
+        if not args.quiet:
+            print(f"\nProcessed {book_data['statistics']['total_chapters']} chapters")
+            print(f"Total sentences: {book_data['statistics']['total_sentences']:,}")
+            print(f"Total words: {book_data['statistics']['total_words']:,}")
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)

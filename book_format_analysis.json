@@ -1,0 +1,145 @@
+{
+  "total_books": 100,
+  "chapter_patterns": {
+    "CHAPTER_ROMAN": 2108,
+    "BARE_ROMAN": 673,
+    "ACT": 403,
+    "BARE_ARABIC": 394,
+    "CHAPTER_ARABIC_TITLED": 348,
+    "Chapter_Roman": 325,
+    "CHAPTER_ROMAN_TITLED": 310,
+    "Chapter_Roman_Titled": 276,
+    "Chapter_Arabic_Titled": 234,
+    "Chapter_Arabic": 103,
+    "BOOK_ROMAN": 101,
+    "CHAPTER_ARABIC": 44,
+    "PART_ROMAN": 31,
+    "CHAPTER_ROMAN_SEP": 21
+  },
+  "toc_patterns": {
+    "Contents": 68,
+    "CONTENTS": 32,
+    "CONTENTS.": 6,
+    "INDEX": 5,
+    "chapter.": 3,
+    "contents.": 2,
+    "CHAPTER": 2,
+    "TABLE OF CONTENTS": 1,
+    "TABLE OF CONTENTS.": 1,
+    "INDEX.": 1,
+    "Table of Contents": 1
+  },
+  "special_sections": {
+    "NOTES": 175,
+    "PREFACE": 61,
+    "PROLOGUE": 51,
+    "APPENDIX": 49,
+    "INTRODUCTION": 36,
+    "EPILOGUE": 33,
+    "EXTRACTS": 7,
+    "BIBLIOGRAPHY": 6,
+    "DEDICATION": 4,
+    "ETYMOLOGY": 4,
+    "GLOSSARY": 3,
+    "ACKNOWLEDGMENTS": 2,
+    "FOREWORD": 2,
+    "AFTERWORD": 1
+  },
+  "metadata_patterns": {
+    "Title:": 46,
+    "Author:": 46,
+    "eBook_of": 24
+  },
+  "statistics": {
+    "books_with_toc": 65,
+    "books_with_chapters": 83,
+    "avg_chapters": 46.66265060240964,
+    "min_chapters": 1,
+    "max_chapters": 543
+  },
+  "edge_cases": [
+    {
+      "file": "pg100-The_Complete_Works_of_William_Shakespeare.txt",
+      "issue": "excessive_chapters",
+      "count": 543
+    },
+    {
+      "file": "pg10554-Right_Ho,_Jeeves.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg17489-Les_misérables_Tome_I_Fantine.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg1952-The_Yellow_Wallpaper.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg2160-The_Expedition_of_Humphry_Clinker.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg22914-The_Sceptical_Chymist.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg236-The_Jungle_Book.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg24151-The_Sky_Trap.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg24571-Der_Struwwelpeter.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg25305-Memoirs_of_Fanny_Hill.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg2591-Grimms'_Fairy_Tales.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg2600-War_and_Peace.txt",
+      "issue": "excessive_chapters",
+      "count": 367
+    },
+    {
+      "file": "pg26184-Simple_Sabotage_Field_Manual.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg30254-The_Romance_of_Lust_A_classic_Victorian_erotic_nov.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg31516-The_Eyes_Have_It.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg3201-Mo.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg383-She_Stoops_to_Conquer;_Or,_The_Mistakes_of_a_Night.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg43-The_Strange_Case_of_Dr._Jekyll_and_Mr._Hyde.txt",
+      "issue": "no_chapters_found"
+    },
+    {
+      "file": "pg8525-Eve's_Diary,_Complete.txt",
+      "issue": "no_chapters_found"
+    }
+  ],
+  "recommendations": [
+    "Prioritize these chapter patterns: CHAPTER_ROMAN, BARE_ROMAN, ACT, BARE_ARABIC, CHAPTER_ARABIC_TITLED",
+    "65.0% of books have TOCs - implement robust TOC detection",
+    "Handle these special sections: NOTES, PREFACE, PROLOGUE, APPENDIX, INTRODUCTION"
+  ]
+}

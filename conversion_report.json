@@ -1,0 +1,935 @@
+{
+  "total_files": 100,
+  "books_with_chapters": 70,
+  "books_without_chapters": 30,
+  "chapter_counts": [
+    21,
+    37,
+    1,
+    12,
+    2,
+    1,
+    90,
+    39,
+    36,
+    60,
+    61,
+    48,
+    86,
+    55,
+    43,
+    22,
+    46,
+    28,
+    4,
+    1,
+    34,
+    20,
+    44,
+    168,
+    2,
+    2,
+    7,
+    9,
+    41,
+    366,
+    20,
+    38,
+    135,
+    1,
+    96,
+    12,
+    3,
+    19,
+    11,
+    11,
+    28,
+    21,
+    16,
+    69,
+    23,
+    1,
+    15,
+    12,
+    3,
+    12,
+    20,
+    25,
+    26,
+    27,
+    33,
+    107,
+    60,
+    1,
+    24,
+    9,
+    46,
+    26,
+    7,
+    1,
+    36,
+    43,
+    64,
+    24,
+    1,
+    45
+  ],
+  "sentence_counts": [
+    1259,
+    2379,
+    0,
+    64,
+    478,
+    11190,
+    1078,
+    6162,
+    5442,
+    3194,
+    4029,
+    5563,
+    5093,
+    9296,
+    0,
+    5029,
+    884,
+    3314,
+    4754,
+    3903,
+    3602,
+    1111,
+    1655,
+    4611,
+    0,
+    4204,
+    0,
+    5606,
+    34452,
+    4457,
+    1510,
+    0,
+    0,
+    0,
+    2656,
+    0,
+    0,
+    0,
+    0,
+    9788,
+    0,
+    20221,
+    0,
+    0,
+    3286,
+    1438,
+    7260,
+    1067,
+    16206,
+    1920,
+    0,
+    2275,
+    0,
+    2580,
+    0,
+    1568,
+    1970,
+    0,
+    6744,
+    0,
+    4509,
+    0,
+    0,
+    1903,
+    3445,
+    2421,
+    0,
+    6200,
+    1601,
+    8005,
+    0,
+    668,
+    5752,
+    2077,
+    2929,
+    8630,
+    6996,
+    8153,
+    43988,
+    6086,
+    0,
+    7797,
+    1617,
+    0,
+    0,
+    4345,
+    0,
+    4872,
+    766,
+    0,
+    0,
+    3333,
+    4259,
+    0,
+    11206,
+    2627,
+    2118,
+    0,
+    0,
+    4463
+  ],
+  "word_counts": [
+    33338,
+    62685,
+    0,
+    3387,
+    26317,
+    460353,
+    12344,
+    241146,
+    184479,
+    71481,
+    120773,
+    184222,
+    159527,
+    315540,
+    0,
+    157432,
+    31216,
+    78205,
+    104314,
+    67759,
+    104415,
+    35891,
+    51209,
+    78511,
+    0,
+    85429,
+    0,
+    103119,
+    888169,
+    174459,
+    31765,
+    0,
+    0,
+    0,
+    77339,
+    0,
+    0,
+    0,
+    0,
+    202692,
+    0,
+    562483,
+    0,
+    0,
+    66424,
+    34780,
+    208155,
+    57665,
+    349952,
+    58332,
+    0,
+    37858,
+    0,
+    65957,
+    0,
+    41312,
+    46719,
+    0,
+    161133,
+    0,
+    98166,
+    0,
+    0,
+    70466,
+    188667,
+    67136,
+    0,
+    128168,
+    39168,
+    115172,
+    0,
+    21935,
+    109534,
+    120793,
+    95628,
+    258277,
+    222464,
+    254555,
+    932070,
+    290286,
+    0,
+    242337,
+    48185,
+    0,
+    0,
+    68164,
+    0,
+    204513,
+    2194,
+    0,
+    0,
+    70151,
+    110570,
+    0,
+    353904,
+    69426,
+    14045,
+    0,
+    0,
+    135551
+  ],
+  "titles": [
+    [
+      "pg100-The_Complete_Works_of_William_Shakespeare_clean",
+      "The Complete Works of William Shakespeare",
+      21
+    ],
+    [
+      "pg103-Around_the_World_in_Eighty_Days_clean",
+      "Around the World in Eighty Days",
+      37
+    ],
+    [
+      "pg10554-Right_Ho,_Jeeves_clean",
+      "Right Ho, Jeeves",
+      0
+    ],
+    [
+      "pg1080-A_Modest_Proposal_clean",
+      "A Modest Proposal",
+      1
+    ],
+    [
+      "pg11-Alice's_Adventures_in_Wonderland_clean",
+      "Alice's Adventures in Wonderland",
+      12
+    ],
+    [
+      "pg1184-The_Count_of_Monte_Cristo_clean",
+      "The Count of Monte Cristo",
+      2
+    ],
+    [
+      "pg12474-Write_It_Right_A_Little_Blacklist_of_Literary_Faul_clean",
+      "Write It Right A Little Blacklist of Literary Faul",
+      1
+    ],
+    [
+      "pg1259-Twenty_years_after_clean",
+      "Twenty years after",
+      90
+    ],
+    [
+      "pg1260-Jane_Eyre_An_Autobiography_clean",
+      "Jane Eyre An Autobiography",
+      39
+    ],
+    [
+      "pg13415-The_Lady_with_the_Dog_and_Other_Stories_clean",
+      "The Lady with the Dog and Other Stories",
+      36
+    ],
+    [
+      "pg1342-Pride_and_Prejudice_clean",
+      "Pride and Prejudice",
+      60
+    ],
+    [
+      "pg1400-Great_Expectations_clean",
+      "Great Expectations",
+      61
+    ],
+    [
+      "pg141-Mansfield_Park_clean",
+      "Mansfield Park",
+      48
+    ],
+    [
+      "pg145-Middlemarch_clean",
+      "Middlemarch",
+      86
+    ],
+    [
+      "pg1513-Romeo_and_Juliet_clean",
+      "Romeo and Juliet",
+      0
+    ],
+    [
+      "pg158-Emma_clean",
+      "Emma",
+      55
+    ],
+    [
+      "pg16328-Beowulf_An_Anglo-Saxon_Epic_Poem_(1060)_clean",
+      "Beowulf",
+      43
+    ],
+    [
+      "pg16389-The_Enchanted_April_clean",
+      "The Enchanted April",
+      22
+    ],
+    [
+      "pg164-Twenty_Thousand_Leagues_under_the_Sea_clean",
+      "Twenty Thousand Leagues under the Sea",
+      46
+    ],
+    [
+      "pg16433-The_Gay_Cockade_clean",
+      "The Gay Cockade",
+      28
+    ],
+    [
+      "pg1661-The_Adventures_of_Sherlock_Holmes_clean",
+      "The Adventures of Sherlock Holmes",
+      4
+    ],
+    [
+      "pg16878-Observations_upon_the_Prophecies_of_Daniel,_and_th_clean",
+      "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
+      1
+    ],
+    [
+      "pg17157-Gulliver's_Travels_into_Several_Remote_Regions_of_clean",
+      "Gulliver's Travels into Several Remote Regions of",
+      34
+    ],
+    [
+      "pg174-The_Picture_of_Dorian_Gray_clean",
+      "The Picture of Dorian Gray",
+      20
+    ],
+    [
+      "pg17489-Les_misérables_Tome_I_Fantine_clean",
+      "Les misérables Tome I: Fantine",
+      0
+    ],
+    [
+      "pg18857-A_Journey_to_the_Centre_of_the_Earth_clean",
+      "A Journey to the Centre of the Earth",
+      44
+    ],
+    [
+      "pg1952-The_Yellow_Wallpaper_clean",
+      "The Yellow Wallpaper",
+      0
+    ],
+    [
+      "pg1998-Thus_Spake_Zarathustra_A_Book_for_All_and_None_clean",
+      "Thus Spake Zarathustra",
+      168
+    ],
+    [
+      "pg200-The_Project_Gutenberg_Encyclopedia,_Volume_1_of_28_clean",
+      "The Project Gutenberg Encyclopedia, Volume 1 of 28",
+      2
+    ],
+    [
+      "pg20228-Noli_Me_Tangere_clean",
+      "Noli Me Tangere",
+      2
+    ],
+    [
+      "pg215-The_call_of_the_wild_clean",
+      "The call of the wild",
+      7
+    ],
+    [
+      "pg2160-The_Expedition_of_Humphry_Clinker_clean",
+      "The Expedition of Humphry Clinker",
+      0
+    ],
+    [
+      "pg22914-The_Sceptical_Chymist_clean",
+      "The Sceptical Chymist",
+      0
+    ],
+    [
+      "pg236-The_Jungle_Book_clean",
+      "The Jungle Book",
+      0
+    ],
+    [
+      "pg23692-South_Africa_and_the_Transvaal_War,_Vol._1_(of_8)_clean",
+      "South Africa and the Transvaal War, Vol. 1 (of 8)",
+      9
+    ],
+    [
+      "pg24151-The_Sky_Trap_clean",
+      "The Sky Trap",
+      0
+    ],
+    [
+      "pg24571-Der_Struwwelpeter_clean",
+      "Der Struwwelpeter",
+      0
+    ],
+    [
+      "pg25305-Memoirs_of_Fanny_Hill_clean",
+      "Memoirs of Fanny Hill",
+      0
+    ],
+    [
+      "pg2542-A_Doll's_House_a_play_clean",
+      "A Doll's House a play",
+      0
+    ],
+    [
+      "pg2554-Crime_and_Punishment_clean",
+      "Crime and Punishment",
+      41
+    ],
+    [
+      "pg2591-Grimms'_Fairy_Tales_clean",
+      "Grimms’ Fairy Tales",
+      0
+    ],
+    [
+      "pg2600-War_and_Peace_clean",
+      "War and Peace",
+      366
+    ],
+    [
+      "pg26184-Simple_Sabotage_Field_Manual_clean",
+      "Simple Sabotage Field Manual",
+      0
+    ],
+    [
+      "pg26198-South_Africa_and_the_Transvaal_War,_Vol._2_(of_8)_clean",
+      "South Africa and the Transvaal War, Vol. 2 (of 8)",
+      0
+    ],
+    [
+      "pg2641-A_Room_with_a_View_clean",
+      "A Room with a View",
+      20
+    ],
+    [
+      "pg2643-The_History_of_John_Bull_clean",
+      "The History of John Bull",
+      38
+    ],
+    [
+      "pg2701-Mo_clean",
+      "Mo",
+      135
+    ],
+    [
+      "pg2707-The_History_of_Herodotus_—_Volume_1_clean",
+      "The History of Herodotus — Volume 1",
+      1
+    ],
+    [
+      "pg28054-The_Brothers_Karamazov_clean",
+      "The Brothers Karamazov",
+      96
+    ],
+    [
+      "pg289-The_Wind_in_the_Willows_clean",
+      "The Wind in the Willows",
+      12
+    ],
+    [
+      "pg2911-Justice_clean",
+      "Justice",
+      0
+    ],
+    [
+      "pg3011-The_Lady_of_the_Lake_clean",
+      "The Lady of the Lake",
+      3
+    ],
+    [
+      "pg30254-The_Romance_of_Lust_A_classic_Victorian_erotic_nov_clean",
+      "The Romance of Lust A classic Victorian erotic nov",
+      0
+    ],
+    [
+      "pg308-Three_men_in_a_boat_(to_say_nothing_of_the_dog)_clean",
+      "Three Men in a Boat",
+      19
+    ],
+    [
+      "pg31516-The_Eyes_Have_It_clean",
+      "The Eyes Have It",
+      0
+    ],
+    [
+      "pg3186-The_Mysterious_Stranger,_and_Other_Stories_clean",
+      "The Mysterious Stranger and Other Stories",
+      11
+    ],
+    [
+      "pg3189-Sketches_New_and_Old_clean",
+      "Sketches New and Old, Complete",
+      11
+    ],
+    [
+      "pg3201-Mo_clean",
+      "Mo",
+      0
+    ],
+    [
+      "pg345-Dracula_clean",
+      "Dracula",
+      28
+    ],
+    [
+      "pg35-The_Time_Machine_clean",
+      "The Time Machine",
+      0
+    ],
+    [
+      "pg36034-White_Nights_and_Other_Stories_clean",
+      "White Nights and Other Stories",
+      21
+    ],
+    [
+      "pg37106-Little_Women;_Or,_Meg,_Jo,_Beth,_and_Amy_clean",
+      "Little Women or Meg, Jo, Beth, and Amy",
+      0
+    ],
+    [
+      "pg383-She_Stoops_to_Conquer;_Or,_The_Mistakes_of_a_Night_clean",
+      "She Stoops to Conquer",
+      0
+    ],
+    [
+      "pg394-Cranford_clean",
+      "Cranford",
+      16
+    ],
+    [
+      "pg4085-The_Adventures_of_Roderick_Random_clean",
+      "The Adventures of Roderick Random",
+      69
+    ],
+    [
+      "pg41445-Frankenstein;_Or,_The_Modern_Prometheus_clean",
+      "Frankenstein; Or, The Modern Prometheus",
+      23
+    ],
+    [
+      "pg43-The_Strange_Case_of_Dr._Jekyll_and_Mr._Hyde_clean",
+      "The Strange Case of Dr. Jekyll and Mr. Hyde",
+      0
+    ],
+    [
+      "pg4300-Ulysses_clean",
+      "Ulysses",
+      1
+    ],
+    [
+      "pg4352-Laughter_An_Essay_on_the_Meaning_of_the_Comic_clean",
+      "Laughter: An Essay on the Meaning of the Comic",
+      15
+    ],
+    [
+      "pg46303-South_Africa_and_the_Transvaal_War,_Vol._6_(of_8)_clean",
+      "South Africa and the Transvaal War, Vol. 6 (of 8)",
+      12
+    ],
+    [
+      "pg5197-My_Life_—_Volume_1_clean",
+      "My Life",
+      0
+    ],
+    [
+      "pg5200-Metamorphosis_clean",
+      "Metamorphosis",
+      3
+    ],
+    [
+      "pg52026-Matthew_Calbraith_Perry_A_Typical_American_Naval_O_clean",
+      "Matthew Calbraith Perry A Typical American Naval O",
+      12
+    ],
+    [
+      "pg521-The_Life_and_Adventures_of_Robinson_Crusoe_clean",
+      "The Life and Adventures of Robinson Crusoe",
+      20
+    ],
+    [
+      "pg5225-The_Satyricon_—_Complete_clean",
+      "The Satyricon, Complete",
+      25
+    ],
+    [
+      "pg54279-A_history_of_the_Peninsular_War,_Vol._2,_Jan.-Sep._clean",
+      "A history of the Peninsular War, Vol. 2, Jan.-Sep.",
+      26
+    ],
+    [
+      "pg55231-A_history_of_the_Peninsular_War,_Vol._3,_Sep._1809_clean",
+      "A history of the Peninsular War, Vol. 3, Sep. 1809",
+      27
+    ],
+    [
+      "pg56812-A_history_of_the_Peninsular_War,_Vol._4,_Dec._1810_clean",
+      "A History of the Peninsular War. Vol. IV.",
+      33
+    ],
+    [
+      "pg57333-Project_Gutenberg_Compilation_of_Short_Stories_clean",
+      "Project Gutenberg Compilation of Short Stories",
+      107
+    ],
+    [
+      "pg580-The_Pickwick_Papers_clean",
+      "The Pickwick Papers",
+      60
+    ],
+    [
+      "pg6130-The_Iliad_clean",
+      "The Iliad",
+      1
+    ],
+    [
+      "pg62291-A_history_of_the_Peninsular_War,_Vol._5,_Oct._1811_clean",
+      "A history of the Peninsular War, Vol. 5, Oct. 1811",
+      24
+    ],
+    [
+      "pg64317-The_Great_Gats_clean",
+      "The Great Gats",
+      9
+    ],
+    [
+      "pg6593-History_of_Tom_Jones,_a_Foundling_clean",
+      "The History of Tom Jones, a Foundling",
+      0
+    ],
+    [
+      "pg6761-The_Adventures_of_Ferdinand_Count_Fathom_—_Complet_clean",
+      "The Adventures of Ferdinand Count Fathom — Complet",
+      0
+    ],
+    [
+      "pg67979-The_Blue_Castle_a_novel_clean",
+      "The Blue Castle a novel",
+      46
+    ],
+    [
+      "pg69087-The_murder_of_Roger_Ackroyd_clean",
+      "The murder of Roger Ackroyd",
+      0
+    ],
+    [
+      "pg7142-The_History_of_the_Peloponnesian_War_clean",
+      "The History of the Peloponnesian War",
+      26
+    ],
+    [
+      "pg7241-Fables_of_La_Fontaine_—_a_New_Edition,_with_Notes_clean",
+      "Fables of La Fontaine -- a New Edition, with Notes",
+      7
+    ],
+    [
+      "pg7255-Cambridge_Sketches_clean",
+      "Cambridge Sketches",
+      1
+    ],
+    [
+      "pg73144-Lady_Chatterley's_lover_clean",
+      "Lady Chatterley's lover",
+      0
+    ],
+    [
+      "pg74-The_Adventures_of_Tom_Sawyer,_Complete_clean",
+      "The Adventures of Tom Sawyer,",
+      36
+    ],
+    [
+      "pg76-Adventures_of_Huckleberry_Finn_clean",
+      "Adventures of Huckleberry Finn",
+      43
+    ],
+    [
+      "pg76407-Telephone_troubles_clean",
+      "Telephone troubles",
+      0
+    ],
+    [
+      "pg766-David_Copperfield_clean",
+      "David Copperfield",
+      64
+    ],
+    [
+      "pg84-Frankenstein;_Or,_The_Modern_Prometheus_clean",
+      "Frankenstein; Or, The Modern Prometheus",
+      24
+    ],
+    [
+      "pg844-The_Importance_of_Being_Earnest_A_Trivial_Comedy_f_clean",
+      "The Importance of Being Earnest",
+      1
+    ],
+    [
+      "pg8525-Eve's_Diary,_Complete_clean",
+      "Eve's Diary, Complete",
+      0
+    ],
+    [
+      "pg9070-The_Imaginary_Invalid_clean",
+      "The Imaginary Invalid",
+      0
+    ],
+    [
+      "pg98-A_Tale_of_Two_Cities_clean",
+      "A Tale of Two Cities",
+      45
+    ]
+  ],
+  "problematic_books": [
+    {
+      "file": "pg10554-Right_Ho,_Jeeves_clean.json",
+      "title": "Right Ho, Jeeves",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg1513-Romeo_and_Juliet_clean.json",
+      "title": "Romeo and Juliet",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg17489-Les_misérables_Tome_I_Fantine_clean.json",
+      "title": "Les misérables Tome I: Fantine",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg1952-The_Yellow_Wallpaper_clean.json",
+      "title": "The Yellow Wallpaper",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg2160-The_Expedition_of_Humphry_Clinker_clean.json",
+      "title": "The Expedition of Humphry Clinker",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg22914-The_Sceptical_Chymist_clean.json",
+      "title": "The Sceptical Chymist",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg236-The_Jungle_Book_clean.json",
+      "title": "The Jungle Book",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg24151-The_Sky_Trap_clean.json",
+      "title": "The Sky Trap",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg24571-Der_Struwwelpeter_clean.json",
+      "title": "Der Struwwelpeter",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg25305-Memoirs_of_Fanny_Hill_clean.json",
+      "title": "Memoirs of Fanny Hill",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg2542-A_Doll's_House_a_play_clean.json",
+      "title": "A Doll's House a play",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg2591-Grimms'_Fairy_Tales_clean.json",
+      "title": "Grimms’ Fairy Tales",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg26184-Simple_Sabotage_Field_Manual_clean.json",
+      "title": "Simple Sabotage Field Manual",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg26198-South_Africa_and_the_Transvaal_War,_Vol._2_(of_8)_clean.json",
+      "title": "South Africa and the Transvaal War, Vol. 2 (of 8)",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg2911-Justice_clean.json",
+      "title": "Justice",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg30254-The_Romance_of_Lust_A_classic_Victorian_erotic_nov_clean.json",
+      "title": "The Romance of Lust A classic Victorian erotic nov",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg31516-The_Eyes_Have_It_clean.json",
+      "title": "The Eyes Have It",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg3201-Mo_clean.json",
+      "title": "Mo",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg35-The_Time_Machine_clean.json",
+      "title": "The Time Machine",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg37106-Little_Women;_Or,_Meg,_Jo,_Beth,_and_Amy_clean.json",
+      "title": "Little Women or Meg, Jo, Beth, and Amy",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg383-She_Stoops_to_Conquer;_Or,_The_Mistakes_of_a_Night_clean.json",
+      "title": "She Stoops to Conquer",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg43-The_Strange_Case_of_Dr._Jekyll_and_Mr._Hyde_clean.json",
+      "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg5197-My_Life_—_Volume_1_clean.json",
+      "title": "My Life",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg6593-History_of_Tom_Jones,_a_Foundling_clean.json",
+      "title": "The History of Tom Jones, a Foundling",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg6761-The_Adventures_of_Ferdinand_Count_Fathom_—_Complet_clean.json",
+      "title": "The Adventures of Ferdinand Count Fathom — Complet",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg69087-The_murder_of_Roger_Ackroyd_clean.json",
+      "title": "The murder of Roger Ackroyd",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg73144-Lady_Chatterley's_lover_clean.json",
+      "title": "Lady Chatterley's lover",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg76407-Telephone_troubles_clean.json",
+      "title": "Telephone troubles",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg8525-Eve's_Diary,_Complete_clean.json",
+      "title": "Eve's Diary, Complete",
+      "issue": "no chapters detected"
+    },
+    {
+      "file": "pg9070-The_Imaginary_Invalid_clean.json",
+      "title": "The Imaginary Invalid",
+      "issue": "no chapters detected"
+    }
+  ]
+}
