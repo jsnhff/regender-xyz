@@ -14,6 +14,7 @@ import time
 
 # Import the unified API client
 from api_client import UnifiedLLMClient
+from model_configs import calculate_optimal_chunk_size, get_model_config
 
 # Import the multi-provider gender transformation logic  
 from gender_transform_v2 import transform_gender_with_context
@@ -146,12 +147,19 @@ def transform_chapter(
     transform_type: str,
     character_context: str,
     model: str = "gpt-4o-mini",
-    sentences_per_chunk: int = 50,
+    sentences_per_chunk: Optional[int] = None,
     verbose: bool = True
 ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-    """Transform a single chapter."""
+    """Transform a single chapter with model-aware chunking."""
     sentences = chapter['sentences']
     total_sentences = len(sentences)
+    
+    # Calculate optimal chunk size if not specified
+    if sentences_per_chunk is None:
+        sentences_per_chunk = calculate_optimal_chunk_size(sentences, model)
+        if verbose:
+            config = get_model_config(model)
+            print(f"    Using chunk size: {sentences_per_chunk} sentences (model: {model})")
     
     if verbose:
         print(f"  Processing {chapter['title']} ({total_sentences} sentences)...")
@@ -165,7 +173,9 @@ def transform_chapter(
         chunk = sentences[i:chunk_end]
         
         if verbose:
-            print(f"    Chunk {i//sentences_per_chunk + 1}/{(total_sentences + sentences_per_chunk - 1)//sentences_per_chunk}", end='', flush=True)
+            chunk_num = i//sentences_per_chunk + 1
+            total_chunks = (total_sentences + sentences_per_chunk - 1)//sentences_per_chunk
+            print(f"    Chunk {chunk_num}/{total_chunks} ({len(chunk)} sentences)", end='', flush=True)
         
         # Transform the chunk
         transformed_chunk, changes = transform_sentences_chunk(
