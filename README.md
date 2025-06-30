@@ -44,6 +44,7 @@ cd regender-xyz
 
 # Install dependencies
 pip install openai
+pip install beautifulsoup4  # Optional: for better Gutenberg downloads
 
 # Set your OpenAI API key
 export OPENAI_API_KEY='your-api-key'
@@ -131,8 +132,13 @@ regender-xyz/
 ├── book_parser/          # Modular parser (100% success rate)
 │   ├── patterns/        # Pattern definitions for various formats
 │   └── detectors/       # Smart section detection
+├── gutenberg_utils/     # Project Gutenberg tools
+│   ├── download_gutenberg_books.py
+│   ├── process_all_gutenberg.py
+│   └── README.md       # Detailed utilities documentation
 ├── regender_cli.py      # Main CLI entry point
 ├── regender_json_cli.py # JSON-based processing CLI
+├── gutenberg_cli.py     # Simple Gutenberg download/process CLI
 ├── book_to_json.py      # Book preprocessing interface
 ├── analyze_characters.py # Character analysis
 ├── gender_transform.py  # Gender transformation
@@ -149,6 +155,18 @@ The parser has been tested on 100 Project Gutenberg books with 100% success rate
 - 72 books parse with standard patterns
 - 28 edge cases handled with specialized patterns
 - Supports multiple languages and formats
+
+### Quick Start with Gutenberg Books
+
+```bash
+# Download and process top 100 books
+python gutenberg_cli.py pipeline
+
+# Process a specific Gutenberg book
+python regender_json_cli.py gutenberg_json/pg1342-Pride_and_Prejudice_clean.json -t feminine
+```
+
+See [gutenberg_utils/README.md](gutenberg_utils/README.md) for detailed documentation.
 
 ## License
 

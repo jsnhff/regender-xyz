@@ -8,10 +8,10 @@ env/
 venv/
 ENV/
 
-# Large data directories
-gutenberg_books/
-gutenberg_texts/
-gutenberg_json/
+# Large data directories (commented out - now tracked)
+# gutenberg_books/
+# gutenberg_texts/
+# gutenberg_json/
 clean_json_books/
 parsed_books/
 

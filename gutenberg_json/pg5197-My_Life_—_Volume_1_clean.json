@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "title": "My Life",
+    "author": "Richard Wagner",
+    "date": "February 1, 2004 [eBook #5197]",
+    "source": "Project Gutenberg",
+    "processing_note": "Cleaned with artifact removal and sentence splitting",
+    "format_version": "1.0"
+  },
+  "chapters": [
+    {
+      "number": "I",
+      "title": "PART I",
+      "sentences": [
+        "PART I 1813 I was born at Leipzig on the 22nd of May 1813, in a room on the second floor of the ‘Red and White Lion,’ and two days later was baptized at St. Thomas’s Church, and christened Wilhelm Richard."
+      ],
+      "sentence_count": 1,
+      "word_count": 41
+    },
+    {
+      "number": "II",
+      "title": "PART II",
+      "sentences": [
+        "PART II 1842 The journey from Paris to Dresden at that time took five days and nights.",
+        "On the German frontier, near Forbach, we met with stormy weather and snow, a greeting which seemed inhospitable after the spring we had already enjoyed in Paris.",
+        "And, indeed, as we continued our journey through our native land once more, we found much to dishearten us, and I could not help thinking that the Frenchmen who on leaving"
+      ],
+      "sentence_count": 3,
+      "word_count": 75
+    }
+  ],
+  "statistics": {
+    "total_chapters": 2,
+    "total_sentences": 4,
+    "total_words": 116,
+    "average_sentences_per_chapter": 2,
+    "average_words_per_sentence": 29
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "title": "Cambridge Sketches",
+    "author": "Frank Preston Stearns",
+    "language": "English",
+    "source_file": "pg7255-Cambridge_Sketches.txt",
+    "processing_note": "Parsed and cleaned for gender transformation",
+    "format_version": "2.0"
+  },
+  "chapters": [
+    {
+      "number": "1905",
+      "title": "1905",
+      "sentences": [],
+      "sentence_count": 0,
+      "word_count": 0
+    }
+  ],
+  "statistics": {
+    "total_chapters": 1,
+    "total_sentences": 0,
+    "total_words": 0,
+    "average_sentences_per_chapter": 0,
+    "average_words_per_chapter": 0
+  }
+}

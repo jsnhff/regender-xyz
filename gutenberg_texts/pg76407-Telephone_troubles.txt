@@ -1,0 +1,1309 @@
+﻿
+*** START OF THE PROJECT GUTENBERG EBOOK 76407 ***
+
+
+                          Transcriber’s Note
+
+In this transcription, bold text is denoted by =equal signs=. Small
+capitals in the original text have been transcribed as Title Case.
+
+See end of this document for details of corrections and other changes.
+
+
+              —————————————— Start of Book ——————————————
+
+
+
+
+                           TELEPHONE TROUBLES
+
+                       THEIR LOCATION AND REMEDY.
+
+
+                              BY E. M. WEV.
+
+
+                                NEW YORK:
+                       MCGRAW PUBLISHING COMPANY.
+                                  1907.
+
+
+
+
+                           Copyrighted, 1907,
+                                 by the
+
+                       McGraw Publishing Company,
+
+                                New York.
+
+
+
+
+                                  NOTE.
+
+
+In putting this little book before the telephone workers I do so
+with the idea of helping the beginner and furnishing a guide for the
+experienced man. It is composed of information gained by 15 years’
+practical experience.
+                                                     E. M. W
+April, 1907.
+
+
+
+
+                                CONTENTS.
+
+
+  CHAPTER.                                                    PAGE.
+
+  I.   Direct Line                                                1
+
+  II.  Two Party Line                                            14
+
+  III.  Four Party Set                                           17
+
+  IV.  How to Test For and Clear Troubles in
+
+       Private Branch Exchange Switchboards                      25
+
+       Inspection                                                40
+
+
+
+
+                           TELEPHONE TROUBLES.
+                                 ———————
+
+
+
+
+                                CHAPTER I.
+
+                             DIRECT LINE.[1]
+
+
+                        Bell Doesn’t Ring at all.
+
+May be caused by any of following:
+
+  1st. Condenser open.
+  2d.  Ringer open.
+  3d.  Hook contacts crossed.
+  4th. Desk stand cords or induction coil crossed.
+  5th. Extention bell open.
+  6th. Ringer short-circuited.
+  7th. Trouble at central office.
+
+1st. When condenser is open you will get weak hook clicks and side
+tones and hearing very weak. Prove by short-circuiting the condenser at
+the lugs with a test cord, which should make the ring of the bell and
+hearing O.K.
+
+(While the condenser is short-circuited you will get only one hook
+click.)
+
+2d. Only one hook click, the side tones normal, and the failure of the
+ringer armature to move when you raise or lower the hook, indicates
+that the ringer is open.
+
+Prove by replacing the receiver on the hook and then bridge across the
+condenser lugs with your head receiver; if you do not get a good click
+every time you make contact, the ringer is open.
+
+Or you can make the following test; open the strap at the top of the
+bell, then short-circuit the condenser lugs with a test cord; then
+connect one side of your head receiver to one of the line binding
+posts, and feel with the other side on the terminals of the ringer;
+if you get battery on one terminal and not on the other the ringer is
+certainly open.
+
+3d. Only one hook click, side tones normal, failure of the ringer
+armature to move when you raise and lower the hook, and the receiver in
+circuit while the hook is down, indicates that the hook contacts are
+crossed together. When this is the case, the bell will ring poorly or
+not at all, and the ring can be heard in the receiver when the hook is
+down. Open the receiver circuit at one of the receiver binding posts,
+this should allow the bell to ring all right.
+
+4th. Red and white strands of desk stand cord or primary and secondary
+of induction coil crossed together will generally cut down hearing;
+it may or may not cause only one hook click, and may or may not put
+battery through the receiver, and may wholly or only partly prevent
+the bell from ringing. Disconnect the strap on top of the bell and
+test with your head receiver from the G post to the L2 post; if you
+get battery there is a cross; disconnect the red and white strands
+of the desk stand cord, this will show whether the trouble is in the
+desk stand cord or in the bell. If it is in the bell, disconnect No.
+2 and No. 4 terminals of the induction coil, and test again, to prove
+certainly that the trouble is in the coil itself and not in the wiring.
+
+5th. If there is an auxiliary bell, and it is open, the set will test
+as though it had an open ringer. Test by short-circuiting the L2 and G
+posts, which cuts out the auxiliary bell and makes it a straight set
+for the time being.
+
+6th. If the ringer is short-circuited you will get battery through the
+receiver, which can be detected by listening while you short-circuit
+the receiver binding posts with your screw driver blade. To prove,
+disconnect the bridge from the top of the bell, and connect the two
+line wires to the L2 and G posts instead of the L2 and L1 posts;
+short-circuit the condenser lugs with a test cord, and then bridge your
+head receiver across the ringer terminals; if the ringer is all right
+you will get a heavy click, if it is completely short-circuited you
+will get no click at all, if it is partially short-circuited you will
+get a partial click.
+
+
+                           Bell Rings Weakly.
+
+May be caused by:
+
+  Poor adjustment of armature or gongs.
+
+  Pivot screws too loose or too tight.
+
+  Clapper rubbing on guard.
+
+  Wiring interfering with the clapper stem.
+
+  “Whiskers” on the magnet heads.
+
+  Magnet heads sticky or gummy.
+
+  Desk stand cord, induction coil, or hook contacts crossed.
+
+  One or both coils of the ringer partially short-circuited.
+
+  Polarizing magnet weak.
+
+  Carbons in protector dirty and generator current jumping across them.
+
+  Trouble at the central office.
+
+
+           Bridge on the Line, Steady Light at Central Office.
+
+Prove whether the trouble is in the instrument or not by disconnecting
+both sides of the line at the top of the bell and going in with your
+head receiver. If you get central the trouble is in the instrument and
+the same will be found either in the wiring, desk stand cords, or the
+hook. If opening the strap (see diagram No. 1) does clear the trouble,
+the leak is across through the ringer, and must be due to:
+
+1. Receiver contact of hook not breaking. If this is the case, opening
+the receiver circuit at one of the receiver binding posts will clear
+the trouble temporarily.
+
+2. White and green strands of the desk stand cord crossed together. If
+this is the trouble, disconnecting the cords from the bell will clear
+it.
+
+[Illustration: Fig. 1.]
+
+3. The condenser must be short-circuited if the trouble is not in the
+hook or cords; if the condenser is completely short-circuited, there
+will be but one hook click, but often there is enough resistance in a
+condenser short-circuit to give both hook clicks. To make sure that the
+trouble is in the condenser itself, and not in the wiring, disconnect
+one terminal of the condenser and go in series with your head receiver.
+
+
+             Instrument Entirely Dead, Nothing can be Heard
+                            in the Receiver.
+
+See first that you have battery at the top of the bell.
+
+The trouble may be due to:
+
+  1. Receiver circuit open.
+  2. Receiver short-circuited.
+
+1. If there is an open in the receiver circuit, it may be in either the
+receiver itself, the receiver cord, the white strand of the desk stand
+cord, the receiver contact of the hook, or the secondary; bridge your
+head receiver successively around these parts, when you bridge around
+the open you will get the side tones in the head receiver.
+
+2. To prove whether a receiver is short-circuited or not, connect your
+head receiver in series with it; if the head receiver responds while
+another receiver in series with it does not, the other one cannot be
+open, and therefore, must be short-circuited.
+
+
+          Transmitter out of Circuit, but Hearing not Entirely
+                                Cut Out.
+
+May be caused by:
+
+1. Open in green strand of desk stand cord, transmitter or transmitter
+   wiring.
+
+2. Transmitter short-circuited.
+
+3. Red and white strands of desk stand cord crossed together.
+
+1. No hook clicks, transmitter entirely dead, but can hear induction on
+the line, and can hear the effect of short-circuiting the line at the
+top of the bell indicates an open. Locate by connecting one terminal of
+your head receiver to the L1 post, and feeling with the other terminal
+successively on the several points of the transmitter circuit from the
+L2 post to the hook; as soon as you pass the open you will cease to get
+battery through the head receiver.
+
+2. Strong hook clicks, transmitter entirely or nearly dead, but can
+hear induction on the line and the effect of short-circuiting the line
+at the top of the bell, indicates transmitter short-circuited. Open at
+the transmitter and put your head receiver in series to see whether the
+trouble is a short-circuit inside of the transmitter head, or a cross
+of the transmitter cord or the green strand of the desk stand cord with
+the frame of the desk stand.
+
+3. Two hook clicks, but the transmitter dead and cannot hear induction
+on the line, and cannot hear the effect of short-circuiting the line at
+the top of the bell, and bell rings poorly or not at all, indicates red
+and white strands of the desk stand cord crossed together which short
+circuits the receiver while the hook is up. Disconnect the strap at the
+top of the bell, and test as previously directed from the G post to the
+L2 post; if you get battery the cord is crossed.
+
+
+                           Transmission Poor.
+
+May be due to:
+
+  1. Transmitter packed or otherwise bad.
+
+  2. Red strand of desk stand cord, primary, or hook contact open (in
+     which case the hearing will also be poor).
+
+  3. Primary or secondary reversed.
+
+  4. Primary and secondary crossed together (this will also affect the
+     hearing).
+
+  5. High resistance in the line or instrument.
+
+1. When a transmitter is believed to be packed, call the wire chief,
+being very careful not to shake it up or jar it, and get him to note
+the way it transmits; then shake it up thoroughly, and see what the
+effect is on transmission. When a transmitter is suspected of packing
+but you fail to catch it in the act, you can sometimes pack it by
+blowing gently into the mouth piece for a minute or so; but in making
+this test be careful not to condemn a good instrument, as almost any
+transmitter is liable to a certain amount of packing, and will come up
+stronger immediately after having been shaken up.
+
+When a transmitter is suspected of being otherwise defective a sure
+test can be made by temporarily swapping faces with some other
+instrument that is all right.
+
+2. Only one hook click and weak side tones indicate primary or red
+cord open. Connect one terminal of your head receiver to the L2 post
+and test with the other successively on the L1 post, No. 1 and No. 2
+terminals of the induction coil, red cord post in desk stand, hook
+spring, and hook; as soon as you pass the open you will not get battery.
+
+3. Examine 1 and 2, and 3 and 4 of the coil to see that they are
+not reversed, that is, see that the numbers of the coil terminals
+correspond with the numbers of the lugs that they connect to. If
+the coil is reversed internally, so that the numbers correspond but
+nevertheless one of the windings is wrong, it can only be detected
+by the man at the other end. Call up the wire chief or go to another
+instrument yourself and listen to the transmission from the suspected
+instrument; if the coil is reversed the transmission will be muffled.
+Prove by reversing either the primary or the secondary, which should
+clear the trouble.
+
+4. Test as previously directed for primary and secondary crossed
+together.
+
+5. Get the wire chief to test the resistance of the line, or test it
+yourself as follows: Bridge your lamp on at the top of the instrument,
+the lamp will burn rather dimly on an ordinary line, very dimly if it
+is a long line, or an extension line from a private branch exchange
+with a high resistance drops and retardation coils. (In the latter
+case the test can be made better after the operator has plugged up the
+line.) Next connect your line in series with the instrument, take the
+receiver off the hook, and compare the brightness of the lamp while the
+instrument is in circuit, and while it is cut out by short-circuiting
+the L1 and L2 posts. If there is much difference noticed there is a
+high resistance in the instrument. Forty ohms is a fair average for
+the resistance of a central battery instrument, but it may be higher or
+may be lower, it may run below 30 ohms. About 16 ohms of this is in the
+primary and the rest is in the transmitter.
+
+[Illustration: Fig. 2.]
+
+To prove that there is no resistance in the soldered connections or
+hook contact, short-circuit both the primary and the transmitter; this
+should cut out all of the resistance and completely short-circuit the
+instrument, so that you will get no battery from L1 to L2 posts when
+the hook is up.
+
+The resistance of a 24 volt test lamp is somewhere about 400 ohms cold
+and 240 ohms hot.
+
+
+                              Hearing Poor.
+
+May be due to:
+
+  1. Receiver bad.
+
+  2. Receiver cord or white strand of desk stand cord bad.
+
+  3. Condenser open.
+
+  4. Primary and secondary crossed together.
+
+  5. Primary short-circuited.
+
+  6. Secondary short-circuited.
+
+  7. High resistance in secondary circuit.
+
+There will be two hook clicks with any of the above troubles, but one
+of the clicks may be cut down more or less.
+
+1. Examine the receiver for dented diaphragms, “whiskers” on the
+magnets, magnets too close to diaphragm, or magnets weak; test by
+putting your head receiver in series with it and comparing the hearing.
+
+2. To test the receiver cord and the white strand of the desk stand
+cord, put battery through them and listen in the receiver for a cut out
+or scratchy sound while you shake them. Short-circuiting the condenser
+with a test cord puts battery through the receiver and its cords when
+the hook is up.
+
+3. If the condenser is open the ringer usually will not ring, but
+sometimes you can ring through a condenser that you cannot hear through
+at all. Test by short-circuiting it with a test cord.
+
+4. Primary and secondary crossed together will usually short-circuit
+the ringer and prevent your getting a ring. Test as previously directed.
+
+5. If the primary is short-circuited bridge your head receiver around
+it; you will get no click when the hook comes up, and no side tones.
+If the primary is all right you will get both clicks and side tones in
+your head receiver.
+
+6. A short-circuited secondary can be tested by exactly the same method
+as is given above for testing the primary.
+
+The above tests work very well if the primary or secondary is
+completely or nearly short-circuited, but if the short circuit is only
+partial it is very hard to detect. If you are in doubt, change the bell
+temporarily for another bell that is all right or change the induction
+coil, and compare results.
+
+7. To test for a high resistance in the secondary circuit, put battery
+through it by short-circuiting the condenser with a test cord while
+the hook up, then listen in the receiver while you short-circuit
+successively the receiver hook contact, the two sides of the receiver
+cord, the white strand of the desk stand cord, the wiring from receiver
+cord to secondary, from secondary to condenser, and from condenser to
+L2, and the secondary itself; when you short circuit out any part of
+the circuit that contains resistance, such as the secondary itself,
+more battery will flow through the receiver, giving you a click.
+
+An instrument in which the ringer is not connected, will, of course,
+give but one hook click.
+
+Reversals in the connecting up of desk stand cords may cause only
+one hook click or poor hook clicks, poor transmission, poor hearing,
+transmitter nearly dead, etc., according to the combination in which
+the three strands of the cord are connected.
+
+If the ground side of the line is open outside the set may be put in
+temporary service by working to a local ground.
+
+If the induction coil is bad, temporary service can be given, if
+necessary, by putting the transmitter and receiver in series, and
+properly poling the receiver.
+
+
+
+
+                               CHAPTER II.
+
+                             TWO PARTY LINE.
+
+
+                               No. 1 Set.
+
+(The battery side of the line goes to the L2 post.)
+
+Gives two hook clicks, and can be tested in very much the same way as
+a straight set, but the following points should be remembered: on sets
+that ring to ground an open ground will, like ringer open, cause the
+bell not to ring and only one hook click.
+
+Resistance in the ground may cause poor ring.
+
+Reversal of the three wires on top of the bell may cause only one hook
+click, bell not to ring, and transmitter nearly dead.
+
+Transmitter very poor may be caused by the ground side of the line
+being open outside. (You can still call the operator and talk, with
+difficulty through the ringer and ground.)
+
+
+                               No. 2 Set.
+
+Gives but one hook click, but otherwise can be tested in very much the
+same way as a straight set. Remember the following points:
+
+On sets that ring to ground:
+
+Ground open will prevent bell from ringing.
+
+Resistance in the ground may cause poor ringing.
+
+A ground on the ground side of the line may cause the bell to ring
+poorly or not at all by taking the generator current off to ground
+before it reaches the instrument.
+
+Condenser short-circuited will not only put a ground on the ground side
+of the line through the ringer, but on exchanges which use pulsating
+current for ringing will also cause bell to ring poorly or not at all.
+
+Reversals of the three wires on top of the bell may cause two hook
+clicks, bell not to ring, and transmitter nearly dead.
+
+On two-party sets, to find reversals of the wires at the top of the
+bell, trace out the wire to the protector, or else find out with your
+head receiver which one of the three wires is alive to both of the
+others, or to an independent ground. This one is the battery side of
+the line.
+
+To test for reversal of the ground wire with the ground side of the
+line, bridge your head receiver from an independent ground to the two
+doubtful wires successively. You will get induction on the line wire,
+and none on the ground wire. Or, bridge your receiver from the battery
+side of the line to the other two wires successively; the one that
+gives the most induction in this case is the ground wire. Or again,
+test by bridging your lamp from the battery side of the line to the
+other two wires successively. If the ground is good, bridging to it
+will give a brighter lamp than bridging to the ground side of the line;
+only a little brighter if the line is short, much brighter if the line
+is long.
+
+The above is also the way to test for a poor ground. The resistance
+of the ground return back to the central office should be less than
+the return through the cable, therefore the lamp should burn brighter
+on the ground wire than on the ground side of the line; very little
+brighter if the line is short, much brighter if the line is long.
+
+An extension bell open will prevent the main bell from ringing, just
+as in a straight set. Test by running a temporary ground, or by
+short-circuiting out the extension bell.
+
+If you are in doubt when testing a two party set, disconnect the ground
+wire and strap the bell, making it a straight set temporarily, and
+then test the ringing, transmission, and hearing. A straight set will
+respond to all rings, direct, two-party, and four-party.
+
+If on a two-party set the ground side of the line is open outside,
+temporary service may be given, if necessary, by working to the local
+ground.
+
+If the ground is open, temporary service can be given, if necessary, by
+converting to a straight set; but in this case the bells will respond
+to both calls.
+
+If second instrument is properly poled and bell rings when first
+station is being called, the trouble is probably due to party at first
+station taking his receiver off the hook before the operator has
+stopped ringing, and vice versa.
+
+
+
+
+                              CHAPTER III.
+
+                             FOUR-PARTY SET.
+
+
+                            (Diagram No. 3.)
+
+Tests of the transmitting and hearing circuits can be made in very much
+the same manner as in a straight set. On account of the relay coil
+being bridged between No. 2 and No. 3 terminals of the induction coil,
+a four-party desk set, if in perfect order, will give two hook clicks,
+no matter how it is poled.
+
+To make a perfectly sure test for primary and secondary crossed
+together, it is necessary to disconnect one terminal of the relay
+winding; then with the receiver on the hook, test from the L2 post to
+the secondary with your head receiver; if you get current there is a
+cross.
+
+Reversals of the three wires at the top of the instrument may cause a
+variety of troubles, just as in the two-party sets.
+
+
+                            Ringing Circuit.
+
+=Relay=: Failure of the relay to come up when the operator rings may be
+caused by:
+
+  Condenser open.
+
+  Relay short-circuited or open.
+
+  Hook contacts, or red and white strands of desk stand cord, or primary
+  and secondary of induction coil crossed together.
+
+  Primary open.
+
+  Trouble at central office.
+
+Test just as though it was a straight set except when testing for
+relay short circuited, or for a cross between primary and secondary,
+(in which case you must open one terminal of the relay winding, as
+previously directed); and except when testing for relay open, which you
+can do by bridging your head receiver from L2 post to No. 2 and No. 3
+terminals of the induction coil successively; you should get strong
+battery on No. 2 terminal, if the relay is all right and a strong
+condenser discharge when you make contact, but a weak battery click
+when you break contact, on No. 3 terminal.
+
+A ground on the ground side of the line may also prevent the relay from
+operating, by carrying the generator current off to ground before it
+reaches the instrument.
+
+If the relay is held up, usually the lamp is kept burning at the
+central office also, and this means that current is flowing from the
+central office over the battery side of the line, passing through
+the relay winding, and returning to the central office over the
+ground side of the line, or through the ground wire and ground. This
+condition may be due to:
+
+1st. Winding of relay crossed with frame. Test by disconnecting the “A”
+or “B” terminals of the ringer from L2 which should release the relay.
+
+2d. As in the case of current through the ringer of a straight set,
+the trouble may be caused by receiver contact of hook not breaking,
+white and green strands of desk stand cord crossed together, condenser
+short-circuited. Test as though it was a straight set.
+
+[Illustration: Fig. 3.]
+
+If the relay vibrates continuously the winding is probably crossed with
+the frame. To find out whether this is the case, disconnect the ground
+wire, which should stop the vibrating.
+
+If the relay “jumps” while the operator is ringing, instead of pulling
+up and staying up as long as the ringing current continues, the relay
+may be weak, due to a part of the winding being short-circuited out,
+or to some other cause; or there may be too many bells and relays on
+the line, so that, owing to the resistance of the line, not enough
+generator current will flow over it to divide up and give each bell and
+relay a proper amount of current; or there may be a slight ground on
+the line, which carries off a part of the ringing current.
+
+To prove that a relay is all right:
+
+1. Short-circuit the condenser; this should hold up the relay, by
+   putting battery current through it.
+
+2. Prove that the spring contact is not crossed with the frame as
+   follows: Disconnect “A” and “B”, then connect the frame of the
+   relay to battery with a test cord, and bridge from the spring
+   contact to ground with your head receiver; if you get no current
+   there is no cross.
+
+3. Prove that the winding is not crossed with the frame as follows:
+   Disconnect “A” and “B” and then test with your head receiver from
+   the frame to the L2 posts; if you get no battery there is no cross.
+
+=Ringer=: If the relay comes up, but the bell does not ring, the
+trouble may be due to:
+
+  Ringer poled wrong.
+
+  Bias spring too tight or too loose.
+
+  Ringer open.
+
+  Ground open.
+
+  Ringer short-circuited.
+
+Bridging your head receiver across the ringer while the operator is
+ringing will show whether or not you are getting generator current on
+the terminals of the ringer winding; going in series at the “A” and “B”
+terminal will show whether or not you are getting current through the
+ringer.
+
+To prove whether a ringer is open or not, connect “A” to battery, hold
+the relay closed, and then test from “B” to ground with your head
+receiver; if you get no current the circuit is open; prove that the
+open is in the ringer itself by testing direct from the two terminals
+of the winding successively.
+
+The ground can be tested in the same manner as on a two-party set.
+
+To prove that the ringer is short-circuited, connect “A” and “B” across
+the line, close the relay contact, and bridge across the terminals of
+the ringer winding with your head receiver; if you get no click the
+ringer must be short circuited; check this test by putting your head
+receiver in series with the ringer, while it is connected across the
+line, and closing the relay contact; this should give you a strong
+click if the ringer is short-circuited.
+
+=Bell ringing weak may be due to=:
+
+  Poor adjustment of armature.
+
+  Poor adjustment of bias spring.
+
+  Pivot screw too loose or too tight.
+
+  Clapper rubbing on guard.
+
+  Wiring interfering with clapper stem.
+
+  “Whiskers” on magnet head.
+
+  Magnet head sticky or gummy.
+
+  Polarizing magnet weak.
+
+  One or both coils of ringer partially short-circuited.
+
+  Too many bells and relays on the line.
+
+  Ground on one side of line which takes part of the generator current
+  off to ground before it reaches the instrument.
+
+  Trouble at central office.
+
+  Earth currents.
+
+To test for earth currents bridge your head receiver from the ground
+side of the line to the ground; you should get no current; if you do
+get current you will probably find that it varies continually, being
+due to trolley cars; report the matter to the chief inspector. In
+making this test be sure that the line is not in use; if the receiver
+is off the hook at any station on the line you will get a false test.
+
+Earth currents very often cause bell troubles on suburban stations,
+particularly those that lie near to trolley lines; but in the city,
+earth currents are seldom noticeable.
+
+=False rings may be caused by=:
+
+  Very strong earth currents.
+
+  One coil of ringer short-circuited.
+
+If a biased ringer has one coil short-circuited, then when it is poled
+for either 1st or 2d stations it will respond to both rings; and
+likewise when poled for 3d or 4th stations it will ring with either
+current.
+
+In the bell diagram No. 3 you will see that “B” connects to the spring
+contact of the relay, the frame of the relay connects to the biased
+side of the ringer, and the unbiased side of the ringer connects to “A.”
+
+In the older bells, “B” connects direct to the biased side of the
+ringer; the unbiased side of the ringer connects to the spring contact
+of the relay, and the frame of the relay connects to “A.”
+
+Therefore, in connecting an extension bell to a set that has no
+extension bell binding posts, connect one side of the wire to the frame
+screw of the relay, under the bottom of the set, and the other side to
+the post at the top of the bell that “A” connects with. Or solder one
+of the extension bell wires to the spring contact of the relay, and
+connect the other to the post at the top of the bell that “B” connects
+with. In every case the auxiliary bell must be connected across the
+terminals of the ringer without being bridged around the break of the
+relay. Pole the extension bell by reversing the wires either at the
+bell or at the set.
+
+=Ringer Adjustments=: In adjusting a biased ringer find out the two
+points where the bell ceases to ring on account of the bias spring
+being too tight and too loose, and adjust the spring half way between
+these points. To locate them, slack off the bias spring until it has
+no tension at all, and then get the operator to ring while you tighten
+up the spring, and note the point at which the bell commences to ring;
+continue to tighten the spring until the bell ceases to ring; by making
+the adjustment half-way between these two limits, you will have a
+margin both ways, so that if the generator rises a little above or
+falls a little below its proper voltage, the bell will still ring.
+
+The little set screw in the yoke at one end of the armature should be
+adjusted so as to hold the opposite or bias spring end of the armature
+a little away from the head of the magnet core; 0.02 of an inch, which
+is a little less than the diameter of a No. 22 cross-connecting wire,
+“In every test use a little judgment.”
+
+
+
+
+                               CHAPTER IV.
+
+                  HOW TO TEST FOR AND CLEAR TROUBLES IN
+                  PRIVATE BRANCH EXCHANGE SWITCHBOARDS.
+
+
+=Station can’t call=: When a station can’t call, the trouble may be due
+to the line being open, or too much resistance in the line; or to the
+signal being open, or short-circuited, or stuck.
+
+Short-circuit the line in the back of the switchboard or at correcting
+frame; if the signal does not operate plug up the jack with a plug and
+see if the cord signal will operate; if it will not the open is between
+the frame and the springs of the jacks if the cord signal will operate,
+the trouble is back of the jack springs, and may be an open, or it may
+be that the drop is short-circuited or stuck. Test with a receiver or
+lamp, if you get good battery on the locknuts but can’t throw the drop,
+it must be short-circuited or stuck; if you get no battery there is an
+open; short-circuit the inner contacts of the jack, and if this brings
+up the signal the open is in the jack; take the jack out and repair it.
+If short-circuiting the inner contacts will not operate the signal, the
+same may be open; test from the ground strap of the jack direct to the
+signal terminals; if the signal tests all right the wire leading from
+one side of the signal to one inner contact of the jack must be open;
+prove by short circuiting same out with a test cord.
+
+If there is battery on the jack but the signal won’t come up, push
+gently against the back of the armature of the signal with a tooth pick
+until it starts to raise; you can tell by the feeling if it is at all
+stuck.
+
+Another good way to tell whether the signal sticks is to go to the
+station and hold the receiver to your ear and then allow the hook to
+raise. When the signal flies up it can be heard in the receiver as a
+sort of “tremble.” This “tremble” should take place the instant the
+hook comes up; if it is delayed, the signal must be sticking.
+
+This test can also be made from the frame with a head receiver.
+
+To test whether the signal is short-circuited, see how brightly your
+lamp burns when connected at the frame and then compare with other
+signals which are all right; a signal which is wholly or partly
+short-circuited will have less resistance than the others, and the lamp
+will burn brighter.
+
+If the signal comes up from the frame but will not come up from the
+instrument, the line may have too much resistance and the signal will
+have to be adjusted so as to be more sensitive.
+
+If a station on a long line has trouble calling at times, there may be
+a poor connection in the circuit which varies; or it may be that the
+signal fails to work only when the board is busy, due to the drop in
+voltage on the battery feed when much current is being drawn from it;
+the signal will have to be adjusted more delicately or the battery feed
+increased.
+
+[Illustration: Fig. 4.]
+
+=Station Signal Stays up=: The line must be either crossed, or grounded
+on the battery side. Plug into the jack with a detached plug and cord,
+and then test successively on the ring and tip of the detached cord
+with a receiver or lamp that is connected to battery. This will show
+if there is a ground on either side of the line. If both sides test
+clear of grounds, there must be a cross; to prove this, ground the tip
+side by holding the tip of the detached cord on the tip of any other
+plug; if there is a cross the ring side will then test grounded. To
+locate the trouble, open the line successively at the frame cable box
+instrument, etc., and note the effect on the signal.
+
+In testing with a receiver for grounds or crosses on lines, you should
+be guided by the click when you break contact; otherwise, you are
+likely to be deceived by the electrostatic capacity of the line and
+condenser in the instrument. In such tests you may get a strong click
+when you make contact, particularly if the line runs through a cable,
+and you may also get plenty of induction on the line; but if you do not
+get a click when you break contact, there is no current flowing through
+your receiver, and therefore the line is clear.
+
+If plugging into the jack does not restore the signal, the trouble must
+be a cross in the jack, or in the signal itself. Examine the jack lugs,
+and also the inner end of the signal winding, which may be in contact
+with the iron mounting strip. If the trouble is not here, disconnect
+the wire going to the jack from the signal; this will show whether the
+trouble is in the signal itself.
+
+If the sleeve of a station jack is grounded, the cord circuit relay
+will operate when you plug into the jack, and cut the battery off of
+that pair of cords. Touching the tip of a plug to the sleeve of a
+station jack with the listening key thrown will show if the sleeve
+is grounded by giving a click in the operator’s receiver, the same as
+touching the sleeve of a trunk jack will do. The ground may be due to
+the sleeve being crossed with the sleeve of a trunk jack, or crossed
+with the sleeve of a station jack that is connected to a trunk jack; or
+it may be between the sleeve and the inner contact of the jack on the
+ground side.
+
+=Battery Feed and Trunks=: The battery feed and trunks must always be
+poled properly. To test the poling of the feed, run a temporary ground
+and touch it to the ring of the back plug. If this does not bring up
+the cord signal the feed is poled wrong, and the feed and ground will
+have to be reversed.
+
+To test the poling of a trunk, plug into the trunk-jack with the front
+plug of any pair, say No. 1 pair; then touch the tip of any other plug
+to the ring of the back plug of No. 1 pair; if this does not bring up
+the cord signal on No. 1 pair the trunk is poled wrong.
+
+One of the troubles caused by the wrong poling of a trunk is that
+if the operator plugs in to answer the trunk while she has another
+listening key thrown, her transmitter goes dead.
+
+If operator at the central office can’t throw a trunk drop at a private
+branch switchboard the same may be open, or the condenser may be open.
+Bridge a receiver across the drop; if you can get a good ring in the
+receiver the condenser is all right and the drop is probably open. If
+you can’t get a ring across the drop, short-circuit the condenser; if
+this puts battery through the drop and brings it up, the condenser must
+be open.
+
+If a cord circuit relay fails to operate on any trunk, the ground strap
+may be broken off of the jack. Plug up the jack, then touch the butt
+of the plug with the tip of a plug of any other pair; if this operates
+the relay, it shows that the sleeve of the jack did not operate it, and
+therefore the sleeve connection must be open.
+
+The sleeve connections are often taken off purposely on tie trunks.
+
+If the operator complains of central cutting her off, some of the
+holding coils may be open. Instructions are given further ahead for
+testing them.
+
+If plugging up a trunk causes the cord circuit relay to vibrate the
+battery feed or ground must be open.
+
+If the line or cord signals fail to come up properly the battery feed
+may be weak; this may be due to a poor connection in the feed or
+ground, or to one of the conductors of the feed being open, or to the
+feed being grounded through resistance. Bridge a lamp across the feed;
+it should burn brightly if no current is being used on the switchboard.
+Throw a listening key, or bridge a receiver across the feed; if this
+puts the lamp out, or dims it excessively, the feed or ground has a
+high resistance on it, or some of the conductors are open. Disconnect
+the conductors one at a time at the table head or protector, and see
+if each one will light your lamp properly. If the lamp burns dimly
+when no current is being used on the switchboard, the feed is probably
+grounded through resistance; disconnect it from the switchboard and
+test; if it still gives a dim lamp disconnect at the protector and test
+again to prove whether trouble is inside or outside.
+
+The amount that a lamp bridged across a battery feed will be dimmed
+by throwing a listening key or bridging on a receiver depends upon
+the resistance of the feed. If the feed is very long the lamp will be
+dimmed very much; if the feed is short or consists of several pair, the
+lamp will be dimmed but slightly. Each inspector should become familiar
+with the behavior of the battery feeds on all his important boards; he
+should know how the lamp burns when the board is idle, and how much it
+is dimmed when a certain number of connections are up, so that in case
+of trouble he can tell at once by a lamp test whether the feed is O.K.
+or whether it has too much resistance, or is partially grounded.
+
+
+                     Troubles Causing Bells to Ring.
+
+A swinging open or swinging ground on the battery feed causes the bells
+at the stations to ring by charging and discharging the condensers.
+
+Generator feed crossed with the battery feed causes bells to ring.
+Examine wiring and generator contacts at ringing keys.
+
+Where the spring of a station jack does not break from, or is crossed
+with the inner contact, all bells may be rung by ringing on that jack
+with power generator, which is always grounded on one side.
+
+If the outer contact of a ringing key makes before the inner contact
+breaks, all bells may be rung when that key is used, by the generator
+current passing down through one side of the retardation coil to the
+battery feed.
+
+
+                              Cord Circuit.
+
+Tip and sleeve crossed causes vibrating relay on that pair.
+
+Tip and ring crossed short-circuits the cord.
+
+Ring and sleeve crossed causes relay to vibrate when ring and tip of
+plug are short-circuited, or when the plug is put in a station jack
+with the station receiver off the hook,—sometimes merely throwing the
+listening key on that pair will make the relay vibrate.
+
+Touching ring to tip and tip to ring of the two plugs of any pair
+should give a spark, and the signal should also come up when the ring
+of the plug is touched with a tip. If there is trouble, take any
+other plug which is O.K. and test the bad pair; if both rings or both
+tips fail to give a spark, there is probably an open at the relay,
+the retardation coil, or the soldered connections on the listening
+key. If only one cord tests open, and the other one of the same pair
+tests O.K., ring on the bad cord and feel for generator current in the
+plug. If you get current, the open must be at the inner contact of
+the ringing key; or, it may be in the cord signal. If you cannot get
+generator on the plug, the open is in the cord.
+
+To locate any open that effects both cords, test successively on inner
+contacts and swinging contacts of relay, inner and outer lugs of
+retardation coil, and swinging contacts of listening key, you should
+get battery across all of these points.
+
+If either cord of a pair is short-circuited it short-circuits both
+cords and you will not get proper sparks when touching ring to tip
+and tip to ring but you may get small sparks. Also the operator’s
+transmitter will be dead on that pair of cords and if you test with a
+receiver or lamp you will get little or no battery between the ring
+and tip of either plug, but will get battery of about half the proper
+strength from either the ring or the tip of either plug to either the
+ring or the tip of a plug of any other pair.
+
+You can also tell whether a cord circuit is short-circuited by bridging
+your receiver around one half of the retardation coil; if there is a
+short-circuit, part of the current that is flowing around through the
+coil will go through your receiver, giving you a click.
+
+To locate the short-circuit, ring on the two cords successively, and
+feel on the plugs for generator. If both cords test clear, the trouble
+must be back of where the circuit branches at the listening key;
+disconnect successively at the relay, the retardation coil, and the
+listening key until you locate the trouble.
+
+In most of the private branch exchange switchboards the battery goes
+first to the inner contacts of the relay, then through the swinging
+contacts to the retardation coil, and from the retardation coil to the
+swinging contacts of the listening key; in other boards the battery
+goes first to the retardation coil, then through the relay contacts to
+the listening key. From the listening key it goes to the inner contacts
+of the ringing key, and from the swinging contacts of the ringing keys
+to the cord fasteners.
+
+If a cord circuit is open at the relay or retardation coil, it will
+still work on a trunk connection, the trunk supplying the battery, if
+the central office is common battery system.
+
+Lamp tests of the retardation coils and cord signals can be made by
+bridging a lamp across the bus-bars and then short-circuiting the tip
+and ring of every cord successively. Each one should dim the lamp
+the same amount; if one cord dims it less than the others, it shows
+that there is more resistance in that cord circuit—possibly a bad
+connection, or a cord signal with too much resistance. If one cord dims
+it more than the others, there must be less resistance in that cord
+circuit, probably one half of the retardation coil is short-circuited.
+(This test fails where there is a floater battery, or a battery feed of
+very low resistance.) To prove that one side of the retardation coil is
+short-circuited, short-circuit one of the plugs of that pair, and then
+bridge a receiver successively around the two sides of the coil, no
+click on one side should mean that that side was short-circuited.
+
+A finer test can be made by bridging the lamp across the tip and
+ring of the cord, and short-circuiting out the two sides of the coil
+successively; each side should brighten the lamp exactly the same
+amount. If one side brightens it more than the other, that side has
+more resistance than the other.
+
+Unbalanced coils are usually noisy, especially on long lines. An
+unbalanced coil can usually be detected by simply listening on each
+pair of cords, successively; if the battery feed induction is stronger
+on one pair than on the other, that pair is probably unbalanced.
+
+In most boards the holding coil is bridged across the outer contacts of
+the relay. In other boards one end of the coil connects to one swinging
+contact of the relay, and the other end to the opposite outer contact.
+To test the holding coil, plug into a trunk jack with the back plug
+and throw the listening key, which will bring up the cord signal, then
+throw the listening key normal. If the signal stays up the holding
+coil is O.K., if it disappears the holding coil circuit must be open.
+The trouble may be that the relay contact does not close, or the coil
+itself may be open.
+
+Test by plugging into a trunk with the back cord and then
+short-circuiting the holding coil; if the cord signal comes up
+the holding coil must be open; if it does not come up, leave the
+short-circuit on the coil and bridge out the holding coil contacts
+of the relay. When you bridge out the contact where the open is, the
+signal will come up.
+
+To test the relay on any cord circuit, touch the tip of any other plug
+to the sleeve of either plug of that pair; if this does not operate the
+relay the sleeve conductor of the cord may be open; if neither plug of
+the pair will operate it, the relay itself may be open; test with a
+receiver or lamp.
+
+Touching the tip of one plug to the sleeve of the other plug of the
+same pair should make the relay vibrate.
+
+To test a switchboard cord, plug into the cord testing jack (every
+board should have a testing jack connected to put battery direct on
+your head receiver) and shake the cord, and turn and shake the plug in
+the jack, while you listen in the operator’s receiver for any cut-off
+or bad connection. Do not have any listening key thrown while you
+are testing switchboard cords; also see that the operator’s receiver
+is poled so that the current from the cord strengthens the magnetism
+instead of weakening it otherwise you will not get a sensitive test.
+The tips and rings of the plugs must be clean, or else they will be
+scratchy.
+
+Be very careful that none of the plugs are bent or “lopsided;” such
+plugs may work all right in some jacks and cut-off in others. If
+turning a plug around in a jack causes a cut-off the plug should be
+condemned; sometimes the jack may be at fault, and the long spring will
+have to be given more “set.” After changing switchboard cords, always
+test the new ones for opens, short-circuits and reversals.
+
+=Cross-Talk=: Solder dropped on the cord fasteners, or a cross at the
+keys, may connect two different cord circuits together, and cause
+cross-talk between them.
+
+Retardation coils may be crossed with their cases, and cause cross-talk
+by the cases being in contact. Condensers on trunk drops may make two
+trunks cross talk in the same way. Test by bridging a receiver from
+the case of the suspected coil or condenser to battery and to ground
+successively. There will be no click if the case is clear.
+
+Unbalanced retardation coils, or a weak battery, may also cause
+cross-talk.
+
+A listening key that does not break contact on both sides will cause
+cross-talk when that pair of cords is used; if with all keys normal you
+get a click in the operator’s receiver when you touch the tip of any
+plug to the frame of the operator’s transmitter, the operator’s circuit
+is in contact with some cord circuit at the listening key. To find out
+which key, see that all keys are normal and then vibrate the relay on
+each pair of cords successively by touching the tip of one plug to the
+sleeve of the other; when you come to the pair where the cross is, the
+buzz will be heard plainly in the operator’s receiver; on the others it
+will be heard very faintly.
+
+=Operator’s Set=: To test the receiver cord, put a plug in the cord
+testing jack, this puts battery through the receiver, and by shaking
+the cord any fault will show up provided the receiver is poled
+properly. Do not have any listening key thrown when making this test.
+
+To test the transmitter cords, throw up any listening key and listen in
+the operator’s receiver while you shake the cords.
+
+To locate an open in the operator’s primary circuit, throw any
+listening key, and then bridge a receiver successively around the
+several parts of the circuit, that is, the 200 ohm resistance coil, the
+transmitter, (including its cords), and the primary. When you bridge
+around the part that is open, you will get a click in the receiver.
+
+To locate an open in the secondary circuit, short-circuit out the
+condenser so as to get battery through the circuit and then bridge
+around the receiver and secondary with a receiver until you have found
+where the open is.
+
+=Buzzer and Buzzer Relay=: If a buzzer which works off the battery feed
+fails to operate at times, although the buzzer relay comes up, probably
+it is not sensitive enough, and when the board is busy the battery feed
+it not strong enough for it. Adjust the buzzer more delicately and
+test it when the board is idle and when it is busy. To make a board
+busy artificially, bridge a head receiver across the bus-bars; that is
+equivalent to several pairs of connections being up.
+
+If some of the station lines are very long, the buzzer relay may fail
+to come up on them, or come up so weakly as not to make good contact.
+To cure this, adjust the relay more delicately.
+
+If a trunk drop won’t operate the buzzer relay when the key is up, the
+trouble is probably at the night bell contact of the drop. If none
+of the trunk drops will operate it, the relay may not be adjusted
+delicately enough, or the 500 ohm resistance coil may be open. Bridge
+around the trunk drop contacts with a receiver. If you get no battery
+the coil must be open; prove by bridging the coil out and repeating the
+test.
+
+A heavy ground on the ground side of any station line will prevent the
+buzzer relay from coming up by shunting it out. A light ground will
+sometimes cause trouble on the long lines only.
+
+A short-circuited condenser or a slight leak across any line or lines,
+may hold up the buzzer relay. Test the lines for crosses and grounds,
+as previously instructed. If the buzzer relay comes up at times when
+no signal is up, the trouble may be due to some station on a long line
+trying to call, and the signal not sensitive enough to come up.
+
+
+                                General.
+
+To prove that a board is perfectly clear, disconnect the battery feed
+from the negative bus-bar, and put a lamp or receiver in series. If you
+get no current then all the lines are free from crosses, they are free
+from grounds on the battery side, and the other circuits in the board
+are also clear of crosses. (This test can only be made when there are
+no connections up, no listening keys thrown, and no stations calling.)
+To prove that the ground sides of all the lines are clear, disconnect
+both the feed and ground wires from the bus-bars, and then test through
+a lamp or receiver from the battery feed to the ground bus-bar; if you
+get no current, the lines are all clear on the ground side.
+
+
+
+
+                               INSPECTION
+
+                How to Inspect Subscribers’ Instruments.
+
+
+1st.—Ask the subscriber if his instrument works properly and repair
+any defect that he reports. Also be sure the instrument is securely
+fastened to the wall or desk.
+
+2d.—Clean and polish the varnished and nickeled parts of the
+instrument; open the bell and see that it is clean and in proper
+condition inside, and that the hook, ringer, and other moving parts
+work properly and clean the hook contacts with paper if they are dirty
+or make a scratching noise in the receiver.
+
+3d.—See that all binding post connections are tight, test all cords; in
+testing the receiver cord, put battery through it by short-circuiting
+the condenser; change any cords or other parts that are defective or
+unsightly.
+
+4th.—Clean the receiver outside, remove the cap and examine the
+diaphragm and clean the magnets; in cleaning the magnets rub them off
+with your coat sleeve or a clean rag rather than with your hands, as
+the moisture from your hand will cause them to rust.
+
+5th.—Examine the adjustment of the bell and test by getting a ring from
+the operator, at the same time test the transmission and hearing.
+
+Test all extention bells by getting a ring from the operator; inspect
+all other apparatus, such as hand generators, switches, local
+batteries, fans booths and signs. It is important that signs should be
+kept in good condition; dirty or unsightly ones should be cleaned or
+ordered changed, and you should be particularly careful to see that all
+signs are securely hung.
+
+6th.—Inspect all wiring, including the leading in wires, the inside
+line wires, the battery wires and the ground wires; also the
+protection, the fuses, any extention bells and also see that the
+ground is properly made that it is connected to the proper pipes. If a
+gas pipe has been used see that the bridge on the meter has not been
+disturbed since the last inspection.
+
+7th.—See that the protector contains the proper kind of fuses, and if
+it can be gotten at readily; examine the connections and remove the cap
+from over the carbons to see that no one has left the carbons out.
+
+8th.—If a subscriber applies to you to have an additional instrument
+installed, take his name and address and turn them in to the manager;
+if he wants his telephone moved or disconnected, or circuit number
+changed, or extention bell or sign installed, request him to call up
+the managers office.
+
+If he complains of poor operating service, or of interference by other
+subscribers on his line, refer him to the manager.
+
+If he complains of some trouble that is in the outside line or at the
+central office, report the matter to the chief inspector at once.
+
+9th.—In making recommendations, state briefly but plainly just what you
+want done and give the reason why. If the installer has done any work
+at the station since your last inspection, and has failed to leave it
+in proper condition, accompany the recommendation that you make with a
+written complaint.
+
+
+             Making First Inspections of New Installations.
+
+In inspecting a new installation, or an instrument that has been
+moved or changed since your last inspection, or in going over your
+instruments for the first time, the inspection should be made more
+carefully than at other times.
+
+Ask the subscriber if he has any extention stations, extention bells
+or other apparatus attached to his instrument, also look out for them
+while you are making the inspection and tracing out the wiring.
+
+Open the desk stand and see that all the locknuts are tight and
+soldered connections are perfect.
+
+Examine and shake all soldered connections in the bell.
+
+Trace out all of the wiring and be sure to see that all splices are
+properly soldered and taped and see that no tacks are driven in the
+splice.
+
+Make a lamp or receiver test of the protector and the instrument
+ground, to see that they are good and have no resistance.
+
+See that the protector is securely fastened, that the connections are
+all tight, that the fuses and carbons are of the proper kind, and that
+the micas have the open side down.
+
+Test the fuses for loose connections inside, by bridging your head
+receiver across the binding post at the instrument end of the protector
+and listening for a cut-off, while you shake and jar the fuses.
+
+Test all switches to see that they make all proper connections, oil the
+hand generators and see that the bell clapper works freely.
+
+See that the specifications have been complied with in placing the
+protector and the instrument, in running all the wire, and in every
+other particular; that the desk stand cords are cleated, and protection
+cleats used where needed; that desk sets give two hook clicks; that
+snap switches are of the indicating type; that the connections to all
+binding posts are neat and of proper length; that the booth is clean
+and have plugs in all the screw holes; that they have no broken glass
+and have linoleum on the floor, and that the doors and latches all work
+freely.
+
+See that the protector is placed so as not to be in the way of
+curtains; that no damage has been done to the subscribers property;
+that all apparatus has been installed so that it will not be in his
+way, and will not be exposed to disfigurement, damage, trouble from
+dampness or rain, etc., that wire is run where it will be safe from
+injury, dampness and wear; in short, see that the installation is done
+according to specifications in every respect.
+
+See that the cut-in (the wires from the pole to the house) are properly
+made and are of the proper kind of wire.
+
+                 DON’T FORGET THAT YOUR REPUTATION AS AN
+                         INSPECTOR IS AT STAKE.
+
+
+
+
+                                FOOTNOTE
+
+[1] Where reference is made to “hook clicks” in these instructions, the
+instrument is understood to be a desk stand, wall sets are so connected
+as to give only one hook click on raising or lowering the hook.
+
+When reference is made to the red, white or green strand of the desk
+stand cord, it is understood that the red goes to the hook, the white
+to the receiver and the green to the transmitter, using the standard
+Western Electric cord.
+
+When reference is made to L1, L2 or G you will find them on diagram
+No. 1 or No. 2. When reference is made to “A” or “B” you will find
+them on diagram No. 3.
+
+               —————————————— End of Book ——————————————
+
+
+                    Transcriber’s Note (continued)
+
+  Page 42 – “deskstand” changed to “desk stand” (Open the desk stand)
+
+  Page 43 – “lineoleum” changed to “linoleum” (have linoleum on the
+            floor)
+
+  Footnote – “G1” changed to “G” (When reference is made to L1, L2 or G)
+
+The words “extension” and “extention” are used interchangeably throughout
+the book and have been left unchanged. Some missing punctuation and other
+minor typographical errors have been corrected without note.
+
+The single footnote has been placed at the end of the book.
+
+
+
+
+
+*** END OF THE PROJECT GUTENBERG EBOOK 76407 ***
