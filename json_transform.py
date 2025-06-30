@@ -18,7 +18,7 @@ from model_configs import calculate_optimal_chunk_size, get_model_config
 from token_utils import smart_chunk_sentences, estimate_tokens
 
 # Import the multi-provider gender transformation logic  
-from gender_transform_v2 import transform_gender_with_context
+from gender_transform import transform_gender_with_context
 from analyze_characters import analyze_characters
 
 # Progress indicators

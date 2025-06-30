@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Gender transformation module for modifying gender representation in text.
+Gender transformation module v2 with multi-provider support.
+
+This version supports both OpenAI and Grok APIs through a unified interface.
 """
 
 import json
@@ -8,12 +10,11 @@ import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 
-from openai import OpenAI
-
 from utils import (
-    load_text_file, save_text_file, get_openai_client,
+    load_text_file, save_text_file, get_llm_client,
     cache_result, safe_api_call, APIError, FileError
 )
+from api_client import UnifiedLLMClient, APIResponse
 
 # Import pronoun validator
 try:
@@ -22,7 +23,7 @@ try:
 except ImportError:
     VALIDATOR_AVAILABLE = False
 
-# Transformation types
+# Transformation types (same as original)
 TRANSFORM_TYPES = {
     "feminine": {
         "name": "Feminine",
@@ -50,374 +51,256 @@ TRANSFORM_TYPES = {
     },
     "neutral": {
         "name": "Gender-neutral",
-        "description": "Transform text to use gender-neutral language with Mx. as the title",
+        "description": "Transform text to use gender-neutral pronouns and references",
         "changes": [
-            "'Mr./Ms./Mrs./Miss' to 'Mx.'", 
-            "'he/she' to 'they'",
-            "'him/her' to 'them'",
-            "'his/her' to 'their'",
-            "Gender-specific terms to neutral alternatives"
+            "'Mr./Ms./Mrs./Miss' to 'Mx.'",
+            "'he/him/his' and 'she/her/her' to 'they/them/their'",
+            "'man/woman' to 'person'",
+            "'husband/wife' to 'spouse/partner'",
+            "'father/mother' to 'parent'",
+            "'gentleman/lady' to 'individual'"
         ]
     }
 }
 
-@safe_api_call
-@cache_result()
-def transform_gender(text: str, transform_type: str, model: str = "gpt-4") -> Tuple[str, List[str]]:
-    """Transform text to use specified gender pronouns and references.
+
+def create_transformation_prompt(text: str, transform_type: str, character_context: Optional[str] = None) -> str:
+    """Create the transformation prompt for the LLM."""
     
-    Args:
-        text: The text to transform
-        transform_type: Type of transformation (feminine, masculine, neutral)
-        model: The OpenAI model to use
-        
-    Returns:
-        Tuple containing (transformed_text, list_of_changes)
-        
-    Raises:
-        ValueError: If the transform type is invalid
-        APIError: If there's an issue with the API call
-    """
-    if transform_type not in TRANSFORM_TYPES:
-        raise ValueError(f"Invalid transform type: {transform_type}. "  
-                         f"Must be one of: {', '.join(TRANSFORM_TYPES.keys())}")
-    
-    client = get_openai_client()
     transform_info = TRANSFORM_TYPES[transform_type]
+    changes_list = '\n'.join(f"  - {change}" for change in transform_info['changes'])
     
-    system_prompt = f"""
-    You are an expert at gender transformation in literature.
-    Your task is to transform text to use {transform_info['name'].lower()} pronouns and gender references.
-    Follow these rules:
-    1. Change character gender references appropriately
-    2. Adjust all gendered terms consistently
-    3. Keep proper names but change pronouns referring to them
-    4. Maintain the original writing style and flow
-    5. Be thorough - don't miss any gendered references
-    6. Pay special attention to possessive pronouns in relationship contexts (e.g., 'his wife' → 'her wife' when the subject is feminine)
-    7. Ensure complete consistency in pronoun usage throughout the text
-    8. Double-check all instances of 'his', 'her', 'him', 'she', 'he' to ensure they match the intended gender
-    9. For neutral transformations, replace 'Mr./Mrs./Ms./Miss' with 'Mx.' rather than removing titles completely
-    10. Return your response as a valid JSON object
-    """
+    prompt = f"""Transform the following text to use {transform_info['name'].lower()} gender representation.
+
+Key changes to make:
+{changes_list}
+
+IMPORTANT RULES:
+1. Transform ALL gendered language consistently throughout the text
+2. Maintain the original meaning, tone, and style
+3. Keep all punctuation, formatting, and paragraph structure EXACTLY as in the original
+4. Do not add or remove any content
+5. Make the transformations sound natural in context
+6. Be consistent - if a character is transformed to feminine, ALL references to that character should be feminine
+
+Text to transform:
+{text}
+
+Return your response in the following JSON format:
+{{
+    "transformed_text": "the complete transformed text",
+    "changes_made": ["list of specific changes made"],
+    "characters_affected": ["list of character names whose gender was changed"]
+}}"""
+
+    if character_context:
+        prompt = f"""Based on this character analysis:
+{character_context}
+
+{prompt}"""
     
-    user_prompt = f"""
-    {transform_info['description']}.
-    Make these specific changes:
-    {chr(10).join(f"{i+1}. Change {change}" for i, change in enumerate(transform_info['changes']))}
-    
-    IMPORTANT: If this is a neutral transformation, replace all instances of Mr., Mrs., Ms., and Miss with Mx. 
-    For example: "Mr. Bennet" should become "Mx. Bennet" NOT just "Bennet".
-    
-    Return your response as a json object in this exact format:
-    {{
-        "text": "<the transformed text>",
-        "changes": ["Changed X to Y", ...]
-    }}
-    
-    Text to transform:
-    {text}
-    """
-    
-    print(f"Applying {transform_info['name']} transformation using model: {model}...")
-    
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0
-    )
-    
-    try:
-        result = json.loads(response.choices[0].message.content)
-        if 'text' not in result or 'changes' not in result:
-            raise APIError("API response missing required fields: 'text' and/or 'changes'")
-        return result['text'], result['changes']
-    except json.JSONDecodeError as e:
-        raise APIError(f"Failed to parse API response as JSON: {e}")
-    except KeyError as e:
-        raise APIError(f"Missing required field in API response: {e}")
+    return prompt
 
 
 @safe_api_call
-@cache_result()
-def transform_gender_with_context(text: str, transform_type: str, character_context: str, model: str = "gpt-4") -> Tuple[str, List[str]]:
-    """Transform text to use specified gender pronouns and references with character context.
+@cache_result(cache_dir=".cache/transformations")
+def transform_text_with_llm(text: str, transform_type: str, 
+                           character_context: Optional[str] = None,
+                           model: Optional[str] = None,
+                           provider: Optional[str] = None) -> Dict[str, Any]:
+    """Transform text using the specified LLM provider.
     
     Args:
-        text: The text to transform
-        transform_type: Type of transformation (feminine, masculine, neutral)
-        character_context: Context about characters in the text
-        model: The OpenAI model to use
+        text: Text to transform
+        transform_type: Type of transformation
+        character_context: Optional character analysis context
+        model: Optional model override
+        provider: Optional provider override ('openai' or 'grok')
         
     Returns:
-        Tuple containing (transformed_text, list_of_changes)
-        
-    Raises:
-        ValueError: If the transform type is invalid
-        APIError: If there's an issue with the API call
+        Dictionary with transformation results
     """
-    if transform_type not in TRANSFORM_TYPES:
-        raise ValueError(f"Invalid transform type: {transform_type}. "  
-                         f"Must be one of: {', '.join(TRANSFORM_TYPES.keys())}")
+    client = get_llm_client(provider)
     
-    client = get_openai_client()
-    transform_info = TRANSFORM_TYPES[transform_type]
+    prompt = create_transformation_prompt(text, transform_type, character_context)
     
-    system_prompt = f"""
-    You are an expert at gender transformation in literature.
-    Your task is to transform text to use {transform_info['name'].lower()} pronouns and gender references.
-    Follow these rules:
-    1. Change character gender references appropriately
-    2. Adjust all gendered terms consistently
-    3. Keep proper names but change pronouns referring to them
-    4. Maintain the original writing style and flow
-    5. Be thorough - don't miss any gendered references
-    6. Pay special attention to possessive pronouns in relationship contexts (e.g., 'his wife' → 'her wife' when the subject is feminine)
-    7. Ensure complete consistency in pronoun usage throughout the text
-    8. Double-check all instances of 'his', 'her', 'him', 'she', 'he' to ensure they match the intended gender
-    9. For neutral transformations, replace 'Mr./Mrs./Ms./Miss' with 'Mx.' rather than removing titles completely
-    10. Return your response as a valid JSON object
-    """
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a literary transformation assistant that modifies gender representation in text while preserving the original style and meaning."
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
     
-    user_prompt = f"""
-    {transform_info['description']}.
-    Make these specific changes:
-    {chr(10).join(f"{i+1}. Change {change}" for i, change in enumerate(transform_info['changes']))}
-    
-    IMPORTANT: If this is a neutral transformation, replace all instances of Mr., Mrs., Ms., and Miss with Mx. 
-    For example: "Mr. Bennet" should become "Mx. Bennet" NOT just "Bennet".
-    
-    Use the following character information to guide your transformation:
-    {character_context}
-    
-    Here is the text to transform:
-    
-    {text}
-    
-    Return a JSON object with these fields:
-    1. "text": The transformed text
-    2. "changes": A list of specific changes made (e.g., "Changed 'Mr. Darcy' to 'Ms. Darcy'")
-    """
-    
-    response = client.chat.completions.create(
+    # Call the LLM
+    response = client.complete(
+        messages=messages,
         model=model,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0.2,
-        response_format={"type": "json_object"}
+        temperature=0,
+        response_format={"type": "json_object"} if client.get_provider() == "openai" else None
     )
     
+    # Parse the response
     try:
-        result = json.loads(response.choices[0].message.content)
-        if 'text' not in result or 'changes' not in result:
-            raise APIError("API response missing required fields: 'text' and/or 'changes'")
-        return result['text'], result['changes']
-    except json.JSONDecodeError as e:
-        raise APIError(f"Failed to parse API response as JSON: {e}")
-    except KeyError as e:
-        raise APIError(f"Missing required field in API response: {e}")
-
-@safe_api_call
-@cache_result()
-def verify_transformation(text: str, target_gender: str, model: str = "gpt-4") -> List[Dict[str, str]]:
-    """Verify that a gender transformation was applied correctly.
-    
-    Args:
-        text: The transformed text to verify
-        target_gender: The target gender of the transformation (feminine, masculine, neutral)
-        model: The OpenAI model to use
+        result = json.loads(response.content)
         
-    Returns:
-        List of dictionaries containing missed transformations with context
+        # Add provider info
+        result['provider'] = client.get_provider()
+        result['model'] = response.model
         
-    Raises:
-        ValueError: If the target gender is invalid
-        APIError: If there's an issue with the API call
-    """
-    if target_gender not in TRANSFORM_TYPES:
-        raise ValueError(f"Invalid target gender: {target_gender}. "  
-                         f"Must be one of: {', '.join(TRANSFORM_TYPES.keys())}")
-    
-    client = get_openai_client()
-    
-    opposite_genders = {
-        "feminine": "male",
-        "masculine": "female",
-        "neutral": "gendered"
-    }
-    
-    check_for = opposite_genders[target_gender]
-    
-    system_prompt = f"""
-    You are an expert at finding gendered language in text.
-    Your task is to identify any remaining {check_for} pronouns or gender references.
-    Be thorough and catch subtle references.
-    """
-    
-    user_prompt = f"""
-    Check this text for any remaining {check_for} pronouns or gender references.
-    Return a JSON array of objects with the following structure:
-    [{{
-        "reference": "the {check_for} reference found",
-        "context": "the surrounding text with the reference",
-        "suggestion": "suggested replacement"
-    }}]
-    
-    If no {check_for} references are found, return an empty array.
-    
-    Text to check:
-    {text}
-    """
-    
-    print(f"Verifying {target_gender} transformation using model: {model}...")
-    
-    response = client.chat.completions.create(
-        model=model,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        temperature=0
-    )
-    
-    try:
-        result = json.loads(response.choices[0].message.content)
-        if isinstance(result, list):
-            return result
-        elif isinstance(result, dict) and "references" in result:
-            return result["references"]
-        else:
-            return []
+        return result
     except json.JSONDecodeError as e:
-        raise APIError(f"Failed to parse verification response as JSON: {e}")
+        raise APIError(f"Failed to parse LLM response as JSON: {e}\nResponse: {response.content}")
 
-def transform_text_file(file_path: str, transform_type: str, output_path: str = None, model: str = "gpt-4", **options) -> Tuple[str, List[str]]:
+
+def transform_text_file(input_file: str, output_file: str, transform_type: str,
+                       analysis_file: Optional[str] = None,
+                       model: Optional[str] = None,
+                       provider: Optional[str] = None) -> Dict[str, Any]:
     """Transform gender representation in a text file.
     
     Args:
-        file_path: Path to the text file to transform
-        transform_type: Type of transformation (feminine, masculine, neutral)
-        output_path: Optional path to save the transformed text
-        model: The OpenAI model to use
+        input_file: Path to input text file
+        output_file: Path to output text file
+        transform_type: Type of transformation
+        analysis_file: Optional character analysis file
+        model: Optional model override
+        provider: Optional provider override ('openai' or 'grok')
         
     Returns:
-        Tuple containing (transformed_text, list_of_changes)
-        
-    Raises:
-        FileError: If there's an issue with the input or output files
-        APIError: If there's an issue with the API call
-        ValueError: If the transform type is invalid
+        Transformation results
     """
-    # Read input text
-    text = load_text_file(file_path)
+    # Load the text
+    text = load_text_file(input_file)
     
-    # Transform text
-    transformed, changes = transform_gender(text, transform_type, model)
+    # Load character context if provided
+    character_context = None
+    if analysis_file:
+        try:
+            with open(analysis_file, 'r') as f:
+                analysis_data = json.load(f)
+                # Format character information
+                char_lines = []
+                for char_name, char_info in analysis_data.get('characters', {}).items():
+                    gender = char_info.get('gender', 'unknown')
+                    role = char_info.get('role', 'character')
+                    char_lines.append(f"- {char_name}: {gender} ({role})")
+                if char_lines:
+                    character_context = "Characters in the text:\n" + '\n'.join(char_lines)
+        except Exception as e:
+            print(f"Warning: Could not load character analysis: {e}")
     
-    # Apply character name customizations if provided
-    character_customizations = options.get('character_customizations', {})
-    if character_customizations:
-        print("\nApplying character name customizations...")
-        for original_name, new_name in character_customizations.items():
-            if original_name in transformed:
-                transformed = transformed.replace(original_name, new_name)
-                changes.append(f"Customized character: '{original_name}' → '{new_name}'")
-                print(f"- Changed '{original_name}' to '{new_name}'")
+    # Transform the text
+    result = transform_text_with_llm(
+        text, 
+        transform_type, 
+        character_context,
+        model=model,
+        provider=provider
+    )
     
-    print("\nChanges made:")
-    for change in changes:
-        print(f"- {change}")
+    # Validate if available
+    if VALIDATOR_AVAILABLE and 'transformed_text' in result:
+        validation_results = validate_transformed_text(
+            text,
+            result['transformed_text'],
+            transform_type
+        )
+        result['validation'] = validation_results
     
-    # Apply pronoun validator if available
-    if VALIDATOR_AVAILABLE:
-        print("\nRunning pronoun consistency validation...")
-        corrected_text, corrections = validate_transformed_text(transformed, transform_type)
+    # Save the transformed text
+    save_text_file(result['transformed_text'], output_file)
+    
+    # Add file information
+    result['input_file'] = input_file
+    result['output_file'] = output_file
+    result['transform_type'] = transform_type
+    
+    return result
+
+
+def transform_gender_with_context(text: str, transform_type: str, character_context: str, 
+                                model: Optional[str] = None) -> Tuple[str, List[str]]:
+    """
+    Compatibility wrapper for the original gender_transform interface.
+    
+    Args:
+        text: Text to transform
+        transform_type: Type of transformation (feminine/masculine/neutral)
+        character_context: Character information for context
+        model: Optional model override
         
-        if corrections:
-            print(f"Found {len(corrections)} pronoun inconsistencies:")
-            for i, correction in enumerate(corrections, 1):
-                print(f"- Changed '{correction['original']}' to '{correction['corrected']}'")
-            # Update the transformed text with corrections
-            transformed = corrected_text
-            # Add the corrections to the changes list
-            changes.extend([f"Fixed pronoun: '{c['original']}' to '{c['corrected']}'" for c in corrections])
-        else:
-            print("No pronoun inconsistencies found.")
+    Returns:
+        Tuple of (transformed_text, changes_made)
+    """
+    result = transform_text_with_llm(
+        text=text,
+        transform_type=transform_type,
+        character_context=character_context,
+        model=model
+    )
     
-    # Verify transformation
-    missed = verify_transformation(transformed, transform_type, model)
+    # Extract transformed text and changes in the format expected by callers
+    transformed_text = result.get('transformed_text', text)
+    changes_made = result.get('changes_made', [])
     
-    if missed:
-        print("\nPotentially missed transformations:")
-        for item in missed:
-            print(f"- {item['reference']} in context: '{item['context']}'")
-            if 'suggestion' in item:
-                print(f"  Suggestion: {item['suggestion']}")
-    else:
-        print("\nNo missed transformations found.")
-    
-    # Save results if output path provided
-    if output_path:
-        save_text_file(transformed, output_path)
-        print(f"\nTransformed text saved to {output_path}")
-    
-    return transformed, changes
+    return transformed_text, changes_made
 
 
 def main():
-    """Command-line entry point for gender transformation."""
+    """CLI entry point for testing."""
     parser = argparse.ArgumentParser(description="Transform gender representation in text")
-    parser.add_argument("file_path", help="Path to the text file to transform")
-    parser.add_argument(
-        "-t", "--type", 
-        choices=list(TRANSFORM_TYPES.keys()), 
-        default="feminine",
-        help="Type of transformation to apply"
-    )
-    parser.add_argument("-o", "--output", help="Path to save the transformed text")
-    parser.add_argument("-m", "--model", default="gpt-4", help="OpenAI model to use (default: gpt-4)")
-    parser.add_argument("--no-cache", action="store_true", help="Disable caching of API responses")
+    parser.add_argument("input", help="Input text file")
+    parser.add_argument("output", help="Output text file")
+    parser.add_argument("-t", "--type", required=True, 
+                       choices=list(TRANSFORM_TYPES.keys()),
+                       help="Type of transformation")
+    parser.add_argument("-a", "--analysis", help="Character analysis JSON file")
+    parser.add_argument("-m", "--model", help="Model override")
+    parser.add_argument("-p", "--provider", choices=["openai", "grok"],
+                       help="LLM provider to use")
+    parser.add_argument("--list-providers", action="store_true",
+                       help="List available providers and exit")
+    
     args = parser.parse_args()
     
-    # Set default output path if not provided
-    output_path = args.output
-    if not output_path:
-        input_path = Path(args.file_path)
-        transform_suffix = f".{args.type}.txt"
-        output_path = input_path.with_suffix(transform_suffix)
+    if args.list_providers:
+        from api_client import UnifiedLLMClient
+        providers = UnifiedLLMClient.list_available_providers()
+        print("Available LLM providers:")
+        for provider in providers:
+            print(f"  - {provider}")
+        return
     
     try:
-        # If cache is disabled, temporarily rename the cache directory
-        if args.no_cache:
-            import os
-            cache_dir = Path(".cache")
-            if cache_dir.exists():
-                temp_cache_dir = Path(".cache_disabled")
-                os.rename(cache_dir, temp_cache_dir)
+        result = transform_text_file(
+            args.input,
+            args.output,
+            args.type,
+            analysis_file=args.analysis,
+            model=args.model,
+            provider=args.provider
+        )
         
-        # Run transformation
-        transform_text_file(args.file_path, args.type, output_path, args.model)
+        print(f"✓ Transformation complete using {result['provider']}")
+        print(f"  Model: {result['model']}")
+        print(f"  Changes made: {len(result.get('changes_made', []))}")
+        print(f"  Output: {args.output}")
         
-        # Restore cache directory if it was renamed
-        if args.no_cache and 'temp_cache_dir' in locals():
-            os.rename(temp_cache_dir, cache_dir)
-            
-    except (FileError, APIError, ValueError) as e:
+        if 'validation' in result:
+            val = result['validation']
+            if val['issues_found']:
+                print(f"⚠ Validation found {len(val['issues'])} potential issues")
+            else:
+                print("✓ Validation passed")
+                
+    except Exception as e:
         print(f"Error: {e}")
         return 1
-    except Exception as e:
-        print(f"Unexpected error: {type(e).__name__}: {e}")
-        return 1
-    
-    return 0
+
 
 if __name__ == "__main__":
-    import sys
-    sys.exit(main())
+    main()
