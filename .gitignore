@@ -19,6 +19,8 @@ parsed_books/
 test_*.json
 *_test.json
 *_v2.json
+test_data/
+parsed_books/
 
 # Reports (keep the important ones)
 # Keep: book_format_analysis.json
@@ -39,4 +41,8 @@ Thumbs.db
 *.tmp
 *.bak
 *~
-EOF < /dev/null
+.cache/
+test_it/
+
+# Backup files
+*_backup.py

@@ -4,29 +4,36 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI to identify characters in text and transform gender representation while preserving narrative coherence. It can perform character analysis, gender transformation, or both in a pipeline. Version 0.4.0 adds book preprocessing capabilities for cleaner text processing.
+This tool uses AI to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more.
 
 ## Features
 
-- **Book Preprocessing** (NEW): Convert text books to clean JSON format
-  - Chapter detection and organization
-  - Artifact removal (brackets, formatting codes)
-  - Smart sentence splitting with dialogue handling
+- **Advanced Book Preprocessing**: Convert any text book to clean JSON format
+  - Supports 100+ book formats (English, French, German, plays, letters, etc.)
+  - Smart chapter/section detection with pattern priority system
+  - Artifact removal and intelligent sentence splitting
+  - 100% success rate on Project Gutenberg collection
 - **Character Analysis**: Identify characters, their gender, and mentions in text
 - **Gender Transformation**: Transform text using different gender representations
   - Feminine transformation (male → female)
   - Masculine transformation (female → male)
   - Gender-neutral transformation
+- **JSON-based Processing**: Work with pre-parsed books for better control
 - **Verification**: Check for missed transformations
-- **Simple CLI Interface**: Easy-to-use command-line interface
+- **Beautiful CLI**: Colorful interface with progress animations
+
+## Documentation
+
+- **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
+- **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser
+- **[Development Docs](docs/development/)** - Parser development and improvements
+- **[Maintenance Docs](docs/maintenance/)** - System maintenance guides
 
 ## Requirements
 
 - Python 3.9+
 - OpenAI API key (set as environment variable `OPENAI_API_KEY`)
-- **Recommended Model:** GPT-4.1 ChatGPT (1 million token context window, 32,768 token output limit)
-  - See [GPT-4.1 Prompting Guide](https://cookbook.openai.com/examples/gpt4-1_prompting_guide) for best practices
-  - Check [OpenAI's official announcements](https://openai.com/) for the most current specifications
+- **Recommended Model:** GPT-4o or GPT-4 (large context windows)
 
 ## Installation
 
@@ -44,129 +51,124 @@ export OPENAI_API_KEY='your-api-key'
 
 ## Usage
 
-### Book Preprocessing (NEW)
+### Book Preprocessing
 
-Convert a text book to clean JSON format for better processing:
+Convert any text book to clean JSON format:
 
 ```bash
 python regender_cli.py preprocess path/to/book.txt
 ```
 
+The parser automatically detects:
+- Standard chapters (CHAPTER I, Chapter 1, etc.)
+- International formats (Chapitre, Kapitel, etc.)
+- Plays (ACT I, SCENE II)
+- Letters and diaries
+- Story collections
+- And many more formats
+
 Options:
 - `-o, --output`: Specify output JSON file (default: book_clean.json)
 - `--verify`: Create verification file by recreating text from JSON
-- `--no-fix-sentences`: Skip splitting embedded dialogues
 - `-q, --quiet`: Suppress progress messages
 
 ### Character Analysis
 
-Analyze a text file to identify characters and their mentions:
+Analyze a text file to identify characters:
 
 ```bash
 python regender_cli.py analyze path/to/your/text.txt
 ```
 
-Options:
-- `-o, --output`: Specify output file for analysis results (default: input_file.analysis.json)
-
 ### Gender Transformation
 
-Transform gender representation in a text file:
+Transform gender representation in text:
 
 ```bash
 python regender_cli.py transform path/to/your/text.txt --type feminine
 ```
 
-Options:
-- `-t, --type`: Type of transformation to apply (feminine, masculine, neutral)
-- `-o, --output`: Specify output file for transformed text
-
 ### Full Pipeline
 
-Run both analysis and transformation in one command:
+Run analysis and transformation together:
 
 ```bash
 python regender_cli.py pipeline path/to/your/text.txt --type feminine
 ```
 
-With GPT-4.1's large context window, you can process the full text of a novel (up to 1 million tokens) in a single call, as long as the output does not exceed 32,768 tokens.
-- **Recommended Model:** GPT-4.1 ChatGPT (1M token context window, ~36K output token limit)
-  - See [OpenAI API documentation](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo) for current specs and limits.
+### JSON-Based Processing
 
-Options:
-- `-t, --type`: Type of transformation to apply (feminine, masculine, neutral)
-- `-o, --output`: Specify output file for transformed text
+For better control over large books, use the JSON workflow:
+
+```bash
+# First preprocess to JSON
+python regender_cli.py preprocess pride_and_prejudice.txt -o pride.json
+
+# Then transform the JSON
+python regender_json_cli.py pride.json -t feminine -o pride_feminine.json
+
+# Optionally recreate as text
+python regender_json_cli.py pride_feminine.json --recreate -o pride_feminine.txt
+```
 
 ## Examples
 
 ```bash
-# Analyze Pride and Prejudice
-python regender_cli.py analyze pride_and_prejudice_chapter_1_full.txt
+# Preprocess a French book
+python regender_cli.py preprocess les_miserables.txt
 
-# Transform to feminine gender representation
-python regender_cli.py transform pride_and_prejudice_chapter_1_full.txt -t feminine
+# Transform Alice in Wonderland to masculine
+python regender_cli.py transform alice.txt -t masculine -o alan_in_wonderland.txt
 
-# Run full pipeline with gender-neutral transformation
-python regender_cli.py pipeline pride_and_prejudice_chapter_1_full.txt -t neutral -o output/neutral_pride.txt
+# Process a play with gender-neutral transformation
+python regender_cli.py pipeline romeo_and_juliet.txt -t neutral
 ```
 
 ## Project Structure
 
-- `regender_cli.py`: Main CLI entry point
-- `analyze_characters.py`: Character analysis module
-- `gender_transform.py`: Gender transformation module
+```
+regender-xyz/
+├── book_parser/          # Modular parser (100% success rate)
+│   ├── patterns/        # Pattern definitions for various formats
+│   └── detectors/       # Smart section detection
+├── regender_cli.py      # Main CLI entry point
+├── regender_json_cli.py # JSON-based processing CLI
+├── book_to_json.py      # Book preprocessing interface
+├── analyze_characters.py # Character analysis
+├── gender_transform.py  # Gender transformation
+├── json_transform.py    # JSON-based transformation
+└── docs/               # Documentation
+    ├── development/    # Parser development docs
+    ├── maintenance/    # Cleanup and maintenance
+    └── reference/      # Architecture and flow diagrams
+```
+
+## Gutenberg Collection Support
+
+The parser has been tested on 100 Project Gutenberg books with 100% success rate:
+- 72 books parse with standard patterns
+- 28 edge cases handled with specialized patterns
+- Supports multiple languages and formats
 
 ## License
 
 MIT
 
-## Roadmap & Milestones
+## Roadmap
 
-### Release 1: Complete Pride and Prejudice (Uniform Gender Swap)
-- **Goal:** Transform the entire text of Pride and Prejudice by uniformly swapping all gendered language (pronouns, titles, etc.), with no character-specific choices. Keep it simple and consistent for the whole book.
-- **Testing Plan:**
-  - [x] Fix JSON parsing error in API response handling ("Unterminated string starting at: line 2 column 11")
-  - [ ] Run gender swap transformation on the full novel text
-  - [ ] Spot-check key scenes (opening, ball, proposal)
-  - [ ] Validate pronoun, title, and relationship consistency throughout
-  - [ ] Prepare print-ready manuscript for book design with Matt Bucknall
-- **Critical Fixes Needed:**
-  - [ ] Fix file writing logic to collect all transformed chunks in memory and write once at the end
-  - [ ] Improve chapter boundary handling to ensure complete novel transformation
-  - [ ] Implement full novel verification step using GPT-4.1's 1M token context window
-  - [ ] Add validation to ensure consistent character representation throughout the novel
-- **Milestone:** Print-ready version for book design collaboration
+### Release 1: Complete Novel Processing
+- [x] Advanced parser supporting 100+ book formats
+- [x] Clean JSON preprocessing pipeline
+- [ ] Full novel transformation with consistency
+- [ ] Print-ready output generation
 
-### Release 2: Website & Open Source Launch
-- **Goal:** Launch a public website to open source the uniform gender-swapped version and sell print-on-demand copies.
-- **Testing Plan:**
-  - [ ] Website displays transformed book and project info
-  - [ ] Print-on-demand integration works (test order flow)
-  - [ ] Repo/documentation for public collaboration
+### Release 2: Web Interface
+- [ ] Public website for transformations
+- [ ] API for programmatic access
+- [ ] Print-on-demand integration
 
-### Release 3: Feature Improvements & Expansion
-- **Goal:** Add advanced features and support for more books.
-- **Testing Plan:**
-  - [ ] Character-specific naming/gender choice
-  - [ ] Interactive transformation options
-  - [ ] Test on additional public domain works (Emma, Jane Eyre, etc.)
-  - [ ] Enhanced validation, analytics, and visualization tools
-
----
-
-## Completed
-
-- [x] **Third major rewrite:** Streamlined the codebase with a CLI-first focus and improved architecture ([77f59c0], [74505b6], [54d31a1])
-- [x] Archived and cleaned up legacy versions, moving old code to `/archive` ([74505b6], [54d31a1])
-- [x] Created project README and initial documentation ([5d623d5], [1ba486a])
-- [x] Set up project structure and repository
-- [x] Implemented main CLI entry point (`regender_cli.py`)
-- [x] Implemented core character analysis and gender transformation modules
-- [x] Added pronoun validator for transformation consistency
-- [x] Added support for gender-neutral transformation with Mx. titles
-- [x] Added post-processing validation for relationship possessives
-- [x] Added colorful CLI visuals and animations
-- [x] Implemented gender-themed animated spinners and progress bars
-- [x] Fixed OpenAI API JSON format compatibility issue
-- [x] Improved pronoun consistency in gender transformations
-- [x] Fixed pronoun validator patterns for neutral transformation
+### Release 3: Advanced Features
+- [ ] Character-specific transformations
+- [ ] Interactive transformation options
+- [ ] Support for more languages
+- [ ] Enhanced validation tools

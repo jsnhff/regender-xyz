@@ -1,32 +1,37 @@
-# regender-xyz Documentation
+# Documentation Index
 
-## Book Processing Pipeline
+This directory contains all project documentation organized by category.
 
-### Core Documentation
+## Development Documentation
 
-1. **[Comprehensive Project Summary](COMPREHENSIVE_PROJECT_SUMMARY.md)**
-   - Complete overview of the clean book processing pipeline
-   - Technical evolution from v1 to v3
-   - Quality metrics and performance data
-   - Usage examples and code snippets
+Documentation related to development processes, improvements, and refactoring:
 
-2. **[Integration Summary](INTEGRATION_SUMMARY.md)**
-   - How the book processor integrates with the CLI
-   - New `preprocess` command details
-   - Architecture and components overview
-   - Testing instructions
+- [Parser Compaction Prompt](development/PARSER_COMPACTION_PROMPT.md) - Guidelines for parser compaction process
+- [Parser Improvements](development/PARSER_IMPROVEMENTS.md) - Detailed parser improvement documentation
+- [Parser Refactoring Complete](development/PARSER_REFACTORING_COMPLETE.md) - Summary of completed parser refactoring
 
-3. **[Book Format Lessons](BOOK_FORMAT_LESSONS.md)**
-   - Learnings from processing different books
-   - Format variations (Pride & Prejudice vs Moby Dick)
-   - Pattern matching challenges and solutions
-   - Recommendations for improvements
+## Maintenance Documentation
 
-4. **[Chapter Chunking Analysis](chapter_chunking_analysis.md)**
-   - Original analysis of the regender-xyz codebase
-   - How books are processed for gender transformation
-   - Chapter detection strategies
-   - Integration points with existing code
+Documentation for ongoing maintenance and cleanup tasks:
+
+- [Post Compaction Tasks](maintenance/POST_COMPACTION_TASKS.md) - Tasks to complete after parser compaction
+- [Cleanup Summary](maintenance/CLEANUP_SUMMARY.md) - Summary of cleanup activities
+
+## Reference Documentation
+
+Technical reference and analysis documentation:
+
+- [Remaining Patterns Analysis](reference/REMAINING_PATTERNS_ANALYSIS.md) - Analysis of remaining patterns to implement
+- [Complete Flow Diagram](reference/COMPLETE_FLOW_DIAGRAM.md) - Complete system flow diagram and architecture
+
+## Book Processing Documentation
+
+Documentation from the original book processing pipeline:
+
+- [Comprehensive Project Summary](COMPREHENSIVE_PROJECT_SUMMARY.md) - Complete overview of the clean book processing pipeline
+- [Integration Summary](INTEGRATION_SUMMARY.md) - How the book processor integrates with the CLI
+- [Book Format Lessons](BOOK_FORMAT_LESSONS.md) - Learnings from processing different books
+- [Chapter Chunking Analysis](chapter_chunking_analysis.md) - Original analysis of the regender-xyz codebase
 
 ## Quick Start
 
@@ -81,6 +86,16 @@ regender-xyz/
 ├── regender_cli.py                 # CLI with preprocess command
 └── docs/                           # Documentation
     ├── README.md                   # This file
+    ├── development/                # Development-related docs
+    │   ├── PARSER_COMPACTION_PROMPT.md
+    │   ├── PARSER_IMPROVEMENTS.md
+    │   └── PARSER_REFACTORING_COMPLETE.md
+    ├── maintenance/                # Maintenance docs
+    │   ├── POST_COMPACTION_TASKS.md
+    │   └── CLEANUP_SUMMARY.md
+    ├── reference/                  # Reference docs
+    │   ├── REMAINING_PATTERNS_ANALYSIS.md
+    │   └── COMPLETE_FLOW_DIAGRAM.md
     ├── COMPREHENSIVE_PROJECT_SUMMARY.md
     ├── INTEGRATION_SUMMARY.md
     ├── BOOK_FORMAT_LESSONS.md

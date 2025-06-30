@@ -21,7 +21,8 @@ from large_text_transform import transform_large_text
 
 # Import book processing integration
 try:
-    from book_to_json import BookProcessorIntegration, process_book_to_json
+    from book_to_json import process_book_to_json
+    from book_parser import BookParser
     BOOK_PROCESSOR_AVAILABLE = True
 except ImportError:
     BOOK_PROCESSOR_AVAILABLE = False
@@ -119,16 +120,13 @@ def preprocess_command(args) -> int:
             input_path = Path(args.file)
             args.output = str(input_path.parent / f"{input_path.stem}_clean.json")
         
-        # Create processor
-        processor = BookProcessorIntegration(verbose=not args.quiet)
-        
         # Run preprocessing
         if CLI_VISUALS_AVAILABLE:
             def run_preprocessing():
-                return processor.process_book_to_json(
+                return process_book_to_json(
                     args.file, 
                     args.output,
-                    fix_long_sentences=not args.no_fix_sentences
+                    verbose=not args.quiet
                 )
             
             book_data = run_with_spinner(
@@ -137,10 +135,10 @@ def preprocess_command(args) -> int:
                 "neutral"
             )
         else:
-            book_data = processor.process_book_to_json(
+            book_data = process_book_to_json(
                 args.file, 
                 args.output,
-                fix_long_sentences=not args.no_fix_sentences
+                verbose=not args.quiet
             )
         
         # Optionally recreate text to verify
