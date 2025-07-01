@@ -5,7 +5,7 @@ TEST FULL TRANSFORMATION PIPELINE WITH OUTPUT SAVING
 
 import sys
 import time
-from test_bulletproof_chunking import python_pattern_detector, bulletproof_chunker
+from bulletproof_chunking import chunk_text_bulletproof
 from gender_transform import transform_gender_with_context
 from analyze_characters import analyze_characters
 
@@ -23,8 +23,7 @@ def test_pipeline_and_save(book_path: str, book_name: str, transform_type: str =
     
     # Bulletproof chunking
     print(f"\n🔧 BULLETPROOF CHUNKING...")
-    analysis = python_pattern_detector(full_text)
-    chunks = bulletproof_chunker(full_text, analysis)
+    chunks = chunk_text_bulletproof(full_text, prefer_ai=False)
     print(f"✅ Created {len(chunks)} chunks with 100% coverage")
     
     # Character analysis on first chunk

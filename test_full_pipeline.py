@@ -6,7 +6,7 @@ Integrate bulletproof chunking with gender transformation to process entire book
 
 import sys
 import time
-from test_bulletproof_chunking import python_pattern_detector, bulletproof_chunker
+from bulletproof_chunking import chunk_text_bulletproof
 from gender_transform import transform_gender_with_context
 from analyze_characters import analyze_characters
 
@@ -34,13 +34,7 @@ def test_full_pipeline(book_path: str, book_name: str, transform_type: str = "ne
     
     # Step 2: Bulletproof chunking
     print(f"\n🔧 BULLETPROOF CHUNKING...")
-    analysis = python_pattern_detector(full_text)
-    
-    if not analysis:
-        print(f"❌ Could not detect chapter pattern for {book_name}")
-        return False
-    
-    chunks = bulletproof_chunker(full_text, analysis)
+    chunks = chunk_text_bulletproof(full_text, prefer_ai=False)  # Use Python fallback for speed
     
     if not chunks:
         print(f"❌ Chunking failed for {book_name}")
