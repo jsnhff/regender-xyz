@@ -74,11 +74,18 @@ output/
 *.feminine.txt
 *.masculine.txt
 
-# Virtual environment folder
+# Virtual environment folders
 venv/
 .env/
 myenv/
 my_multi_agent_env/
+test_it/
+*_testing/
+*_v*/
+
+# Transformed output files
+transformed_*.txt
+*_chunk*.txt
 
 # IDE Config Files (optional)
 .vscode/
