@@ -106,7 +106,7 @@ def test_full_pipeline(book_path: str, book_name: str, transform_type: str = "ne
             first_chunk['text'], 
             transform_type, 
             character_context,
-            model="gpt-4o-mini"  # Use mini to avoid quota issues
+            model="gpt-4.1-nano"  # Use 4.1-nano model with 2M daily limit
         )
         
         transform_time = time.time() - start_time

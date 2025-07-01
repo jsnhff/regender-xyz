@@ -45,7 +45,7 @@ def load_chapter(file_path: str) -> str:
 
 @safe_api_call
 @cache_result()
-def analyze_characters(text: str, model: str = "gpt-4") -> Dict[str, Any]:
+def analyze_characters(text: str, model: str = "gpt-4.1-nano") -> Dict[str, Any]:
     """Analyze text to identify characters and their mentions.
     
     Args:
