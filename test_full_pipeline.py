@@ -6,7 +6,7 @@ Integrate bulletproof chunking with gender transformation to process entire book
 
 import sys
 import time
-from bulletproof_chunking import chunk_text_bulletproof
+from ai_chunking import chunk_text_ai
 from gender_transform import transform_gender_with_context
 from analyze_characters import analyze_characters
 
@@ -32,9 +32,9 @@ def test_full_pipeline(book_path: str, book_name: str, transform_type: str = "ne
     
     print(f"📚 Loaded {book_name}: {len(full_text):,} characters")
     
-    # Step 2: Bulletproof chunking
-    print(f"\n🔧 BULLETPROOF CHUNKING...")
-    chunks = chunk_text_bulletproof(full_text, prefer_ai=False)  # Use Python fallback for speed
+    # Step 2: AI chunking
+    print(f"\n🔧 AI CHUNKING...")
+    chunks = chunk_text_ai(full_text, prefer_ai=False)  # Use Python fallback for speed
     
     if not chunks:
         print(f"❌ Chunking failed for {book_name}")

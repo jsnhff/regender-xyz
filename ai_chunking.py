@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-BULLETPROOF CHUNKING MODULE
-Standalone chunking system that achieves 100% coverage for any Project Gutenberg book.
-Hybrid AI + Python approach with guaranteed reliability.
+AI CHUNKING MODULE
+AI-powered chunking system that achieves 100% coverage for any Project Gutenberg book.
+Hybrid AI analysis + Python execution approach with guaranteed reliability.
 """
 
 import json
@@ -135,8 +135,8 @@ def python_pattern_detector(text: str) -> dict:
         'sample_chapters': ['Detected with Python fallback']
     }
 
-def bulletproof_chunker(text: str, analysis: dict) -> list:
-    """Creates chunks with guaranteed 100% text coverage.
+def ai_chunker(text: str, analysis: dict) -> list:
+    """Creates chunks with guaranteed 100% text coverage using AI analysis.
     
     Args:
         text: The full text to chunk
@@ -145,7 +145,7 @@ def bulletproof_chunker(text: str, analysis: dict) -> list:
     Returns:
         List of chunk dictionaries with guaranteed 100% coverage
     """
-    print("⚙️ BULLETPROOF CHUNKER: Creating 100% coverage chunks...")
+    print("⚙️ AI CHUNKER: Creating 100% coverage chunks...")
     
     chapter_regex = analysis.get('chapter_regex', '')
     chapters_per_chunk = analysis.get('chapters_per_chunk', 10)
@@ -199,7 +199,7 @@ def bulletproof_chunker(text: str, analysis: dict) -> list:
         
         chunk_text = text[chunk_start:chunk_end]  # Don't strip!
         
-        # BULLETPROOF SIZE CHECK - split if too large
+        # AI SIZE CHECK - split if too large
         MAX_CHUNK_SIZE = 80000  # 80k chars = ~20k tokens (safe for 32k output)
         
         if len(chunk_text) > MAX_CHUNK_SIZE:
@@ -260,8 +260,8 @@ def bulletproof_chunker(text: str, analysis: dict) -> list:
     
     return chunks
 
-def chunk_text_bulletproof(text: str, prefer_ai: bool = True, model: str = "gpt-4.1-nano") -> list:
-    """Main function to chunk text with bulletproof 100% coverage.
+def chunk_text_ai(text: str, prefer_ai: bool = True, model: str = "gpt-4.1-nano") -> list:
+    """Main function to chunk text with AI-powered 100% coverage.
     
     Args:
         text: The full text to chunk
@@ -271,7 +271,7 @@ def chunk_text_bulletproof(text: str, prefer_ai: bool = True, model: str = "gpt-
     Returns:
         List of chunks with guaranteed 100% coverage
     """
-    print("🚀 BULLETPROOF CHUNKING SYSTEM")
+    print("🚀 AI CHUNKING SYSTEM")
     print("=" * 60)
     
     analysis = {}
@@ -290,15 +290,15 @@ def chunk_text_bulletproof(text: str, prefer_ai: bool = True, model: str = "gpt-
         print("❌ Both AI and Python analysis failed!")
         return []
     
-    # Step 3: Create bulletproof chunks
-    print("\nStep 3: Bulletproof Chunking...")
-    chunks = bulletproof_chunker(text, analysis)
+    # Step 3: Create AI-powered chunks
+    print("\nStep 3: AI Chunking...")
+    chunks = ai_chunker(text, analysis)
     
     if not chunks:
         print("❌ Chunking failed!")
         return []
     
-    print(f"\n🏆 SUCCESS: Created {len(chunks)} chunks with bulletproof coverage!")
+    print(f"\n🏆 SUCCESS: Created {len(chunks)} chunks with AI-powered coverage!")
     return chunks
 
 if __name__ == "__main__":
@@ -307,7 +307,7 @@ if __name__ == "__main__":
         with open('test_data/pride_and_prejudice_full.txt', 'r') as f:
             test_text = f.read()
         
-        chunks = chunk_text_bulletproof(test_text)
+        chunks = chunk_text_ai(test_text)
         
         if chunks:
             print(f"\n📋 CHUNK SUMMARY:")
