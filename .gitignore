@@ -13,12 +13,18 @@ ENV/
 .env.local
 .env.*.local
 
-# Large data directories (commented out - now tracked)
-# gutenberg_books/
-# gutenberg_texts/
-# gutenberg_json/
+# Book data directories
+# Uncomment to ignore book files
+# books/texts/
+# books/json/
+# books/output/
+
+# Old directories (cleanup)
 clean_json_books/
 parsed_books/
+book_texts/
+book_json/
+book_transforms/
 
 # Test outputs
 test_*.json

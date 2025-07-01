@@ -34,12 +34,14 @@ Unified interface for multiple LLM providers with automatic .env loading.
 **Supported Providers:**
 - OpenAI (GPT-4, GPT-4o, GPT-4o-mini)
 - Grok (grok-beta, grok-3-mini-fast)
+- MLX (local models on Apple Silicon - Mistral-7B)
 
 **Key Classes:**
-- `BaseLLMClient` - Abstract base for providers
-- `OpenAIClient` - OpenAI implementation
-- `GrokClient` - Grok implementation  
-- `UnifiedLLMClient` - Auto-detecting wrapper
+- `_BaseLLMClient` - Abstract base for providers (internal)
+- `_OpenAIClient` - OpenAI implementation (internal)
+- `_GrokClient` - Grok implementation (internal)
+- `_MLXClient` - MLX local model implementation (internal)
+- `UnifiedLLMClient` - Auto-detecting wrapper (public API)
 
 **Features:**
 - Automatic .env file loading
@@ -47,69 +49,68 @@ Unified interface for multiple LLM providers with automatic .env loading.
 - Unified API across providers
 - Graceful error handling
 
-### 3. Transformation Pipeline
+### 3. Transformation Pipeline (`book_transform/`)
 
-#### Character Analysis (`analyze_characters.py`)
+#### Character Analysis (`book_transform/character_analyzer.py`)
 - Identifies characters and their genders
 - Tracks character mentions and relationships
 - Provides context for accurate transformations
+- Handles MLX JSON parsing limitations gracefully
 
-#### Gender Transformation (`gender_transform.py`)
-- Multi-provider implementation supporting OpenAI and Grok
+#### Gender Transformation (`book_transform/transform.py`)
+- Multi-provider implementation supporting OpenAI, Grok, and MLX
 - Handles three transformation types:
-  - Feminine (he→she)
-  - Masculine (she→he)
-  - Neutral (he/she→they)
+  - comprehensive (default)
+  - names_only
+  - pronouns_only
 - Provider selection via parameter or environment
-- Backward compatible with original API
+- Paragraph-aware processing
 
-#### JSON-Based Processing (`json_transform.py`)
+#### Smart Chunking (`book_transform/chunking/`)
 - Chapter-by-chapter transformation
 - Intelligent token-based chunking
-- Model-aware optimization (via `token_utils.py`)
+- Model-aware optimization
 - Progress tracking and error recovery
 - Optimized for large books with minimal API calls
 
-### 4. CLI Interfaces
+### 4. CLI Interface (`regender_book_cli.py`)
 
-#### Main CLI (`regender_cli.py`)
-```bash
-regender_cli.py [analyze|transform|pipeline|preprocess] [options]
-```
+Unified command-line interface for all book processing operations:
 
-#### JSON CLI (`regender_json_cli.py`)
 ```bash
-regender_json_cli.py input.json -t feminine -o output.json
-```
+# Download books from Project Gutenberg
+regender_book_cli.py download --count 10
 
-#### Gutenberg CLI (`gutenberg_cli.py`)
-```bash
-gutenberg_cli.py [download|process|pipeline|list] [options]
+# Process text files to JSON
+regender_book_cli.py process --input books/texts --output books/json
+
+# Transform books
+regender_book_cli.py transform books/json/book.json --type comprehensive --provider mlx
+
+# List available books
+regender_book_cli.py list
+
+# Validate JSON files
+regender_book_cli.py validate
 ```
 
 ### 5. Utilities
 
-#### Core Utils (`utils.py`)
-- File I/O operations
-- API client management
+#### Book Transform Utils (`book_transform/utils.py`)
+- API error handling
 - Caching system
-- Error handling
+- Safe API call decorators
 
-#### Token Utils (`token_utils.py`)
+#### Chunking Utilities (`book_transform/chunking/`)
 - Token estimation algorithms
 - Smart sentence chunking
 - Model-specific optimization
-- Cost estimation
+- Model configurations
 
-#### Model Configs (`model_configs.py`)
-- Context window definitions
-- Default chunk sizes per model
-- Model capability tracking
-
-#### Gutenberg Utils (`gutenberg_utils/`)
+#### Gutenberg Downloader (`gutenberg/`)
 - Book downloading from Project Gutenberg
-- Batch processing utilities
-- Format analysis tools
+- Metadata extraction
+- Automatic file naming
 
 ## Data Flow
 
@@ -154,25 +155,25 @@ regender-xyz/
 │   ├── maintenance/    # Maintenance docs
 │   └── reference/      # API references
 ├── tests/              # Test suite
-├── gutenberg_texts/    # Downloaded texts (100 books)
-├── gutenberg_json/     # Processed JSONs
+├── books/              # All book files
+│   ├── texts/         # Downloaded text files
+│   ├── json/          # Processed JSON files
+│   └── output/        # Transformed books
 ├── logs/               # Processing logs
 ├── .cache/             # API response cache
 │
 # Core modules
-├── api_client.py       # Multi-provider LLM support
-├── model_configs.py    # Model-specific configurations
-├── token_utils.py      # Token counting and chunking
-├── analyze_characters.py
-├── gender_transform.py  # Multi-provider transformer
-├── json_transform.py    # Smart chunking processor
-├── book_to_json.py
-├── utils.py
+├── api_client.py       # Multi-provider LLM support (OpenAI/Grok/MLX)
+├── book_to_json.py     # Book parsing wrapper
+├── book_transform/     # Transformation system
+│   ├── transform.py   # Main transformation logic
+│   ├── character_analyzer.py
+│   ├── llm_transform.py
+│   ├── utils.py      # Transform utilities
+│   └── chunking/     # Smart chunking system
 │
-# CLI tools
-├── regender_cli.py
-├── regender_json_cli.py
-└── gutenberg_cli.py
+# CLI tool
+└── regender_book_cli.py  # Unified CLI interface
 ```
 
 ## Configuration
@@ -182,7 +183,8 @@ regender-xyz/
 # LLM Provider Configuration
 OPENAI_API_KEY=sk-...
 GROK_API_KEY=xai-...
-LLM_PROVIDER=openai  # or grok
+MLX_MODEL_PATH=/path/to/mlx/model  # For local MLX models
+LLM_PROVIDER=openai  # or grok or mlx
 
 # Optional Settings
 REGENDER_DISABLE_CACHE=1
@@ -236,6 +238,7 @@ REGENDER_DEBUG=1
 - Streaming API support
 - Real-time transformation preview
 - Web interface
+- Enhanced MLX model support
 
 ### Extension Points
 - Custom pattern definitions

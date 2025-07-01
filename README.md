@@ -4,17 +4,20 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI (OpenAI or Grok) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
+This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
 
 ## Features
 
-- **Multi-Provider LLM Support**: Choose between OpenAI and Grok APIs
+- **Multi-Provider LLM Support**: Choose between OpenAI, Grok, and local MLX models
   - Automatic provider detection based on available API keys
   - Provider-specific model optimization
   - Unified interface for seamless switching
+  - **NEW**: Local model support via MLX on Apple Silicon
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports 100+ book formats (English, French, German, plays, letters, etc.)
   - Smart chapter/section detection with pattern priority system
+  - **NEW**: Paragraph preservation for maintaining original text structure
+  - **NEW**: Intelligent abbreviation handling (Mr., Mrs., Dr., etc.)
   - Artifact removal and intelligent sentence splitting
   - 100% success rate on Project Gutenberg collection
 - **Intelligent Token-Based Chunking**: Optimizes API usage for each model
@@ -34,6 +37,8 @@ This tool uses AI (OpenAI or Grok) to identify characters in text and transform 
 
 - **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
 - **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok APIs
+- **[MLX Setup Guide](docs/MLX_SETUP.md)** - Running local models on Apple Silicon
+- **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the paragraph-aware JSON format
 - **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser
 - **[Development Docs](docs/development/)** - Parser development and improvements
 - **[Maintenance Docs](docs/maintenance/)** - System maintenance guides
@@ -41,12 +46,14 @@ This tool uses AI (OpenAI or Grok) to identify characters in text and transform 
 ## Requirements
 
 - Python 3.9+
-- API key for at least one LLM provider:
+- At least one LLM provider:
   - OpenAI API key (set as `OPENAI_API_KEY`)
   - Grok API key (set as `GROK_API_KEY`)
+  - MLX local model (Apple Silicon only, set `MLX_MODEL_PATH`)
 - **Supported Models:**
   - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
   - Grok: grok-beta, grok-3-mini-fast
+  - MLX: Mistral-7B-Instruct (32K context window)
 
 ## Installation
 
@@ -90,26 +97,26 @@ The system now supports multiple LLM providers for flexibility and redundancy:
 
 ```bash
 # Use default provider (auto-detected or from LLM_PROVIDER env var)
-python regender_cli.py transform text.txt -t feminine
+python regender_book_cli.py transform books/json/book.json --type comprehensive
 
 # Explicitly use OpenAI
-python regender_cli.py transform text.txt -t feminine --provider openai
+python regender_book_cli.py transform books/json/book.json --provider openai
 
 # Explicitly use Grok
-python regender_cli.py transform text.txt -t feminine --provider grok
+python regender_book_cli.py transform books/json/book.json --provider grok
 
-# Use a specific model
-python regender_cli.py transform text.txt -t feminine --provider openai --model gpt-4
+# Use local MLX model (no API costs)
+python regender_book_cli.py transform books/json/book.json --provider mlx
 ```
 
 ## Usage
 
-### Book Preprocessing
+### Book Processing
 
 Convert any text book to clean JSON format:
 
 ```bash
-python regender_cli.py preprocess path/to/book.txt
+python regender_book_cli.py process --input books/texts --output books/json
 ```
 
 The parser automatically detects:
@@ -121,87 +128,76 @@ The parser automatically detects:
 - And many more formats
 
 Options:
-- `-o, --output`: Specify output JSON file (default: book_clean.json)
-- `--verify`: Create verification file by recreating text from JSON
-- `-q, --quiet`: Suppress progress messages
-
-### Character Analysis
-
-Analyze a text file to identify characters:
-
-```bash
-python regender_cli.py analyze path/to/your/text.txt
-```
+- `--input`: Input directory for text files (default: books/texts)
+- `--output`: Output directory for JSON files (default: books/json)
+- `--verify`: Validate the JSON by recreating text
 
 ### Gender Transformation
 
-Transform gender representation in text:
+Transform books with automatic character analysis:
 
 ```bash
-python regender_cli.py transform path/to/your/text.txt --type feminine
+# Transform a single book
+python regender_book_cli.py transform books/json/book.json --type comprehensive
+
+# Batch transform multiple books
+python regender_book_cli.py transform books/json/*.json --type comprehensive --batch
 ```
 
-### Full Pipeline
-
-Run analysis and transformation together:
+### Complete Workflow Example
 
 ```bash
-python regender_cli.py pipeline path/to/your/text.txt --type feminine
-```
+# 1. Place your text files in books/texts/
+cp ~/my_books/*.txt books/texts/
 
-### JSON-Based Processing
+# 2. Process all text files to JSON
+python regender_book_cli.py process
 
-For better control over large books, use the JSON workflow:
-
-```bash
-# First preprocess to JSON
-python regender_cli.py preprocess pride_and_prejudice.txt -o pride.json
-
-# Then transform the JSON
-python regender_json_cli.py pride.json -t feminine -o pride_feminine.json
-
-# Optionally recreate as text
-python regender_json_cli.py pride_feminine.json --recreate -o pride_feminine.txt
+# 3. Transform a specific book
+python regender_book_cli.py transform books/json/book.json \
+  --type comprehensive \
+  --provider mlx \
+  --output books/output/book_transformed.json \
+  --text books/output/book_transformed.txt
 ```
 
 ## Examples
 
 ```bash
-# Preprocess a French book
-python regender_cli.py preprocess les_miserables.txt
+# Use local MLX model for transformation (no API costs)
+python regender_book_cli.py transform books/json/alice.json \
+  --provider mlx \
+  --type comprehensive
 
-# Transform Alice in Wonderland to masculine
-python regender_cli.py transform alice.txt -t masculine -o alan_in_wonderland.txt
+# Use OpenAI for high-quality transformation
+python regender_book_cli.py transform books/json/pride.json \
+  --provider openai \
+  --model gpt-4o
 
-# Process a play with gender-neutral transformation
-python regender_cli.py pipeline romeo_and_juliet.txt -t neutral
+# Use Grok for fast processing
+python regender_book_cli.py transform books/json/gatsby.json \
+  --provider grok \
+  --model grok-beta
 ```
 
 ## Project Structure
 
 ```
 regender-xyz/
-├── book_parser/          # Modular parser (100% success rate)
-│   ├── patterns/        # Pattern definitions for various formats
-│   └── detectors/       # Smart section detection
-├── gutenberg_utils/     # Project Gutenberg tools
-│   ├── download_gutenberg_books.py
-│   ├── process_all_gutenberg.py
-│   └── README.md       # Detailed utilities documentation
-├── api_client.py        # Unified LLM client (OpenAI/Grok)
-├── model_configs.py     # Model-specific configurations
-├── token_utils.py       # Token counting and smart chunking
-├── regender_cli.py      # Main CLI entry point
-├── regender_json_cli.py # JSON-based processing CLI
-├── gutenberg_cli.py     # Simple Gutenberg download/process CLI
-├── book_to_json.py      # Book preprocessing interface
-├── analyze_characters.py # Character analysis
-├── gender_transform.py  # Multi-provider gender transformation
-├── json_transform.py    # JSON-based transformation with smart chunking
+├── books/               # All book files
+│   ├── texts/          # Downloaded text files
+│   ├── json/           # Parsed JSON files  
+│   └── output/         # Transformed books
+├── book_parser/         # Book parsing system
+│   ├── patterns/       # Format detection patterns
+│   ├── detectors/      # Smart section detection
+│   └── utils/          # Validation and batch processing
+├── gutenberg/          # Project Gutenberg downloader
+├── book_transform/     # AI book transformation system
+│   └── chunking/       # Smart token-based chunking
+├── api_client.py       # Unified LLM client (OpenAI/Grok/MLX)
+├── regender_book_cli.py # Main CLI interface
 └── docs/               # Documentation
-    ├── development/    # Parser development docs
-    ├── maintenance/    # Cleanup and maintenance
-    └── reference/      # Architecture and flow diagrams
 ```
 
 ## Gutenberg Collection Support
@@ -215,19 +211,28 @@ The parser has been tested on 100 Project Gutenberg books with 100% success rate
 
 ```bash
 # Download and process top 100 books
-python gutenberg_cli.py pipeline
+python regender_book_cli.py download --count 100
+python regender_book_cli.py process
 
-# Process a specific Gutenberg book
-python regender_json_cli.py gutenberg_json/pg1342-Pride_and_Prejudice_clean.json -t feminine
+# Transform a specific book
+python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type comprehensive
 ```
 
-See [gutenberg_utils/README.md](gutenberg_utils/README.md) for detailed documentation.
+The Gutenberg downloader automatically handles book metadata and creates properly named files.
 
 ## License
 
 MIT
 
 ## Recent Updates
+
+### v0.7.0 - Paragraph Preservation & MLX Support
+- ✅ Added paragraph preservation in JSON structure
+- ✅ Intelligent abbreviation handling (Mr., Mrs., Dr., etc.)
+- ✅ Full MLX local model support for offline processing
+- ✅ Improved error handling for character analysis
+- ✅ Cleaned up codebase - removed obsolete CLI files
+- ✅ Consolidated utilities into appropriate modules
 
 ### v0.6.0 - Multi-Provider & Smart Chunking
 - ✅ Added Grok API support alongside OpenAI

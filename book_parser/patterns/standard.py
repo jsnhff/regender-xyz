@@ -12,6 +12,12 @@ NUMBER_WORDS = r'(?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|' \
                r'Eighteen|Nineteen|Twenty|Thirty|Forty|Fifty|Sixty|Seventy|' \
                r'Eighty|Ninety|Hundred)'
 
+# Uppercase number words pattern component
+NUMBER_WORDS_UPPER = r'(?:ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|' \
+                     r'ELEVEN|TWELVE|THIRTEEN|FOURTEEN|FIFTEEN|SIXTEEN|SEVENTEEN|' \
+                     r'EIGHTEEN|NINETEEN|TWENTY|THIRTY|FORTY|FIFTY|SIXTY|SEVENTY|' \
+                     r'EIGHTY|NINETY|HUNDRED)'
+
 
 ENGLISH_PATTERNS = [
     # Chapter patterns with titles
@@ -131,6 +137,23 @@ ENGLISH_PATTERNS = [
         priority=110,
         description="CHAPTER ONE"
     ),
+    Pattern(
+        regex=r'^CHAPTER\s+(' + NUMBER_WORDS_UPPER + r')\.\s*$',
+        pattern_type=PatternType.CHAPTER,
+        number_type=NumberType.WORD,
+        capture_groups={1: 'number'},
+        priority=115,
+        description="CHAPTER ONE."
+    ),
+    # This pattern is higher priority than the regular CHAPTER ONE pattern
+    Pattern(
+        regex=r'^CHAPTER\s+(' + NUMBER_WORDS_UPPER + r')\s*$',
+        pattern_type=PatternType.CHAPTER,
+        number_type=NumberType.WORD,
+        capture_groups={1: 'number'},
+        priority=125,  # Higher than the lowercase "CHAPTER ONE" pattern
+        description="CHAPTER ONE (uppercase)"
+    ),
     
     # Alternative formats
     Pattern(
@@ -186,12 +209,12 @@ ENGLISH_PATTERNS = [
     
     # Letter patterns
     Pattern(
-        regex=r'^To\s+([A-Z].+[.!?])\s*$',
+        regex=r'^To\s+((?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.|Sir\s+|Lord\s+|Lady\s+|Miss\s+|Master\s+|Dame\s+)[A-Z][^.!?]+)\s*$',
         pattern_type=PatternType.LETTER,
         number_type=NumberType.NONE,
         capture_groups={1: 'title'},
         priority=90,
-        description="To Someone"
+        description="To Someone (epistolary format)"
     ),
     Pattern(
         regex=r'^Letter\s+(\d+)\.?\s*$',

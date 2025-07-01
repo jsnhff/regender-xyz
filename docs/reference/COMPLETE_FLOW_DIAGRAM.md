@@ -16,24 +16,24 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                        ENTRY POINTS                              │
-├────────────────────────────┬─────────────────────────────────────┤
-│    regender_cli.py         │      regender_json_cli.py           │
-│  (Full text processing)    │   (JSON-based processing)           │
-└────────────┬───────────────┴──────────────┬──────────────────────┘
-             │                              │
-             v                              v
+│                        ENTRY POINT                               │
+├──────────────────────────────────────────────────────────────────┤
+│                     regender_book_cli.py                         │
+│              (Unified CLI for all operations)                    │
+└────────────────────────────┬─────────────────────────────────────┘
+                             │
+                             v
 ┌────────────────────────────┐  ┌──────────────────────────────────┐
 │   PREPROCESSING STAGE      │  │   JSON TRANSFORMATION STAGE      │
 ├────────────────────────────┤  ├──────────────────────────────────┤
-│ book_to_json.py           │  │ json_transform.py                │
-│  └─ process_book_to_json() │  │  ├─ transform_json_book()        │
-│                           │  │  ├─ load character context       │
+│ book_to_json.py           │  │ book_transform/transform.py      │
+│  └─ process_book_to_json() │  │  ├─ transform_book()             │
+│                           │  │  ├─ analyze_book_characters()    │
 │ Uses book_parser/:        │  │  └─ process chapters             │
 │  ├─ PatternRegistry       │  │                                  │
 │  ├─ SectionDetector       │  │ For each chapter:                │
-│  └─ BookParser API        │  │  ├─ chunk sentences (50 each)    │
-│                           │  │  ├─ call OpenAI API              │
+│  └─ BookParser API        │  │  ├─ smart chunk sentences        │
+│                           │  │  ├─ call LLM API                 │
 │ Supports:                 │  │  └─ merge results                │
 │  • English chapters       │  │                                  │
 │  • French (Chapitre)      │  │                                  │
@@ -45,13 +45,15 @@
              │                                │
              v                                v
 ┌────────────────────────────────────────────────────────────────┐
-│                     OPENAI API CALLS                           │
+│                     LLM API CALLS                              │
 ├────────────────────────────────────────────────────────────────┤
-│ 1. Character Analysis (analyze_characters.py)                  │
-│    └─ GPT-4: Identify characters and their genders             │
+│ Providers: OpenAI, Grok, MLX (local)                           │
 │                                                                │
-│ 2. Gender Transformation (gender_transform.py)                 │
-│    └─ GPT-4/GPT-4o-mini: Transform pronouns                    │
+│ 1. Character Analysis (book_transform/character_analyzer.py)   │
+│    └─ Identify characters and their genders                    │
+│                                                                │
+│ 2. Gender Transformation (book_transform/llm_transform.py)     │
+│    └─ Transform gender references                             │
 │                                                                │
 │ API Request Format:                                            │
 │ {                                                              │
@@ -107,7 +109,7 @@ Scene 1. A public place.
 [Enter SAMPSON and GREGORY]
 ```
 
-### Intermediate: Clean JSON
+### Intermediate: Clean JSON (with Paragraph Structure)
 ```json
 {
   "metadata": {
@@ -121,9 +123,19 @@ Scene 1. A public place.
       "number": "I",
       "title": "Down the Rabbit-Hole",
       "type": "chapter",
-      "sentences": [
-        "Alice was beginning to get very tired...",
-        "She had peeped into the book..."
+      "paragraphs": [
+        {
+          "sentences": [
+            "Alice was beginning to get very tired...",
+            "She had peeped into the book..."
+          ]
+        },
+        {
+          "sentences": [
+            "So she was considering in her own mind...",
+            "Whether the pleasure of making a daisy-chain..."
+          ]
+        }
       ],
       "sentence_count": 123,
       "word_count": 2184
@@ -131,6 +143,7 @@ Scene 1. A public place.
   ],
   "statistics": {
     "total_chapters": 12,
+    "total_paragraphs": 450,
     "total_sentences": 1234,
     "total_words": 26358
   }
@@ -185,19 +198,24 @@ Scene 1. A public place.
 ### Core Processing:
 1. **book_to_json.py** - Main entry point for text→JSON conversion
 2. **book_parser/** - Modular parser with 100% success rate
-3. **json_transform.py** - JSON-based gender transformation
-4. **gender_transform.py** - Core transformation logic & OpenAI integration
-5. **utils.py** - API client, caching, error handling
+3. **book_transform/** - Complete transformation system
+   - **transform.py** - Main transformation orchestration
+   - **character_analyzer.py** - Character identification
+   - **llm_transform.py** - LLM integration
+   - **chunking/** - Smart token-based chunking
+4. **api_client.py** - Unified LLM client (OpenAI/Grok/MLX)
 
-### Processing Modes:
-1. **Direct Text Mode**: Process entire text files at once
-2. **JSON Mode**: Process pre-parsed JSON for better control
-3. **Pipeline Mode**: Full analysis + transformation workflow
+### Processing Commands:
+1. **download**: Get books from Project Gutenberg
+2. **process**: Convert text files to JSON format
+3. **transform**: Apply gender transformation
+4. **validate**: Check JSON accuracy
+5. **list**: Show available books
 
 ### Transformation Types:
-- **Feminine**: he→she, Mr.→Ms., his→her
-- **Masculine**: she→he, Ms.→Mr., her→his  
-- **Neutral**: he/she→they, Mr./Ms.→Mx., his/her→their
+- **comprehensive**: Full gender transformation (default)
+- **names_only**: Only transform character names
+- **pronouns_only**: Only transform pronouns
 
 ## Parser Success Rates
 
@@ -216,9 +234,12 @@ Successfully handles:
 
 1. **Smart Pattern Matching**: Priority-based pattern system
 2. **Caching**: All API responses cached for 24 hours
-3. **Chunking**: Process 50 sentences at a time
-4. **Parallel Processing**: Chapters can be processed independently
-5. **Model Selection**: Use gpt-4o-mini for bulk processing (faster/cheaper)
+3. **Smart Chunking**: Model-adaptive chunk sizes
+   - MLX: Handles up to 32K tokens
+   - GPT-4o: Optimized for 8K chunks
+   - Grok: Adjusted for model limits
+4. **Paragraph Preservation**: Maintains text structure
+5. **Local Processing**: MLX option for privacy/cost savings
 
 ## Error Recovery
 

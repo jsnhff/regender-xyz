@@ -9,9 +9,8 @@ LLM APIs while maintaining security and flexibility.
 import os
 import json
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
-import functools
 from pathlib import Path
 
 # Manual .env loading since dotenv might not be available
@@ -35,18 +34,23 @@ from openai import OpenAI, OpenAIError
 # Try to import Grok client if available
 try:
     import requests
-    REQUESTS_AVAILABLE = True
+    _REQUESTS_AVAILABLE = True
 except ImportError:
-    REQUESTS_AVAILABLE = False
+    _REQUESTS_AVAILABLE = False
 
 
-class APIError(Exception):
-    """Base exception for API-related errors."""
-    pass
+# Import APIError from book_transform.utils to avoid duplication
+try:
+    from book_transform.utils import APIError
+except ImportError:
+    # Fallback if utils not available
+    class APIError(Exception):
+        """Base exception for API-related errors."""
+        pass
 
 
 @dataclass
-class APIResponse:
+class _APIResponse:
     """Standardized response from any LLM API."""
     content: str
     model: str
@@ -54,14 +58,14 @@ class APIResponse:
     raw_response: Optional[Any] = None
 
 
-class BaseLLMClient(ABC):
+class _BaseLLMClient(ABC):
     """Abstract base class for LLM API clients."""
     
     @abstractmethod
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,
                 temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> APIResponse:
+                response_format: Optional[Dict] = None) -> _APIResponse:
         """Complete a chat conversation."""
         pass
     
@@ -76,7 +80,7 @@ class BaseLLMClient(ABC):
         pass
 
 
-class OpenAIClient(BaseLLMClient):
+class _OpenAIClient(_BaseLLMClient):
     """OpenAI API client implementation."""
     
     def __init__(self, api_key: Optional[str] = None):
@@ -99,7 +103,7 @@ class OpenAIClient(BaseLLMClient):
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,
                 temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> APIResponse:
+                response_format: Optional[Dict] = None) -> _APIResponse:
         """Complete using OpenAI API."""
         if not self.client:
             raise APIError("OpenAI client not initialized. Set OPENAI_API_KEY.")
@@ -116,7 +120,7 @@ class OpenAIClient(BaseLLMClient):
             
             response = self.client.chat.completions.create(**kwargs)
             
-            return APIResponse(
+            return _APIResponse(
                 content=response.choices[0].message.content,
                 model=response.model,
                 usage={
@@ -133,14 +137,14 @@ class OpenAIClient(BaseLLMClient):
             raise APIError(f"Unexpected error calling OpenAI: {e}")
 
 
-class GrokClient(BaseLLMClient):
+class _GrokClient(_BaseLLMClient):
     """Grok API client implementation."""
     
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or os.environ.get("GROK_API_KEY")
         self.base_url = base_url or os.environ.get("GROK_API_BASE_URL", "https://api.x.ai/v1")
         
-        if not REQUESTS_AVAILABLE:
+        if not _REQUESTS_AVAILABLE:
             raise APIError("requests library not available. Install with: pip install requests")
     
     def is_available(self) -> bool:
@@ -154,7 +158,7 @@ class GrokClient(BaseLLMClient):
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,
                 temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> APIResponse:
+                response_format: Optional[Dict] = None) -> _APIResponse:
         """Complete using Grok API."""
         if not self.is_available():
             raise APIError("Grok client not configured. Set GROK_API_KEY.")
@@ -191,7 +195,7 @@ class GrokClient(BaseLLMClient):
             
             result = response.json()
             
-            return APIResponse(
+            return _APIResponse(
                 content=result["choices"][0]["message"]["content"],
                 model=result.get("model", model or self.get_default_model()),
                 usage=result.get("usage"),
@@ -202,6 +206,157 @@ class GrokClient(BaseLLMClient):
             raise APIError(f"Grok API request error: {e}")
         except Exception as e:
             raise APIError(f"Unexpected error calling Grok: {e}")
+
+
+class _MLXClient(_BaseLLMClient):
+    """MLX-LM local model client implementation."""
+    
+    def __init__(self):
+        self.model_path = os.environ.get("MLX_MODEL_PATH")
+        self._model = None
+        self._tokenizer = None
+        self._model_loaded = False
+        
+    def _load_model(self):
+        """Lazy load the model when first needed."""
+        if self._model_loaded:
+            return
+            
+        try:
+            import mlx_lm
+            from mlx_lm import load, generate
+            
+            if not self.model_path:
+                raise APIError("MLX_MODEL_PATH not set in environment")
+            
+            # Load model and tokenizer
+            self._model, self._tokenizer = load(self.model_path)
+            self._model_loaded = True
+            
+        except ImportError:
+            raise APIError("mlx-lm not installed. Install with: pip install mlx-lm")
+        except Exception as e:
+            raise APIError(f"Failed to load MLX model from {self.model_path}: {e}")
+    
+    def is_available(self) -> bool:
+        """Check if MLX is configured and available."""
+        if not self.model_path:
+            return False
+            
+        # Check if mlx_lm is installed
+        try:
+            import mlx_lm
+            return True
+        except ImportError:
+            return False
+    
+    def get_default_model(self) -> str:
+        """Return the model name."""
+        return "mistral-7b-instruct"
+    
+    def complete(self, messages: List[Dict[str, str]], 
+                model: Optional[str] = None,
+                temperature: float = 0.0,
+                response_format: Optional[Dict] = None) -> _APIResponse:
+        """Complete a chat conversation using MLX model."""
+        try:
+            # Ensure model is loaded
+            self._load_model()
+            
+            from mlx_lm import generate
+            from mlx_lm.sample_utils import make_sampler
+            
+            # Convert messages to prompt format
+            # Mistral format: [INST] user message [/INST] assistant response
+            prompt = ""
+            system_content = ""
+            
+            # First, extract any system messages
+            for msg in messages:
+                if msg["role"] == "system":
+                    system_content += msg["content"] + "\n\n"
+            
+            # Then process the conversation
+            for i, msg in enumerate(messages):
+                if msg["role"] == "user":
+                    user_content = msg['content']
+                    # Prepend system content to first user message
+                    if i == 0 and system_content:
+                        user_content = system_content + user_content
+                    
+                    if prompt == "":
+                        prompt += f"[INST] {user_content} [/INST]"
+                    else:
+                        prompt += f" [INST] {user_content} [/INST]"
+                elif msg["role"] == "assistant":
+                    prompt += f" {msg['content']}"
+                # System messages already handled above
+            
+            # If response format is JSON, add instruction
+            if response_format and response_format.get("type") == "json_object":
+                prompt = prompt.rstrip(" [/INST]") + "\n\nRespond with valid JSON only. [/INST]"
+            
+            # Create sampler with temperature
+            sampler = make_sampler(temp=temperature)
+            
+            # Generate response
+            response = generate(
+                self._model,
+                self._tokenizer,
+                prompt=prompt,
+                sampler=sampler,
+                max_tokens=2048,  # Conservative limit for local model
+                verbose=False
+            )
+            
+            # Extract just the generated text (remove the prompt)
+            generated_text = response
+            if prompt in generated_text:
+                generated_text = generated_text[len(prompt):].strip()
+            
+            # For JSON responses, try to clean up common MLX formatting issues
+            if response_format and response_format.get("type") == "json_object":
+                # MLX models sometimes add extra text before/after JSON
+                # Try to extract just the JSON part
+                import re
+                
+                # Look for JSON object boundaries
+                json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', generated_text, re.DOTALL)
+                if json_match:
+                    generated_text = json_match.group(0)
+                else:
+                    # If no clear JSON found, try to clean up common issues
+                    # Remove any text before the first {
+                    if '{' in generated_text:
+                        generated_text = generated_text[generated_text.index('{'):]
+                    # Remove any text after the last }
+                    if '}' in generated_text:
+                        generated_text = generated_text[:generated_text.rindex('}')+1]
+                    
+                # Try to validate it's proper JSON
+                try:
+                    json.loads(generated_text)
+                except json.JSONDecodeError:
+                    # If still not valid JSON, wrap in a basic structure
+                    generated_text = '{"error": "MLX model failed to generate valid JSON", "raw_response": ' + json.dumps(generated_text) + '}'
+            
+            # Estimate token usage (rough approximation)
+            prompt_tokens = len(prompt.split())
+            completion_tokens = len(generated_text.split())
+            
+            return _APIResponse(
+                content=generated_text,
+                model=model or self.get_default_model(),
+                usage={
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "total_tokens": prompt_tokens + completion_tokens
+                },
+                raw_response={"prompt": prompt, "response": response}
+            )
+            
+        except Exception as e:
+            raise APIError(f"MLX completion error: {e}")
 
 
 class UnifiedLLMClient:
@@ -216,8 +371,9 @@ class UnifiedLLMClient:
     
     def __init__(self, provider: Optional[str] = None):
         self.providers = {
-            "openai": OpenAIClient(),
-            "grok": GrokClient()
+            "openai": _OpenAIClient(),
+            "grok": _GrokClient(),
+            "mlx": _MLXClient()
         }
         
         # Determine which provider to use
@@ -246,7 +402,7 @@ class UnifiedLLMClient:
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,
                 temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> APIResponse:
+                response_format: Optional[Dict] = None) -> _APIResponse:
         """Complete using the configured provider."""
         return self.client.complete(messages, model, temperature, response_format)
     
@@ -264,8 +420,9 @@ class UnifiedLLMClient:
         available = []
         temp_client = cls.__new__(cls)
         temp_client.providers = {
-            "openai": OpenAIClient(),
-            "grok": GrokClient()
+            "openai": _OpenAIClient(),
+            "grok": _GrokClient(),
+            "mlx": _MLXClient()
         }
         
         for name, client in temp_client.providers.items():
@@ -289,15 +446,3 @@ def get_llm_client(provider: Optional[str] = None) -> UnifiedLLMClient:
     return UnifiedLLMClient(provider)
 
 
-# Decorator for safe API calls
-def safe_api_call(func):
-    """Decorator to handle API calls safely with proper error handling."""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except APIError:
-            raise  # Re-raise our API errors as-is
-        except Exception as e:
-            raise APIError(f"Unexpected error during API call: {e}")
-    return wrapper

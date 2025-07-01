@@ -25,12 +25,16 @@ class BookParser:
         self.pattern_registry = PatternRegistry()
         self.section_detector = SectionDetector(self.pattern_registry)
         
-        # Sentence splitting pattern
-        self.sentence_pattern = re.compile(
-            r'(?<=[.!?])\s+(?=[A-Z])|'  # Standard sentence end
-            r'(?<=[.!?]"\s)(?=[A-Z])|'   # Quote end
-            r'(?<=[.!?]"\s)(?=[A-Z])'    # Another quote pattern
-        )
+        # Common abbreviations that don't end sentences
+        self.abbreviations = {
+            'Mr', 'Mrs', 'Ms', 'Dr', 'Prof', 'Rev', 'Sr', 'Jr', 
+            'Lt', 'Col', 'Gen', 'Capt', 'Sgt', 'Corp', 'Pvt',
+            'Inc', 'Ltd', 'Co', 'Corp',
+            'Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Sept', 'Oct', 'Nov', 'Dec',
+            'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+            'St', 'Ave', 'Rd', 'Blvd', 'Ln', 'Ct',
+            'vs', 'etc'
+        }
     
     def parse_file(self, file_path: str, options: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Parse a book file"""
@@ -59,6 +63,27 @@ class BookParser:
         
         # Convert sections to chapters format
         chapters = self._sections_to_chapters(sections, lines)
+        
+        # If no chapters detected, treat entire text as one chapter
+        if not chapters:
+            # Clean the entire text
+            full_text = '\n'.join(lines)
+            cleaned_text = self._clean_content(full_text)
+            paragraphs = self._split_paragraphs(cleaned_text)
+            
+            if paragraphs:
+                all_sentences = []
+                for para in paragraphs:
+                    all_sentences.extend(para['sentences'])
+                
+                chapters = [{
+                    "number": "1",
+                    "title": "",
+                    "type": "chapter",
+                    "paragraphs": paragraphs,
+                    "sentence_count": len(all_sentences),
+                    "word_count": sum(len(s.split()) for s in all_sentences)
+                }]
         
         # Calculate statistics
         statistics = self._calculate_statistics(chapters)
@@ -137,17 +162,22 @@ class BookParser:
             # Clean content
             content = self._clean_content(content)
             
-            # Split into sentences
-            sentences = self._split_sentences(content)
+            # Split into paragraphs first, then sentences
+            paragraphs = self._split_paragraphs(content)
+            
+            # Calculate statistics
+            all_sentences = []
+            for para in paragraphs:
+                all_sentences.extend(para['sentences'])
             
             # Create chapter entry
             chapter = {
                 "number": section.number or str(i + 1),
                 "title": section.title or "",
                 "type": section.pattern_type.value,
-                "sentences": sentences,
-                "sentence_count": len(sentences),
-                "word_count": sum(len(s.split()) for s in sentences)
+                "paragraphs": paragraphs,
+                "sentence_count": len(all_sentences),
+                "word_count": sum(len(s.split()) for s in all_sentences)
             }
             
             chapters.append(chapter)
@@ -166,10 +196,16 @@ class BookParser:
         # Remove formatting artifacts
         content = re.sub(r'/\s*[A-Z]{3,}', '', content)
         
-        # Fix spacing
+        # Fix spacing while preserving paragraph breaks
+        # First, normalize paragraph breaks to double newlines
+        content = re.sub(r'\n\s*\n+', '\n\n', content)
+        
+        # Fix spacing around punctuation
         content = re.sub(r'\s+([.!?,;:])', r'\1', content)
         content = re.sub(r'([.!?])\s*([a-z])', r'\1 \2', content)
-        content = re.sub(r'\s+', ' ', content)
+        
+        # Collapse multiple spaces (but not newlines) into single spaces
+        content = re.sub(r'[^\S\n]+', ' ', content)
         
         # Remove orphan brackets
         content = re.sub(r'(?<!\[)\]', '', content)
@@ -177,19 +213,62 @@ class BookParser:
         
         return content.strip()
     
-    def _split_sentences(self, text: str) -> List[str]:
-        """Split text into sentences"""
+    def _split_paragraphs(self, text: str) -> List[Dict[str, List[str]]]:
+        """Split text into paragraphs, preserving sentence structure within each"""
         if not text:
             return []
         
-        # Basic sentence splitting
-        sentences = self.sentence_pattern.split(text)
+        # First, normalize line breaks within paragraphs (unwrap soft line breaks)
+        # Replace single newlines with spaces, but preserve double newlines
+        text = re.sub(r'(?<!\n)\n(?!\n)', ' ', text)
         
-        # Clean and filter
+        # Now split on actual paragraph breaks (2+ newlines)
+        paragraph_splits = re.split(r'\n\s*\n+', text)
+        
+        paragraphs = []
+        for para_text in paragraph_splits:
+            para_text = para_text.strip()
+            if para_text:  # Skip empty paragraphs
+                sentences = self._split_sentences(para_text)
+                if sentences:  # Only add paragraphs that have sentences
+                    paragraphs.append({
+                        "sentences": sentences
+                    })
+        
+        return paragraphs
+    
+    def _split_sentences(self, text: str) -> List[str]:
+        """Split text into sentences with proper handling of abbreviations"""
+        if not text:
+            return []
+        
+        # First, mark abbreviations to protect them
+        protected_text = text
+        for abbr in self.abbreviations:
+            # Replace periods after abbreviations with a placeholder
+            protected_text = re.sub(
+                rf'\b{re.escape(abbr)}\.',
+                f'{abbr}<<<ABBR_DOT>>>',
+                protected_text,
+                flags=re.IGNORECASE
+            )
+        
+        # Now split on sentence boundaries
+        # Match: period/exclamation/question + space + capital letter or quote
+        sentences = re.split(
+            r'(?<=[.!?])\s+(?=[A-Z"])|(?<=[.!?])\s*\n+',
+            protected_text
+        )
+        
+        # Restore abbreviation periods and clean
         cleaned = []
         for sent in sentences:
+            # Restore periods
+            sent = sent.replace('<<<ABBR_DOT>>>', '.')
             sent = sent.strip()
-            if sent and len(sent) > 5:  # Filter very short fragments
+            
+            # Skip very short fragments
+            if sent and len(sent) > 5:
                 cleaned.append(sent)
         
         return cleaned
@@ -199,12 +278,16 @@ class BookParser:
         total_chapters = len(chapters)
         total_sentences = sum(ch['sentence_count'] for ch in chapters)
         total_words = sum(ch['word_count'] for ch in chapters)
+        total_paragraphs = sum(len(ch.get('paragraphs', [])) for ch in chapters)
         
         return {
             "total_chapters": total_chapters,
+            "total_paragraphs": total_paragraphs,
             "total_sentences": total_sentences,
             "total_words": total_words,
             "average_sentences_per_chapter": total_sentences / total_chapters if total_chapters > 0 else 0,
+            "average_paragraphs_per_chapter": total_paragraphs / total_chapters if total_chapters > 0 else 0,
+            "average_sentences_per_paragraph": total_sentences / total_paragraphs if total_paragraphs > 0 else 0,
             "average_words_per_sentence": total_words / total_sentences if total_sentences > 0 else 0
         }
     
@@ -219,3 +302,10 @@ class BookParser:
     def get_pattern_summary(self) -> Dict[str, int]:
         """Get summary of registered patterns"""
         return self.pattern_registry.get_pattern_summary()
+    
+    def parse_file_to_json(self, input_file: str, output_file: str) -> Dict[str, Any]:
+        """Parse a file and save to JSON."""
+        from .formatters import save_book_json
+        book_data = self.parse_file(input_file)
+        save_book_json(book_data, output_file)
+        return book_data

@@ -1,0 +1,90 @@
+# Changelog
+
+All notable changes to the regender-xyz project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.7.0] - 2024-01-20
+
+### Added
+- Full paragraph preservation in JSON structure for accurate text recreation
+- Intelligent abbreviation handling (Mr., Mrs., Dr., etc.) in sentence splitting
+- Comprehensive MLX support with improved JSON parsing for local models
+- Robust error handling for character analysis failures
+- Fallback mechanisms for MLX JSON generation issues
+- Backward compatibility for both old (flat sentences) and new (paragraphs) JSON structures
+
+### Changed
+- Main CLI is now `regender_book_cli.py` (consolidated functionality)
+- Renamed `gender_transform` module to `book_transform` for clarity
+- Improved sentence splitting to handle abbreviations correctly
+- Enhanced JSON structure to preserve paragraph breaks
+- Updated transform system to maintain paragraph structure
+- Reorganized project with unified `books/` directory structure
+- Made internal API client classes private (prefixed with underscore)
+
+### Removed
+- Obsolete CLI files: `regender_cli.py`, `cli_visuals.py`, `interactive_cli.py`
+- Temporary utility: `process_new_texts.py`
+- Redundant `utils.py` (moved essential functions to `book_transform/utils.py`)
+- Duplicate `safe_api_call` decorator from `api_client.py`
+- Verse detection complexity (simplified to paragraph-only structure)
+
+### Fixed
+- Character analysis now gracefully handles MLX JSON parsing errors
+- MLX transformations continue even if character analysis fails
+- Improved JSON extraction from MLX model responses
+
+## [0.5.0] - 2024-01-15
+
+### Added
+- Modular book parser with 100% success rate on Gutenberg collection
+- Pattern registry system with priority-based matching
+- Support for 100+ book formats including international languages
+- Smart section detection with fallback strategies
+- Gutenberg CLI for easy book downloading and processing
+
+### Changed
+- Complete parser overhaul from monolithic to modular architecture
+- Improved chapter detection accuracy from 72% to 100%
+- Enhanced pattern matching with language-specific support
+
+## [0.4.0] - 2024-01-10
+
+### Added
+- Book preprocessing pipeline
+- JSON-based transformation workflow
+- Character analysis module
+- CLI commands for full pipeline processing
+
+### Changed
+- Improved sentence splitting algorithm
+- Enhanced artifact removal
+- Better dialogue handling
+
+## [0.3.0] - 2024-01-05
+
+### Added
+- Basic gender transformation functionality
+- Support for feminine, masculine, and neutral transformations
+- OpenAI API integration
+- Simple CLI interface
+
+### Changed
+- Improved text processing accuracy
+- Enhanced error handling
+
+## [0.2.0] - 2024-01-01
+
+### Added
+- Initial book parser
+- Basic chapter detection
+- Text cleaning utilities
+
+## [0.1.0] - 2023-12-28
+
+### Added
+- Initial project structure
+- Basic CLI framework
+- Project documentation

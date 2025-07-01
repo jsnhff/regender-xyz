@@ -35,69 +35,81 @@ Documentation from the original book processing pipeline:
 
 ## Quick Start
 
-### Preprocessing a Book
+### Processing Books
 
 ```bash
-# Basic usage - creates clean JSON
-python regender_cli.py preprocess book.txt
+# Process all text files in books/texts/ to JSON
+python regender_book_cli.py process
 
-# With verification file
-python regender_cli.py preprocess book.txt --verify
+# Transform a book using local MLX model
+python regender_book_cli.py transform books/json/book.json --provider mlx
 
-# Specify output location
-python regender_cli.py preprocess book.txt -o output/book_clean.json
-
-# Skip dialogue splitting
-python regender_cli.py preprocess book.txt --no-fix-sentences
+# Download and process Gutenberg books
+python regender_book_cli.py download --count 10
+python regender_book_cli.py process
 ```
 
-### Using the Clean JSON
+### Using the Paragraph-Aware JSON
 
 ```python
 import json
 
 # Load preprocessed book
-with open('book_clean.json', 'r') as f:
+with open('books/json/book.json', 'r') as f:
     book = json.load(f)
 
-# Access chapters and sentences
+# Access chapters with paragraph structure
 for chapter in book['chapters']:
-    print(f"{chapter['title']}: {chapter['sentence_count']} sentences")
+    print(f"{chapter['title']}: {chapter.get('sentence_count', 0)} sentences")
     
-    # Process sentences
-    for sentence in chapter['sentences']:
-        # Apply transformations
-        transformed = transform_gender(sentence)
+    # Process paragraphs (new structure)
+    if 'paragraphs' in chapter:
+        for paragraph in chapter['paragraphs']:
+            for sentence in paragraph['sentences']:
+                # Apply transformations
+                transformed = transform_gender(sentence)
+    # Handle old structure for compatibility
+    elif 'sentences' in chapter:
+        for sentence in chapter['sentences']:
+            transformed = transform_gender(sentence)
 ```
 
 ## Key Features
 
 - **Fast Processing**: < 1 second for full novels
 - **Accurate Chapter Detection**: 100% accuracy for standard formats
+- **Paragraph Preservation**: Maintains original text structure
+- **Abbreviation Handling**: Correctly handles Mr., Mrs., Dr., etc.
 - **Artifact Removal**: Removes EPUB artifacts, brackets, formatting codes
 - **Smart Sentence Splitting**: Handles embedded dialogues and abbreviations
-- **Clean Output**: JSON format with metadata and sentence arrays
+- **Multi-Provider Support**: OpenAI, Grok, and local MLX models
+- **Clean Output**: JSON format with metadata, paragraphs, and sentence arrays
 
 ## File Organization
 
 ```
 regender-xyz/
-├── book_to_json.py                 # Complete book processing pipeline
-├── regender_cli.py                 # CLI with preprocess command
-└── docs/                           # Documentation
-    ├── README.md                   # This file
-    ├── development/                # Development-related docs
-    │   ├── PARSER_COMPACTION_PROMPT.md
-    │   ├── PARSER_IMPROVEMENTS.md
-    │   └── PARSER_REFACTORING_COMPLETE.md
-    ├── maintenance/                # Maintenance docs
-    │   ├── POST_COMPACTION_TASKS.md
-    │   └── CLEANUP_SUMMARY.md
-    ├── reference/                  # Reference docs
-    │   ├── REMAINING_PATTERNS_ANALYSIS.md
-    │   └── COMPLETE_FLOW_DIAGRAM.md
-    ├── COMPREHENSIVE_PROJECT_SUMMARY.md
-    ├── INTEGRATION_SUMMARY.md
-    ├── BOOK_FORMAT_LESSONS.md
-    └── chapter_chunking_analysis.md
+├── books/                          # All book files
+│   ├── texts/                      # Source text files
+│   ├── json/                       # Processed JSON files
+│   └── output/                     # Transformed books
+├── book_parser/                    # Modular book parsing system
+│   ├── parser.py                   # Main parser API
+│   ├── patterns/                   # Format detection patterns
+│   └── detectors/                  # Smart section detection
+├── book_transform/                 # Gender transformation system
+│   ├── transform.py                # Main transformation logic
+│   ├── character_analyzer.py       # Character analysis
+│   ├── llm_transform.py           # LLM integration
+│   └── utils.py                   # Utility functions
+├── api_client.py                   # Unified LLM client (OpenAI/Grok/MLX)
+├── regender_book_cli.py           # Main CLI interface
+└── docs/                          # Documentation
+    ├── README.md                  # This file
+    ├── QUICK_START.md             # Getting started guide
+    ├── CHANGELOG.md               # Version history
+    ├── JSON_STRUCTURE.md          # JSON format documentation
+    ├── development/               # Development-related docs
+    ├── maintenance/               # Maintenance docs
+    └── reference/                 # Reference docs
 ```
