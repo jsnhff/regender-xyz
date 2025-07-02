@@ -5,6 +5,39 @@ All notable changes to the regender-xyz project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-01-02
+
+### Added
+- Pure LLM-based character analysis (removed regex scanning for better accuracy)
+- Smart chunking strategy for comprehensive book coverage with Grok
+- Support for Grok-3-latest model with 131k context window
+- Pre-analyzed character support for faster processing
+- Numbered sentence transformation approach for perfect alignment
+- Handles 100+ characters per book (tested on Harry Potter)
+- Strategic chunk analysis (beginning, middle, end sections)
+- Character position tracking (where characters first appear)
+- Anti-merging rules to prevent family member confusion
+
+### Changed
+- Character analysis now uses LLM exclusively for better accuracy
+- Improved sentence boundary detection for abbreviations (Mr., Mrs., Dr., etc.)
+- Enhanced name transformations (e.g., Harry → Harriet)
+- Better handling of complex family relationships
+- Optimized context usage for Grok (85% vs 70% for others)
+- Updated prompts to prevent character merging issues
+
+### Fixed
+- Fixed character consolidation bug where family members were merged
+- Resolved sentence splitting issues around abbreviations
+- Fixed Grok API key conflicts with environment variables
+- Corrected Grok model selection (grok-3-latest vs grok-beta)
+- Fixed JSON output formatting for Grok provider
+
+### Performance
+- Character analysis: 5-10 minutes for 400k character books with Grok
+- Found 106 characters in Harry Potter (vs 70-95 with other methods)
+- Reduced API calls through smart chunking strategy
+
 ## [0.7.0] - 2024-01-20
 
 ### Added

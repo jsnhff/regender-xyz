@@ -46,8 +46,9 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
 ## Documentation
 
 - **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
+- **[Transformation Pipeline](docs/reference/TRANSFORMATION_PIPELINE.md)** - Detailed transformation process
 - **[Character Analysis Module](book_characters/README.md)** - Smart character extraction system
-- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok APIs
+- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI, Grok, and MLX
 - **[MLX Setup Guide](docs/MLX_SETUP.md)** - Running local models on Apple Silicon
 - **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the paragraph-aware JSON format
 - **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser

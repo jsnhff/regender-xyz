@@ -1,0 +1,25 @@
+Warning: BeautifulSoup not available. Install with: pip install beautifulsoup4
+
+[96m📖 Analyzing characters in: books/json/pg1342-Pride_and_Prejudice_clean.json[0m
+Analyzing characters using LLM...
+  Book length: 676743 characters
+  Book too long for single analysis (169185 tokens > 111411 usable)
+  Using chunked processing...
+Analyzing characters with chunked API processing...
+  Max tokens per chunk: 111411
+  Total text: 676744 characters (~169186 tokens)
+  Using chunks of ~356515 characters
+  Created 2 chunks for analysis
+
+  Processing chunk 1/2...
+    Found 6 characters in chunk
+    Total unique characters: 6
+
+  Processing chunk 2/2...
+    Found 4 characters in chunk
+    Total unique characters: 9
+
+✅ Analysis complete! Found 9 unique characters
+[92m✓ Saved transformed JSON to: books/json/pg1342-Pride_and_Prejudice_characters.json[0m
+
+[92m✓ Saved 9 characters to: books/json/pg1342-Pride_and_Prejudice_characters.json[0m

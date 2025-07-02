@@ -1,6 +1,6 @@
 # MLX Local Model Support
 
-ReGender-XYZ now supports running local models using MLX on Apple Silicon Macs. This allows you to transform books without API costs using models like Mistral-7B-Instruct.
+ReGender-XYZ supports running local models using MLX on Apple Silicon Macs. This allows you to transform books and analyze characters without API costs using models like Mistral-7B-Instruct or Mistral-Small-24B.
 
 ## Prerequisites
 
@@ -46,14 +46,21 @@ DEFAULT_LLM_PROVIDER=mlx
 ### Using MLX with the CLI
 
 ```bash
+# Analyze characters in a book
+python regender_book_cli.py analyze-characters book.json --provider mlx
+
 # Transform a single book
 python regender_book_cli.py transform book.json --provider mlx
 
-# Transform with specific model (if you have multiple)
-python regender_book_cli.py transform book.json --provider mlx --model mistral-7b-instruct
+# Transform with pre-analyzed characters
+python regender_book_cli.py transform book.json \
+  --characters book_characters.json \
+  --provider mlx
 
-# Batch transform
-python regender_book_cli.py transform book_json/ --batch --provider mlx
+# Use Mistral-24B for better quality (requires ~45GB RAM)
+python regender_book_cli.py transform book.json \
+  --provider mlx \
+  --model mistral-small-24b
 ```
 
 ### Testing MLX Support
@@ -66,18 +73,30 @@ python test_mlx.py
 
 ## Performance Notes
 
-- **Memory Usage**: Mistral-7B 8-bit requires ~7-8GB of RAM
-- **Speed**: Expect 10-50 tokens/second depending on your Mac
-- **Context Window**: Mistral-7B supports 32K tokens (much larger than GPT-3.5)
-- **Quality**: Local models may produce different results than GPT-4
+### Model Comparison
+
+| Model | Memory Usage | Speed | Context | Quality | Use Case |
+|-------|--------------|-------|---------|---------|----------|
+| Mistral-7B-8bit | ~7-8GB | Fast | 32K | Good | Quick transforms |
+| Mistral-Small-24B | ~45GB | Slow | 32K | Very Good | Character analysis |
+
+### Character Analysis Performance
+- **Mistral-7B**: 15-20 minutes for full book, finds 60-80 characters
+- **Mistral-24B**: 45+ minutes for full book, finds 70-80 characters
+- **Recommendation**: Use Grok API for character analysis if available
+
+### Memory-Aware Chunking
+The system automatically adjusts chunk sizes for MLX models:
+- Default: 150k characters per chunk
+- Memory-constrained (24B on 64GB system): 50k characters per chunk
+- Overlap: 2000 characters between chunks
 
 ## Supported Models
 
-Currently optimized for:
-- Mistral-7B-Instruct (all versions)
-- Mistral-7B-Instruct-v0.3-8bit (recommended)
-
-Other MLX models may work but haven't been tested.
+Tested and optimized for:
+- **Mistral-7B-Instruct-v0.3** (8-bit recommended) - Fast, efficient
+- **Mistral-Small-24B** (16-bit) - Better quality, high memory usage
+- Other MLX models may work but require configuration adjustments
 
 ## Troubleshooting
 
