@@ -27,12 +27,12 @@ def ai_chapter_analyzer(text: str, model: str = "gpt-4.1-nano") -> dict:
     CRITICAL REQUIREMENTS:
     1. Identify the precise regex pattern to find ALL chapters
     2. Count the total number of chapters
-    3. Recommend how many chapters to group together (target ~15k tokens per chunk)
+    3. Recommend how many chapters to group together (target ~8k chars per chunk for better AI processing)
     
     Return JSON with:
     - chapter_regex: exact regex pattern to match chapters
     - total_chapters: total count of chapters found
-    - chapters_per_chunk: recommended chapters per chunk for ~15k tokens
+    - chapters_per_chunk: recommended chapters per chunk for ~8k chars
     - sample_chapters: first 3 chapter titles found
     """
     
@@ -120,9 +120,9 @@ def python_pattern_detector(text: str) -> dict:
     
     # Be more conservative with larger chapters
     if avg_chapter_size > 10000:  # Large chapters like Moby Dick
-        target_chunk_size = 50000  # Smaller target for safety
+        target_chunk_size = 8000   # Small chunks for better AI transformation accuracy
     else:
-        target_chunk_size = 60000  # Normal target
+        target_chunk_size = 10000  # Normal target - still small for reliability
         
     chapters_per_chunk = max(1, target_chunk_size // avg_chapter_size)
     
@@ -241,6 +241,58 @@ def ai_chunker(text: str, analysis: dict) -> list:
             })
             
             print(f"✅ Chunk {len(chunks)}: Chapters {start_chapter_num}-{end_chapter_num} = {len(chunk_text):,} chars")
+    
+    # POST-PROCESS: Split any chunks that are still too large for AI processing
+    max_chunk_size = 12000  # Maximum size for reliable AI transformation
+    final_chunks = []
+    
+    for chunk in chunks:
+        if chunk['size'] <= max_chunk_size:
+            final_chunks.append(chunk)
+        else:
+            # Split large chunk into smaller pieces
+            print(f"🔧 Splitting large chunk ({chunk['size']:,} chars) into smaller pieces...")
+            
+            text_to_split = chunk['text']
+            split_chunks = []
+            current_pos = 0
+            split_num = 1
+            
+            while current_pos < len(text_to_split):
+                end_pos = min(current_pos + max_chunk_size, len(text_to_split))
+                
+                # Try to break at a good spot (paragraph or sentence)
+                if end_pos < len(text_to_split):
+                    # Look for paragraph break first
+                    para_break = text_to_split.rfind('\n\n', current_pos, end_pos)
+                    if para_break > current_pos:
+                        end_pos = para_break + 2
+                    else:
+                        # Look for sentence break
+                        sent_break = text_to_split.rfind('. ', current_pos, end_pos)
+                        if sent_break > current_pos:
+                            end_pos = sent_break + 2
+                
+                split_text = text_to_split[current_pos:end_pos]
+                split_chunks.append({
+                    'text': split_text,
+                    'description': f"{chunk['description']} (part {split_num})",
+                    'chapters': chunk['chapters'],
+                    'size': len(split_text),
+                    'start_pos': chunk['start_pos'] + current_pos,
+                    'end_pos': chunk['start_pos'] + end_pos
+                })
+                
+                print(f"   ✅ Split part {split_num}: {len(split_text):,} chars")
+                current_pos = end_pos
+                split_num += 1
+            
+            final_chunks.extend(split_chunks)
+    
+    chunks = final_chunks
+    print(f"\n📊 FINAL CHUNK SIZES:")
+    for i, chunk in enumerate(chunks, 1):
+        print(f"   Chunk {i}: {chunk['size']:,} chars - {chunk['description']}")
     
     # VERIFY 100% COVERAGE
     total_chunk_size = sum(chunk['size'] for chunk in chunks)
