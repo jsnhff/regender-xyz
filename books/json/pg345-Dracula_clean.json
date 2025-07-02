@@ -752,18 +752,9 @@
         },
         {
           "sentences": [
-            "“There you are right,” I said. “I know no more than the dead where even"
+            "“There you are right,” I said. “I know no more than the dead where even to look for them.” Then we drifted into other matters."
           ]
-        }
-      ],
-      "sentence_count": 157,
-      "word_count": 3424
-    },
-    {
-      "number": "4",
-      "title": "look for them.” Then we drifted into other matters.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Come,” he said at last, “tell me of London and of the house which you have procured for me.” With an apology for my remissness, I went into my own room to get the papers from my bag.",
@@ -838,6 +829,7 @@
         {
           "sentences": [
             "It was the better part of an hour when the Count returned. “Aha!” he said; “still at your books?",
+            "Good!",
             "But you must not work always.",
             "Come; I am informed that your supper is ready.” He took my arm, and we went into the next room, where I found an excellent supper ready on the table.",
             "The Count again excused himself, as he had dined out on his being away from home.",
@@ -933,8 +925,8 @@
           ]
         }
       ],
-      "sentence_count": 96,
-      "word_count": 2049
+      "sentence_count": 254,
+      "word_count": 5484
     },
     {
       "number": "III",
@@ -1050,6 +1042,7 @@
           "sentences": [
             "“I shall illustrate.",
             "Your friend and mine, Mr. Peter Hawkins, from under the shadow of your beautiful cathedral at Exeter, which is far from London, buys for me through your good self my place at London.",
+            "Good!",
             "Now here let me say frankly, lest you should think it strange that I have sought the services of one so far off from London instead of some one resident there, that my motive was that no local interest might be served save my wish only; and as one of London residence might, perhaps, have some purpose of himself or friend to serve, I went thus afield to seek my agent, whose labours should be only to my interest.",
             "Now, suppose I, who have much of affairs, wish to ship goods, say, to Newcastle, or Durham, or Harwich, or Dover, might it not be that it could with more ease be done by consigning to one in these ports?” I answered that certainly it would be most easy, but that we solicitors had a system of agency one for the other, so that local work could be done locally on instruction from any solicitor, so that the client, simply placing himself in the hands of one man, could have his wishes carried out by him without further trouble."
           ]
@@ -1369,8 +1362,8 @@
           ]
         }
       ],
-      "sentence_count": 243,
-      "word_count": 5724
+      "sentence_count": 244,
+      "word_count": 5725
     },
     {
       "number": "IV",
@@ -1779,18 +1772,9 @@
             "He could not have lain there long, for the earthy smell would have passed away in a few hours.",
             "By the side of the box was its cover, pierced with holes here and there.",
             "I thought he might have the keys on him, but when I went to search I saw the dead eyes, and in them, dead though they were, such a look of hate, though unconscious of me or my presence, that I fled from the place, and leaving the Count’s room by the window, crawled again up the castle wall.",
-            "Regaining my room, I threw myself panting upon the bed and tried"
+            "Regaining my room, I threw myself panting upon the bed and tried to think...."
           ]
-        }
-      ],
-      "sentence_count": 201,
-      "word_count": 3722
-    },
-    {
-      "number": "7",
-      "title": "think....",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "* * * * *"
@@ -1913,6 +1897,7 @@
           "sentences": [
             "“Back, back, to your own place!",
             "Your time is not yet come.",
+            "Wait!",
             "Have patience!",
             "To-night is mine.",
             "To-morrow night is yours!” There was a low, sweet ripple of laughter, and in a rage I threw open the door, and saw without the three terrible women licking their lips.",
@@ -2044,12 +2029,13 @@
           "sentences": [
             "At least God’s mercy is better than that of these monsters, and the precipice is steep and high.",
             "At its foot a man may sleep--as a man.",
-            "Good-bye, all!"
+            "Good-bye, all!",
+            "Mina!"
           ]
         }
       ],
-      "sentence_count": 120,
-      "word_count": 2166
+      "sentence_count": 323,
+      "word_count": 5892
     },
     {
       "number": "V",
@@ -2186,6 +2172,11 @@
           "sentences": [
             "“P.S.--I need not tell you this is a secret.",
             "Good-night again."
+          ]
+        },
+        {
+          "sentences": [
+            "“L.”"
           ]
         },
         {
@@ -2390,6 +2381,8 @@
         },
         {
           "sentences": [
+            "R.",
+            "M.",
             "Renfield, ætat 59.--Sanguine temperament; great physical strength; morbidly excitable; periods of gloom, ending in some fixed idea which I cannot make out.",
             "I presume that the sanguine temperament itself and the disturbing influence end in a mentally-accomplished finish; a possibly dangerous man, probably dangerous if unselfish.",
             "In selfish men caution is as secure an armour for their foes as for themselves.",
@@ -2422,7 +2415,8 @@
             "There will only be one other, our old pal at the Korea, Jack Seward.",
             "He’s coming, too, and we both want to mingle our weeps over the wine-cup, and to drink a health with all our hearts to the happiest man in all the wide world, who has won the noblest heart that God has made and the best worth winning.",
             "We promise you a hearty welcome, and a loving greeting, and a health as true as your own right hand.",
-            "We shall both swear to leave you at home if you drink too deep to a certain pair of eyes."
+            "We shall both swear to leave you at home if you drink too deep to a certain pair of eyes.",
+            "Come!"
           ]
         },
         {
@@ -2459,8 +2453,8 @@
           ]
         }
       ],
-      "sentence_count": 210,
-      "word_count": 3539
+      "sentence_count": 214,
+      "word_count": 3543
     },
     {
       "number": "VI",
@@ -3090,18 +3084,9 @@
             "On the summit of the East Cliff the new searchlight was ready for experiment, but had not yet been tried.",
             "The officers in charge of it got it into working order, and in the pauses of the inrushing mist swept with it the surface of the sea.",
             "Once or twice its service was most effective, as when a fishing-boat, with gunwale under water, rushed into the harbour, able, by the guidance of the sheltering light, to avoid the danger of dashing against the piers.",
-            "As each boat achieved the safety of the port there was a shout of joy from the mass of people on shore, a shout which for a moment seemed"
+            "As each boat achieved the safety of the port there was a shout of joy from the mass of people on shore, a shout which for a moment seemed to cleave the gale and was then swept away in its rush."
           ]
-        }
-      ],
-      "sentence_count": 37,
-      "word_count": 1081
-    },
-    {
-      "number": "11",
-      "title": "cleave the gale and was then swept away in its rush.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Before long the searchlight discovered some distance away a schooner with all sails set, apparently the same vessel which had been noticed earlier in the evening.",
@@ -3144,6 +3129,7 @@
             "Between the inner hand and the wood was a crucifix, the set of beads on which it was fastened being around both wrists and wheel, and all kept fast by the binding cords.",
             "The poor fellow may have been seated at one time, but the flapping and buffeting of the sails had worked through the rudder of the wheel and dragged him to and fro, so that the cords with which he was tied had cut the flesh to the bone.",
             "Accurate note was made of the state of things, and a doctor--Surgeon J.",
+            "M.",
             "Caffyn, of 33, East Elliot Place--who came immediately after me, declared, after making examination, that the man must have been dead for quite two days.",
             "In his pocket was a bottle, carefully corked, empty save for a little roll of paper, which proved to be the addendum to the log.",
             "The coastguard said the man must have tied up his own hands, fastening the knots with his teeth.",
@@ -3169,10 +3155,13 @@
             "It turns out that the schooner is a Russian from Varna, and is called the _Demeter_.",
             "She is almost entirely in ballast of silver sand, with only a small amount of cargo--a number of great wooden boxes filled with mould.",
             "This cargo was consigned to a Whitby solicitor, Mr. S.",
+            "F.",
             "Billington, of 7, The Crescent, who this morning went aboard and formally took possession of the goods consigned to him.",
             "The Russian consul, too, acting for the charter-party, took formal possession of the ship, and paid all harbour dues, etc. Nothing is talked about here to-day except the strange coincidence; the officials of the Board of Trade have been most exacting in seeing that every compliance has been made with existing regulations.",
             "As the matter is to be a “nine days’ wonder,” they are evidently determined that there shall be no cause of after complaint.",
             "A good deal of interest was abroad concerning the dog which landed when the ship struck, and more than a few of the members of the S.",
+            "P.",
+            "C.",
             "A., which is very strong in Whitby, have tried to befriend the animal.",
             "To the general disappointment, however, it was not to be found; it seems to have disappeared entirely from the town.",
             "It may be that it was frightened and made its way on to the moors, where it is still hiding in terror.",
@@ -3497,18 +3486,9 @@
             "I am growing weaker, and the night is coming on.",
             "If He can look me in the face again, I may not have time to act....",
             "If we are wrecked, mayhap this bottle may be found, and those who find it may understand; if not,... well, then all men shall know that I have been true to my trust.",
-            "God and the Blessed Virgin and the saints help a poor ignorant soul trying"
+            "God and the Blessed Virgin and the saints help a poor ignorant soul trying to do his duty...."
           ]
-        }
-      ],
-      "sentence_count": 206,
-      "word_count": 3526
-    },
-    {
-      "number": "12",
-      "title": "do his duty....",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "* * * * *"
@@ -3598,8 +3578,8 @@
           ]
         }
       ],
-      "sentence_count": 52,
-      "word_count": 1036
+      "sentence_count": 299,
+      "word_count": 5663
     },
     {
       "number": "VIII",
@@ -3700,20 +3680,7 @@
             "When I had her carefully wrapped up I put my shoes on her feet and then began very gently to wake her.",
             "At first she did not respond; but gradually she became more and more uneasy in her sleep, moaning and sighing occasionally.",
             "At last, as time was passing fast, and, for many other reasons, I wished to get her home at once, I shook her more forcibly, till finally she opened her eyes and awoke.",
-            "She did not seem surprised"
-          ]
-        }
-      ],
-      "sentence_count": 77,
-      "word_count": 1486
-    },
-    {
-      "number": "14",
-      "title": "see me, as, of course, she did not realise all at once where she was.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "She did not seem surprised to see me, as, of course, she did not realise all at once where she was.",
             "Lucy always wakes prettily, and even at such a time, when her body must have been chilled with cold, and her mind somewhat appalled at waking unclad in a churchyard at night, she did not lose her grace.",
             "She trembled a little, and clung to me; when I told her to come at once with me home she rose without a word, with the obedience of a child.",
             "As we passed along, the gravel hurt my feet, and Lucy noticed me wince.",
@@ -4052,8 +4019,7 @@
             "I have cried over the good Sister’s letter till I can feel it wet against my bosom, where it lies.",
             "It is of Jonathan, and must be next my heart, for he is _in_ my heart.",
             "My journey is all mapped out, and my luggage ready.",
-            "I am only taking one change of dress; Lucy will bring my trunk to London and keep it till I send for it, for it may be that...",
-            "I must write no more; I must keep it to say to Jonathan, my husband.",
+            "I am only taking one change of dress; Lucy will bring my trunk to London and keep it till I send for it, for it may be that... I must write no more; I must keep it to say to Jonathan, my husband.",
             "The letter that he has seen and touched must comfort me till we meet."
           ]
         },
@@ -4076,6 +4042,7 @@
         {
           "sentences": [
             "“I write by desire of Mr. Jonathan Harker, who is himself not strong enough to write, though progressing well, thanks to God and St. Joseph and Ste.",
+            "Mary.",
             "He has been under our care for nearly six weeks, suffering from a violent brain fever.",
             "He wishes me to convey his love, and to say that by this post I write for him to Mr. Peter Hawkins, Exeter, to say, with his dutiful respects, that he is sorry for his delay, and that all of his work is completed.",
             "He will require some few weeks’ rest in our sanatorium in the hills, but will then return.",
@@ -4099,6 +4066,7 @@
         },
         {
           "sentences": [
+            "“P.",
             "S.--My patient being asleep, I open this to let you know something more.",
             "He has told me all about you, and that you are shortly to be his wife.",
             "All blessings to you both!",
@@ -4272,8 +4240,8 @@
           ]
         }
       ],
-      "sentence_count": 283,
-      "word_count": 4809
+      "sentence_count": 361,
+      "word_count": 6313
     },
     {
       "number": "IX",
@@ -4436,8 +4404,10 @@
         },
         {
           "sentences": [
+            "“P.",
             "S.--Mother sends her love.",
             "She seems better, poor dear. “P.",
+            "P.",
             "S.--We are to be married on September.”"
           ]
         },
@@ -4484,8 +4454,7 @@
         },
         {
           "sentences": [
-            "* * * * *...",
-            "Three nights has the same thing happened--violent all day then quiet from moonrise to sunrise.",
+            "* * * * *... Three nights has the same thing happened--violent all day then quiet from moonrise to sunrise.",
             "I wish I could get some clue to the cause.",
             "It would almost seem as if there was some influence which came and went.",
             "Happy thought!",
@@ -4507,6 +4476,7 @@
             "We shall in future be able to ease his bonds for a few hours each day.",
             "I have given orders to the night attendant merely to shut him in the padded room, when once he is quiet, until an hour before sunrise.",
             "The poor soul’s body will enjoy the relief even if his mind cannot appreciate it.",
+            "Hark!",
             "The unexpected again!",
             "I am called; the patient has once more escaped."
           ]
@@ -4941,8 +4911,8 @@
           ]
         }
       ],
-      "sentence_count": 340,
-      "word_count": 5937
+      "sentence_count": 342,
+      "word_count": 5940
     },
     {
       "number": "X",
@@ -5824,6 +5794,7 @@
             "Then, for the first time in my life, I saw Van Helsing break down.",
             "He raised his hands over his head in a sort of mute despair, and then beat his palms together in a helpless way; finally he sat down on a chair, and putting his hands before his face, began to sob, with loud, dry sobs that seemed to come from the very racking of his heart.",
             "Then he raised his arms again, as though appealing to the whole universe. “God!",
+            "God!",
             "God!” he said. “What have we done, what has this poor thing done, that we are so sore beset?",
             "Is there fate amongst us still, sent down from the pagan world of old, that such things must be, and in such way?",
             "This poor mother, all unknowing, and all for the best as she think, does such thing as lose her daughter body and soul; and we must not tell her, we must not even warn her, or she die, and then both die.",
@@ -6278,18 +6249,9 @@
             "The maids shrieked, and then went in a body to the dining-room; and I laid what flowers I had on my dear mother’s breast.",
             "When they were there I remembered what Dr. Van Helsing had told me, but I didn’t like to remove them, and, besides, I would have some of the servants to sit up with me now.",
             "I was surprised that the maids did not come back.",
-            "I called them, but got no answer, so I went"
+            "I called them, but got no answer, so I went to the dining-room to look for them."
           ]
-        }
-      ],
-      "sentence_count": 249,
-      "word_count": 4903
-    },
-    {
-      "number": "18",
-      "title": "the dining-room to look for them.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "My heart sank when I saw what had happened.",
@@ -6317,8 +6279,8 @@
           ]
         }
       ],
-      "sentence_count": 18,
-      "word_count": 209
+      "sentence_count": 268,
+      "word_count": 5120
     },
     {
       "number": "XII",
@@ -6822,7 +6784,16 @@
           "sentences": [
             "_Report from Patrick Hennessey, M.",
             "D., M.",
-            "I., etc., etc., to John Seward, M."
+            "R.",
+            "C.",
+            "S.",
+            "L.",
+            "K.",
+            "Q.",
+            "C.",
+            "P.",
+            "I., etc., etc., to John Seward, M.",
+            "D._"
           ]
         },
         {
@@ -7170,8 +7141,8 @@
           ]
         }
       ],
-      "sentence_count": 404,
-      "word_count": 7279
+      "sentence_count": 413,
+      "word_count": 7288
     },
     {
       "number": "XIII",
@@ -7338,9 +7309,13 @@
             "John, my child, you have been my friend now many years, and yet did you ever know me to do any without good cause?",
             "I may err--I am but man; but I believe in all I do.",
             "Was it not for these causes that you send for me when the great trouble came?",
+            "Yes!",
             "Were you not amazed, nay horrified, when I would not let Arthur kiss his love--though she was dying--and snatched him away by all my strength?",
+            "Yes!",
             "And yet you saw how she thanked me, with her so beautiful dying eyes, her voice, too, so weak, and she kiss my rough old hand and bless me?",
-            "And did you not hear me swear promise to her, that so she closed her eyes grateful?"
+            "Yes!",
+            "And did you not hear me swear promise to her, that so she closed her eyes grateful?",
+            "Yes!"
           ]
         },
         {
@@ -7470,6 +7445,7 @@
         {
           "sentences": [
             "“Oh, Jack!",
+            "Jack!",
             "What shall I do!",
             "The whole of life seems gone from me all at once, and there is nothing in the wide world for me to live for.”"
           ]
@@ -7963,8 +7939,8 @@
           ]
         }
       ],
-      "sentence_count": 348,
-      "word_count": 6569
+      "sentence_count": 353,
+      "word_count": 6574
     },
     {
       "number": "XIV",
@@ -8214,6 +8190,7 @@
           "sentences": [
             "“Oh, you so clever woman!” he said. “I knew long that Mr. Jonathan was a man of much thankfulness; but see, his wife have all the good things.",
             "And will you not so much honour me and so help me as to read it for me?",
+            "Alas!",
             "I know not the shorthand.” By this time my little joke was over, and I was almost ashamed; so I took the typewritten copy from my workbasket and handed it to him."
           ]
         },
@@ -8668,17 +8645,24 @@
             "Ah, it is the fault of our science that it wants to explain all; and if it explain not, then it says there is nothing to explain.",
             "But yet we see around us every day the growth of new beliefs, which think themselves new; and which are yet but the old, which pretend to be young--like the fine ladies at the opera.",
             "I suppose now you do not believe in corporeal transference.",
+            "No?",
             "Nor in materialisation.",
+            "No?",
             "Nor in astral bodies.",
+            "No?",
             "Nor in the reading of thought.",
+            "No?",
             "Nor in hypnotism----”"
           ]
         },
         {
           "sentences": [
             "“Yes,” I said. “Charcot has proved that pretty well.” He smiled as he went on: “Then you are satisfied as to it.",
+            "Yes?",
             "And of course then you understand how it act, and can follow the mind of the great Charcot--alas that he is no more!--into the very soul of the patient that he influence.",
+            "No?",
             "Then, friend John, am I to take it that you simply accept fact, and are satisfied to let from premise to conclusion be a blank?",
+            "No?",
             "Then tell me--for I am student of the brain--how you accept the hypnotism and reject the thought reading.",
             "Let me tell you, my friend, that there are things done to-day in electrical science which would have been deemed unholy by the very men who discovered electricity--who would themselves not so long before have been burned as wizards.",
             "There are always mysteries in life.",
@@ -8732,6 +8716,7 @@
             "I heard once of an American who so defined faith: ‘that faculty which enables us to believe things which we know to be untrue.’ For one, I follow that man.",
             "He meant that we shall have an open mind, and not let a little bit of truth check the rush of a big truth, like a small rock does a railway truck.",
             "We get the small truth first.",
+            "Good!",
             "We keep him, and we value him; but all the same we must not let him think himself all the truth in the universe.”"
           ]
         },
@@ -8777,8 +8762,8 @@
           ]
         }
       ],
-      "sentence_count": 357,
-      "word_count": 6409
+      "sentence_count": 366,
+      "word_count": 6418
     },
     {
       "number": "XV",
@@ -9199,6 +9184,7 @@
             "He will then argue back that it is we, mistaken ones, that have killed her by our ideas; and so he will be much unhappy always.",
             "Yet he never can be sure; and that is the worst of all.",
             "And he will sometimes think that she he loved was buried alive, and that will paint his dreams with horrors of what she must have suffered; and again, he will think that we may be right, and that his so beloved was, after all, an Un-Dead.",
+            "No!",
             "I told him once, and since then I learn much.",
             "Now, since I know it is all true, a hundred thousand times more do I know that he must pass through the bitter waters to reach the sweet.",
             "He, poor fellow, must have one hour that will make the very face of heaven grow black to him; then we can act for good all round and send him peace.",
@@ -9219,7 +9205,8 @@
         },
         {
           "sentences": [
-            "_Note left by Van Helsing in his portmanteau, Berkeley Hotel directed to John Seward, M."
+            "_Note left by Van Helsing in his portmanteau, Berkeley Hotel directed to John Seward, M.",
+            "D._"
           ]
         },
         {
@@ -9342,18 +9329,9 @@
         },
         {
           "sentences": [
-            "“I thank you, sir,” said Van Helsing proudly. “I have done myself the honour of counting you one trusting friend, and such endorsement is dear"
+            "“I thank you, sir,” said Van Helsing proudly. “I have done myself the honour of counting you one trusting friend, and such endorsement is dear to me.” He held out a hand, which Quincey took."
           ]
-        }
-      ],
-      "sentence_count": 256,
-      "word_count": 4739
-    },
-    {
-      "number": "23",
-      "title": "me.” He held out a hand, which Quincey took.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Then Arthur spoke out:--"
@@ -9455,6 +9433,7 @@
         {
           "sentences": [
             "“Miss Lucy is dead; is it not so?",
+            "Yes!",
             "Then there can be no wrong to her.",
             "But if she be not dead----”"
           ]
@@ -9534,8 +9513,8 @@
           ]
         }
       ],
-      "sentence_count": 63,
-      "word_count": 1059
+      "sentence_count": 322,
+      "word_count": 5811
     },
     {
       "number": "XVI",
@@ -9769,18 +9748,9 @@
             "Quincey and I simultaneously moved towards him, and took his arms.",
             "We could hear the click of the closing lantern as Van Helsing held it down; coming close to the tomb, he began to remove from the chinks some of the sacred emblem which he had placed there.",
             "We all looked on in horrified amazement as we saw, when he stood back, the woman, with a corporeal body as real at that moment as our own, pass in through the interstice where scarce a knife-blade could have gone.",
-            "We all felt a glad sense of relief when we saw the Professor calmly restoring the strings of putty"
+            "We all felt a glad sense of relief when we saw the Professor calmly restoring the strings of putty to the edges of the door."
           ]
-        }
-      ],
-      "sentence_count": 118,
-      "word_count": 2123
-    },
-    {
-      "number": "25",
-      "title": "the edges of the door.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "When this was done, he lifted the child and said:"
@@ -10011,6 +9981,7 @@
             "Shall you not all help me?",
             "We have learned to believe, all of us--is it not so?",
             "And since so, do we not see our duty?",
+            "Yes!",
             "And do we not promise to go on to the bitter end?”"
           ]
         },
@@ -10032,8 +10003,8 @@
           ]
         }
       ],
-      "sentence_count": 118,
-      "word_count": 2433
+      "sentence_count": 237,
+      "word_count": 4563
     },
     {
       "number": "XVII",
@@ -10075,6 +10046,7 @@
             "What is here told,” he laid his hand heavily and gravely on the packet of papers as he spoke, “may be the beginning of the end to you and me and many another; or it may sound the knell of the Un-Dead who walk the earth.",
             "Read all, I pray you, with the open mind; and if you can add in any way to the story here told do so, for it is all-important.",
             "You have kept diary of all these so strange things; is it not so?",
+            "Yes!",
             "Then we shall go through all these together when we meet.” He then made ready for his departure, and shortly after drove off to Liverpool Street.",
             "I took my way to Paddington, where I arrived about fifteen minutes before the train came in."
           ]
@@ -10649,8 +10621,8 @@
           ]
         }
       ],
-      "sentence_count": 292,
-      "word_count": 5571
+      "sentence_count": 293,
+      "word_count": 5572
     },
     {
       "number": "XVIII",
@@ -10794,9 +10766,12 @@
         {
           "sentences": [
             "“Ah, friend John, how goes all?",
+            "Well?",
+            "So!",
             "I have been busy, for I come here to stay if need be.",
             "All affairs are settled with me, and I have much to tell.",
             "Madam Mina is with you?",
+            "Yes.",
             "And her so fine husband?",
             "And Arthur and my friend Quincey, they are with you, too?",
             "Good!”"
@@ -10908,207 +10883,8 @@
           ]
         }
       ],
-      "sentence_count": 110,
-      "word_count": 2240
-    },
-    {
-      "number": "28",
-      "title": "sleep, lest Jonathan have added anxiety about me when he returns.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "Seward’s Diary._"
-          ]
-        },
-        {
-          "sentences": [
-            "_ October, a. m._--Just as we were about to leave the house, an urgent message was brought to me from Renfield to know if I would see him at once, as he had something of the utmost importance to say to me.",
-            "I told the messenger to say that I would attend to his wishes in the morning; I was busy just at the moment.",
-            "The attendant added:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“He seems very importunate, sir.",
-            "I have never seen him so eager.",
-            "I don’t know but what, if you don’t see him soon, he will have one of his violent fits.” I knew the man would not have said this without some cause, so I said: “All right; I’ll go now”; and I asked the others to wait a few minutes for me, as I had to go and see my “patient.”"
-          ]
-        },
-        {
-          "sentences": [
-            "“Take me with you, friend John,” said the Professor. “His case in your diary interest me much, and it had bearing, too, now and again on _our_ case.",
-            "I should much like to see him, and especial when his mind is disturbed.”"
-          ]
-        },
-        {
-          "sentences": [
-            "“May I come also?” asked Lord Godalming."
-          ]
-        },
-        {
-          "sentences": [
-            "“Me too?” said Quincey Morris. “May I come?” said Harker.",
-            "I nodded, and we all went down the passage together."
-          ]
-        },
-        {
-          "sentences": [
-            "We found him in a state of considerable excitement, but far more rational in his speech and manner than I had ever seen him.",
-            "There was an unusual understanding of himself, which was unlike anything I had ever met with in a lunatic; and he took it for granted that his reasons would prevail with others entirely sane.",
-            "We all four went into the room, but none of the others at first said anything.",
-            "His request was that I would at once release him from the asylum and send him home.",
-            "This he backed up with arguments regarding his complete recovery, and adduced his own existing sanity. “I appeal to your friends,” he said, “they will, perhaps, not mind sitting in judgment on my case.",
-            "By the way, you have not introduced me.” I was so much astonished, that the oddness of introducing a madman in an asylum did not strike me at the moment; and, besides, there was a certain dignity in the man’s manner, so much of the habit of equality, that I at once made the introduction: “Lord Godalming; Professor Van Helsing; Mr. Quincey Morris, of Texas; Mr. Renfield.” He shook hands with each of them, saying in turn:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Lord Godalming, I had the honour of seconding your father at the Windham; I grieve to know, by your holding the title, that he is no more.",
-            "He was a man loved and honoured by all who knew him; and in his youth was, I have heard, the inventor of a burnt rum punch, much patronised on Derby night.",
-            "Mr. Morris, you should be proud of your great state.",
-            "Its reception into the Union was a precedent which may have far-reaching effects hereafter, when the Pole and the Tropics may hold alliance to the Stars and Stripes.",
-            "The power of Treaty may yet prove a vast engine of enlargement, when the Monroe doctrine takes its true place as a political fable.",
-            "What shall any man say of his pleasure at meeting Van Helsing?",
-            "Sir, I make no apology for dropping all forms of conventional prefix.",
-            "When an individual has revolutionised therapeutics by his discovery of the continuous evolution of brain-matter, conventional forms are unfitting, since they would seem to limit him to one of a class.",
-            "You, gentlemen, who by nationality, by heredity, or by the possession of natural gifts, are fitted to hold your respective places in the moving world, I take to witness that I am as sane as at least the majority of men who are in full possession of their liberties.",
-            "And I am sure that you, Dr. Seward, humanitarian and medico-jurist as well as scientist, will deem it a moral duty to deal with me as one to be considered as under exceptional circumstances.” He made this last appeal with a courtly air of conviction which was not without its own charm."
-          ]
-        },
-        {
-          "sentences": [
-            "I think we were all staggered.",
-            "For my own part, I was under the conviction, despite my knowledge of the man’s character and history, that his reason had been restored; and I felt under a strong impulse to tell him that I was satisfied as to his sanity, and would see about the necessary formalities for his release in the morning.",
-            "I thought it better to wait, however, before making so grave a statement, for of old I knew the sudden changes to which this particular patient was liable.",
-            "So I contented myself with making a general statement that he appeared to be improving very rapidly; that I would have a longer chat with him in the morning, and would then see what I could do in the direction of meeting his wishes.",
-            "This did not at all satisfy him, for he said quickly:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“But I fear, Dr. Seward, that you hardly apprehend my wish.",
-            "I desire to go at once--here--now--this very hour--this very moment, if I may.",
-            "Time presses, and in our implied agreement with the old scytheman it is of the essence of the contract.",
-            "I am sure it is only necessary to put before so admirable a practitioner as Dr. Seward so simple, yet so momentous a wish, to ensure its fulfilment.” He looked at me keenly, and seeing the negative in my face, turned to the others, and scrutinised them closely.",
-            "Not meeting any sufficient response, he went on:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Is it possible that I have erred in my supposition?”"
-          ]
-        },
-        {
-          "sentences": [
-            "“You have,” I said frankly, but at the same time, as I felt, brutally.",
-            "There was a considerable pause, and then he said slowly:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Then I suppose I must only shift my ground of request.",
-            "Let me ask for this concession--boon, privilege, what you will.",
-            "I am content to implore in such a case, not on personal grounds, but for the sake of others.",
-            "I am not at liberty to give you the whole of my reasons; but you may, I assure you, take it from me that they are good ones, sound and unselfish, and spring from the highest sense of duty.",
-            "Could you look, sir, into my heart, you would approve to the full the sentiments which animate me.",
-            "Nay, more, you would count me amongst the best and truest of your friends.” Again he looked at us all keenly.",
-            "I had a growing conviction that this sudden change of his entire intellectual method was but yet another form or phase of his madness, and so determined to let him go on a little longer, knowing from experience that he would, like all lunatics, give himself away in the end.",
-            "Van Helsing was gazing at him with a look of utmost intensity, his bushy eyebrows almost meeting with the fixed concentration of his look.",
-            "He said to Renfield in a tone which did not surprise me at the time, but only when I thought of it afterwards--for it was as of one addressing an equal:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Can you not tell frankly your real reason for wishing to be free to-night?",
-            "I will undertake that if you will satisfy even me--a stranger, without prejudice, and with the habit of keeping an open mind--Dr. Seward will give you, at his own risk and on his own responsibility, the privilege you seek.” He shook his head sadly, and with a look of poignant regret on his face.",
-            "The Professor went on:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Come, sir, bethink yourself.",
-            "You claim the privilege of reason in the highest degree, since you seek to impress us with your complete reasonableness.",
-            "You do this, whose sanity we have reason to doubt, since you are not yet released from medical treatment for this very defect.",
-            "If you will not help us in our effort to choose the wisest course, how can we perform the duty which you yourself put upon us?",
-            "Be wise, and help us; and if we can we shall aid you to achieve your wish.” He still shook his head as he said:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Dr. Van Helsing, I have nothing to say.",
-            "Your argument is complete, and if I were free to speak I should not hesitate a moment; but I am not my own master in the matter.",
-            "I can only ask you to trust me.",
-            "If I am refused, the responsibility does not rest with me.” I thought it was now time to end the scene, which was becoming too comically grave, so I went towards the door, simply saying:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Come, my friends, we have work to do.",
-            "Good-night.”"
-          ]
-        },
-        {
-          "sentences": [
-            "As, however, I got near the door, a new change came over the patient.",
-            "He moved towards me so quickly that for the moment I feared that he was about to make another homicidal attack.",
-            "My fears, however, were groundless, for he held up his two hands imploringly, and made his petition in a moving manner.",
-            "As he saw that the very excess of his emotion was militating against him, by restoring us more to our old relations, he became still more demonstrative.",
-            "I glanced at Van Helsing, and saw my conviction reflected in his eyes; so I became a little more fixed in my manner, if not more stern, and motioned to him that his efforts were unavailing.",
-            "I had previously seen something of the same constantly growing excitement in him when he had to make some request of which at the time he had thought much, such, for instance, as when he wanted a cat; and I was prepared to see the collapse into the same sullen acquiescence on this occasion.",
-            "My expectation was not realised, for, when he found that his appeal would not be successful, he got into quite a frantic condition.",
-            "He threw himself on his knees, and held up his hands, wringing them in plaintive supplication, and poured forth a torrent of entreaty, with the tears rolling down his cheeks, and his whole face and form expressive of the deepest emotion:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“Let me entreat you, Dr. Seward, oh, let me implore you, to let me out of this house at once.",
-            "Send me away how you will and where you will; send keepers with me with whips and chains; let them take me in a strait-waistcoat, manacled and leg-ironed, even to a gaol; but let me go out of this.",
-            "You don’t know what you do by keeping me here.",
-            "I am speaking from the depths of my heart--of my very soul.",
-            "You don’t know whom you wrong, or how; and I may not tell.",
-            "Woe is me!",
-            "I may not tell.",
-            "By all you hold sacred--by all you hold dear--by your love that is lost--by your hope that lives--for the sake of the Almighty, take me out of this and save my soul from guilt!",
-            "Can’t you hear me, man?",
-            "Can’t you understand?",
-            "Will you never learn?",
-            "Don’t you know that I am sane and earnest now; that I am no lunatic in a mad fit, but a sane man fighting for his soul?",
-            "Oh, hear me! hear me!",
-            "Let me go! let me go! let me go!”"
-          ]
-        },
-        {
-          "sentences": [
-            "I thought that the longer this went on the wilder he would get, and so would bring on a fit; so I took him by the hand and raised him up."
-          ]
-        },
-        {
-          "sentences": [
-            "“Come,” I said sternly, “no more of this; we have had quite enough already.",
-            "Get to your bed and try to behave more discreetly.”"
-          ]
-        },
-        {
-          "sentences": [
-            "He suddenly stopped and looked at me intently for several moments.",
-            "Then, without a word, he rose and moving over, sat down on the side of the bed.",
-            "The collapse had come, as on former occasion, just as I had expected."
-          ]
-        },
-        {
-          "sentences": [
-            "When I was leaving the room, last of our party, he said to me in a quiet, well-bred voice:--"
-          ]
-        },
-        {
-          "sentences": [
-            "“You will, I trust, Dr. Seward, do me the justice to bear in mind, later on, that I did what I could to convince you to-night.”"
-          ]
-        }
-      ],
-      "sentence_count": 94,
-      "word_count": 2013
+      "sentence_count": 113,
+      "word_count": 2243
     },
     {
       "number": "XIX",
@@ -11310,6 +11086,7 @@
             "One lesson, too, we have learned, if it be allowable to argue _a particulari_: that the brute beasts which are to the Count’s command are yet themselves not amenable to his spiritual power; for look, these rats that would come to his call, just as from his castle top he summon the wolves to your going and to that poor mother’s cry, though they come to him, they run pell-mell from the so little dogs of my friend Arthur.",
             "We have other matters before us, other dangers, other fears; and that monster--he has not used his power over the brute world for the only or the last time to-night.",
             "So be it that he has gone elsewhere.",
+            "Good!",
             "It has given us opportunity to cry ‘check’ in some ways in this chess game, which we play for the stake of human souls.",
             "And now let us go home.",
             "The dawn is close at hand, and we have reason to be content with our first night’s work.",
@@ -11544,8 +11321,8 @@
           ]
         }
       ],
-      "sentence_count": 248,
-      "word_count": 5675
+      "sentence_count": 249,
+      "word_count": 5676
     },
     {
       "number": "XX",
@@ -11591,20 +11368,8 @@
         {
           "sentences": [
             "“Look ’ere, guv’nor, there ain’t no sense in me a-keepin’ you ’ere.",
-            "I may find Sam soon, or I mayn’t; but anyhow he ain’t like to be in a way"
-          ]
-        }
-      ],
-      "sentence_count": 22,
-      "word_count": 507
-    },
-    {
-      "number": "31",
-      "title": "tell ye much to-night. Sam is a rare one when he starts on the booze.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I may find Sam soon, or I mayn’t; but anyhow he ain’t like to be in a way to tell ye much to-night.",
+            "Sam is a rare one when he starts on the booze.",
             "If you can give me a envelope with a stamp on it, and put yer address on it, I’ll find out where Sam is to be found and post it ye to-night.",
             "But ye’d better be up arter ’im soon in the mornin’, or maybe ye won’t ketch ’im; for Sam gets off main early, never mind the booze the night afore.”"
           ]
@@ -11612,20 +11377,9 @@
         {
           "sentences": [
             "This was all practical, so one of the children went off with a penny to buy an envelope and a sheet of paper, and to keep the change.",
-            "When she came back, I addressed the envelope and stamped it, and when Smollet had again faithfully promised to post the address when found, I took my way"
-          ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 118
-    },
-    {
-      "number": "32",
-      "title": "home. We’re on the track anyhow. I am tired to-night, and want sleep.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "When she came back, I addressed the envelope and stamped it, and when Smollet had again faithfully promised to post the address when found, I took my way to home.",
+            "We’re on the track anyhow.",
+            "I am tired to-night, and want sleep.",
             "Mina is fast asleep, and looks a little too pale; her eyes look as though she had been crying.",
             "Poor dear, I’ve no doubt it frets her to be kept in the dark, and it may make her doubly anxious about me and the others.",
             "But it is best as it is.",
@@ -12318,26 +12072,13 @@
         {
           "sentences": [
             "The attendant came bursting into my room and told me that Renfield had somehow met with some accident.",
-            "He had heard him yell; and when he went"
-          ]
-        }
-      ],
-      "sentence_count": 285,
-      "word_count": 5232
-    },
-    {
-      "number": "33",
-      "title": "him found him lying on his face on the floor, all covered with blood.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He had heard him yell; and when he went to him found him lying on his face on the floor, all covered with blood.",
             "I must go at once...."
           ]
         }
       ],
-      "sentence_count": 1,
-      "word_count": 5
+      "sentence_count": 315,
+      "word_count": 5907
     },
     {
       "number": "XXI",
@@ -12954,8 +12695,7 @@
             "The teaching, big or little, could not have landed Mina or me anywhere worse than we are to-day.",
             "However, we must trust and hope.",
             "Poor Mina told me just now, with the tears running down her dear cheeks, that it is in trouble and trial that our faith is tested--that we must keep on trusting; and that God will aid us up to the end.",
-            "The end! oh my God! what end?...",
-            "To work!",
+            "The end! oh my God! what end?... To work!",
             "To work!"
           ]
         },
@@ -12970,36 +12710,15 @@
           "sentences": [
             "Dr. Seward asked the attendant who was on duty in the passage if he had heard anything.",
             "He said that he had been sitting down--he confessed to half dozing--when he heard loud voices in the room, and then Renfield had called out loudly several times, “God!",
+            "God!",
             "God!” after that there was a sound of falling, and when he entered the room he found him lying on the floor, face down, just as the doctors had seen him.",
             "Van Helsing asked if he had heard “voices” or “a voice,” and he said he could not say; that at first it had seemed to him as if there were two, but as there was no one in the room it could have been only one.",
-            "He could swear"
-          ]
-        }
-      ],
-      "sentence_count": 20,
-      "word_count": 370
-    },
-    {
-      "number": "36",
-      "title": "it, if required, that the word “God” was spoken by the patient. Dr.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "Seward said to us, when we were alone, that he did not wish to go into the matter; the question of an inquest had to be considered, and it would never do to put forward the truth, as no one would believe it.",
+            "He could swear to it, if required, that the word “God” was spoken by the patient.",
+            "Dr. Seward said to us, when we were alone, that he did not wish to go into the matter; the question of an inquest had to be considered, and it would never do to put forward the truth, as no one would believe it.",
             "As it was, he thought that on the attendant’s evidence he could give a certificate of death by misadventure in falling from bed.",
-            "In case the coroner should demand it, there would be a formal inquest, necessarily"
+            "In case the coroner should demand it, there would be a formal inquest, necessarily to the same result."
           ]
-        }
-      ],
-      "sentence_count": 3,
-      "word_count": 80
-    },
-    {
-      "number": "37",
-      "title": "the same result.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "When the question began to be discussed as to what should be our next step, the very first thing we decided was that Mina should be in full confidence; that nothing of any sort--no matter how painful--should be kept from her.",
@@ -13465,8 +13184,8 @@
           ]
         }
       ],
-      "sentence_count": 224,
-      "word_count": 4985
+      "sentence_count": 247,
+      "word_count": 5454
     },
     {
       "number": "XXIII",
@@ -13793,8 +13512,7 @@
           "sentences": [
             "“Oh, hush! oh, hush! in the name of the good God.",
             "Don’t say such things, Jonathan, my husband; or you will crush me with fear and horror.",
-            "Just think, my dear--I have been thinking all this long, long day of it--that... perhaps... some day...",
-            "I, too, may need such pity; and that some other like you--and with equal cause for anger--may deny it to me!",
+            "Just think, my dear--I have been thinking all this long, long day of it--that... perhaps... some day... I, too, may need such pity; and that some other like you--and with equal cause for anger--may deny it to me!",
             "Oh, my husband! my husband, indeed I would have spared you such a thought had there been another way; but I pray that God may not have treasured your wild words, except as the heart-broken wail of a very loving and sorely stricken man.",
             "Oh, God, let these poor white hairs go in evidence of what he has suffered, who all his life has done no wrong, and on whom so many sorrows have come.”"
           ]
@@ -13817,18 +13535,9 @@
             "When they had retired, Quincey, Godalming, and I arranged that we should sit up, dividing the night between us, and watch over the safety of the poor stricken lady.",
             "The first watch falls to Quincey, so the rest of us shall be off to bed as soon as we can.",
             "Godalming has already turned in, for his is the second watch.",
-            "Now that my work is done I, too, shall go"
+            "Now that my work is done I, too, shall go to bed."
           ]
-        }
-      ],
-      "sentence_count": 195,
-      "word_count": 3762
-    },
-    {
-      "number": "39",
-      "title": "bed.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "_Jonathan Harker’s Journal._"
@@ -14137,8 +13846,8 @@
           ]
         }
       ],
-      "sentence_count": 127,
-      "word_count": 1900
+      "sentence_count": 321,
+      "word_count": 5664
     },
     {
       "number": "XXIV",
@@ -14179,18 +13888,10 @@
             "He is finite, though he is powerful to do much harm and suffers not as we do.",
             "But we are strong, each in our purpose; and we are all more strong together.",
             "Take heart afresh, dear husband of Madam Mina.",
-            "This battle is but begun, and in the end we shall win--so sure as that God sits on high"
+            "This battle is but begun, and in the end we shall win--so sure as that God sits on high to watch over His children.",
+            "Therefore be of much comfort till we return."
           ]
-        }
-      ],
-      "sentence_count": 25,
-      "word_count": 395
-    },
-    {
-      "number": "41",
-      "title": "watch over His children. Therefore be of much comfort till we return.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "VAN HELSING."
@@ -14357,6 +14058,7 @@
             "This that we hunt from our village is a tiger, too, a man-eater, and he never cease to prowl.",
             "Nay, in himself he is not one to retire and stay afar.",
             "In his life, his living life, he go over the Turkey frontier and attack his enemy on his own ground; he be beaten back, but did he stay?",
+            "No!",
             "He come again, and again, and again.",
             "Look at his persistence and endurance.",
             "With the child-brain that was to him he have long since conceive the idea of coming to a great city.",
@@ -14604,20 +14306,7 @@
         },
         {
           "sentences": [
-            "“I promise!” I said, and for a moment she looked supremely happy; though"
-          ]
-        }
-      ],
-      "sentence_count": 228,
-      "word_count": 4611
-    },
-    {
-      "number": "42",
-      "title": "me all happiness for her was denied by the red scar on her forehead.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“I promise!” I said, and for a moment she looked supremely happy; though to me all happiness for her was denied by the red scar on her forehead.",
             "She said:--"
           ]
         },
@@ -14807,8 +14496,8 @@
           ]
         }
       ],
-      "sentence_count": 86,
-      "word_count": 1269
+      "sentence_count": 341,
+      "word_count": 6304
     },
     {
       "number": "XXV",
@@ -15102,6 +14791,8 @@
         {
           "sentences": [
             "_Rufus Smith, Lloyd’s, London, to Lord Godalming, care of H.",
+            "B.",
+            "M.",
             "Vice-Consul, Varna._"
           ]
         },
@@ -15128,8 +14819,7 @@
             "We talk of her often; we have not, however, said a word to the others.",
             "It would break poor Harker’s heart--certainly his nerve--if he knew that we had even a suspicion on the subject.",
             "Van Helsing examines, he tells me, her teeth very carefully, whilst she is in the hypnotic condition, for he says that so long as they do not begin to sharpen there is no active danger of a change in her.",
-            "If this change should come, it would be necessary to take steps!...",
-            "We both know what those steps would have to be, though we do not mention our thoughts to each other.",
+            "If this change should come, it would be necessary to take steps!... We both know what those steps would have to be, though we do not mention our thoughts to each other.",
             "We should neither of us shrink from the task--awful though it be to contemplate. “Euthanasia” is an excellent and a comforting word!",
             "I am grateful to whoever invented it."
           ]
@@ -15218,6 +14908,8 @@
         {
           "sentences": [
             "_ October._--Telegram. _Rufus Smith, London, to Lord Godalming,  care H.",
+            "B.",
+            "M.",
             "Vice Consul, Varna._"
           ]
         },
@@ -15373,6 +15065,7 @@
             "Not much? no!",
             "The Count’s child-thought see nothing; therefore he speak so free.",
             "Your man-thought see nothing; my man-thought see nothing, till just now.",
+            "No!",
             "But there comes another word from some one who speak without thought because she, too, know not what it mean--what it _might_ mean.",
             "Just as there are elements which rest, yet when in nature’s course they move on their way and they touch--then pouf! and there comes a flash of light, heaven wide, that blind and kill and destroy some; but that show up all earth below for leagues and leagues.",
             "Is it not so?",
@@ -15476,8 +15169,8 @@
           ]
         }
       ],
-      "sentence_count": 312,
-      "word_count": 6250
+      "sentence_count": 316,
+      "word_count": 6255
     },
     {
       "number": "XXVI",
@@ -15598,20 +15291,8 @@
         },
         {
           "sentences": [
-            "_ October, a. m._--We are near Galatz now, and I may not have time"
-          ]
-        }
-      ],
-      "sentence_count": 57,
-      "word_count": 1007
-    },
-    {
-      "number": "45",
-      "title": "write later. Sunrise this morning was anxiously looked for by us all.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "_ October, a. m._--We are near Galatz now, and I may not have time to write later.",
+            "Sunrise this morning was anxiously looked for by us all.",
             "Knowing of the increasing difficulty of procuring the hypnotic trance, Van Helsing began his passes earlier than usual.",
             "They produced no effect, however, until the regular time, when she yielded with a still greater difficulty, only a minute before the sun rose.",
             "The Professor lost no time in his questioning; her answer came with equal quickness:--"
@@ -15772,18 +15453,9 @@
           "sentences": [
             "As we came home we could arrive at no definite conclusion.",
             "We were all convinced that the box was on its way, by water, to somewhere; but where that might be we would have to discover.",
-            "With heavy hearts we came home"
+            "With heavy hearts we came home to the hotel to Mina."
           ]
-        }
-      ],
-      "sentence_count": 77,
-      "word_count": 1651
-    },
-    {
-      "number": "46",
-      "title": "the hotel to Mina.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "When we met together, the first thing was to consult as to taking Mina again into our confidence.",
@@ -15921,18 +15593,9 @@
         },
         {
           "sentences": [
-            "_Firstly._--We must differentiate between what he did in London as part of his general plan of action, when he was pressed for moments and had"
+            "_Firstly._--We must differentiate between what he did in London as part of his general plan of action, when he was pressed for moments and had to arrange as best he could."
           ]
-        }
-      ],
-      "sentence_count": 48,
-      "word_count": 748
-    },
-    {
-      "number": "47",
-      "title": "arrange as best he could.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "_Secondly_ we must see, as well as we can surmise it from the facts we know of, what he has done here."
@@ -16050,8 +15713,7 @@
             "It may be necessary to fight the Slovaks, and a chance thrust--for I don’t suppose these fellows carry guns--would undo all our plans.",
             "There must be no chances, this time; we shall not rest until the Count’s head and body have been separated, and we are sure that he cannot re-incarnate.” He looked at Jonathan as he spoke, and Jonathan looked at me.",
             "I could see that the poor dear was torn about in his mind.",
-            "Of course he wanted to be with me; but then the boat service would, most likely, be the one which would destroy the... the... the...",
-            "Vampire. (Why did I hesitate to write the word?) He was silent awhile, and during his silence Dr. Van Helsing spoke:--"
+            "Of course he wanted to be with me; but then the boat service would, most likely, be the one which would destroy the... the... the... Vampire. (Why did I hesitate to write the word?) He was silent awhile, and during his silence Dr. Van Helsing spoke:--"
           ]
         },
         {
@@ -16125,6 +15787,7 @@
             "We shall drive ourselves, for we have no one whom we can trust in the matter.",
             "The Professor knows something of a great many languages, so we shall get on all right.",
             "We have all got arms, even for me a large-bore revolver; Jonathan would not be happy unless I was armed like the rest.",
+            "Alas!",
             "I cannot carry one arm that the rest do; the scar on my forehead forbids that.",
             "Dear Dr. Van Helsing comforts me by telling me that I am fully armed as there may be wolves; the weather is getting colder every hour, and there are snow-flurries which come and go as warnings."
           ]
@@ -16323,8 +15986,8 @@
           ]
         }
       ],
-      "sentence_count": 205,
-      "word_count": 3720
+      "sentence_count": 388,
+      "word_count": 7151
     },
     {
       "number": "XXVII",
@@ -16395,6 +16058,7 @@
             "We go to seek the place where my poor darling suffered so much.",
             "God grant that we may be guided aright, and that He will deign to watch over my husband and those dear to us both, and who are in such deadly peril.",
             "As for me, I am not worthy in His sight.",
+            "Alas!",
             "I am unclean to His eyes, and shall be until He may deign to let me stand forth in His sight as one of those who have not incurred His wrath."
           ]
         },
@@ -16571,6 +16235,7 @@
         },
         {
           "sentences": [
+            "No!",
             "Do not go without.",
             "Here you are safe!” I turned to her, and looking in her eyes, said:--"
           ]
@@ -16598,6 +16263,7 @@
           "sentences": [
             "“Come, sister.",
             "Come to us.",
+            "Come!",
             "Come!” In fear I turned to my poor Madam Mina, and my heart with gladness leapt like flame; for oh! the terror in her sweet eyes, the repulsion, the horror, told a story to my heart that was all of hope.",
             "God be thanked she was not, yet, of them.",
             "I seized some of the firewood which was by me, and holding out some of the Wafer, advanced on them towards the fire.",
@@ -16851,6 +16517,8 @@
         {
           "sentences": [
             "“Look!",
+            "Look!",
+            "Look!",
             "See, two horsemen follow fast, coming up from the south.",
             "It must be Quincey and John.",
             "Take the glass.",
@@ -16999,6 +16667,11 @@
         },
         {
           "sentences": [
+            "NOTE"
+          ]
+        },
+        {
+          "sentences": [
             "Seven years ago we all went through the flames; and the happiness of some of us since then is, we think, well worth the pain we endured.",
             "It is an added joy to Mina and to me that our boy’s birthday is the same day as that on which Quincey Morris died.",
             "His mother holds, I know, the secret belief that some of our brave friend’s spirit has passed into him.",
@@ -17085,6 +16758,7 @@
         {
           "sentences": [
             "DETECTIVE STORIES BY J.",
+            "S.",
             "FLETCHER"
           ]
         },
@@ -17219,6 +16893,7 @@
         },
         {
           "sentences": [
+            "1.A.",
             "By reading or using any part of this Project Gutenberg™ electronic work, you indicate that you have read, understand, agree to and accept all the terms of this license and intellectual property (trademark/copyright) agreement.",
             "If you do not agree to abide by all the terms of this agreement, you must cease using and return or destroy all copies of Project Gutenberg™ electronic works in your possession.",
             "If you paid a fee for obtaining a copy of or access to a Project Gutenberg™ electronic work and you do not agree to be bound by the terms of this agreement, you may obtain a refund from the person or entity to whom you paid the fee as set forth in paragraph 1.E.8."
@@ -17236,6 +16911,7 @@
         },
         {
           "sentences": [
+            "1.C.",
             "The Project Gutenberg Literary Archive Foundation (“the Foundation” or PGLAF), owns a compilation copyright in the collection of Project Gutenberg™ electronic works.",
             "Nearly all the individual works in the collection are in the public domain in the United States.",
             "If an individual work is unprotected by copyright law in the United States and you are located in the United States, we do not claim a right to prevent you from copying, distributing, performing, displaying or creating derivative works based on the work as long as all references to Project Gutenberg are removed.",
@@ -17245,6 +16921,7 @@
         },
         {
           "sentences": [
+            "1.D.",
             "The copyright laws of the place where you are located also govern what you can do with this work.",
             "Copyright laws in most countries are in a constant state of change.",
             "If you are outside the United States, check the laws of your country in addition to the terms of this agreement before downloading, copying, displaying, performing, distributing or creating derivative works based on this work or any other Project Gutenberg™ work.",
@@ -17253,6 +16930,7 @@
         },
         {
           "sentences": [
+            "1.E.",
             "Unless you have removed all references to Project Gutenberg:"
           ]
         },
@@ -17344,6 +17022,11 @@
             "1.E.9.",
             "If you wish to charge a fee or distribute a Project Gutenberg™ electronic work or group of works on different terms than are set forth in this agreement, you must obtain permission in writing from the Project Gutenberg Literary Archive Foundation, the manager of the Project Gutenberg™ trademark.",
             "Contact the Foundation as set forth in Section below."
+          ]
+        },
+        {
+          "sentences": [
+            "1.F."
           ]
         },
         {
@@ -17497,18 +17180,18 @@
           ]
         }
       ],
-      "sentence_count": 545,
-      "word_count": 11072
+      "sentence_count": 557,
+      "word_count": 11084
     }
   ],
   "statistics": {
-    "total_chapters": 48,
-    "total_paragraphs": 2177,
-    "total_sentences": 8352,
-    "total_words": 161001,
-    "average_sentences_per_chapter": 174.0,
-    "average_paragraphs_per_chapter": 45.354166666666664,
-    "average_sentences_per_paragraph": 3.836472209462563,
-    "average_words_per_sentence": 19.276939655172413
+    "total_chapters": 28,
+    "total_paragraphs": 2149,
+    "total_sentences": 8327,
+    "total_words": 159242,
+    "average_sentences_per_chapter": 297.39285714285717,
+    "average_paragraphs_per_chapter": 76.75,
+    "average_sentences_per_paragraph": 3.8748255002326664,
+    "average_words_per_sentence": 19.123573916176294
   }
 }

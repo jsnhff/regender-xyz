@@ -153,7 +153,7 @@ class _GrokClient(_BaseLLMClient):
     
     def get_default_model(self) -> str:
         """Get default Grok model."""
-        return "grok-beta"
+        return "grok-3-latest"
     
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,

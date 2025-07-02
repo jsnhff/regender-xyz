@@ -253,22 +253,33 @@ class BookParser:
                 flags=re.IGNORECASE
             )
         
+        # Also protect ellipses
+        protected_text = re.sub(r'\.\.\.', '<<<ELLIPSIS>>>', protected_text)
+        protected_text = re.sub(r'\.\.', '<<<DOUBLE_DOT>>>', protected_text)
+        
         # Now split on sentence boundaries
-        # Match: period/exclamation/question + space + capital letter or quote
+        # More sophisticated pattern that handles edge cases better
+        # Split on: sentence-ending punctuation followed by space and capital letter,
+        # or followed by closing quote and space, or followed by newlines
         sentences = re.split(
-            r'(?<=[.!?])\s+(?=[A-Z"])|(?<=[.!?])\s*\n+',
+            r'(?<=[.!?])\s+(?=[A-Z])|'  # Period + space + capital
+            r'(?<=[.!?]")\s+|'          # Period + quote + space
+            r'(?<=[.!?])\s*\n+',        # Period + newline(s)
             protected_text
         )
         
-        # Restore abbreviation periods and clean
+        # Restore protected elements and clean
         cleaned = []
         for sent in sentences:
-            # Restore periods
+            # Restore periods and ellipses
             sent = sent.replace('<<<ABBR_DOT>>>', '.')
+            sent = sent.replace('<<<ELLIPSIS>>>', '...')
+            sent = sent.replace('<<<DOUBLE_DOT>>>', '..')
             sent = sent.strip()
             
-            # Skip very short fragments
-            if sent and len(sent) > 5:
+            # Skip very short fragments, but keep short complete sentences
+            # Check if it's a title (all caps) or has proper sentence structure
+            if sent and (len(sent) > 5 or sent.isupper() or re.match(r'^[A-Z].*[.!?]$', sent)):
                 cleaned.append(sent)
         
         return cleaned

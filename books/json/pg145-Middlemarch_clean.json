@@ -813,8 +813,7 @@
       "paragraphs": [
         {
           "sentences": [
-            "“Say, goddess, what ensued, when Raphael, The affable archangel...",
-            "Eve The story heard attentive, and was filled With admiration, and deep muse, to hear Of things so high and strange.” —_Paradise Lost_, B. vii."
+            "“Say, goddess, what ensued, when Raphael, The affable archangel...  Eve The story heard attentive, and was filled With admiration, and deep muse, to hear Of things so high and strange.” —_Paradise Lost_, B. vii."
           ]
         },
         {
@@ -958,18 +957,9 @@
         },
         {
           "sentences": [
-            "Sir James interpreted the heightened color in the way most gratifying"
+            "Sir James interpreted the heightened color in the way most gratifying to himself, and thought he never saw Miss Brooke looking so handsome."
           ]
-        }
-      ],
-      "sentence_count": 74,
-      "word_count": 2534
-    },
-    {
-      "number": "5",
-      "title": "himself, and thought he never saw Miss Brooke looking so handsome.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I have brought a little petitioner,” he said, “or rather, I have brought him to see if he will be approved before his petition is offered.” He showed the white object under his arm, which was a tiny Maltese puppy, one of nature’s most naive toys."
@@ -1169,8 +1159,8 @@
           ]
         }
       ],
-      "sentence_count": 90,
-      "word_count": 1767
+      "sentence_count": 163,
+      "word_count": 4313
     },
     {
       "number": "IV",
@@ -2112,6 +2102,7 @@
         {
           "sentences": [
             "“Where your certain point is?",
+            "No.",
             "I should like to be told how a man can have any certain point when he belongs to no party—leading a roving life, and never letting his friends know his address. ‘Nobody knows where Brooke will be—there’s no counting on Brooke’—that is what people say of you, to be quite frank.",
             "Now, do turn respectable.",
             "How will you like going to Sessions with everybody looking shy on you, and you with a bad conscience and an empty pocket?”"
@@ -2170,18 +2161,9 @@
         {
           "sentences": [
             "But here Celia entered, blooming from a walk in the garden, and the greeting with her delivered Mr. Brooke from the necessity of answering immediately.",
-            "He got up hastily, and saying, “By the way, I must speak"
+            "He got up hastily, and saying, “By the way, I must speak to Wright about the horses,” shuffled quickly out of the room."
           ]
-        }
-      ],
-      "sentence_count": 85,
-      "word_count": 1494
-    },
-    {
-      "number": "9",
-      "title": "Wright about the horses,” shuffled quickly out of the room.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“My dear child, what is this?—this about your sister’s engagement?” said Mrs. Cadwallader."
@@ -2536,8 +2518,8 @@
           ]
         }
       ],
-      "sentence_count": 141,
-      "word_count": 2779
+      "sentence_count": 227,
+      "word_count": 4285
     },
     {
       "number": "VII",
@@ -2928,6 +2910,7 @@
           "sentences": [
             "“Oh, he dreams footnotes, and they run away with all his brains.",
             "They say, when he was a little boy, he made an abstract of ‘Hop o’ my Thumb,’ and he has been making abstracts ever since.",
+            "Ugh!",
             "And that is the man Humphrey goes on saying that a woman may be happy with.”"
           ]
         },
@@ -2965,8 +2948,8 @@
           ]
         }
       ],
-      "sentence_count": 114,
-      "word_count": 2101
+      "sentence_count": 115,
+      "word_count": 2102
     },
     {
       "number": "IX",
@@ -3882,18 +3865,9 @@
           "sentences": [
             "Evidently Miss Brooke was not Mr. Lydgate’s style of woman any more than Mr. Chichely’s.",
             "Considered, indeed, in relation to the latter, whose mind was matured, she was altogether a mistake, and calculated to shock his trust in final causes, including the adaptation of fine young women to purplefaced bachelors.",
-            "But Lydgate was less ripe, and might possibly have experience before him which would modify his opinion as"
+            "But Lydgate was less ripe, and might possibly have experience before him which would modify his opinion as to the most excellent things in woman."
           ]
-        }
-      ],
-      "sentence_count": 161,
-      "word_count": 4295
-    },
-    {
-      "number": "14",
-      "title": "the most excellent things in woman.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Miss Brooke, however, was not again seen by either of these gentlemen under her maiden name.",
@@ -3901,8 +3875,8 @@
           ]
         }
       ],
-      "sentence_count": 2,
-      "word_count": 33
+      "sentence_count": 163,
+      "word_count": 4335
     },
     {
       "number": "XI",
@@ -4262,18 +4236,9 @@
             "“It always makes a difference, though, to be of good family,” said Rosamond, with a tone of decision which showed that she had thought on this subject.",
             "Rosamond felt that she might have been happier if she had not been the daughter of a Middlemarch manufacturer.",
             "She disliked anything which reminded her that her mother’s father had been an innkeeper.",
-            "Certainly any one remembering the fact might think that Mrs. Vincy had the air of a very handsome good-humored landlady, accustomed"
+            "Certainly any one remembering the fact might think that Mrs. Vincy had the air of a very handsome good-humored landlady, accustomed to the most capricious orders of gentlemen."
           ]
-        }
-      ],
-      "sentence_count": 132,
-      "word_count": 2751
-    },
-    {
-      "number": "16",
-      "title": "the most capricious orders of gentlemen.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I thought it was odd his name was Tertius,” said the bright-faced matron, “but of course it’s a name in the family.",
@@ -4445,8 +4410,8 @@
           ]
         }
       ],
-      "sentence_count": 46,
-      "word_count": 826
+      "sentence_count": 178,
+      "word_count": 3584
     },
     {
       "number": "XII",
@@ -4948,6 +4913,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "Oh, minding the house—pouring out syrup—pretending to be amiable and contented—learning to have a bad opinion of everybody.”"
           ]
         },
@@ -5199,6 +5165,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "What can you blame me for?”"
           ]
         },
@@ -5447,8 +5414,8 @@
           ]
         }
       ],
-      "sentence_count": 365,
-      "word_count": 6554
+      "sentence_count": 367,
+      "word_count": 6556
     },
     {
       "number": "XIII",
@@ -5466,18 +5433,9 @@
           "sentences": [
             "2_d Gent_.",
             "Nay, tell me how you class your wealth of books  The drifted relics of all time.",
-            "As well sort them at once by size and livery:  Vellum, tall copies, and the common calf  Will hardly cover more diversity  Than all your labels cunningly devised"
+            "As well sort them at once by size and livery:  Vellum, tall copies, and the common calf  Will hardly cover more diversity  Than all your labels cunningly devised  To class your unread authors."
           ]
-        }
-      ],
-      "sentence_count": 6,
-      "word_count": 70
-    },
-    {
-      "number": "19",
-      "title": "class your unread authors.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "In consequence of what he had heard from Fred, Mr. Vincy determined to speak with Mr. Bulstrode in his private room at the Bank at half-past one, when he was usually free from other callers.",
@@ -5833,8 +5791,8 @@
           ]
         }
       ],
-      "sentence_count": 158,
-      "word_count": 3632
+      "sentence_count": 164,
+      "word_count": 3707
     },
     {
       "number": "XIV",
@@ -6532,18 +6490,9 @@
             "He intended to begin in his own case some particular reforms which were quite certainly within his reach, and much less of a problem than the demonstrating of an anatomical conception.",
             "One of these reforms was to act stoutly on the strength of a recent legal decision, and simply prescribe, without dispensing drugs or taking percentage from druggists.",
             "This was an innovation for one who had chosen to adopt the style of general practitioner in a country town, and would be felt as offensive criticism by his professional brethren.",
-            "But Lydgate meant to innovate in his treatment also, and he was wise enough to see that the best security for his practising honestly according to his belief was"
+            "But Lydgate meant to innovate in his treatment also, and he was wise enough to see that the best security for his practising honestly according to his belief was to get rid of systematic temptations to the contrary."
           ]
-        }
-      ],
-      "sentence_count": 72,
-      "word_count": 2748
-    },
-    {
-      "number": "22",
-      "title": "get rid of systematic temptations to the contrary.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Perhaps that was a more cheerful time for observers and theorizers than the present; we are apt to think it the finest era of the world when America was beginning to be discovered, when a bold sailor, even if he were wrecked, might alight on a new kingdom; and about the dark territories of Pathology were a fine America for a spirited young adventurer.",
@@ -6659,18 +6608,9 @@
         },
         {
           "sentences": [
-            "Lydgate, strong man as he was, turned pale and trembled: moments seemed"
+            "Lydgate, strong man as he was, turned pale and trembled: moments seemed to pass before he rose and stood at a distance from her."
           ]
-        }
-      ],
-      "sentence_count": 74,
-      "word_count": 2395
-    },
-    {
-      "number": "23",
-      "title": "pass before he rose and stood at a distance from her.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“There was a secret, then,” he said at last, even vehemently. “He was brutal to you: you hated him.”"
@@ -6718,8 +6658,8 @@
           ]
         }
       ],
-      "sentence_count": 14,
-      "word_count": 317
+      "sentence_count": 160,
+      "word_count": 5481
     },
     {
       "number": "XVI",
@@ -6734,18 +6674,9 @@
         {
           "sentences": [
             "The question whether Mr. Tyke should be appointed as salaried chaplain to the hospital was an exciting topic to the Middlemarchers; and Lydgate heard it discussed in a way that threw much light on the power exercised in the town by Mr. Bulstrode.",
-            "The banker was evidently a ruler, but there was an opposition party, and even among his supporters there were some who allowed it to be seen that their support was a compromise, and who frankly stated their impression that the general scheme of things, and especially the casualties of trade, required you"
+            "The banker was evidently a ruler, but there was an opposition party, and even among his supporters there were some who allowed it to be seen that their support was a compromise, and who frankly stated their impression that the general scheme of things, and especially the casualties of trade, required you to hold a candle to the devil."
           ]
-        }
-      ],
-      "sentence_count": 3,
-      "word_count": 122
-    },
-    {
-      "number": "25",
-      "title": "hold a candle to the devil.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Mr. Bulstrode’s power was not due simply to his being a country banker, who knew the financial secrets of most traders in the town and could touch the springs of their credit; it was fortified by a beneficence that was at once ready and severe—ready to confer obligations, and severe in watching the result.",
@@ -7178,8 +7109,8 @@
           ]
         }
       ],
-      "sentence_count": 175,
-      "word_count": 5064
+      "sentence_count": 178,
+      "word_count": 5193
     },
     {
       "number": "XVII",
@@ -7414,7 +7345,7 @@
       "word_count": 2136
     },
     {
-      "number": "27",
+      "number": "19",
       "title": "prologue about me.”",
       "type": "prologue",
       "paragraphs": [
@@ -8326,18 +8257,9 @@
         {
           "sentences": [
             "Mr. Casaubon pronounced this little speech with the most conscientious intention, blinking a little and swaying his head up and down, and concluding with a smile.",
-            "He had not found marriage a rapturous state, but he had no idea of being anything else than an irreproachable husband, who would make a charming young woman as happy as she deserved"
+            "He had not found marriage a rapturous state, but he had no idea of being anything else than an irreproachable husband, who would make a charming young woman as happy as she deserved to be."
           ]
-        }
-      ],
-      "sentence_count": 76,
-      "word_count": 2992
-    },
-    {
-      "number": "31",
-      "title": "be.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I hope you are thoroughly satisfied with our stay—I mean, with the result so far as your studies are concerned,” said Dorothea, trying to keep her mind fixed on what most affected her husband."
@@ -8436,8 +8358,8 @@
           ]
         }
       ],
-      "sentence_count": 45,
-      "word_count": 1565
+      "sentence_count": 121,
+      "word_count": 4559
     },
     {
       "number": "XXI",
@@ -8462,18 +8384,9 @@
             "She was alive to anything that gave her an opportunity for active sympathy, and at this moment it seemed as if the visit had come to shake her out of her self-absorbed discontent—to remind her of her husband’s goodness, and make her feel that she had now the right to be his helpmate in all kind deeds.",
             "She waited a minute or two, but when she passed into the next room there were just signs enough that she had been crying to make her open face look more youthful and appealing than usual.",
             "She met Ladislaw with that exquisite smile of good-will which is unmixed with vanity, and held out her hand to him.",
-            "He was the elder by several years, but at that moment he looked much the younger, for his transparent complexion flushed suddenly, and he spoke with a shyness extremely unlike the ready indifference of his manner with his male companion, while Dorothea became all the calmer with a wondering desire"
+            "He was the elder by several years, but at that moment he looked much the younger, for his transparent complexion flushed suddenly, and he spoke with a shyness extremely unlike the ready indifference of his manner with his male companion, while Dorothea became all the calmer with a wondering desire to put him at ease."
           ]
-        }
-      ],
-      "sentence_count": 9,
-      "word_count": 311
-    },
-    {
-      "number": "33",
-      "title": "put him at ease.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I was not aware that you and Mr. Casaubon were in Rome, until this morning, when I saw you in the Vatican Museum,” he said. “I knew you at once—but—I mean, that I concluded Mr. Casaubon’s address would be found at the Poste Restante, and I was anxious to pay my respects to him and you as early as possible.”"
@@ -8753,18 +8666,9 @@
         {
           "sentences": [
             "“I think it is time for us to dress,” he added, looking at his watch.",
-            "They both rose, and there was never any further allusion between them"
+            "They both rose, and there was never any further allusion between them to what had passed on this day."
           ]
-        }
-      ],
-      "sentence_count": 114,
-      "word_count": 2602
-    },
-    {
-      "number": "34",
-      "title": "what had passed on this day.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But Dorothea remembered it to the last with the vividness with which we all remember epochs in our experience when some dear expectation dies, or some new motive is born.",
@@ -8777,8 +8681,8 @@
           ]
         }
       ],
-      "sentence_count": 3,
-      "word_count": 188
+      "sentence_count": 126,
+      "word_count": 3113
     },
     {
       "number": "XXII",
@@ -8872,18 +8776,9 @@
         },
         {
           "sentences": [
-            "“I think I would rather feel that painting is beautiful than have to read it as an enigma; but I should learn to understand these pictures sooner than yours with the very wide meaning,” said Dorothea, speaking"
+            "“I think I would rather feel that painting is beautiful than have to read it as an enigma; but I should learn to understand these pictures sooner than yours with the very wide meaning,” said Dorothea, speaking to Will."
           ]
-        }
-      ],
-      "sentence_count": 38,
-      "word_count": 1094
-    },
-    {
-      "number": "36",
-      "title": "Will.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Don’t speak of my painting before Naumann,” said Will. “He will tell you, it is all _pfuscherei_, which is his most opprobrious word!”"
@@ -9435,8 +9330,8 @@
           ]
         }
       ],
-      "sentence_count": 206,
-      "word_count": 4487
+      "sentence_count": 244,
+      "word_count": 5583
     },
     {
       "number": "XXIII",
@@ -9844,18 +9739,9 @@
         },
         {
           "sentences": [
-            "“Dictator, now,” said Letty, with injured looks, and not without a wish"
+            "“Dictator, now,” said Letty, with injured looks, and not without a wish to make her mother repent."
           ]
-        }
-      ],
-      "sentence_count": 67,
-      "word_count": 2093
-    },
-    {
-      "number": "39",
-      "title": "make her mother repent.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Very well, dictator!” said Ben, contemptuously. “But that isn’t a good word: he didn’t tell them to write on slates.”"
@@ -10162,8 +10048,8 @@
           ]
         }
       ],
-      "sentence_count": 117,
-      "word_count": 2471
+      "sentence_count": 184,
+      "word_count": 4569
     },
     {
       "number": "XXV",
@@ -10172,8 +10058,7 @@
       "paragraphs": [
         {
           "sentences": [
-            "“Love seeketh not itself to please,  Nor for itself hath any care But for another gives its ease  And builds a heaven in hell’s despair........",
-            "Love seeketh only self to please,  To bind another to its delight, Joys in another’s loss of ease,  And builds a hell in heaven’s despite.” —W.",
+            "“Love seeketh not itself to please,  Nor for itself hath any care But for another gives its ease  And builds a heaven in hell’s despair........ Love seeketh only self to please,  To bind another to its delight, Joys in another’s loss of ease,  And builds a hell in heaven’s despite.” —W.",
             "BLAKE: _Songs of Experience_."
           ]
         },
@@ -10508,7 +10393,7 @@
           ]
         }
       ],
-      "sentence_count": 133,
+      "sentence_count": 132,
       "word_count": 2636
     },
     {
@@ -10901,6 +10786,7 @@
         {
           "sentences": [
             "“I think I shall turn round on you and accuse you of being a Goth,” said Rosamond, looking at Lydgate with a smile. “I suspect you know nothing about Lady Blessington and L.",
+            "E.",
             "L.” Rosamond herself was not without relish for these writers, but she did not readily commit herself by admiration, and was alive to the slightest hint that anything was not, according to Lydgate, in the very highest taste."
           ]
         },
@@ -10957,18 +10843,10 @@
             "“Well, there is a bird who can teach me what she will.",
             "Don’t I listen to her willingly?”"
           ]
-        }
-      ],
-      "sentence_count": 112,
-      "word_count": 3089
-    },
-    {
-      "number": "43",
-      "title": "Rosamond it seemed as if she and Lydgate were as good as engaged.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
+            "To Rosamond it seemed as if she and Lydgate were as good as engaged.",
             "That they were some time to be engaged had long been an idea in her mind; and ideas, we know, tend to a more solid kind of existence, the necessary materials being at hand.",
             "It is true, Lydgate had the counter-idea of remaining unengaged; but this was a mere negative, a shadow cast by other resolves which themselves were capable of shrinking.",
             "Circumstance was almost sure to be on the side of Rosamond’s idea, which had a shaping activity and looked through watchful blue eyes, whereas Lydgate’s lay blind and unconcerned as a jelly-fish which gets melted without knowing it."
@@ -10984,8 +10862,8 @@
           ]
         }
       ],
-      "sentence_count": 8,
-      "word_count": 320
+      "sentence_count": 122,
+      "word_count": 3424
     },
     {
       "number": "XXVIII",
@@ -11108,18 +10986,9 @@
         },
         {
           "sentences": [
-            "“You would like coffee in your own room, uncle?” said Dorothea, coming"
+            "“You would like coffee in your own room, uncle?” said Dorothea, coming to the rescue."
           ]
-        }
-      ],
-      "sentence_count": 55,
-      "word_count": 1486
-    },
-    {
-      "number": "45",
-      "title": "the rescue.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Yes; and you must go to Celia: she has great news to tell you, you know.",
@@ -11139,18 +11008,9 @@
         {
           "sentences": [
             "“It would not suit all—not you, dear, for example,” said Dorothea, quietly.",
-            "No one would ever know what she thought of a wedding journey"
+            "No one would ever know what she thought of a wedding journey to Rome."
           ]
-        }
-      ],
-      "sentence_count": 6,
-      "word_count": 109
-    },
-    {
-      "number": "46",
-      "title": "Rome.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Mrs. Cadwallader says it is nonsense, people going a long journey when they are married.",
@@ -11229,8 +11089,8 @@
           ]
         }
       ],
-      "sentence_count": 25,
-      "word_count": 304
+      "sentence_count": 86,
+      "word_count": 1904
     },
     {
       "number": "XXIX",
@@ -12401,18 +12261,9 @@
             "There was occasionally a little fierceness in his demeanor, but it was directed chiefly against false opinion, of which there is so much to correct in the world that a man of some reading and experience necessarily has his patience tried.",
             "He felt that the Featherstone family generally was of limited understanding, but being a man of the world and a public character, took everything as a matter of course, and even went to converse with Mr. Jonah and young Cranch in the kitchen, not doubting that he had impressed the latter greatly by his leading questions concerning the Chalky Flats.",
             "If anybody had observed that Mr. Borthrop Trumbull, being an auctioneer, was bound to know the nature of everything, he would have smiled and trimmed himself silently with the sense that he came pretty near that.",
-            "On the whole, in an auctioneering way, he was an honorable man, not ashamed of his business, and feeling that “the celebrated Peel, now Sir Robert,” if introduced to him, would not fail"
+            "On the whole, in an auctioneering way, he was an honorable man, not ashamed of his business, and feeling that “the celebrated Peel, now Sir Robert,” if introduced to him, would not fail to recognize his importance."
           ]
-        }
-      ],
-      "sentence_count": 88,
-      "word_count": 3102
-    },
-    {
-      "number": "51",
-      "title": "recognize his importance.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I don’t mind if I have a slice of that ham, and a glass of that ale, Miss Garth, if you will allow me,” he said, coming into the parlor at half-past eleven, after having had the exceptional privilege of seeing old Featherstone, and standing with his back to the fire between Mrs. Waule and Solomon."
@@ -12584,8 +12435,8 @@
           ]
         }
       ],
-      "sentence_count": 54,
-      "word_count": 1292
+      "sentence_count": 142,
+      "word_count": 4398
     },
     {
       "number": "XXXIII",
@@ -12775,18 +12626,9 @@
           "sentences": [
             "Mary’s heart began to beat more quickly.",
             "Various ideas rushed through her mind as to what the burning of a second will might imply.",
-            "She had"
+            "She had to make a difficult decision in a hurry."
           ]
-        }
-      ],
-      "sentence_count": 74,
-      "word_count": 1344
-    },
-    {
-      "number": "53",
-      "title": "make a difficult decision in a hurry.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I will call him, if you will let me call Mr. Jonah and others with him.”"
@@ -12906,8 +12748,8 @@
           ]
         }
       ],
-      "sentence_count": 54,
-      "word_count": 791
+      "sentence_count": 128,
+      "word_count": 2143
     },
     {
       "number": "XXXIV",
@@ -13346,18 +13188,9 @@
         {
           "sentences": [
             "Old Featherstone had often reflected as he sat looking at the fire that Standish would be surprised some day: it is true that if he had done as he liked at the last, and burnt the will drawn up by another lawyer, he would not have secured that minor end; still he had had his pleasure in ruminating on it.",
-            "And certainly Mr. Standish was surprised, but not at all sorry; on the contrary, he rather enjoyed the zest of a little curiosity in his own mind, which the discovery of a second will added"
+            "And certainly Mr. Standish was surprised, but not at all sorry; on the contrary, he rather enjoyed the zest of a little curiosity in his own mind, which the discovery of a second will added to the prospective amazement on the part of the Featherstone family."
           ]
-        }
-      ],
-      "sentence_count": 48,
-      "word_count": 1665
-    },
-    {
-      "number": "56",
-      "title": "the prospective amazement on the part of the Featherstone family.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "As to the sentiments of Solomon and Jonah, they were held in utter suspense: it seemed to them that the old will would have a certain validity, and that there might be such an interlacement of poor Peter’s former and latter intentions as to create endless “lawing” before anybody came by their own—an inconvenience which would have at least the advantage of going all round.",
@@ -13379,18 +13212,9 @@
         },
         {
           "sentences": [
-            "“Dear, dear!” said sister Martha, not meaning to be audible, but driven"
+            "“Dear, dear!” said sister Martha, not meaning to be audible, but driven to some articulation under this pressure of dates."
           ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 289
-    },
-    {
-      "number": "57",
-      "title": "some articulation under this pressure of dates.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I shall begin by reading the earlier will,” continued Mr. Standish, “since such, as appears by his not having destroyed the document, was the intention of the deceased.”"
@@ -13608,8 +13432,8 @@
           ]
         }
       ],
-      "sentence_count": 96,
-      "word_count": 2338
+      "sentence_count": 152,
+      "word_count": 4311
     },
     {
       "number": "XXXVI",
@@ -13618,8 +13442,7 @@
       "paragraphs": [
         {
           "sentences": [
-            "’T is strange to see the humors of these men, These great aspiring spirits, that should be wise:........",
-            "For being the nature of great spirits to love To be where they may be most eminent; They, rating of themselves so farre above Us in conceit, with whom they do frequent, Imagine how we wonder and esteeme All that they do or say; which makes them strive To make our admiration more extreme, Which they suppose they cannot, ’less they give Notice of their extreme and highest thoughts. —DANIEL: _Tragedy of Philotas_."
+            "’T is strange to see the humors of these men, These great aspiring spirits, that should be wise:........ For being the nature of great spirits to love To be where they may be most eminent; They, rating of themselves so farre above Us in conceit, with whom they do frequent, Imagine how we wonder and esteeme All that they do or say; which makes them strive To make our admiration more extreme, Which they suppose they cannot, ’less they give Notice of their extreme and highest thoughts. —DANIEL: _Tragedy of Philotas_."
           ]
         },
         {
@@ -13733,21 +13556,8 @@
         },
         {
           "sentences": [
-            "This was a not infrequent procedure with Mr. Vincy—to be rash in jovial assent, and on becoming subsequently conscious that he had been rash,"
-          ]
-        }
-      ],
-      "sentence_count": 52,
-      "word_count": 949
-    },
-    {
-      "number": "59",
-      "title": "employ others in making the offensive retractation. However, Mrs.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "Vincy, who never willingly opposed her husband, lost no time the next morning in letting Rosamond know what he had said.",
+            "This was a not infrequent procedure with Mr. Vincy—to be rash in jovial assent, and on becoming subsequently conscious that he had been rash, to employ others in making the offensive retractation.",
+            "However, Mrs. Vincy, who never willingly opposed her husband, lost no time the next morning in letting Rosamond know what he had said.",
             "Rosamond, examining some muslin-work, listened in silence, and at the end gave a certain turn of her graceful neck, of which only long experience could teach you that it meant perfect obstinacy."
           ]
         },
@@ -14040,18 +13850,9 @@
         {
           "sentences": [
             "An unmistakable delight shone forth from the blue eyes that met his, and the radiance seemed to light up all his future with mild sunshine.",
-            "Ideal happiness (of the kind known in the Arabian Nights, in which you are invited to step from the labor and discord of the street into a paradise where everything is given to you and nothing claimed) seemed"
+            "Ideal happiness (of the kind known in the Arabian Nights, in which you are invited to step from the labor and discord of the street into a paradise where everything is given to you and nothing claimed) seemed to be an affair of a few weeks’ waiting, more or less."
           ]
-        }
-      ],
-      "sentence_count": 126,
-      "word_count": 2740
-    },
-    {
-      "number": "60",
-      "title": "be an affair of a few weeks’ waiting, more or less.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Why should we defer it?” he said, with ardent insistence. “I have taken the house now: everything else can soon be got ready—can it not?",
@@ -14073,18 +13874,9 @@
         {
           "sentences": [
             "There was a serious pleading in Lydgate’s tone, as if he felt that she would be injuring him by any fantastic delays.",
-            "Rosamond became serious too, and slightly meditative; in fact, she was going through many intricacies of lace-edging and hosiery and petticoat-tucking, in order"
+            "Rosamond became serious too, and slightly meditative; in fact, she was going through many intricacies of lace-edging and hosiery and petticoat-tucking, in order to give an answer that would at least be approximative."
           ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 191
-    },
-    {
-      "number": "61",
-      "title": "give an answer that would at least be approximative.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Six weeks would be ample—say so, Rosamond,” insisted Lydgate, releasing her hands to put his arm gently round her."
@@ -14338,8 +14130,8 @@
           ]
         }
       ],
-      "sentence_count": 100,
-      "word_count": 1948
+      "sentence_count": 285,
+      "word_count": 5860
     },
     {
       "number": "XXXVII",
@@ -15088,20 +14880,7 @@
             "Poor Mr. Casaubon felt (and must not we, being impartial, feel with him a little?) that no man had juster cause for disgust and suspicion than he.",
             "Young Ladislaw, he was sure, meant to defy and annoy him, meant to win Dorothea’s confidence and sow her mind with disrespect, and perhaps aversion, towards her husband.",
             "Some motive beneath the surface had been needed to account for Will’s sudden change of course in rejecting Mr. Casaubon’s aid and quitting his travels; and this defiant determination to fix himself in the neighborhood by taking up something so much at variance with his former choice as Mr. Brooke’s Middlemarch projects, revealed clearly enough that the undeclared motive had relation to Dorothea.",
-            "Not for one moment did Mr. Casaubon suspect Dorothea of any doubleness: he had no suspicions of her, but he had (what was little less uncomfortable) the positive knowledge that her tendency to form opinions about her husband’s conduct was accompanied with a disposition"
-          ]
-        }
-      ],
-      "sentence_count": 313,
-      "word_count": 7818
-    },
-    {
-      "number": "63",
-      "title": "regard Will Ladislaw favorably and be influenced by what he said.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Not for one moment did Mr. Casaubon suspect Dorothea of any doubleness: he had no suspicions of her, but he had (what was little less uncomfortable) the positive knowledge that her tendency to form opinions about her husband’s conduct was accompanied with a disposition to regard Will Ladislaw favorably and be influenced by what he said.",
             "His own proud reticence had prevented him from ever being undeceived in the supposition that Dorothea had originally asked her uncle to invite Will to his house."
           ]
         },
@@ -15136,8 +14915,8 @@
           ]
         }
       ],
-      "sentence_count": 15,
-      "word_count": 360
+      "sentence_count": 328,
+      "word_count": 8190
     },
     {
       "number": "XXXVIII",
@@ -15736,18 +15515,9 @@
             "She was thinking of what Will had no knowledge of—the conversation between her and her husband in the darkness; and she was anew smitten with hopelessness that she could influence Mr. Casaubon’s action.",
             "But the marked expression of her sorrow convinced Will that it was not all given to him personally, and that Dorothea had not been visited by the idea that Mr. Casaubon’s dislike and jealousy of him turned upon herself.",
             "He felt an odd mixture of delight and vexation: of delight that he could dwell and be cherished in her thought as in a pure home, without suspicion and without stint—of vexation because he was of too little account with her, was not formidable enough, was treated with an unhesitating benevolence which did not flatter him.",
-            "But his dread of any change in Dorothea was stronger than his discontent, and he began"
+            "But his dread of any change in Dorothea was stronger than his discontent, and he began to speak again in a tone of mere explanation."
           ]
-        }
-      ],
-      "sentence_count": 69,
-      "word_count": 1667
-    },
-    {
-      "number": "66",
-      "title": "speak again in a tone of mere explanation.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Mr. Casaubon’s reason is, his displeasure at my taking a position here which he considers unsuited to my rank as his cousin.",
@@ -15926,18 +15696,9 @@
         },
         {
           "sentences": [
-            "“Dagley, my good fellow,” began Mr. Brooke, conscious that he was going"
+            "“Dagley, my good fellow,” began Mr. Brooke, conscious that he was going to be very friendly about the boy."
           ]
-        }
-      ],
-      "sentence_count": 73,
-      "word_count": 1694
-    },
-    {
-      "number": "67",
-      "title": "be very friendly about the boy.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Oh, ay, I’m a good feller, am I?",
@@ -16039,8 +15800,8 @@
           ]
         }
       ],
-      "sentence_count": 40,
-      "word_count": 1218
+      "sentence_count": 182,
+      "word_count": 4595
     },
     {
       "number": "XL",
@@ -16545,18 +16306,9 @@
         },
         {
           "sentences": [
-            "“I think, there is hardly anything honest that his family would object"
+            "“I think, there is hardly anything honest that his family would object to more,” said Mrs. Garth, decidedly."
           ]
-        }
-      ],
-      "sentence_count": 181,
-      "word_count": 4560
-    },
-    {
-      "number": "69",
-      "title": "more,” said Mrs. Garth, decidedly.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“What care I about their objecting?” said Caleb, with a sturdiness which he was apt to show when he had an opinion. “The lad is of age and must get his bread.",
@@ -16602,18 +16354,9 @@
             "I’ve always had my hands full with scattered things, and there’s always something fresh turning up.",
             "Why, only yesterday—bless me, I don’t think I told you!—it was rather odd that two men should have been at me on different sides to do the same bit of valuing.",
             "And who do you think they were?” said Caleb, taking a pinch of snuff and holding it up between his fingers, as if it were a part of his exposition.",
-            "He was fond of a pinch when it occurred"
+            "He was fond of a pinch when it occurred to him, but he usually forgot that this indulgence was at his command."
           ]
-        }
-      ],
-      "sentence_count": 20,
-      "word_count": 416
-    },
-    {
-      "number": "70",
-      "title": "him, but he usually forgot that this indulgence was at his command.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "His wife held down her knitting and looked attentive."
@@ -16662,8 +16405,8 @@
           ]
         }
       ],
-      "sentence_count": 15,
-      "word_count": 365
+      "sentence_count": 216,
+      "word_count": 5360
     },
     {
       "number": "XLI",
@@ -17713,18 +17456,9 @@
             "But in truth his views were perturbed.",
             "For years he had been paying bills with strictly made items, so that for every half-crown and eighteen-pence he was certain something measurable had been delivered.",
             "He had done this with satisfaction, including it among his responsibilities as a husband and father, and regarding a longer bill than usual as a dignity worth mentioning.",
-            "Moreover, in addition to the massive benefit of the drugs to “self and family,” he had enjoyed the pleasure of forming an acute judgment as to their immediate effects, so as to give an intelligent statement for the guidance of Mr. Gambit—a practitioner just a little lower in status than Wrench or Toller, and especially esteemed as an accoucheur, of whose ability Mr. Mawmsey had the poorest opinion on all other points, but in doctoring, he was wont"
+            "Moreover, in addition to the massive benefit of the drugs to “self and family,” he had enjoyed the pleasure of forming an acute judgment as to their immediate effects, so as to give an intelligent statement for the guidance of Mr. Gambit—a practitioner just a little lower in status than Wrench or Toller, and especially esteemed as an accoucheur, of whose ability Mr. Mawmsey had the poorest opinion on all other points, but in doctoring, he was wont to say in an undertone, he placed Gambit above any of them."
           ]
-        }
-      ],
-      "sentence_count": 34,
-      "word_count": 1510
-    },
-    {
-      "number": "76",
-      "title": "say in an undertone, he placed Gambit above any of them.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Here were deeper reasons than the superficial talk of a new man, which appeared still flimsier in the drawing-room over the shop, when they were recited to Mrs. Mawmsey, a woman accustomed to be made much of as a fertile mother,—generally under attendance more or less frequent from Mr. Gambit, and occasionally having attacks which required Dr. Minchin."
@@ -17943,20 +17677,7 @@
         },
         {
           "sentences": [
-            "This had happened before the affair of Fred Vincy’s illness had given"
-          ]
-        }
-      ],
-      "sentence_count": 89,
-      "word_count": 2752
-    },
-    {
-      "number": "77",
-      "title": "Mr. Wrench’s enmity towards Lydgate more definite personal ground.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "This had happened before the affair of Fred Vincy’s illness had given to Mr. Wrench’s enmity towards Lydgate more definite personal ground.",
             "The new-comer already threatened to be a nuisance in the shape of rivalry, and was certainly a nuisance in the shape of practical criticism or reflections on his hard-driven elders, who had had something else to do than to busy themselves with untried notions.",
             "His practice had spread in one or two quarters, and from the first the report of his high family had led to his being pretty generally invited, so that the other medical men had to meet him at dinner in the best houses; and having to meet a man whom you dislike is not observed always to end in a mutual attachment.",
             "There was hardly ever so much unanimity among them as in the opinion that Lydgate was an arrogant young fellow, and yet ready for the sake of ultimately predominating to show a crawling subservience to Bulstrode.",
@@ -17970,18 +17691,9 @@
             "Caleb Garth had undertaken it, had failed during its progress, and before the interior fittings were begun had retired from the management of the business; and when referring to the Hospital he often said that however Bulstrode might ring if you tried him, he liked good solid carpentry and masonry, and had a notion both of drains and chimneys.",
             "In fact, the Hospital had become an object of intense interest to Bulstrode, and he would willingly have continued to spare a large yearly sum that he might rule it dictatorially without any Board; but he had another favorite object which also required money for its accomplishment: he wished to buy some land in the neighborhood of Middlemarch, and therefore he wished to get considerable contributions towards maintaining the Hospital.",
             "Meanwhile he framed his plan of management.",
-            "The Hospital was to be reserved for fever in all its forms; Lydgate was to be chief medical superintendent, that he might have free authority to pursue all comparative investigations which his studies, particularly in Paris, had shown him the importance of, the other medical visitors having a consultative influence, but no power to contravene Lydgate’s ultimate decisions; and the general management was to be lodged exclusively in the hands of five directors associated with Mr. Bulstrode, who were to have votes in the ratio of their contributions, the Board itself filling up any vacancy in its numbers, and no mob of small contributors being admitted"
+            "The Hospital was to be reserved for fever in all its forms; Lydgate was to be chief medical superintendent, that he might have free authority to pursue all comparative investigations which his studies, particularly in Paris, had shown him the importance of, the other medical visitors having a consultative influence, but no power to contravene Lydgate’s ultimate decisions; and the general management was to be lodged exclusively in the hands of five directors associated with Mr. Bulstrode, who were to have votes in the ratio of their contributions, the Board itself filling up any vacancy in its numbers, and no mob of small contributors being admitted to a share of government."
           ]
-        }
-      ],
-      "sentence_count": 10,
-      "word_count": 528
-    },
-    {
-      "number": "78",
-      "title": "a share of government.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "There was an immediate refusal on the part of every medical man in the town to become a visitor at the Fever Hospital."
@@ -18125,18 +17837,9 @@
         },
         {
           "sentences": [
-            "Presently Rosamond left the piano and seated herself on a chair close"
+            "Presently Rosamond left the piano and seated herself on a chair close to the sofa and opposite her husband’s face."
           ]
-        }
-      ],
-      "sentence_count": 58,
-      "word_count": 1357
-    },
-    {
-      "number": "79",
-      "title": "the sofa and opposite her husband’s face.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Is that enough music for you, my lord?” she said, folding her hands before her and putting on a little air of meekness."
@@ -18257,8 +17960,8 @@
           ]
         }
       ],
-      "sentence_count": 35,
-      "word_count": 676
+      "sentence_count": 226,
+      "word_count": 6858
     },
     {
       "number": "XLVI",
@@ -18667,21 +18370,7 @@
             "But this, which happens to us all, happens to some with a wide difference; and Will was not one of those whose wit “keeps the roadway:” he had his bypaths where there were little joys of his own choosing, such as gentlemen cantering on the highroad might have thought rather idiotic.",
             "The way in which he made a sort of happiness for himself out of his feeling for Dorothea was an example of this.",
             "It may seem strange, but it is the fact, that the ordinary vulgar vision of which Mr. Casaubon suspected him—namely, that Dorothea might become a widow, and that the interest he had established in her mind might turn into acceptance of him as a husband—had no tempting, arresting power over him; he did not live in the scenery of such an event, and follow it out, as we all do with that imagined “otherwise” which is our practical heaven.",
-            "It was not only that he was unwilling to entertain thoughts which could be accused of baseness, and was already uneasy in the sense that he had to justify himself from the charge of ingratitude—the latent consciousness of many other barriers between himself and Dorothea besides the existence of her husband, had helped"
-          ]
-        }
-      ],
-      "sentence_count": 14,
-      "word_count": 429
-    },
-    {
-      "number": "82",
-      "title": "turn away his imagination from speculating on what might befall Mr.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "Casaubon.",
+            "It was not only that he was unwilling to entertain thoughts which could be accused of baseness, and was already uneasy in the sense that he had to justify himself from the charge of ingratitude—the latent consciousness of many other barriers between himself and Dorothea besides the existence of her husband, had helped to turn away his imagination from speculating on what might befall Mr. Casaubon.",
             "And there were yet other reasons.",
             "Will, we know, could not bear the thought of any flaw appearing in his crystal: he was at once exasperated and delighted by the calm freedom with which Dorothea looked at him and spoke to him, and there was something so exquisite in thinking of her just as she was, that he could not long for a change which must somehow change her.",
             "Do we not shun the street version of a fine melody?—or shrink from the news that the rarity—some bit of chiselling or engraving perhaps—which we have dwelt on even with exultation in the trouble it has cost us to snatch glimpses of it, is really not an uncommon thing, and may be obtained as an every-day possession?",
@@ -18818,8 +18507,8 @@
           ]
         }
       ],
-      "sentence_count": 66,
-      "word_count": 1750
+      "sentence_count": 79,
+      "word_count": 2191
     },
     {
       "number": "XLVIII",
@@ -19139,18 +18828,9 @@
         },
         {
           "sentences": [
-            "“God bless you, madam!” said Tantripp, with an irrepressible movement of love towards the beautiful, gentle creature for whom she felt unable"
+            "“God bless you, madam!” said Tantripp, with an irrepressible movement of love towards the beautiful, gentle creature for whom she felt unable to do anything more, now that she had finished tying the bonnet."
           ]
-        }
-      ],
-      "sentence_count": 116,
-      "word_count": 2944
-    },
-    {
-      "number": "84",
-      "title": "do anything more, now that she had finished tying the bonnet.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "This was too much for Dorothea’s highly-strung feeling, and she burst into tears, sobbing against Tantripp’s arm.",
@@ -19224,8 +18904,8 @@
           ]
         }
       ],
-      "sentence_count": 32,
-      "word_count": 617
+      "sentence_count": 148,
+      "word_count": 3573
     },
     {
       "number": "XLIX",
@@ -19884,18 +19564,9 @@
             "The fact was that Will had been made the more susceptible by observing that Mr. Brooke, instead of wishing him, as before, to come to the Grange oftener than was quite agreeable to himself, seemed now to contrive that he should go there as little as possible.",
             "This was a shuffling concession of Mr. Brooke’s to Sir James Chettam’s indignant remonstrance; and Will, awake to the slightest hint in this direction, concluded that he was to be kept away from the Grange on Dorothea’s account.",
             "Her friends, then, regarded him with some suspicion?",
-            "Their fears were quite superfluous: they were very much mistaken if they imagined that he would put himself forward as a needy adventurer trying"
+            "Their fears were quite superfluous: they were very much mistaken if they imagined that he would put himself forward as a needy adventurer trying to win the favor of a rich woman."
           ]
-        }
-      ],
-      "sentence_count": 12,
-      "word_count": 375
-    },
-    {
-      "number": "88",
-      "title": "win the favor of a rich woman.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Until now Will had never fully seen the chasm between himself and Dorothea—until now that he was come to the brink of it, and saw her on the other side.",
@@ -20235,8 +19906,8 @@
           ]
         }
       ],
-      "sentence_count": 150,
-      "word_count": 4460
+      "sentence_count": 162,
+      "word_count": 4843
     },
     {
       "number": "LII",
@@ -21101,18 +20772,9 @@
         },
         {
           "sentences": [
-            "But since Bulstrode did not speak, Raffles ran on, by way of using time"
+            "But since Bulstrode did not speak, Raffles ran on, by way of using time to the utmost."
           ]
-        }
-      ],
-      "sentence_count": 154,
-      "word_count": 3943
-    },
-    {
-      "number": "91",
-      "title": "the utmost.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I’ve not had such fine luck as you, by Jove!",
@@ -21246,8 +20908,8 @@
           ]
         }
       ],
-      "sentence_count": 60,
-      "word_count": 1179
+      "sentence_count": 214,
+      "word_count": 5125
     },
     {
       "number": "LIV",
@@ -21489,20 +21151,7 @@
             "Mrs. Farebrother recurred to her knitting with a dignified satisfaction in her neat little effort at oratory, but this was not what Dorothea wanted to hear.",
             "Poor thing! she did not even know whether Will Ladislaw was still at Middlemarch, and there was no one whom she dared to ask, unless it were Lydgate.",
             "But just now she could not see Lydgate without sending for him or going to seek him.",
-            "Perhaps Will Ladislaw, having heard of that strange ban against him left by Mr. Casaubon, had felt it better that he and she should not meet again, and perhaps she was wrong"
-          ]
-        }
-      ],
-      "sentence_count": 98,
-      "word_count": 2194
-    },
-    {
-      "number": "93",
-      "title": "wish for a meeting that others might find many good reasons against.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Perhaps Will Ladislaw, having heard of that strange ban against him left by Mr. Casaubon, had felt it better that he and she should not meet again, and perhaps she was wrong to wish for a meeting that others might find many good reasons against.",
             "Still “I do wish it” came at the end of those wise reflections as naturally as a sob after holding the breath.",
             "And the meeting did happen, but in a formal way quite unexpected by her."
           ]
@@ -21771,8 +21420,8 @@
           ]
         }
       ],
-      "sentence_count": 113,
-      "word_count": 2378
+      "sentence_count": 211,
+      "word_count": 4585
     },
     {
       "number": "LV",
@@ -22953,18 +22602,9 @@
           "sentences": [
             "Fred wondered a little at this strong language, but only said, “I hope it will not be so with me, Mrs. Garth, since I have some encouragement to believe that I may win Mary.",
             "Mr. Garth has told you about that?",
-            "You were not surprised, I dare say?” Fred ended, innocently referring only"
+            "You were not surprised, I dare say?” Fred ended, innocently referring only to his own love as probably evident enough."
           ]
-        }
-      ],
-      "sentence_count": 43,
-      "word_count": 1150
-    },
-    {
-      "number": "97",
-      "title": "his own love as probably evident enough.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Not surprised that Mary has given you encouragement?” returned Mrs. Garth, who thought it would be well for Fred to be more alive to the fact that Mary’s friends could not possibly have wished this beforehand, whatever the Vincys might suppose. “Yes, I confess I was surprised.”"
@@ -22997,18 +22637,9 @@
         },
         {
           "sentences": [
-            "“I cannot conceive how it could be any pain to Mr. Farebrother,” said Fred, who nevertheless felt that surprising conceptions were beginning"
+            "“I cannot conceive how it could be any pain to Mr. Farebrother,” said Fred, who nevertheless felt that surprising conceptions were beginning to form themselves."
           ]
-        }
-      ],
-      "sentence_count": 11,
-      "word_count": 331
-    },
-    {
-      "number": "98",
-      "title": "form themselves.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Precisely; you cannot conceive,” said Mrs. Garth, cutting her words as neatly as possible."
@@ -23070,18 +22701,9 @@
             "She was unpleasantly conscious that she had been on the verge of speaking as “one of the foolish women speaketh”—telling first and entreating silence after.",
             "But she had not entreated silence, and to prevent Caleb’s blame she determined to blame herself and confess all to him that very night.",
             "It was curious what an awful tribunal the mild Caleb’s was to her, whenever he set it up.",
-            "But she meant to point out"
+            "But she meant to point out to him that the revelation might do Fred Vincy a great deal of good."
           ]
-        }
-      ],
-      "sentence_count": 24,
-      "word_count": 551
-    },
-    {
-      "number": "99",
-      "title": "him that the revelation might do Fred Vincy a great deal of good.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "No doubt it was having a strong effect on him as he walked to Lowick.",
@@ -23293,8 +22915,8 @@
           ]
         }
       ],
-      "sentence_count": 78,
-      "word_count": 1711
+      "sentence_count": 156,
+      "word_count": 3768
     },
     {
       "number": "LVIII",
@@ -24150,18 +23772,9 @@
             "Will did not confess this weakness to himself, but he lingered.",
             "What was the use of going to London at that time of the year?",
             "The Rugby men who would remember him were not there; and so far as political writing was concerned, he would rather for a few weeks go on with the “Pioneer.” At the present moment, however, when Mr. Bulstrode was speaking to him, he had both a strengthened resolve to go and an equally strong resolve not to go till he had once more seen Dorothea.",
-            "Hence he replied that he had reasons for deferring his departure a little, and would be happy to go"
+            "Hence he replied that he had reasons for deferring his departure a little, and would be happy to go to the sale."
           ]
-        }
-      ],
-      "sentence_count": 20,
-      "word_count": 810
-    },
-    {
-      "number": "103",
-      "title": "the sale.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Will was in a defiant mood, his consciousness being deeply stung with the thought that the people who looked at him probably knew a fact tantamount to an accusation against him as a fellow with low designs which were to be frustrated by a disposal of property.",
@@ -24411,6 +24024,7 @@
         },
         {
           "sentences": [
+            "Well!",
             "I’ve often wondered what became of your mother.",
             "She ran away from her friends when she was a young lass—a proud-spirited lass, and pretty, by Jove!",
             "I knew the reason why she ran away,” said Raffles, winking slowly as he looked sideways at Will."
@@ -24458,14 +24072,19 @@
           ]
         }
       ],
-      "sentence_count": 135,
-      "word_count": 3263
+      "sentence_count": 156,
+      "word_count": 4077
     },
     {
-      "number": "104",
-      "title": "man they may both be true.”—_Rasselas_.",
-      "type": "letter",
+      "number": "LXI",
+      "title": "",
+      "type": "chapter",
       "paragraphs": [
+        {
+          "sentences": [
+            "“Inconsistencies,” answered Imlac, “cannot both be right, but imputed to man they may both be true.”—_Rasselas_."
+          ]
+        },
         {
           "sentences": [
             "The same night, when Mr. Bulstrode returned from a journey to Brassing on business, his good wife met him in the entrance-hall and drew him into his private sitting-room."
@@ -24524,18 +24143,9 @@
           "sentences": [
             "Physically Mr. Bulstrode did not want the vinegar, but morally the affectionate attention soothed him.",
             "Though always polite, it was his habit to receive such services with marital coolness, as his wife’s duty.",
-            "But to-day, while she was bending over him, he said, “You are very good, Harriet,” in a tone which had something new in it to her ear; she did not know exactly what the novelty was, but her woman’s solicitude shaped itself into a darting thought that he might be going"
+            "But to-day, while she was bending over him, he said, “You are very good, Harriet,” in a tone which had something new in it to her ear; she did not know exactly what the novelty was, but her woman’s solicitude shaped itself into a darting thought that he might be going to have an illness."
           ]
-        }
-      ],
-      "sentence_count": 21,
-      "word_count": 442
-    },
-    {
-      "number": "105",
-      "title": "have an illness.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Has anything worried you?” she said. “Did that man come to you at the Bank?”"
@@ -24629,18 +24239,9 @@
             "By-and-by came a decided external leading: a confidential subordinate partner died, and nobody seemed to the principal so well fitted to fill the severely felt vacancy as his young friend Bulstrode, if he would become confidential accountant.",
             "The offer was accepted.",
             "The business was a pawnbroker’s, of the most magnificent sort both in extent and profits; and on a short acquaintance with it Bulstrode became aware that one source of magnificent profit was the easy reception of any goods offered, without strict inquiry as to where they came from.",
-            "But there was a branch house at the west end, and no pettiness or dinginess"
+            "But there was a branch house at the west end, and no pettiness or dinginess to give suggestions of shame."
           ]
-        }
-      ],
-      "sentence_count": 48,
-      "word_count": 1378
-    },
-    {
-      "number": "106",
-      "title": "give suggestions of shame.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He remembered his first moments of shrinking.",
@@ -24972,8 +24573,8 @@
           ]
         }
       ],
-      "sentence_count": 142,
-      "word_count": 3522
+      "sentence_count": 212,
+      "word_count": 5367
     },
     {
       "number": "LXII",
@@ -26340,18 +25941,9 @@
           "sentences": [
             "“Many persons must have been in debt in the same way, but if they are respectable, people trust them.",
             "I am sure I have heard papa say that the Torbits were in debt, and they went on very well.",
-            "It cannot be good"
+            "It cannot be good to act rashly,” said Rosamond, with serene wisdom."
           ]
-        }
-      ],
-      "sentence_count": 245,
-      "word_count": 5527
-    },
-    {
-      "number": "110",
-      "title": "act rashly,” said Rosamond, with serene wisdom.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Lydgate sat paralyzed by opposing impulses: since no reasoning he could apply to Rosamond seemed likely to conquer her assent, he wanted to smash and grind some object on which he could at least produce an impression, or else to tell her brutally that he was master, and she must obey.",
@@ -26405,8 +25997,8 @@
           ]
         }
       ],
-      "sentence_count": 28,
-      "word_count": 1050
+      "sentence_count": 273,
+      "word_count": 6585
     },
     {
       "number": "LXV",
@@ -26696,6 +26288,7 @@
             "As to money just now, Fred had in his mind the heroic project of saving almost all of the eighty pounds that Mr. Garth offered him, and returning it, which he could easily do by giving up all futile money-spending, since he had a superfluous stock of clothes, and no expense in his board.",
             "In that way he could, in one year, go a good way towards repaying the ninety pounds of which he had deprived Mrs. Garth, unhappily at a time when she needed that sum more than she did now.",
             "Nevertheless, it must be acknowledged that on this evening, which was the fifth of his recent visits to the billiard-room, Fred had, not in his pocket, but in his mind, the ten pounds which he meant to reserve for himself from his half-year’s salary (having before him the pleasure of carrying thirty to Mrs. Garth when Mary was likely to be come home again)—he had those ten pounds in his mind as a fund from which he might risk something, if there were a chance of a good bet.",
+            "Why?",
             "Well, when sovereigns were flying about, why shouldn’t he catch a few?",
             "He would never go far along that road again; but a man likes to assure himself, and men of pleasure generally, what he could do in the way of mischief if he chose, and that if he abstains from making himself ill, or beggaring himself, or talking with the utmost looseness which the narrow limits of human capacity will allow, it is not because he is a spooney.",
             "Fred did not enter into formal reasons, which are a very artificial, inexact way of representing the tingling returns of old habit, and the caprices of young blood: but there was lurking in him a prophetic sense that evening, that when he began to play he should also begin to bet—that he should enjoy some punch-drinking, and in general prepare himself for feeling “rather seedy” in the morning.",
@@ -26935,8 +26528,8 @@
           ]
         }
       ],
-      "sentence_count": 139,
-      "word_count": 3757
+      "sentence_count": 140,
+      "word_count": 3758
     },
     {
       "number": "LXVII",
@@ -27497,18 +27090,9 @@
         },
         {
           "sentences": [
-            "He longed for some confirmation of this hopeful conjecture, but to have asked any question as to what Raffles had said or done would have been"
+            "He longed for some confirmation of this hopeful conjecture, but to have asked any question as to what Raffles had said or done would have been to betray fear."
           ]
-        }
-      ],
-      "sentence_count": 32,
-      "word_count": 689
-    },
-    {
-      "number": "116",
-      "title": "betray fear.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I am exceedingly obliged to you, Mr. Garth,” he said, in his usual tone of politeness. “My servant will be back in a few minutes, and I shall then go myself to see what can be done for this unfortunate man.",
@@ -27822,20 +27406,7 @@
         {
           "sentences": [
             "He did not hinder her from going to her father early in the morning—it seemed now that he ought not to hinder her from doing as she pleased.",
-            "In half an hour she came back, and said that papa and mamma wished her"
-          ]
-        }
-      ],
-      "sentence_count": 132,
-      "word_count": 2954
-    },
-    {
-      "number": "117",
-      "title": "go and stay with them while things were in this miserable state.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "In half an hour she came back, and said that papa and mamma wished her to go and stay with them while things were in this miserable state.",
             "Papa said he could do nothing about the debt—if he paid this, there would be half-a-dozen more.",
             "She had better come back home again till Lydgate had got a comfortable home for her. “Do you object, Tertius?”"
           ]
@@ -27877,8 +27448,8 @@
           ]
         }
       ],
-      "sentence_count": 14,
-      "word_count": 253
+      "sentence_count": 178,
+      "word_count": 3912
     },
     {
       "number": "LXX",
@@ -28857,18 +28428,9 @@
         {
           "sentences": [
             "Mr. Brooke, who had before heard only imperfect hints of it, and was very uneasy that he had “gone a little too far” in countenancing Bulstrode, now got himself fully informed, and felt some benevolent sadness in talking to Mr. Farebrother about the ugly light in which Lydgate had come to be regarded.",
-            "Mr. Farebrother was going to walk back"
+            "Mr. Farebrother was going to walk back to Lowick."
           ]
-        }
-      ],
-      "sentence_count": 192,
-      "word_count": 6153
-    },
-    {
-      "number": "120",
-      "title": "Lowick.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Step into my carriage,” said Mr. Brooke. “I am going round to see Mrs. Casaubon.",
@@ -28928,8 +28490,8 @@
           ]
         }
       ],
-      "sentence_count": 18,
-      "word_count": 299
+      "sentence_count": 210,
+      "word_count": 6454
     },
     {
       "number": "LXXII",
@@ -29407,20 +28969,8 @@
             "Poor Mrs. Bulstrode, meanwhile, had been no further shaken by the oncoming tread of calamity than in the busier stirring of that secret uneasiness which had always been present in her since the last visit of Raffles to The Shrubs.",
             "That the hateful man had come ill to Stone Court, and that her husband had chosen to remain there and watch over him, she allowed to be explained by the fact that Raffles had been employed and aided in earlier-days, and that this made a tie of benevolence towards him in his degraded helplessness; and she had been since then innocently cheered by her husband’s more hopeful speech about his own health and ability to continue his attention to business.",
             "The calm was disturbed when Lydgate had brought him home ill from the meeting, and in spite of comforting assurances during the next few days, she cried in private from the conviction that her husband was not suffering from bodily illness merely, but from something that afflicted his mind.",
-            "He would not allow her to read to him, and scarcely to sit with him, alleging nervous susceptibility to sounds and movements; yet she suspected that in shutting himself up in his private room he wanted"
-          ]
-        }
-      ],
-      "sentence_count": 77,
-      "word_count": 1944
-    },
-    {
-      "number": "124",
-      "title": "be busy with his papers. Something, she felt sure, had happened.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He would not allow her to read to him, and scarcely to sit with him, alleging nervous susceptibility to sounds and movements; yet she suspected that in shutting himself up in his private room he wanted to be busy with his papers.",
+            "Something, she felt sure, had happened.",
             "Perhaps it was some great loss of money; and she was kept in the dark.",
             "Not daring to question her husband, she said to Lydgate, on the fifth day after the meeting, when she had not left home except to go to church—"
           ]
@@ -29626,8 +29176,8 @@
           ]
         }
       ],
-      "sentence_count": 86,
-      "word_count": 2189
+      "sentence_count": 164,
+      "word_count": 4145
     },
     {
       "number": "LXXV",
@@ -29968,18 +29518,9 @@
           "sentences": [
             "When Lydgate came in, she was almost shocked at the change in his face, which was strikingly perceptible to her who had not seen him for two months.",
             "It was not the change of emaciation, but that effect which even young faces will very soon show from the persistent presence of resentment and despondency.",
-            "Her cordial look, when she put out her hand"
+            "Her cordial look, when she put out her hand to him, softened his expression, but only with melancholy."
           ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 555
-    },
-    {
-      "number": "127",
-      "title": "him, softened his expression, but only with melancholy.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I have wished very much to see you for a long while, Mr. Lydgate,” said Dorothea when they were seated opposite each other; “but I put off asking you to come until Mr. Bulstrode applied to me again about the Hospital.",
@@ -30321,8 +29862,8 @@
           ]
         }
       ],
-      "sentence_count": 156,
-      "word_count": 3405
+      "sentence_count": 174,
+      "word_count": 3969
     },
     {
       "number": "LXXVII",
@@ -30773,20 +30314,7 @@
         {
           "sentences": [
             "Lydgate too was reticent in the midst of his confidence.",
-            "He made no allusion to Rosamond’s feeling under their trouble, and of Dorothea he only said, “Mrs. Casaubon has been the one person to come forward and say that she had no belief in any of the suspicions against me.” Observing a change in Will’s face, he avoided any further mention of her, feeling himself too ignorant of their relation to each other not"
-          ]
-        }
-      ],
-      "sentence_count": 26,
-      "word_count": 623
-    },
-    {
-      "number": "131",
-      "title": "fear that his words might have some hidden painful bearing on it.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He made no allusion to Rosamond’s feeling under their trouble, and of Dorothea he only said, “Mrs. Casaubon has been the one person to come forward and say that she had no belief in any of the suspicions against me.” Observing a change in Will’s face, he avoided any further mention of her, feeling himself too ignorant of their relation to each other not to fear that his words might have some hidden painful bearing on it.",
             "And it occurred to him that Dorothea was the real cause of the present visit to Middlemarch."
           ]
         },
@@ -30805,8 +30333,8 @@
           ]
         }
       ],
-      "sentence_count": 7,
-      "word_count": 216
+      "sentence_count": 33,
+      "word_count": 852
     },
     {
       "number": "LXXX",
@@ -31086,18 +30614,9 @@
         },
         {
           "sentences": [
-            "Now, when he came up, he said to her very gently, “Rosy, dear, Mrs. Casaubon is come to see you again; you would like to see her, would you not?” That she colored and gave rather a startled movement did not surprise him after the agitation produced by the interview yesterday—a beneficent agitation, he thought, since it seemed to have made her turn"
+            "Now, when he came up, he said to her very gently, “Rosy, dear, Mrs. Casaubon is come to see you again; you would like to see her, would you not?” That she colored and gave rather a startled movement did not surprise him after the agitation produced by the interview yesterday—a beneficent agitation, he thought, since it seemed to have made her turn to him again."
           ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 536
-    },
-    {
-      "number": "134",
-      "title": "him again.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Rosamond dared not say no.",
@@ -31342,18 +30861,9 @@
             "Your husband will be rightly valued.",
             "And he depends on you for comfort.",
             "He loves you best.",
-            "The worst loss would be"
+            "The worst loss would be to lose that—and you have not lost it,” said Dorothea."
           ]
-        }
-      ],
-      "sentence_count": 115,
-      "word_count": 2809
-    },
-    {
-      "number": "135",
-      "title": "lose that—and you have not lost it,” said Dorothea.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "She tried to thrust away the too overpowering thought of her own relief, lest she should fail to win some sign that Rosamond’s affection was yearning back towards her husband."
@@ -31428,8 +30938,8 @@
           ]
         }
       ],
-      "sentence_count": 25,
-      "word_count": 497
+      "sentence_count": 158,
+      "word_count": 3855
     },
     {
       "number": "LXXXII",
@@ -31935,6 +31445,7 @@
         {
           "sentences": [
             "“Gamekeeper?",
+            "No.",
             "Let us go in; I can tell you all in the house, you know,” said Mr. Brooke, nodding at the Cadwalladers, to show that he included them in his confidence. “As to poachers like Trapping Bass, you know, Chettam,” he continued, as they were entering, “when you are a magistrate, you’ll not find it so easy to commit.",
             "Severity is all very well, but it’s a great deal easier when you’ve got somebody to do it for you.",
             "You have a soft place in your heart yourself, you know—you’re not a Draco, a Jeffreys, that sort of thing.”"
@@ -32403,8 +31914,8 @@
           ]
         }
       ],
-      "sentence_count": 193,
-      "word_count": 3630
+      "sentence_count": 194,
+      "word_count": 3631
     },
     {
       "number": "LXXXV",
@@ -32890,18 +32401,9 @@
         },
         {
           "sentences": [
-            "There were three boys: Mary was not discontented that she brought forth men-children only; and when Fred wished to have a girl like her, she said, laughingly, “that would be too great a trial to your mother.” Mrs. Vincy in her declining years, and in the diminished lustre of her housekeeping, was much comforted by her perception that two at least of Fred’s boys were real Vincys, and did not “feature the Garths.” But Mary secretly rejoiced that the youngest of the three was very much what her father must have been when he wore a round jacket, and showed a marvellous nicety of aim in playing at marbles, or in throwing stones"
+            "There were three boys: Mary was not discontented that she brought forth men-children only; and when Fred wished to have a girl like her, she said, laughingly, “that would be too great a trial to your mother.” Mrs. Vincy in her declining years, and in the diminished lustre of her housekeeping, was much comforted by her perception that two at least of Fred’s boys were real Vincys, and did not “feature the Garths.” But Mary secretly rejoiced that the youngest of the three was very much what her father must have been when he wore a round jacket, and showed a marvellous nicety of aim in playing at marbles, or in throwing stones to bring down the mellow pears."
           ]
-        }
-      ],
-      "sentence_count": 104,
-      "word_count": 2207
-    },
-    {
-      "number": "141",
-      "title": "bring down the mellow pears.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Ben and Letty Garth, who were uncle and aunt before they were well in their teens, disputed much as to whether nephews or nieces were more desirable; Ben contending that it was clear girls were good for less than boys, else they would not be always in petticoats, which showed how little they were meant for; whereupon Letty, who argued much from books, got angry in replying that God made coats of skins for both Adam and Eve alike—also it occurred to her that in the East the men too wore petticoats.",
@@ -33051,18 +32553,18 @@
           ]
         }
       ],
-      "sentence_count": 72,
-      "word_count": 2149
+      "sentence_count": 176,
+      "word_count": 4362
     }
   ],
   "statistics": {
-    "total_chapters": 141,
-    "total_paragraphs": 4693,
-    "total_sentences": 13005,
-    "total_words": 315471,
-    "average_sentences_per_chapter": 92.23404255319149,
-    "average_paragraphs_per_chapter": 33.283687943262414,
-    "average_sentences_per_paragraph": 2.7711485190709566,
-    "average_words_per_sentence": 24.257670126874277
+    "total_chapters": 88,
+    "total_paragraphs": 4686,
+    "total_sentences": 13012,
+    "total_words": 315914,
+    "average_sentences_per_chapter": 147.86363636363637,
+    "average_paragraphs_per_chapter": 53.25,
+    "average_sentences_per_paragraph": 2.776781903542467,
+    "average_words_per_sentence": 24.278665846910545
   }
 }

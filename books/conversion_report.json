@@ -1,208 +1,200 @@
 {
-  "total_files": 60,
-  "books_with_chapters": 60,
+  "total_files": 59,
+  "books_with_chapters": 59,
   "books_without_chapters": 0,
   "chapter_counts": [
-    37,
-    37,
-    2150,
+    17,
+    867,
     2,
-    24,
-    173,
-    37,
-    6,
-    130,
-    79,
-    141,
-    71,
-    81,
-    53,
-    40,
-    18,
-    5,
+    12,
+    119,
     29,
-    213,
-    178,
+    97,
+    90,
+    61,
     88,
-    12,
-    36,
-    10,
-    63,
-    485,
-    3,
-    23,
-    33,
-    172,
+    28,
+    58,
+    43,
     22,
-    132,
-    18,
-    48,
-    11,
-    82,
-    23,
-    87,
-    5,
-    48,
-    35,
-    24,
-    6,
-    71,
-    51,
+    4,
+    1,
+    22,
+    176,
+    15,
+    150,
+    1,
+    16,
+    4,
     40,
-    43,
-    64,
-    276,
-    40,
-    55,
-    48,
-    107,
+    369,
+    66,
     12,
-    43,
-    55,
+    21,
+    141,
+    209,
+    98,
     18,
-    43,
+    28,
+    400,
+    47,
+    17,
+    71,
+    85,
     5,
-    61
+    19,
+    1,
+    35,
+    58,
+    10,
+    19,
+    16,
+    33,
+    227,
+    24,
+    46,
+    28,
+    11,
+    201,
+    36,
+    43,
+    18,
+    28,
+    110,
+    45
   ],
   "sentence_counts": [
-    6263,
-    6263,
-    98286,
+    6150,
+    102295,
     3,
-    1143,
-    24277,
-    1240,
-    1007,
-    14751,
-    5568,
-    13005,
-    2996,
-    6620,
-    1627,
-    4292,
-    5822,
-    1479,
-    5826,
-    6671,
-    40874,
-    2742,
-    1185,
-    3469,
-    3094,
-    13038,
-    27619,
-    424,
-    4741,
-    5135,
-    8012,
-    2832,
-    21661,
-    67,
-    8352,
-    4925,
-    8464,
-    2519,
-    3753,
-    704,
-    19714,
-    7370,
-    6430,
-    765,
-    5475,
-    6292,
-    4846,
-    5116,
-    6114,
-    9287,
-    3373,
-    5419,
-    5302,
-    3194,
-    3141,
-    4993,
-    5896,
-    1578,
-    3229,
-    2348,
-    7144
+    1145,
+    24360,
+    1245,
+    1136,
+    14778,
+    5576,
+    13012,
+    3037,
+    6638,
+    1654,
+    4305,
+    4496,
+    1005,
+    5838,
+    6852,
+    8538,
+    586,
+    1551,
+    3361,
+    3711,
+    12883,
+    27325,
+    406,
+    5247,
+    5168,
+    8020,
+    878,
+    21555,
+    70,
+    8327,
+    3533,
+    8982,
+    2526,
+    3762,
+    463,
+    18105,
+    8913,
+    1170,
+    152,
+    5674,
+    2043,
+    3903,
+    3169,
+    5387,
+    9320,
+    3369,
+    5444,
+    5308,
+    3297,
+    842,
+    5004,
+    5901,
+    1582,
+    3264,
+    2373,
+    7199
   ],
   "word_counts": [
-    78189,
-    78189,
-    918722,
+    78376,
+    933116,
     70,
-    26354,
-    459115,
-    48746,
-    10826,
-    240773,
-    120158,
-    315471,
-    25215,
-    153396,
-    34019,
-    80753,
-    102522,
-    51556,
-    78715,
-    106746,
-    1017357,
-    147805,
-    72943,
-    87532,
-    25802,
-    197906,
-    563384,
-    7010,
-    96844,
-    66268,
-    204007,
-    152390,
-    351890,
+    26422,
+    459628,
+    48822,
+    9048,
+    241101,
+    120306,
+    315914,
+    25641,
+    153621,
+    34110,
+    80910,
+    77347,
+    36155,
+    78874,
+    106343,
+    187964,
+    5889,
+    91780,
+    83131,
+    26462,
+    198208,
+    564443,
+    4036,
+    97394,
+    66383,
+    203255,
+    14370,
+    352248,
     684,
-    161001,
-    87132,
-    191902,
-    73678,
-    190135,
-    19109,
-    239650,
-    116218,
-    210448,
-    23271,
-    107214,
-    182695,
-    137998,
-    154617,
-    178691,
-    348867,
-    154791,
-    67967,
-    207194,
-    54118,
-    78076,
-    70187,
-    110401,
-    28643,
-    74756,
-    18012,
-    138247
+    159242,
+    33379,
+    192200,
+    73732,
+    190277,
+    6104,
+    211941,
+    117750,
+    36141,
+    1730,
+    107516,
+    58405,
+    110075,
+    95743,
+    155395,
+    349265,
+    154495,
+    68062,
+    207354,
+    54981,
+    9640,
+    70310,
+    110544,
+    28647,
+    74925,
+    12666,
+    138431
   ],
   "titles": [
     [
-      "Sorcerers_Stone_backup_clean",
-      "Unknown",
-      37
-    ],
-    [
       "Sorcerers_Stone_clean",
       "Unknown",
-      37
+      17
     ],
     [
       "pg100-The_Complete_Works_of_William_Shakespeare_clean",
       "Unknown",
-      2150
+      867
     ],
     [
       "pg1080-A_Modest_Proposal_clean",
@@ -212,142 +204,142 @@
     [
       "pg11-Alice's_Adventures_in_Wonderland_clean",
       "Unknown",
-      24
+      12
     ],
     [
       "pg1184-The_Count_of_Monte_Cristo_clean",
       "Unknown",
-      173
+      119
     ],
     [
       "pg1232-The_Prince_clean",
       "Unknown",
-      37
+      29
     ],
     [
       "pg12474-Write_It_Right_A_Little_Blacklist_of_Literary_Faults_clean",
       "Unknown",
-      6
+      97
     ],
     [
       "pg1259-Twenty_years_after_clean",
       "Unknown",
-      130
+      90
     ],
     [
       "pg1342-Pride_and_Prejudice_clean",
       "Unknown",
-      79
+      61
     ],
     [
       "pg145-Middlemarch_clean",
       "Unknown",
-      141
+      88
     ],
     [
       "pg1513-Romeo_and_Juliet_clean",
       "Unknown",
-      71
+      28
     ],
     [
       "pg158-Emma_clean",
       "Unknown",
-      81
+      58
     ],
     [
       "pg16328-Beowulf_An_Anglo-Saxon_Epic_Poem_(768)_clean",
       "Beowulf",
-      53
+      43
     ],
     [
       "pg16389-The_Enchanted_April_clean",
       "The Enchanted April",
-      40
+      22
     ],
     [
       "pg1661-The_Adventures_of_Sherlock_Holmes_clean",
       "The Adventures of Sherlock Holmes",
-      18
+      4
     ],
     [
       "pg16878-Observations_upon_the_Prophecies_of_Daniel,_and_the_Apocalypse_of_St._John_clean",
       "Observations upon the Prophecies of Daniel, and the Apocalypse of St. John",
-      5
+      1
     ],
     [
       "pg174-The_Picture_of_Dorian_Gray_clean",
       "Unknown",
-      29
+      22
     ],
     [
       "pg1998-Thus_Spake_Zarathustra_A_Book_for_All_and_None_clean",
       "Thus Spake Zarathustra",
-      213
+      176
     ],
     [
       "pg200-The_Project_Gutenberg_Encyclopedia,_Volume_1_of_28_clean",
       "The Project Gutenberg Encyclopedia, Volume 1 of 28",
-      178
+      15
     ],
     [
       "pg2160-The_Expedition_of_Humphry_Clinker_clean",
       "Unknown",
-      88
+      150
     ],
     [
       "pg22914-The_Sceptical_Chymist_clean",
       "The Sceptical Chymist",
-      12
+      1
     ],
     [
       "pg23692-South_Africa_and_the_Transvaal_War,_Vol._1_(of_8)_clean",
       "South Africa and the Transvaal War, Vol. 1 (of 8)",
-      36
+      16
     ],
     [
       "pg2542-A_Doll's_House_a_play_clean",
       "Unknown",
-      10
+      4
     ],
     [
       "pg2554-Crime_and_Punishment_clean",
       "Unknown",
-      63
+      40
     ],
     [
       "pg2600-War_and_Peace_clean",
       "War and Peace",
-      485
+      369
     ],
     [
       "pg26184-Simple_Sabotage_Field_Manual_clean",
       "Unknown",
-      3
+      66
     ],
     [
       "pg26198-South_Africa_and_the_Transvaal_War,_Vol._2_(of_8)_clean",
       "South Africa and the Transvaal War, Vol. 2 (of 8)",
-      23
+      12
     ],
     [
       "pg2641-A_Room_with_a_View_clean",
       "Unknown",
-      33
+      21
     ],
     [
       "pg2701-Mo_clean",
       "Unknown",
-      172
+      141
     ],
     [
       "pg2707-The_History_of_Herodotus_—_Volume_1_clean",
       "Unknown",
-      22
+      209
     ],
     [
       "pg28054-The_Brothers_Karamazov_clean",
       "The Brothers Karamazov",
-      132
+      98
     ],
     [
       "pg3201-Mo_clean",
@@ -357,117 +349,117 @@
     [
       "pg345-Dracula_clean",
       "Dracula",
-      48
+      28
     ],
     [
       "pg36034-White_Nights_and_Other_Stories_clean",
       "White Nights and Other Stories",
-      11
+      400
     ],
     [
       "pg37106-Little_Women;_Or,_Meg,_Jo,_Beth,_and_Amy_clean",
       "Little Women or Meg, Jo, Beth, and Amy",
-      82
+      47
     ],
     [
       "pg394-Cranford_clean",
       "Cranford",
-      23
+      17
     ],
     [
       "pg4085-The_Adventures_of_Roderick_Random_clean",
       "Unknown",
-      87
+      71
     ],
     [
       "pg43-The_Strange_Case_of_Dr._Jekyll_and_Mr._Hyde_clean",
       "Unknown",
-      5
+      85
     ],
     [
       "pg4300-Ulysses_clean",
       "Unknown",
-      48
+      5
     ],
     [
       "pg46303-South_Africa_and_the_Transvaal_War,_Vol._6_(of_8)_clean",
       "Unknown",
-      35
+      19
     ],
     [
       "pg5197-My_Life_—_Volume_1_clean",
       "My Life",
-      24
+      1
     ],
     [
       "pg5200-Metamorphosis_clean",
       "Metamorphosis",
-      6
+      35
     ],
     [
       "pg52026-Matthew_Calbraith_Perry_A_Typical_American_Naval_Officer_clean",
       "Unknown",
-      71
+      58
     ],
     [
       "pg54279-A_history_of_the_Peninsular_War,_Vol._2,_Jan.-Sep._1809_clean",
       "Unknown",
-      51
+      10
     ],
     [
       "pg55231-A_history_of_the_Peninsular_War,_Vol._3,_Sep._1809-Dec._1810_clean",
       "Unknown",
-      40
+      19
     ],
     [
       "pg56812-A_history_of_the_Peninsular_War,_Vol._4,_Dec._1810-Dec._1811_clean",
       "A History of the Peninsular War. Vol. IV.",
-      43
+      16
     ],
     [
       "pg62291-A_history_of_the_Peninsular_War,_Vol._5,_Oct._1811-Aug._31,_1812_clean",
       "Unknown",
-      64
+      33
     ],
     [
       "pg6593-History_of_Tom_Jones,_a_Foundling_clean",
       "The History of Tom Jones, a Foundling",
-      276
+      227
     ],
     [
       "pg6761-The_Adventures_of_Ferdinand_Count_Fathom_—_Complete_clean",
       "Unknown",
-      40
+      24
     ],
     [
       "pg67979-The_Blue_Castle_a_novel_clean",
       "Unknown",
-      55
+      46
     ],
     [
       "pg7142-The_History_of_the_Peloponnesian_War_clean",
       "The History of the Peloponnesian War",
-      48
+      28
     ],
     [
       "pg7241-Fables_of_La_Fontaine_—_a_New_Edition,_with_Notes_clean",
       "Fables of La Fontaine — a New Edition, with Notes",
-      107
+      11
     ],
     [
       "pg7255-Cambridge_Sketches_clean",
       "Cambridge Sketches",
-      12
+      201
     ],
     [
       "pg74-The_Adventures_of_Tom_Sawyer,_Complete_clean",
       "Unknown",
-      43
+      36
     ],
     [
       "pg76-Adventures_of_Huckleberry_Finn_clean",
       "Unknown",
-      55
+      43
     ],
     [
       "pg76411-The_last_dragon_clean",
@@ -477,17 +469,17 @@
     [
       "pg84-Frankenstein;_Or,_The_Modern_Prometheus_clean",
       "Unknown",
-      43
+      28
     ],
     [
       "pg844-The_Importance_of_Being_Earnest_A_Trivial_Comedy_for_Serious_People_clean",
       "The Importance of Being Earnest",
-      5
+      110
     ],
     [
       "pg98-A_Tale_of_Two_Cities_clean",
       "A Tale of Two Cities",
-      61
+      45
     ]
   ],
   "problematic_books": []

@@ -985,20 +985,7 @@
         {
           "sentences": [
             "Tom did play hookey, and he had a very good time.",
-            "He got back home barely in season to help Jim, the small colored boy, saw next-day’s wood and split the kindlings before supper—at least he was there in time"
-          ]
-        }
-      ],
-      "sentence_count": 54,
-      "word_count": 673
-    },
-    {
-      "number": "3",
-      "title": "tell his adventures to Jim while Jim did three-fourths of the work.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He got back home barely in season to help Jim, the small colored boy, saw next-day’s wood and split the kindlings before supper—at least he was there in time to tell his adventures to Jim while Jim did three-fourths of the work.",
             "Tom’s younger brother (or rather half-brother) Sid was already through with his part of the work (picking up chips), for he was a quiet boy, and had no adventurous, trouble-some ways."
           ]
         },
@@ -1494,8 +1481,8 @@
           ]
         }
       ],
-      "sentence_count": 152,
-      "word_count": 1692
+      "sentence_count": 206,
+      "word_count": 2378
     },
     {
       "number": "II",
@@ -1658,6 +1645,7 @@
             "Stand by that stage, now—let her go!",
             "Done with the engines, sir!",
             "Ting-a-ling-ling!",
+            "SH’T!",
             "S’H’T!",
             "SH’T!” (trying the gauge-cocks)."
           ]
@@ -1833,8 +1821,8 @@
           ]
         }
       ],
-      "sentence_count": 142,
-      "word_count": 1842
+      "sentence_count": 143,
+      "word_count": 1843
     },
     {
       "number": "III",
@@ -2337,18 +2325,9 @@
           "sentences": [
             "There was only one thing wanting to make Mr. Walters’ ecstasy complete, and that was a chance to deliver a Bible-prize and exhibit a prodigy.",
             "Several pupils had a few yellow tickets, but none had enough—he had been around among the star pupils inquiring.",
-            "He would have given worlds, now,"
+            "He would have given worlds, now, to have that German lad back again with a sound mind."
           ]
-        }
-      ],
-      "sentence_count": 122,
-      "word_count": 2592
-    },
-    {
-      "number": "7",
-      "title": "have that German lad back again with a sound mind.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "And now at this moment, when hope was dead, Tom Sawyer came forward with nine yellow tickets, nine red tickets, and ten blue ones, and demanded a Bible.",
@@ -2464,8 +2443,8 @@
           ]
         }
       ],
-      "sentence_count": 46,
-      "word_count": 772
+      "sentence_count": 168,
+      "word_count": 3375
     },
     {
       "number": "V",
@@ -2518,22 +2497,14 @@
         {
           "sentences": [
             "After the hymn had been sung, the Rev. Mr. Sprague turned himself into a bulletin-board, and read off “notices” of meetings and societies and things till it seemed that the list would stretch out to the crack of doom—a queer custom which is still kept up in America, even in cities, away here in this age of abundant newspapers.",
-            "Often, the less there is"
+            "Often, the less there is to justify a traditional custom, the harder it is to get rid of it."
           ]
-        }
-      ],
-      "sentence_count": 21,
-      "word_count": 617
-    },
-    {
-      "number": "9",
-      "title": "justify a traditional custom, the harder it is to get rid of it.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "And now the minister prayed.",
-            "A good, generous prayer it was, and went into details: it pleaded for the church, and the little children of the church; for the other churches of the village; for the village itself; for the county; for the State; for the State officers; for the United States; for the churches of the United States; for Congress; for the President; for the officers of the Government; for poor sailors, tossed by stormy seas; for the oppressed millions groaning under the heel of European monarchies and Oriental despotisms; for such as have the light and the good tidings, and yet have not eyes to see nor ears to hear withal; for the heathen in the far islands of the sea; and closed with a supplication that the words he was about to speak might find grace and favor, and be as seed sown in fertile ground, yielding in time a grateful harvest of good."
+            "A good, generous prayer it was, and went into details: it pleaded for the church, and the little children of the church; for the other churches of the village; for the village itself; for the county; for the State; for the State officers; for the United States; for the churches of the United States; for Congress; for the President; for the officers of the Government; for poor sailors, tossed by stormy seas; for the oppressed millions groaning under the heel of European monarchies and Oriental despotisms; for such as have the light and the good tidings, and yet have not eyes to see nor ears to hear withal; for the heathen in the far islands of the sea; and closed with a supplication that the words he was about to speak might find grace and favor, and be as seed sown in fertile ground, yielding in time a grateful harvest of good.",
+            "Amen."
           ]
         },
         {
@@ -2594,8 +2565,8 @@
           ]
         }
       ],
-      "sentence_count": 39,
-      "word_count": 1281
+      "sentence_count": 61,
+      "word_count": 1913
     },
     {
       "number": "VI",
@@ -2668,6 +2639,7 @@
         {
           "sentences": [
             "Say, Tom!” No response. “Here, Tom!",
+            "TOM!",
             "What is the matter, Tom?” And he shook him and looked in his face anxiously."
           ]
         },
@@ -2704,6 +2676,7 @@
         {
           "sentences": [
             "“Hours.",
+            "Ouch!",
             "Oh, don’t stir so, Sid, you’ll kill me.”"
           ]
         },
@@ -3576,16 +3549,20 @@
           ]
         }
       ],
-      "sentence_count": 341,
-      "word_count": 3484
+      "sentence_count": 343,
+      "word_count": 3486
     },
     {
-      "number": "11",
-      "title": "him that the noon recess would never come. The air was utterly dead.",
-      "type": "letter",
+      "number": "VII",
+      "title": "",
+      "type": "chapter",
       "paragraphs": [
         {
           "sentences": [
+            "The harder Tom tried to fasten his mind on his book, the more his ideas wandered.",
+            "So at last, with a sigh and a yawn, he gave it up.",
+            "It seemed to him that the noon recess would never come.",
+            "The air was utterly dead.",
             "There was not a breath stirring.",
             "It was the sleepiest of sleepy days.",
             "The drowsing murmur of the five and twenty studying scholars soothed the soul like the spell that is in the murmur of bees.",
@@ -4057,8 +4034,8 @@
           ]
         }
       ],
-      "sentence_count": 164,
-      "word_count": 1859
+      "sentence_count": 168,
+      "word_count": 1904
     },
     {
       "number": "VIII",
@@ -4460,6 +4437,11 @@
         },
         {
           "sentences": [
+            "“I—”"
+          ]
+        },
+        {
+          "sentences": [
             "“There!",
             "Now you hear it.”"
           ]
@@ -4692,6 +4674,7 @@
         },
         {
           "sentences": [
+            "“I!",
             "I never done it!”"
           ]
         },
@@ -4777,8 +4760,8 @@
           ]
         }
       ],
-      "sentence_count": 189,
-      "word_count": 2123
+      "sentence_count": 191,
+      "word_count": 2125
     },
     {
       "number": "X",
@@ -6658,6 +6641,7 @@
         {
           "sentences": [
             "“Oh, shucks!",
+            "Baby!",
             "You want to see your mother, I reckon.”"
           ]
         },
@@ -6761,6 +6745,7 @@
         {
           "sentences": [
             "“Wait!",
+            "Wait!",
             "I want to tell you something!”"
           ]
         },
@@ -7013,20 +6998,7 @@
             "But they cared nothing for marbles, or circus, or swimming, or anything.",
             "He reminded them of the imposing secret, and raised a ray of cheer.",
             "While it lasted, he got them interested in a new device.",
-            "This was"
-          ]
-        }
-      ],
-      "sentence_count": 202,
-      "word_count": 2859
-    },
-    {
-      "number": "21",
-      "title": "knock off being pirates, for a while, and be Indians for a change.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "This was to knock off being pirates, for a while, and be Indians for a change.",
             "They were attracted by this idea; so it was not long before they were stripped, and striped from head to heel with black mud, like so many zebras—all of them chiefs, of course—and then they went tearing through the woods to attack an English settlement."
           ]
         },
@@ -7055,8 +7027,8 @@
           ]
         }
       ],
-      "sentence_count": 13,
-      "word_count": 293
+      "sentence_count": 217,
+      "word_count": 3168
     },
     {
       "number": "XVII",
@@ -7365,6 +7337,7 @@
         {
           "sentences": [
             "“Well?",
+            "Well?",
             "What did I make him do, Tom?",
             "What did I make him do?”"
           ]
@@ -7757,8 +7730,8 @@
           ]
         }
       ],
-      "sentence_count": 212,
-      "word_count": 2877
+      "sentence_count": 213,
+      "word_count": 2878
     },
     {
       "number": "XIX",
@@ -8077,18 +8050,9 @@
         },
         {
           "sentences": [
-            "Tom took his whipping and went back to his seat not at all broken-hearted, for he thought it was possible that he had unknowingly upset the ink on the spelling-book himself, in some skylarking bout—he had denied it for form’s sake and because it was custom, and had stuck"
+            "Tom took his whipping and went back to his seat not at all broken-hearted, for he thought it was possible that he had unknowingly upset the ink on the spelling-book himself, in some skylarking bout—he had denied it for form’s sake and because it was custom, and had stuck to the denial from principle."
           ]
-        }
-      ],
-      "sentence_count": 70,
-      "word_count": 1090
-    },
-    {
-      "number": "26",
-      "title": "the denial from principle.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "A whole hour drifted by, the master sat nodding in his throne, the air was drowsy with the hum of study.",
@@ -8204,8 +8168,8 @@
           ]
         }
       ],
-      "sentence_count": 46,
-      "word_count": 578
+      "sentence_count": 116,
+      "word_count": 1673
     },
     {
       "number": "XXI",
@@ -8446,18 +8410,9 @@
         },
         {
           "sentences": [
-            "Tom presently wondered to find that his coveted vacation was beginning"
+            "Tom presently wondered to find that his coveted vacation was beginning to hang a little heavily on his hands."
           ]
-        }
-      ],
-      "sentence_count": 17,
-      "word_count": 330
-    },
-    {
-      "number": "29",
-      "title": "hang a little heavily on his hands.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He attempted a diary—but nothing happened during three days, and so he abandoned it."
@@ -8545,8 +8500,8 @@
           ]
         }
       ],
-      "sentence_count": 34,
-      "word_count": 667
+      "sentence_count": 51,
+      "word_count": 1005
     },
     {
       "number": "XXIII",
@@ -9891,15 +9846,12 @@
         },
         {
           "sentences": [
-            "“Sh!...",
-            "There!...",
-            "Hear it?”"
+            "“Sh!... There!... Hear it?”"
           ]
         },
         {
           "sentences": [
-            "“Yes!...",
-            "Oh, my!",
+            "“Yes!... Oh, my!",
             "Let’s run!”"
           ]
         },
@@ -10327,7 +10279,7 @@
           ]
         }
       ],
-      "sentence_count": 231,
+      "sentence_count": 228,
       "word_count": 2572
     },
     {
@@ -10442,8 +10394,7 @@
         },
         {
           "sentences": [
-            "“Goody!...",
-            "No, Tom, that ain’t it.",
+            "“Goody!... No, Tom, that ain’t it.",
             "If it is, it ain’t in this one-horse town.",
             "They ain’t no numbers here.”"
           ]
@@ -10546,7 +10497,7 @@
           ]
         }
       ],
-      "sentence_count": 82,
+      "sentence_count": 81,
       "word_count": 950
     },
     {
@@ -10977,18 +10928,9 @@
             "Huck’s heart shot into his throat, but he swallowed it again; and then he stood there shaking as if a dozen agues had taken charge of him at once, and so weak that he thought he must surely fall to the ground.",
             "He knew where he was.",
             "He knew he was within five steps of the stile leading into Widow Douglas’ grounds.",
-            "Very well, he thought, let them bury it there; it won’t be hard"
+            "Very well, he thought, let them bury it there; it won’t be hard to find."
           ]
-        }
-      ],
-      "sentence_count": 110,
-      "word_count": 1733
-    },
-    {
-      "number": "37",
-      "title": "find.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Now there was a voice—a very low voice—Injun Joe’s:"
@@ -11154,8 +11096,8 @@
           ]
         }
       ],
-      "sentence_count": 72,
-      "word_count": 803
+      "sentence_count": 182,
+      "word_count": 2538
     },
     {
       "number": "XXX",
@@ -11905,6 +11847,7 @@
           "sentences": [
             "“Oh, how _could_ I sleep!",
             "I wish I never, never had waked!",
+            "No!",
             "No, I don’t, Tom!",
             "Don’t look so!",
             "I won’t say it again.”"
@@ -12101,6 +12044,7 @@
         },
         {
           "sentences": [
+            "“SH!",
             "Did you hear that?”"
           ]
         },
@@ -12179,8 +12123,8 @@
           ]
         }
       ],
-      "sentence_count": 204,
-      "word_count": 2988
+      "sentence_count": 206,
+      "word_count": 2990
     },
     {
       "number": "XXXII",
@@ -13454,13 +13398,13 @@
     }
   ],
   "statistics": {
-    "total_chapters": 43,
-    "total_paragraphs": 2016,
-    "total_sentences": 4993,
-    "total_words": 70187,
-    "average_sentences_per_chapter": 116.11627906976744,
-    "average_paragraphs_per_chapter": 46.883720930232556,
-    "average_sentences_per_paragraph": 2.476686507936508,
-    "average_words_per_sentence": 14.057079911876627
+    "total_chapters": 36,
+    "total_paragraphs": 2015,
+    "total_sentences": 5004,
+    "total_words": 70310,
+    "average_sentences_per_chapter": 139.0,
+    "average_paragraphs_per_chapter": 55.97222222222222,
+    "average_sentences_per_paragraph": 2.4833746898263027,
+    "average_words_per_sentence": 14.050759392486011
   }
 }

@@ -24,6 +24,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Do you mean the fashion, or the side?"
           ]
         },
@@ -37,6 +38,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Well, I am afraid I really have none.",
             "I am a Liberal Unionist."
           ]
@@ -53,6 +55,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I have lost both my parents."
           ]
         },
@@ -62,15 +65,29 @@
             "To lose one parent, Mr. Worthing, may be regarded as a misfortune; to lose both looks like carelessness.",
             "Who was your father?",
             "He was evidently a man of some wealth.",
-            "Was he born in what the Radical papers call the purple of commerce, or did he rise from the ranks of the aristocracy?"
+            "Was he born in what the Radical papers"
+          ]
+        }
+      ],
+      "sentence_count": 27,
+      "word_count": 128
+    },
+    {
+      "number": "2",
+      "title": "call the purple of commerce, or did he rise from the ranks of the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "aristocracy?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "I am afraid I really don’t know.",
             "The fact is, Lady Bracknell, I said I had lost my parents.",
-            "It would be nearer the truth to say that my parents seem to have lost me...",
-            "I don’t actually know who I am by birth.",
+            "It would be nearer the truth to say that my parents seem to have lost me... I don’t actually know who I am by birth.",
             "I was... well, I was found."
           ]
         },
@@ -82,19 +99,27 @@
         },
         {
           "sentences": [
-            "The late Mr. Thomas Cardew, an old gentleman of a very charitable and kindly disposition, found me, and gave me the name of Worthing, because he happened to have a first-class ticket for Worthing in his pocket at the time.",
-            "Worthing is a place in Sussex.",
-            "It is a seaside resort."
+            "JACK.",
+            "The late Mr. Thomas Cardew, an old gentleman of a very charitable and"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 69
+    },
+    {
+      "number": "3",
+      "title": "Where did the charitable gentleman who had a first-class ticket for",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "this seaside resort find you?"
           ]
         },
         {
           "sentences": [
-            "LADY BRACKNELL.",
-            "Where did the charitable gentleman who had a first-class ticket for this seaside resort find you?"
-          ]
-        },
-        {
-          "sentences": [
+            "JACK.",
             "Gravely.",
             "In a hand-bag."
           ]
@@ -107,9 +132,24 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Very seriously.",
             "Yes, Lady Bracknell.",
-            "I was in a hand-bag—a somewhat large, black leather hand-bag, with handles to it—an ordinary hand-bag in fact."
+            "I was in a hand-bag—a somewhat"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 26
+    },
+    {
+      "number": "4",
+      "title": "large, black leather hand-bag, with handles to it—an ordinary hand-bag",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "in fact."
           ]
         },
         {
@@ -120,6 +160,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "In the cloak-room at Victoria Station.",
             "It was given to him in mistake for his own."
           ]
@@ -132,6 +173,8 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "Yes.",
             "The Brighton line."
           ]
         },
@@ -140,13 +183,26 @@
             "LADY BRACKNELL.",
             "The line is immaterial.",
             "Mr. Worthing, I confess I feel somewhat bewildered by what you have just told me.",
-            "To be born, or at any rate bred, in a hand-bag, whether it had handles or not, seems to me to display a contempt for the ordinary decencies of family life that reminds one of the worst excesses of the French Revolution.",
-            "And I presume you know what that unfortunate movement led to?",
-            "As for the particular locality in which the hand-bag was found, a cloak-room at a railway station might serve to conceal a social indiscretion—has probably, indeed, been used for that purpose before now—but it could hardly be regarded as an assured basis for a recognised position in good society."
+            "To be born, or at any rate"
+          ]
+        }
+      ],
+      "sentence_count": 15,
+      "word_count": 76
+    },
+    {
+      "number": "5",
+      "title": "hardly be regarded as an assured basis for a recognised position in",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "good society."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "May I ask you then what you would advise me to do?",
             "I need hardly say I would do anything in the world to ensure Gwendolen’s happiness."
           ]
@@ -154,11 +210,26 @@
         {
           "sentences": [
             "LADY BRACKNELL.",
-            "I would strongly advise you, Mr. Worthing, to try and acquire some relations as soon as possible, and to make a definite effort to produce at any rate one parent, of either sex, before the season is quite over."
+            "I would strongly advise you, Mr. Worthing, to try and acquire some"
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 44
+    },
+    {
+      "number": "6",
+      "title": "relations as soon as possible, and to make a definite effort to produce",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "at any rate one parent, of either sex, before the season is quite over."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Well, I don’t see how I could possibly manage to do that.",
             "I can produce the hand-bag at any moment.",
             "It is in my dressing-room at home.",
@@ -170,7 +241,21 @@
             "LADY BRACKNELL.",
             "Me, sir!",
             "What has it to do with me?",
-            "You can hardly imagine that I and Lord Bracknell would dream of allowing our only daughter—a girl brought up with the utmost care—to marry into a cloak-room, and form an alliance with a parcel?",
+            "You can hardly imagine that I and"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 69
+    },
+    {
+      "number": "7",
+      "title": "up with the utmost care—to marry into a cloak-room, and form an",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "alliance with a parcel?",
             "Good morning, Mr. Worthing!"
           ]
         },
@@ -181,6 +266,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Good morning!",
             "Algernon, from the other room, strikes up the Wedding March.",
             "Jack looks perfectly furious, and goes to the door.",
@@ -205,13 +291,12 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, Gwendolen is as right as a trivet.",
             "As far as she is concerned, we are engaged.",
             "Her mother is perfectly unbearable.",
-            "Never met such a Gorgon...",
-            "I don’t really know what a Gorgon is like, but I am quite sure that Lady Bracknell is one.",
-            "In any case, she is a monster, without being a myth, which is rather unfair...",
-            "I beg your pardon, Algy, I suppose I shouldn’t talk about your own aunt in that way before you."
+            "Never met such a Gorgon... I don’t really know what a Gorgon is like, but I am quite sure that Lady Bracknell is one.",
+            "In any case, she is a monster, without being a myth, which is rather unfair... I beg your pardon, Algy, I suppose I shouldn’t talk about your own aunt in that way before you."
           ]
         },
         {
@@ -224,6 +309,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, that is nonsense!"
           ]
         },
@@ -235,6 +321,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Well, I won’t argue about the matter.",
             "You always want to argue about things."
           ]
@@ -247,9 +334,22 @@
         },
         {
           "sentences": [
-            "Upon my word, if I thought that, I’d shoot myself...",
-            "A pause.",
-            "You don’t think there is any chance of Gwendolen becoming like her mother in about a hundred and fifty years, do you, Algy?"
+            "JACK.",
+            "Upon my word, if I thought that, I’d shoot myself... A pause."
+          ]
+        }
+      ],
+      "sentence_count": 37,
+      "word_count": 272
+    },
+    {
+      "number": "8",
+      "title": "don’t think there is any chance of Gwendolen becoming like her mother",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "in about a hundred and fifty years, do you, Algy?"
           ]
         },
         {
@@ -263,6 +363,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Is that clever?"
           ]
         },
@@ -274,6 +375,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I am sick to death of cleverness.",
             "Everybody is clever nowadays.",
             "You can’t go anywhere without meeting clever people.",
@@ -289,6 +391,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I should extremely like to meet them.",
             "What do they talk about?"
           ]
@@ -302,17 +405,32 @@
         },
         {
           "sentences": [
+            "JACK.",
             "What fools!"
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "By the way, did you tell Gwendolen the truth about your being Ernest in town, and Jack in the country?"
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 27,
+      "word_count": 115
+    },
+    {
+      "number": "9",
+      "title": "By the way, did you tell Gwendolen the truth about your being Ernest in",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "town, and Jack in the country?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "In a very patronising manner.",
             "My dear fellow, the truth isn’t quite the sort of thing one tells to a nice, sweet, refined girl.",
             "What extraordinary ideas you have about the way to behave to a woman!"
@@ -320,12 +438,26 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "The only way to behave to a woman is to make love to her, if she is pretty, and to some one else, if she is plain."
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 45
+    },
+    {
+      "number": "10",
+      "title": "The only way to behave to a woman is to make love to her, if she is",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "pretty, and to some one else, if she is plain."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, that is nonsense."
           ]
         },
@@ -338,6 +470,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, before the end of the week I shall have got rid of him.",
             "I’ll say he died in Paris of apoplexy.",
             "Lots of people die of apoplexy, quite suddenly, don’t they?"
@@ -353,6 +486,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "You are sure a severe chill isn’t hereditary, or anything of that kind?"
           ]
         },
@@ -364,6 +498,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Very well, then.",
             "My poor brother Ernest is carried off suddenly, in Paris, by a severe chill.",
             "That gets rid of him."
@@ -372,13 +507,13 @@
         {
           "sentences": [
             "ALGERNON.",
-            "But I thought you said that...",
-            "Miss Cardew was a little too much interested in your poor brother Ernest?",
+            "But I thought you said that... Miss Cardew was a little too much interested in your poor brother Ernest?",
             "Won’t she feel his loss a good deal?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, that is all right.",
             "Cecily is not a silly romantic girl, I am glad to say.",
             "She has got a capital appetite, goes long walks, and pays no attention at all to her lessons."
@@ -392,34 +527,59 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I will take very good care you never do.",
             "She is excessively pretty, and she is only just eighteen."
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "Have you told Gwendolen yet that you have an excessively pretty ward who is only just eighteen?"
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 35,
+      "word_count": 218
+    },
+    {
+      "number": "11",
+      "title": "Have you told Gwendolen yet that you have an excessively pretty ward",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "who is only just eighteen?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Oh! one doesn’t blurt these things out to people.",
             "Cecily and Gwendolen are perfectly certain to be extremely great friends.",
-            "I’ll bet you anything you like that half an hour after they have met, they will be calling each other sister."
+            "I’ll bet you"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 29
+    },
+    {
+      "number": "12",
+      "title": "Women only do that when they have called each other a lot of other",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "ALGERNON.",
-            "Women only do that when they have called each other a lot of other things first.",
+            "things first.",
             "Now, my dear boy, if we want to get a good table at Willis’s, we really must go and dress.",
             "Do you know it is nearly seven?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Irritably.",
+            "Oh!",
             "It always is nearly seven."
           ]
         },
@@ -431,6 +591,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I never knew you when you weren’t..."
           ]
         },
@@ -443,6 +604,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh no!",
             "I loathe listening."
           ]
@@ -455,6 +617,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, no!",
             "I hate talking."
           ]
@@ -467,6 +630,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, no!",
             "I can’t bear looking at things.",
             "It is so silly."
@@ -480,6 +644,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Nothing!"
           ]
         },
@@ -497,6 +662,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "Miss Fairfax."
           ]
         },
@@ -535,6 +701,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "My own darling!"
           ]
         },
@@ -546,26 +713,52 @@
             "Few parents nowadays pay any regard to what their children say to them.",
             "The old-fashioned respect for the young is fast dying out.",
             "Whatever influence I ever had over mamma, I lost at the age of three.",
-            "But although she may prevent us from becoming man and wife, and I may marry some one else, and marry often, nothing that she can possibly do can alter my eternal devotion to you."
+            "But although she may prevent us from becoming man and wife,"
+          ]
+        }
+      ],
+      "sentence_count": 60,
+      "word_count": 273
+    },
+    {
+      "number": "13",
+      "title": "and I may marry some one else, and marry often, nothing that she can",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "possibly do can alter my eternal devotion to you."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Dear Gwendolen!"
           ]
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "The story of your romantic origin, as related to me by mamma, with unpleasing comments, has naturally stirred the deeper fibres of my nature.",
-            "Your Christian name has an irresistible fascination.",
-            "The simplicity of your character makes you exquisitely incomprehensible to me.",
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 13
+    },
+    {
+      "number": "14",
+      "title": "simplicity of your character makes you exquisitely incomprehensible to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "Your town address at the Albany I have.",
             "What is your address in the country?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "The Manor House, Woolton, Hertfordshire."
           ]
         },
@@ -586,6 +779,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "My own one!"
           ]
         },
@@ -597,12 +791,14 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Till Monday."
           ]
         },
         {
           "sentences": [
             "GWENDOLEN.",
+            "Good!",
             "Algy, you may turn round now."
           ]
         },
@@ -620,6 +816,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "You will let me see you to your carriage, my own darling?"
           ]
         },
@@ -631,12 +828,14 @@
         },
         {
           "sentences": [
+            "JACK.",
             "To Lane, who now enters.",
             "I will see Miss Fairfax out."
           ]
         },
         {
           "sentences": [
+            "LANE.",
             "Yes, sir.",
             "Jack and Gwendolen go off."
           ]
@@ -644,7 +843,21 @@
         {
           "sentences": [
             "Lane presents several letters on a salver to Algernon.",
-            "It is to be surmised that they are bills, as Algernon, after looking at the envelopes, tears them up."
+            "It is to be"
+          ]
+        }
+      ],
+      "sentence_count": 36,
+      "word_count": 157
+    },
+    {
+      "number": "15",
+      "title": "surmised that they are bills, as Algernon, after looking at the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "envelopes, tears them up."
           ]
         },
         {
@@ -655,6 +868,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "Yes, sir."
           ]
         },
@@ -666,6 +880,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "Yes, sir."
           ]
         },
@@ -678,6 +893,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "Yes, sir.",
             "Handing sherry."
           ]
@@ -690,6 +906,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "It never is, sir."
           ]
         },
@@ -701,6 +918,7 @@
         },
         {
           "sentences": [
+            "LANE.",
             "I do my best to give satisfaction, sir."
           ]
         },
@@ -712,6 +930,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "There’s a sensible, intellectual girl! the only girl I ever cared for in my life.",
             "Algernon is laughing immoderately.",
             "What on earth are you so amused at?"
@@ -725,7 +944,21 @@
         },
         {
           "sentences": [
-            "If you don’t take care, your friend Bunbury will get you into a serious scrape some day."
+            "JACK."
+          ]
+        }
+      ],
+      "sentence_count": 32,
+      "word_count": 127
+    },
+    {
+      "number": "16",
+      "title": "If you don’t take care, your friend Bunbury will get you into a serious",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "scrape some day."
           ]
         },
         {
@@ -737,6 +970,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, that’s nonsense, Algy.",
             "You never talk anything but nonsense."
           ]
@@ -752,17 +986,16 @@
             "Jack looks indignantly at him, and leaves the room.",
             "Algernon lights a cigarette, reads his shirt-cuff, and smiles."
           ]
-        },
-        {
-          "sentences": [
-            "ACT DROP"
-          ]
-        },
-        {
-          "sentences": [
-            "SECOND ACT"
-          ]
-        },
+        }
+      ],
+      "sentence_count": 11,
+      "word_count": 49
+    },
+    {
+      "number": "17",
+      "title": "SCENE",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
             "Garden at the Manor House.",
@@ -801,8 +1034,21 @@
         },
         {
           "sentences": [
-            "MISS PRISM.",
-            "Child, you know how anxious your guardian is that you should improve yourself in every way.",
+            "MISS PRISM."
+          ]
+        }
+      ],
+      "sentence_count": 21,
+      "word_count": 136
+    },
+    {
+      "number": "18",
+      "title": "Child, you know how anxious your guardian is that you should improve",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "yourself in every way.",
             "He laid particular stress on your German, as he was leaving for town yesterday.",
             "Indeed, he always lays stress on your German when he is leaving for town."
           ]
@@ -818,14 +1064,21 @@
           "sentences": [
             "MISS PRISM.",
             "Drawing herself up.",
-            "Your guardian enjoys the best of health, and his gravity of demeanour is especially to be commended in one so comparatively young as he is.",
-            "I know no one who has a higher sense of duty and responsibility."
+            "Your guardian enjoys the best of health, and his"
           ]
-        },
+        }
+      ],
+      "sentence_count": 9,
+      "word_count": 67
+    },
+    {
+      "number": "19",
+      "title": "I suppose that is why he often looks a little bored when we three are",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CECILY.",
-            "I suppose that is why he often looks a little bored when we three are together."
+            "together."
           ]
         },
         {
@@ -852,7 +1105,21 @@
           "sentences": [
             "MISS PRISM.",
             "Shaking her head.",
-            "I do not think that even I could produce any effect on a character that according to his own brother’s admission is irretrievably weak and vacillating.",
+            "I do not think that even I could produce any effect"
+          ]
+        }
+      ],
+      "sentence_count": 16,
+      "word_count": 114
+    },
+    {
+      "number": "20",
+      "title": "on a character that according to his own brother’s admission is",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "irretrievably weak and vacillating.",
             "Indeed I am not sure that I would desire to reclaim him.",
             "I am not in favour of this modern mania for turning bad people into good people at a moment’s notice.",
             "As a man sows so let him reap.",
@@ -875,8 +1142,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Yes, but it usually chronicles the things that have never happened, and couldn’t possibly have happened.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 12,
+      "word_count": 108
+    },
+    {
+      "number": "21",
+      "title": "Yes, but it usually chronicles the things that have never happened, and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "couldn’t possibly have happened.",
             "I believe that Memory is responsible for nearly all the three-volume novels that Mudie sends us."
           ]
         },
@@ -964,8 +1244,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "No, dear Miss Prism, I know that, but I felt instinctively that you had a headache.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 41,
+      "word_count": 214
+    },
+    {
+      "number": "22",
+      "title": "No, dear Miss Prism, I know that, but I felt instinctively that you had",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "a headache.",
             "Indeed I was thinking about that, and not about my German lesson, when the Rector came in."
           ]
         },
@@ -988,6 +1281,7 @@
             "Were I fortunate enough to be Miss Prism’s pupil, I would hang upon her lips.",
             "Miss Prism glares.",
             "I spoke metaphorically.—My metaphor was drawn from bees.",
+            "Ahem!",
             "Mr. Worthing, I suppose, has not returned from town yet?"
           ]
         },
@@ -1001,7 +1295,21 @@
           "sentences": [
             "CHASUBLE.",
             "Ah yes, he usually likes to spend his Sunday in London.",
-            "He is not one of those whose sole aim is enjoyment, as, by all accounts, that unfortunate young man his brother seems to be.",
+            "He is not one"
+          ]
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 101
+    },
+    {
+      "number": "23",
+      "title": "of those whose sole aim is enjoyment, as, by all accounts, that",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "unfortunate young man his brother seems to be.",
             "But I must not disturb Egeria and her pupil any longer."
           ]
         },
@@ -1139,14 +1447,28 @@
         {
           "sentences": [
             "ALGERNON.",
+            "Oh!",
             "I am not really wicked at all, cousin Cecily.",
             "You mustn’t think that I am wicked."
           ]
         },
         {
           "sentences": [
-            "CECILY.",
-            "If you are not, then you have certainly been deceiving us all in a very inexcusable manner.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 66,
+      "word_count": 387
+    },
+    {
+      "number": "24",
+      "title": "If you are not, then you have certainly been deceiving us all in a very",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "inexcusable manner.",
             "I hope you have not been leading a double life, pretending to be wicked and being really good all the time.",
             "That would be hypocrisy."
           ]
@@ -1155,6 +1477,7 @@
           "sentences": [
             "ALGERNON.",
             "Looks at her in amazement.",
+            "Oh!",
             "Of course I have been rather reckless."
           ]
         },
@@ -1166,14 +1489,21 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "In fact, now you mention the subject, I have been very bad in my own small way."
+            "ALGERNON."
           ]
-        },
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 49
+    },
+    {
+      "number": "25",
+      "title": "I don’t think you should be so proud of that, though I am sure it must",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CECILY.",
-            "I don’t think you should be so proud of that, though I am sure it must have been very pleasant."
+            "have been very pleasant."
           ]
         },
         {
@@ -1211,8 +1541,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Well, I know, of course, how important it is not to keep a business engagement, if one wants to retain any sense of the beauty of life, but still I think you had better wait till Uncle Jack arrives.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 15,
+      "word_count": 78
+    },
+    {
+      "number": "26",
+      "title": "engagement, if one wants to retain any sense of the beauty of life, but",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "still I think you had better wait till Uncle Jack arrives.",
             "I know he wants to speak to you about your emigrating."
           ]
         },
@@ -1252,8 +1595,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Well, he said at dinner on Wednesday night, that you would have to choose between this world, the next world, and Australia."
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 17,
+      "word_count": 75
+    },
+    {
+      "number": "27",
+      "title": "Well, he said at dinner on Wednesday night, that you would have to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "choose between this world, the next world, and Australia."
           ]
         },
         {
@@ -1320,20 +1676,7 @@
           "sentences": [
             "CECILY.",
             "How thoughtless of me.",
-            "I should have remembered that when one is going"
-          ]
-        }
-      ],
-      "sentence_count": 538,
-      "word_count": 3694
-    },
-    {
-      "number": "2",
-      "title": "lead an entirely new life, one requires regular and wholesome meals.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I should have remembered that when one is going to lead an entirely new life, one requires regular and wholesome meals.",
             "Won’t you come in?"
           ]
         },
@@ -1361,6 +1704,7 @@
         {
           "sentences": [
             "CECILY.",
+            "Why?",
             "Cuts a flower."
           ]
         },
@@ -1431,7 +1775,21 @@
             "MISS PRISM.",
             "Sententiously.",
             "That is obviously the reason why the Primitive Church has not lasted up to the present day.",
-            "And you do not seem to realise, dear Doctor, that by persistently remaining single, a man converts himself into a permanent public temptation.",
+            "And you do not seem to realise,"
+          ]
+        }
+      ],
+      "sentence_count": 71,
+      "word_count": 389
+    },
+    {
+      "number": "28",
+      "title": "dear Doctor, that by persistently remaining single, a man converts",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "himself into a permanent public temptation.",
             "Men should be more careful; this very celibacy leads weaker vessels astray."
           ]
         },
@@ -1499,6 +1857,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Shakes Miss Prism’s hand in a tragic manner.",
             "I have returned sooner than I expected.",
             "Dr. Chasuble, I hope you are well?"
@@ -1512,6 +1871,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "My brother."
           ]
         },
@@ -1529,7 +1889,9 @@
         },
         {
           "sentences": [
-            "Shaking his head."
+            "JACK.",
+            "Shaking his head.",
+            "Dead!"
           ]
         },
         {
@@ -1540,6 +1902,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Quite dead."
           ]
         },
@@ -1554,11 +1917,26 @@
           "sentences": [
             "CHASUBLE.",
             "Mr. Worthing, I offer you my sincere condolence.",
-            "You have at least the consolation of knowing that you were always the most generous and forgiving of brothers."
+            "You have at least the"
+          ]
+        }
+      ],
+      "sentence_count": 53,
+      "word_count": 241
+    },
+    {
+      "number": "29",
+      "title": "consolation of knowing that you were always the most generous and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "forgiving of brothers."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Poor Ernest!",
             "He had many faults, but it is a sad, sad blow."
           ]
@@ -1572,6 +1950,8 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "No.",
             "He died abroad; in Paris, in fact.",
             "I had a telegram last night from the manager of the Grand Hotel."
           ]
@@ -1584,6 +1964,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "A severe chill, it seems."
           ]
         },
@@ -1605,6 +1986,8 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "No.",
             "He seems to have expressed a desire to be buried in Paris."
           ]
         },
@@ -1618,13 +2001,27 @@
             "Jack presses his hand convulsively.",
             "My sermon on the meaning of the manna in the wilderness can be adapted to almost any occasion, joyful, or, as in the present case, distressing.",
             "All sigh.",
-            "I have preached it at harvest celebrations, christenings, confirmations, on days of humiliation and festal days.",
-            "The last time I delivered it was in the Cathedral, as a charity sermon on behalf of the Society for the Prevention of Discontent among the Upper Orders.",
+            "I have preached it"
+          ]
+        }
+      ],
+      "sentence_count": 35,
+      "word_count": 190
+    },
+    {
+      "number": "30",
+      "title": "Cathedral, as a charity sermon on behalf of the Society for the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "Prevention of Discontent among the Upper Orders.",
             "The Bishop, who was present, was much struck by some of the analogies I drew."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Ah! that reminds me, you mentioned christenings I think, Dr. Chasuble?",
             "I suppose you know how to christen all right?",
             "Dr. Chasuble looks astounded.",
@@ -1633,8 +2030,21 @@
         },
         {
           "sentences": [
-            "MISS PRISM.",
-            "It is, I regret to say, one of the Rector’s most constant duties in this parish.",
+            "MISS PRISM."
+          ]
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 59
+    },
+    {
+      "number": "31",
+      "title": "It is, I regret to say, one of the Rector’s most constant duties in",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "this parish.",
             "I have often spoken to the poorer classes on the subject.",
             "But they don’t seem to know what thrift is."
           ]
@@ -1648,6 +2058,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh yes."
           ]
         },
@@ -1660,6 +2071,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "But it is not for any child, dear Doctor.",
             "I am very fond of children.",
             "No! the fact is, I would like to be christened myself, this afternoon, if you have nothing better to do."
@@ -1673,6 +2085,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I don’t remember anything about it."
           ]
         },
@@ -1684,6 +2097,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I certainly intend to have.",
             "Of course I don’t know if the thing would bother you in any way, or if you think I am a little too old now."
           ]
@@ -1697,6 +2111,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Immersion!"
           ]
         },
@@ -1711,6 +2126,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh, I might trot round about five if that would suit you."
           ]
         },
@@ -1725,6 +2141,8 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "Oh!",
             "I don’t see much fun in being christened along with other babies.",
             "It would be childish.",
             "Would half-past five do?"
@@ -1786,6 +2204,12 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "Who?"
+          ]
+        },
+        {
+          "sentences": [
             "CECILY.",
             "Your brother Ernest.",
             "He arrived about half an hour ago."
@@ -1793,6 +2217,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "What nonsense!",
             "I haven’t got a brother."
           ]
@@ -1816,12 +2241,26 @@
         },
         {
           "sentences": [
-            "MISS PRISM.",
-            "After we had all been resigned to his loss, his sudden return seems to me peculiarly distressing."
+            "MISS PRISM."
+          ]
+        }
+      ],
+      "sentence_count": 90,
+      "word_count": 504
+    },
+    {
+      "number": "32",
+      "title": "After we had all been resigned to his loss, his sudden return seems to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "me peculiarly distressing."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "My brother is in the dining-room?",
             "I don’t know what it all means.",
             "I think it is perfectly absurd."
@@ -1835,14 +2274,28 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Good heavens!",
             "Motions Algernon away."
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "Brother John, I have come down from town to tell you that I am very sorry for all the trouble I have given you, and that I intend to lead a better life in the future.",
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 11,
+      "word_count": 43
+    },
+    {
+      "number": "33",
+      "title": "sorry for all the trouble I have given you, and that I intend to lead a",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "better life in the future.",
             "Jack glares at him and does not take his hand."
           ]
         },
@@ -1854,6 +2307,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Nothing will induce me to take his hand.",
             "I think his coming down here disgraceful.",
             "He knows perfectly well why."
@@ -1865,11 +2319,26 @@
             "Uncle Jack, do be nice.",
             "There is some good in every one.",
             "Ernest has just been telling me about his poor invalid friend Mr. Bunbury whom he goes to visit so often.",
-            "And surely there must be much good in one who is kind to an invalid, and leaves the pleasures of London to sit by a bed of pain."
+            "And surely there must be much good in one who"
+          ]
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 92
+    },
+    {
+      "number": "34",
+      "title": "is kind to an invalid, and leaves the pleasures of London to sit by a",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "bed of pain."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Oh! he has been talking about Bunbury, has he?"
           ]
         },
@@ -1881,6 +2350,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Bunbury!",
             "Well, I won’t have him talk to you about Bunbury or about anything else.",
             "It is enough to drive one perfectly frantic."
@@ -1890,18 +2360,21 @@
           "sentences": [
             "ALGERNON.",
             "Of course I admit that the faults were all on my side.",
-            "But I must say that I think that Brother John’s coldness to me is peculiarly painful.",
-            "I expected a more enthusiastic welcome, especially considering it is the first time I have come here."
+            "But I must say that I think that Brother John’s coldness to me is peculiarly painful."
           ]
-        },
+        }
+      ],
+      "sentence_count": 12,
+      "word_count": 83
+    },
+    {
+      "number": "35",
+      "title": "Uncle Jack, if you don’t shake hands with Ernest I will never forgive",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CECILY.",
-            "Uncle Jack, if you don’t shake hands with Ernest I will never forgive you."
-          ]
-        },
-        {
-          "sentences": [
+            "JACK.",
             "Never forgive me?"
           ]
         },
@@ -1913,6 +2386,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Well, this is the last time I shall ever do it.",
             "Shakes with Algernon and glares."
           ]
@@ -1958,7 +2432,21 @@
         },
         {
           "sentences": [
-            "You young scoundrel, Algy, you must get out of this place as soon as possible.",
+            "JACK."
+          ]
+        }
+      ],
+      "sentence_count": 23,
+      "word_count": 99
+    },
+    {
+      "number": "36",
+      "title": "You young scoundrel, Algy, you must get out of this place as soon as",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "possible.",
             "I don’t allow any Bunburying here."
           ]
         },
@@ -1976,6 +2464,12 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "What?"
+          ]
+        },
+        {
+          "sentences": [
             "MERRIMAN.",
             "Mr. Ernest’s luggage, sir.",
             "I have unpacked it and put it in the room next to your own."
@@ -1983,6 +2477,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "His luggage?"
           ]
         },
@@ -2001,6 +2496,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Merriman, order the dog-cart at once.",
             "Mr. Ernest has been suddenly called back to town."
           ]
@@ -2021,6 +2517,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Yes, you have."
           ]
         },
@@ -2032,17 +2529,32 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Your duty as a gentleman calls you back."
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "My duty as a gentleman has never interfered with my pleasures in the smallest degree."
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 34,
+      "word_count": 143
+    },
+    {
+      "number": "37",
+      "title": "My duty as a gentleman has never interfered with my pleasures in the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "smallest degree."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "I can quite understand that."
           ]
         },
@@ -2054,6 +2566,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "You are not to talk of Miss Cardew like that.",
             "I don’t like it."
           ]
@@ -2064,13 +2577,21 @@
             "Well, I don’t like your clothes.",
             "You look perfectly ridiculous in them.",
             "Why on earth don’t you go up and change?",
-            "It is perfectly childish to be in deep mourning for a man who is actually staying for a whole week with you in your house as a guest.",
-            "I call it grotesque."
+            "It is perfectly childish to be"
           ]
-        },
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 57
+    },
+    {
+      "number": "38",
+      "title": "You are certainly not staying with me for a whole week as a guest or",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "You are certainly not staying with me for a whole week as a guest or anything else.",
+            "anything else.",
             "You have got to leave... by the four-five train."
           ]
         },
@@ -2085,6 +2606,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Well, will you go if I change my clothes?"
           ]
         },
@@ -2097,18 +2619,21 @@
         },
         {
           "sentences": [
-            "Well, at any rate, that is better than being always over-dressed as you are."
+            "JACK."
           ]
-        },
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 83
+    },
+    {
+      "number": "39",
+      "title": "Your vanity is ridiculous, your conduct an outrage, and your presence",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "ALGERNON.",
-            "If I am occasionally a little over-dressed, I make up for it by being always immensely over-educated."
-          ]
-        },
-        {
-          "sentences": [
-            "Your vanity is ridiculous, your conduct an outrage, and your presence in my garden utterly absurd.",
+            "in my garden utterly absurd.",
             "However, you have got to catch the four-five, and I hope you will have a pleasant journey back to town.",
             "This Bunburying, as you call it, has not been a great success for you."
           ]
@@ -2173,8 +2698,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "It is always painful to part from people whom one has known for a very brief space of time.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 26,
+      "word_count": 161
+    },
+    {
+      "number": "40",
+      "title": "It is always painful to part from people whom one has known for a very",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "brief space of time.",
             "The absence of old friends one can endure with equanimity.",
             "But even a momentary separation from anyone to whom one has just been introduced is almost unbearable."
           ]
@@ -2212,8 +2750,21 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "I hope, Cecily, I shall not offend you if I state quite frankly and openly that you seem to me to be in every way the visible personification of absolute perfection."
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 15,
+      "word_count": 63
+    },
+    {
+      "number": "41",
+      "title": "openly that you seem to me to be in every way the visible",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "personification of absolute perfection."
           ]
         },
         {
@@ -2237,7 +2788,21 @@
             "CECILY.",
             "Oh no.",
             "Puts her hand over it.",
-            "You see, it is simply a very young girl’s record of her own thoughts and impressions, and consequently meant for publication.",
+            "You see, it is simply a very young"
+          ]
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 68
+    },
+    {
+      "number": "42",
+      "title": "girl’s record of her own thoughts and impressions, and consequently",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "meant for publication.",
             "When it appears in volume form I hope you will order a copy.",
             "But pray, Ernest, don’t stop.",
             "I delight in taking down from dictation.",
@@ -2249,7 +2814,9 @@
         {
           "sentences": [
             "ALGERNON.",
-            "Somewhat taken aback."
+            "Somewhat taken aback.",
+            "Ahem!",
+            "Ahem!"
           ]
         },
         {
@@ -2312,8 +2879,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Uncle Jack would be very much annoyed if he knew you were staying on till next week, at the same hour."
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 34,
+      "word_count": 165
+    },
+    {
+      "number": "43",
+      "title": "Uncle Jack would be very much annoyed if he knew you were staying on",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "till next week, at the same hour."
           ]
         },
         {
@@ -2353,8 +2933,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Well, ever since dear Uncle Jack first confessed to us that he had a younger brother who was very wicked and bad, you of course have formed the chief topic of conversation between myself and Miss Prism.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 17,
+      "word_count": 75
+    },
+    {
+      "number": "44",
+      "title": "younger brother who was very wicked and bad, you of course have formed",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "the chief topic of conversation between myself and Miss Prism.",
             "And of course a man who is much talked about is always very attractive.",
             "One feels there must be something in him, after all.",
             "I daresay it was foolish of me, but I fell in love with you, Ernest."
@@ -2371,8 +2964,21 @@
           "sentences": [
             "CECILY.",
             "On the 14th of February last.",
-            "Worn out by your entire ignorance of my existence, I determined to end the matter one way or the other, and after a long struggle with myself I accepted you under this dear old tree here.",
-            "The next day I bought this little ring in your name, and this is the little bangle with the true lover’s knot I promised you always to wear."
+            "Worn out by your entire ignorance of my"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 73
+    },
+    {
+      "number": "45",
+      "title": "this is the little bangle with the true lover’s knot I promised you",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "always to wear."
           ]
         },
         {
@@ -2418,7 +3024,21 @@
             "Oh, I couldn’t possibly.",
             "They would make you far too conceited.",
             "Replaces box.",
-            "The three you wrote me after I had broken off the engagement are so beautiful, and so badly spelled, that even now I can hardly read them without crying a little."
+            "The three you wrote me after I had broken off the"
+          ]
+        }
+      ],
+      "sentence_count": 23,
+      "word_count": 142
+    },
+    {
+      "number": "46",
+      "title": "engagement are so beautiful, and so badly spelled, that even now I can",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "hardly read them without crying a little."
           ]
         },
         {
@@ -2450,8 +3070,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "It would hardly have been a really serious engagement if it hadn’t been broken off at least once.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 17,
+      "word_count": 98
+    },
+    {
+      "number": "47",
+      "title": "It would hardly have been a really serious engagement if it hadn’t been",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "broken off at least once.",
             "But I forgave you before the week was out."
           ]
         },
@@ -2504,8 +3137,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "You must not laugh at me, darling, but it had always been a girlish dream of mine to love some one whose name was Ernest.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 22,
+      "word_count": 105
+    },
+    {
+      "number": "48",
+      "title": "You must not laugh at me, darling, but it had always been a girlish",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "dream of mine to love some one whose name was Ernest.",
             "Algernon rises, Cecily also.",
             "There is something in that name that seems to inspire absolute confidence.",
             "I pity any poor married woman whose husband is not called Ernest."
@@ -2513,8 +3159,21 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "But, my dear child, do you mean to say you could not love me if I had some other name?"
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 40
+    },
+    {
+      "number": "49",
+      "title": "But, my dear child, do you mean to say you could not love me if I had",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "some other name?"
           ]
         },
         {
@@ -2537,28 +3196,46 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "Well, my own dear, sweet, loving little darling, I really can’t see why you should object to the name of Algernon.",
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 24
+    },
+    {
+      "number": "50",
+      "title": "Well, my own dear, sweet, loving little darling, I really can’t see why",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "you should object to the name of Algernon.",
             "It is not at all a bad name.",
             "In fact, it is rather an aristocratic name.",
             "Half of the chaps who get into the Bankruptcy Court are called Algernon.",
-            "But seriously, Cecily...",
-            "Moving to her... if my name was Algy, couldn’t you love me?"
+            "But seriously, Cecily... Moving to her... if my name was Algy, couldn’t you love me?"
           ]
         },
         {
           "sentences": [
             "CECILY.",
             "Rising.",
-            "I might respect you, Ernest, I might admire your character, but I fear that I should not be able to give you my undivided attention."
+            "I might respect you, Ernest, I might admire your character,"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 64
+    },
+    {
+      "number": "51",
+      "title": "thoroughly experienced in the practice of all the rites and ceremonials",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "ALGERNON.",
-            "Cecily!",
-            "Picking up hat.",
-            "Your Rector here is, I suppose, thoroughly experienced in the practice of all the rites and ceremonials of the Church?"
+            "of the Church?"
           ]
         },
         {
@@ -2571,13 +3248,27 @@
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "I must see him at once on a most important christening—I mean on most important business."
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 29
+    },
+    {
+      "number": "52",
+      "title": "I must see him at once on a most important christening—I mean on most",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "important business."
           ]
         },
         {
           "sentences": [
-            "CECILY."
+            "CECILY.",
+            "Oh!"
           ]
         },
         {
@@ -2588,8 +3279,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Considering that we have been engaged since February the 14th, and that I only met you to-day for the first time, I think it is rather hard that you should leave me for so long a period as half an hour.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 15
+    },
+    {
+      "number": "53",
+      "title": "I only met you to-day for the first time, I think it is rather hard",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "that you should leave me for so long a period as half an hour.",
             "Couldn’t you make it twenty minutes?"
           ]
         },
@@ -2701,8 +3405,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "How nice of you to like me so much after we have known each other such a comparatively short time.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 45,
+      "word_count": 237
+    },
+    {
+      "number": "54",
+      "title": "How nice of you to like me so much after we have known each other such",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "a comparatively short time.",
             "Pray sit down."
           ]
         },
@@ -2747,8 +3464,20 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "Perhaps this might be a favourable opportunity for my mentioning who I am.",
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 58
+    },
+    {
+      "number": "55",
+      "title": "Perhaps this might be a favourable opportunity for my mentioning who I",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "My father is Lord Bracknell.",
             "You have never heard of papa, I suppose?"
           ]
@@ -2768,7 +3497,21 @@
             "And certainly once a man begins to neglect his domestic duties he becomes painfully effeminate, does he not?",
             "And I don’t like that.",
             "It makes men so very attractive.",
-            "Cecily, mamma, whose views on education are remarkably strict, has brought me up to be extremely short-sighted; it is part of her system; so do you mind my looking at you through my glasses?"
+            "Cecily, mamma, whose"
+          ]
+        }
+      ],
+      "sentence_count": 12,
+      "word_count": 86
+    },
+    {
+      "number": "56",
+      "title": "extremely short-sighted; it is part of her system; so do you mind my",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "looking at you through my glasses?"
           ]
         },
         {
@@ -2815,8 +3558,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "My dear guardian, with the assistance of Miss Prism, has the arduous task of looking after me."
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 20,
+      "word_count": 75
+    },
+    {
+      "number": "57",
+      "title": "My dear guardian, with the assistance of Miss Prism, has the arduous",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "task of looking after me."
           ]
         },
         {
@@ -2834,13 +3590,28 @@
         {
           "sentences": [
             "GWENDOLEN.",
+            "Oh!",
             "It is strange he never mentioned to me that he had a ward.",
             "How secretive of him!",
             "He grows more interesting hourly.",
             "I am not sure, however, that the news inspires me with feelings of unmixed delight.",
             "Rising and going to her.",
             "I am very fond of you, Cecily; I have liked you ever since I met you!",
-            "But I am bound to state that now that I know that you are Mr. Worthing’s ward, I cannot help expressing a wish you were—well, just a little older than you seem to be—and not quite so very alluring in appearance.",
+            "But I am bound to state that now that I know that you are Mr. Worthing’s ward, I cannot help expressing a wish you"
+          ]
+        }
+      ],
+      "sentence_count": 14,
+      "word_count": 99
+    },
+    {
+      "number": "58",
+      "title": "were—well, just a little older than you seem to be—and not quite so",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "very alluring in appearance.",
             "In fact, if I may speak candidly—"
           ]
         },
@@ -2853,13 +3624,21 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "Well, to speak with perfect candour, Cecily, I wish that you were fully forty-two, and more than usually plain for your age.",
-            "Ernest has a strong upright nature.",
-            "He is the very soul of truth and honour.",
-            "Disloyalty would be as impossible to him as deception.",
-            "But even men of the noblest possible moral character are extremely susceptible to the influence of the physical charms of others.",
-            "Modern, no less than Ancient History, supplies us with many most painful examples of what I refer to.",
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 31
+    },
+    {
+      "number": "59",
+      "title": "Ancient History, supplies us with many most painful examples of what I",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "refer to.",
             "If it were not so, indeed, History would be quite unreadable."
           ]
         },
@@ -2871,7 +3650,8 @@
         },
         {
           "sentences": [
-            "GWENDOLEN."
+            "GWENDOLEN.",
+            "Yes."
           ]
         },
         {
@@ -2957,27 +3737,21 @@
             "Produces diary of her own.",
             "I never travel without my diary.",
             "One should always have something sensational to read in the train.",
-            "I am so sorry, dear Cecily, if it is any disappointment to you, but I am afraid I have the prior claim."
+            "I am so sorry, dear Cecily,"
           ]
-        },
+        }
+      ],
+      "sentence_count": 52,
+      "word_count": 337
+    },
+    {
+      "number": "60",
+      "title": "may have got into, I will never reproach him with it after we are",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CECILY.",
-            "It would distress me more than I can tell you, dear Gwendolen, if it caused you any mental or physical anguish, but I feel bound to point out that since Ernest proposed to you he clearly has changed his mind."
-          ]
-        },
-        {
-          "sentences": [
-            "GWENDOLEN.",
-            "Meditatively.",
-            "If the poor fellow has been entrapped into any foolish promise I shall consider it my duty to rescue him at once, and with a firm hand."
-          ]
-        },
-        {
-          "sentences": [
-            "CECILY.",
-            "Thoughtfully and sadly.",
-            "Whatever unfortunate entanglement my dear boy may have got into, I will never reproach him with it after we are married."
+            "married."
           ]
         },
         {
@@ -2991,8 +3765,21 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Do you suggest, Miss Fairfax, that I entrapped Ernest into an engagement?",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 7,
+      "word_count": 37
+    },
+    {
+      "number": "61",
+      "title": "Do you suggest, Miss Fairfax, that I entrapped Ernest into an",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "engagement?",
             "How dare you?",
             "This is no time for wearing the shallow mask of manners.",
             "When I see a spade I call it a spade."
@@ -3011,7 +3798,21 @@
             "Enter Merriman, followed by the footman.",
             "He carries a salver, table cloth, and plate stand.",
             "Cecily is about to retort.",
-            "The presence of the servants exercises a restraining influence, under which both girls chafe."
+            "The presence of the"
+          ]
+        }
+      ],
+      "sentence_count": 12,
+      "word_count": 74
+    },
+    {
+      "number": "62",
+      "title": "servants exercises a restraining influence, under which both girls",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "chafe."
           ]
         },
         {
@@ -3085,14 +3886,28 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "Personally I cannot understand how anybody manages to exist in the country, if anybody who is anybody does.",
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 31,
+      "word_count": 151
+    },
+    {
+      "number": "63",
+      "title": "Personally I cannot understand how anybody manages to exist in the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "country, if anybody who is anybody does.",
             "The country always bores me to death."
           ]
         },
         {
           "sentences": [
             "CECILY.",
+            "Ah!",
             "This is what the newspapers call agricultural depression, is it not?",
             "I believe the aristocracy are suffering very much from it just at present.",
             "It is almost an epidemic amongst them, I have been told.",
@@ -3144,18 +3959,9 @@
           "sentences": [
             "CECILY.",
             "Cuts a very large slice of cake, and puts it on the tray.",
-            "Hand that"
+            "Hand that to Miss Fairfax."
           ]
-        }
-      ],
-      "sentence_count": 775,
-      "word_count": 5105
-    },
-    {
-      "number": "3",
-      "title": "Miss Fairfax.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Merriman does so, and goes out with footman.",
@@ -3166,9 +3972,21 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "You have filled my tea with lumps of sugar, and though I asked most distinctly for bread and butter, you have given me cake.",
-            "I am known for the gentleness of my disposition, and the extraordinary sweetness of my nature, but I warn you, Miss Cardew, you may go too far."
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 37,
+      "word_count": 190
+    },
+    {
+      "number": "64",
+      "title": "the gentleness of my disposition, and the extraordinary sweetness of my",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "nature, but I warn you, Miss Cardew, you may go too far."
           ]
         },
         {
@@ -3189,8 +4007,20 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "It seems to me, Miss Fairfax, that I am trespassing on your valuable time.",
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 72
+    },
+    {
+      "number": "65",
+      "title": "It seems to me, Miss Fairfax, that I am trespassing on your valuable",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "No doubt you have many other calls of a similar character to make in the neighbourhood."
           ]
         },
@@ -3209,6 +4039,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Gwendolen!",
             "Darling!",
             "Offers to kiss her."
@@ -3225,6 +4056,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Laughing.",
             "To dear little Cecily!",
             "Of course not!",
@@ -3262,7 +4094,9 @@
         {
           "sentences": [
             "GWENDOLEN.",
-            "Receding."
+            "Receding.",
+            "Jack!",
+            "Oh!"
           ]
         },
         {
@@ -3336,7 +4170,22 @@
             "CECILY.",
             "Breaking away from Algernon.",
             "Algernon Moncrieff!",
-            "The two girls move towards each other and put their arms round each other’s waists as if for protection."
+            "Oh!",
+            "The two girls"
+          ]
+        }
+      ],
+      "sentence_count": 71,
+      "word_count": 255
+    },
+    {
+      "number": "66",
+      "title": "move towards each other and put their arms round each other’s waists as",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "if for protection."
           ]
         },
         {
@@ -3353,7 +4202,8 @@
         },
         {
           "sentences": [
-            "CECILY."
+            "CECILY.",
+            "Oh!"
           ]
         },
         {
@@ -3364,6 +4214,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Standing rather proudly.",
             "I could deny it if I liked.",
             "I could deny anything if I liked.",
@@ -3411,15 +4262,43 @@
             "GWENDOLEN.",
             "An admirable idea!",
             "Mr. Worthing, there is just one question I would like to be permitted to put to you.",
-            "Where is your brother Ernest?",
-            "We are both engaged to be married to your brother Ernest, so it is a matter of some importance to us to know where your brother Ernest is at present."
+            "Where is your brother Ernest?"
+          ]
+        }
+      ],
+      "sentence_count": 34,
+      "word_count": 141
+    },
+    {
+      "number": "67",
+      "title": "matter of some importance to us to know where your brother Ernest is at",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "present."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Slowly and hesitatingly.",
             "Gwendolen—Cecily—it is very painful for me to be forced to speak the truth.",
-            "It is the first time in my life that I have ever been reduced to such a painful position, and I am really quite inexperienced in doing anything of the kind.",
+            "It is the first time in my life that I"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 28
+    },
+    {
+      "number": "68",
+      "title": "have ever been reduced to such a painful position, and I am really",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "quite inexperienced in doing anything of the kind.",
             "However, I will tell you quite frankly that I have no brother Ernest.",
             "I have no brother at all.",
             "I never had a brother in my life, and I certainly have not the smallest intention of ever having one in the future."
@@ -3434,7 +4313,9 @@
         },
         {
           "sentences": [
-            "Cheerily."
+            "JACK.",
+            "Cheerily.",
+            "None!"
           ]
         },
         {
@@ -3446,6 +4327,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Pleasantly.",
             "Never.",
             "Not even of any kind."
@@ -3453,14 +4335,21 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "I am afraid it is quite clear, Cecily, that neither of us is engaged to be married to any one."
+            "GWENDOLEN."
           ]
-        },
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 78
+    },
+    {
+      "number": "69",
+      "title": "It is not a very pleasant position for a young girl suddenly to find",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CECILY.",
-            "It is not a very pleasant position for a young girl suddenly to find herself in.",
+            "herself in.",
             "Is it?"
           ]
         },
@@ -3484,6 +4373,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "This ghastly state of things is what you call Bunburying, I suppose?"
           ]
         },
@@ -3496,6 +4386,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Well, you’ve no right whatsoever to Bunbury here."
           ]
         },
@@ -3509,14 +4400,28 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Serious Bunburyist!",
             "Good heavens!"
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "Well, one must be serious about something, if one wants to have any amusement in life.",
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 23,
+      "word_count": 102
+    },
+    {
+      "number": "70",
+      "title": "Well, one must be serious about something, if one wants to have any",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "amusement in life.",
             "I happen to be serious about Bunburying.",
             "What on earth you are serious about I haven’t got the remotest idea.",
             "About everything, I should fancy.",
@@ -3525,22 +4430,21 @@
         },
         {
           "sentences": [
-            "Well, the only small satisfaction I have in the whole of this wretched business is that your friend Bunbury is quite exploded.",
-            "You won’t be able to run down to the country quite so often as you used to do, dear Algy.",
-            "And a very good thing too."
+            "JACK."
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 36
+    },
+    {
+      "number": "71",
+      "title": "As for your conduct towards Miss Cardew, I must say that your taking in",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "ALGERNON.",
-            "Your brother is a little off colour, isn’t he, dear Jack?",
-            "You won’t be able to disappear to London quite so frequently as your wicked custom was.",
-            "And not a bad thing either."
-          ]
-        },
-        {
-          "sentences": [
-            "As for your conduct towards Miss Cardew, I must say that your taking in a sweet, simple, innocent girl like that is quite inexcusable.",
+            "a sweet, simple, innocent girl like that is quite inexcusable.",
             "To say nothing of the fact that she is my ward."
           ]
         },
@@ -3553,6 +4457,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I wanted to be engaged to Gwendolen, that is all.",
             "I love her."
           ]
@@ -3566,17 +4471,32 @@
         },
         {
           "sentences": [
+            "JACK.",
             "There is certainly no chance of your marrying Miss Cardew."
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "I don’t think there is much likelihood, Jack, of you and Miss Fairfax being united."
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 14,
+      "word_count": 93
+    },
+    {
+      "number": "72",
+      "title": "I don’t think there is much likelihood, Jack, of you and Miss Fairfax",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "being united."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Well, that is no business of yours."
           ]
         },
@@ -3591,7 +4511,21 @@
         },
         {
           "sentences": [
-            "How can you sit there, calmly eating muffins when we are in this horrible trouble, I can’t make out.",
+            "JACK."
+          ]
+        }
+      ],
+      "sentence_count": 9,
+      "word_count": 47
+    },
+    {
+      "number": "73",
+      "title": "How can you sit there, calmly eating muffins when we are in this",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "horrible trouble, I can’t make out.",
             "You seem to me to be perfectly heartless."
           ]
         },
@@ -3606,14 +4540,21 @@
         },
         {
           "sentences": [
-            "I say it’s perfectly heartless your eating muffins at all, under the circumstances."
+            "JACK."
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 48
+    },
+    {
+      "number": "74",
+      "title": "Indeed, when I am in really great trouble, as any one who knows me",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "ALGERNON.",
-            "When I am in trouble, eating is the only thing that consoles me.",
-            "Indeed, when I am in really great trouble, as any one who knows me intimately will tell you, I refuse everything except food and drink.",
+            "intimately will tell you, I refuse everything except food and drink.",
             "At the present moment I am eating muffins because I am unhappy.",
             "Besides, I am particularly fond of muffins.",
             "Rising."
@@ -3621,6 +4562,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Rising.",
             "Well, that is no reason why you should eat them all in that greedy way.",
             "Takes muffins from Algernon."
@@ -3636,6 +4578,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Good heavens!",
             "I suppose a man may eat his own muffins in his own garden."
           ]
@@ -3648,6 +4591,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I said it was perfectly heartless of you, under the circumstances.",
             "That is a very different thing."
           ]
@@ -3662,6 +4606,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Algy, I wish to goodness you would go."
           ]
         },
@@ -3677,6 +4622,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "My dear fellow, the sooner you give up that nonsense the better.",
             "I made arrangements this morning with Dr. Chasuble to be christened myself at 5.30, and I naturally will take the name of Ernest.",
             "Gwendolen would wish it.",
@@ -3697,6 +4643,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Yes, but you have been christened.",
             "That is the important thing."
           ]
@@ -3706,13 +4653,26 @@
             "ALGERNON.",
             "Quite so.",
             "So I know my constitution can stand it.",
-            "If you are not quite sure about your ever having been christened, I must say I think it rather dangerous your venturing on it now.",
-            "It might make you very unwell.",
-            "You can hardly have forgotten that some one very closely connected with you was very nearly carried off this week in Paris by a severe chill."
+            "If you are not quite"
+          ]
+        }
+      ],
+      "sentence_count": 52,
+      "word_count": 328
+    },
+    {
+      "number": "75",
+      "title": "connected with you was very nearly carried off this week in Paris by a",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "severe chill."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Yes, but you said yourself that a severe chill was not hereditary."
           ]
         },
@@ -3725,6 +4685,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Picking up the muffin-dish.",
             "Oh, that is nonsense; you are always talking nonsense."
           ]
@@ -3741,18 +4702,33 @@
         },
         {
           "sentences": [
+            "JACK.",
             "But I hate tea-cake."
           ]
         },
         {
           "sentences": [
-            "ALGERNON.",
-            "Why on earth then do you allow tea-cake to be served up for your guests?",
+            "ALGERNON."
+          ]
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 83
+    },
+    {
+      "number": "76",
+      "title": "Why on earth then do you allow tea-cake to be served up for your",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "guests?",
             "What ideas you have of hospitality!"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Algernon!",
             "I have already told you to go.",
             "I don’t want you here.",
@@ -3766,17 +4742,16 @@
             "Jack groans, and sinks into a chair.",
             "Algernon still continues eating."
           ]
-        },
-        {
-          "sentences": [
-            "ACT DROP"
-          ]
-        },
-        {
-          "sentences": [
-            "THIRD ACT"
-          ]
-        },
+        }
+      ],
+      "sentence_count": 11,
+      "word_count": 51
+    },
+    {
+      "number": "77",
+      "title": "SCENE",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
             "Morning-room at the Manor House."
@@ -3789,8 +4764,21 @@
         },
         {
           "sentences": [
-            "GWENDOLEN.",
-            "The fact that they did not follow us at once into the house, as any one else would have done, seems to me to show that they have some sense of shame left."
+            "GWENDOLEN."
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 18
+    },
+    {
+      "number": "78",
+      "title": "else would have done, seems to me to show that they have some sense of",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "shame left."
           ]
         },
         {
@@ -3911,6 +4899,7 @@
         {
           "sentences": [
             "GWENDOLEN.",
+            "True.",
             "In matters of grave importance, style, not sincerity is the vital thing.",
             "Mr. Worthing, what explanation can you offer to me for pretending to have a brother?",
             "Was it in order that you might have an opportunity of coming up to town to see me as often as possible?"
@@ -3918,6 +4907,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Can you doubt it, Miss Fairfax?"
           ]
         },
@@ -3948,12 +4938,14 @@
         {
           "sentences": [
             "CECILY.",
+            "Yes.",
             "I mean no."
           ]
         },
         {
           "sentences": [
             "GWENDOLEN.",
+            "True!",
             "I had forgotten.",
             "There are principles at stake that one cannot surrender.",
             "Which of us should tell them?",
@@ -4005,6 +4997,12 @@
         },
         {
           "sentences": [
+            "JACK.",
+            "I am."
+          ]
+        },
+        {
+          "sentences": [
             "CECILY.",
             "To Algernon.",
             "To please me you are ready to face this fearful ordeal?"
@@ -4012,7 +5010,8 @@
         },
         {
           "sentences": [
-            "ALGERNON."
+            "ALGERNON.",
+            "I am!"
           ]
         },
         {
@@ -4024,14 +5023,28 @@
         },
         {
           "sentences": [
+            "JACK.",
             "We are.",
             "Clasps hands with Algernon."
           ]
         },
         {
           "sentences": [
-            "CECILY.",
-            "They have moments of physical courage of which we women know absolutely nothing."
+            "CECILY."
+          ]
+        }
+      ],
+      "sentence_count": 109,
+      "word_count": 499
+    },
+    {
+      "number": "79",
+      "title": "They have moments of physical courage of which we women know absolutely",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "nothing."
           ]
         },
         {
@@ -4058,11 +5071,14 @@
         {
           "sentences": [
             "MERRIMAN.",
+            "Ahem!",
+            "Ahem!",
             "Lady Bracknell!"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Good heavens!"
           ]
         },
@@ -4094,17 +5110,27 @@
             "Sit down immediately.",
             "Hesitation of any kind is a sign of mental decay in the young, of physical weakness in the old.",
             "Turns to Jack.",
-            "Apprised, sir, of my daughter’s sudden flight by her trusty maid, whose confidence I purchased by means of a small coin, I followed her at once by a luggage train.",
-            "Her unhappy father is, I am glad to say, under the impression that she is attending a more than usually lengthy lecture by the University Extension Scheme on the Influence of a permanent income on Thought.",
-            "I do not propose to undeceive him.",
-            "Indeed I have never undeceived him on any question.",
-            "I would consider it wrong.",
-            "But of course, you will clearly understand that all communication between yourself and my daughter must cease immediately from this moment.",
+            "Apprised, sir, of my daughter’s sudden flight by her"
+          ]
+        }
+      ],
+      "sentence_count": 31,
+      "word_count": 104
+    },
+    {
+      "number": "80",
+      "title": "that all communication between yourself and my daughter must cease",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "immediately from this moment.",
             "On this point, as indeed on all points, I am firm."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "I am engaged to be married to Gwendolen, Lady Bracknell!"
           ]
         },
@@ -4112,8 +5138,7 @@
           "sentences": [
             "LADY BRACKNELL.",
             "You are nothing of the kind, sir.",
-            "And now, as regards Algernon!...",
-            "Algernon!"
+            "And now, as regards Algernon!... Algernon!"
           ]
         },
         {
@@ -4132,6 +5157,8 @@
           "sentences": [
             "ALGERNON.",
             "Stammering.",
+            "Oh!",
+            "No!",
             "Bunbury doesn’t live here.",
             "Bunbury is somewhere else at present.",
             "In fact, Bunbury is dead."
@@ -4140,6 +5167,7 @@
         {
           "sentences": [
             "LADY BRACKNELL.",
+            "Dead!",
             "When did Mr. Bunbury die?",
             "His death must have been extremely sudden."
           ]
@@ -4148,6 +5176,7 @@
           "sentences": [
             "ALGERNON.",
             "Airily.",
+            "Oh!",
             "I killed Bunbury this afternoon.",
             "I mean poor Bunbury died this afternoon."
           ]
@@ -4184,13 +5213,26 @@
         {
           "sentences": [
             "LADY BRACKNELL.",
-            "He seems to have had great confidence in the opinion of his physicians.",
-            "I am glad, however, that he made up his mind at the last to some definite course of action, and acted under proper medical advice.",
-            "And now that we have finally got rid of this Mr. Bunbury, may I ask, Mr. Worthing, who is that young person whose hand my nephew Algernon is now holding in what seems to me a peculiarly unnecessary manner?"
+            "He seems to have had great confidence in the opinion of his physicians."
+          ]
+        }
+      ],
+      "sentence_count": 42,
+      "word_count": 200
+    },
+    {
+      "number": "81",
+      "title": "Worthing, who is that young person whose hand my nephew Algernon is now",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "holding in what seems to me a peculiarly unnecessary manner?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "That lady is Miss Cecily Cardew, my ward.",
             "Lady Bracknell bows coldly to Cecily."
           ]
@@ -4217,7 +5259,21 @@
           "sentences": [
             "LADY BRACKNELL.",
             "With a shiver, crossing to the sofa and sitting down.",
-            "I do not know whether there is anything peculiarly exciting in the air of this particular part of Hertfordshire, but the number of engagements that go on seems to me considerably above the proper average that statistics have laid down for our guidance.",
+            "I do not know"
+          ]
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 70
+    },
+    {
+      "number": "82",
+      "title": "on seems to me considerably above the proper average that statistics",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "have laid down for our guidance.",
             "I think some preliminary inquiry on my part would not be out of place.",
             "Mr. Worthing, is Miss Cardew at all connected with any of the larger railway stations in London?",
             "I merely desire information.",
@@ -4227,6 +5283,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "In a clear, cold voice.",
             "Miss Cardew is the grand-daughter of the late Mr. Thomas Cardew of Belgrave Square, S.W.; Gervase Park, Dorking, Surrey; and the Sporran, Fifeshire, N.B."
           ]
@@ -4241,6 +5298,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I have carefully preserved the Court Guides of the period.",
             "They are open to your inspection, Lady Bracknell."
           ]
@@ -4254,6 +5312,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Miss Cardew’s family solicitors are Messrs.",
             "Markby, Markby, and Markby."
           ]
@@ -4269,14 +5328,30 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Very irritably.",
             "How extremely kind of you, Lady Bracknell!",
-            "I have also in my possession, you will be pleased to hear, certificates of Miss Cardew’s birth, baptism, whooping cough, registration, vaccination, confirmation, and the measles; both the German and the English variety."
+            "I have"
+          ]
+        }
+      ],
+      "sentence_count": 31,
+      "word_count": 210
+    },
+    {
+      "number": "83",
+      "title": "vaccination, confirmation, and the measles; both the German and the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "English variety."
           ]
         },
         {
           "sentences": [
             "LADY BRACKNELL.",
+            "Ah!",
             "A life crowded with incident, I see; though perhaps somewhat too exciting for a young girl.",
             "I am not myself in favour of premature experiences.",
             "Rises, looks at her watch.",
@@ -4287,6 +5362,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Oh! about a hundred and thirty thousand pounds in the Funds.",
             "That is all.",
             "Goodbye, Lady Bracknell.",
@@ -4306,14 +5382,27 @@
             "To Cecily.",
             "Come over here, dear.",
             "Cecily goes across.",
-            "Pretty child! your dress is sadly simple, and your hair seems almost as Nature might have left it.",
-            "But we can soon alter all that.",
-            "A thoroughly experienced French maid produces a really marvellous result in a very brief space of time.",
+            "Pretty child!"
+          ]
+        }
+      ],
+      "sentence_count": 26,
+      "word_count": 170
+    },
+    {
+      "number": "84",
+      "title": "French maid produces a really marvellous result in a very brief space",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "of time.",
             "I remember recommending one to young Lady Lancing, and after three months her own husband did not know her."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "And after six months nobody knew her."
           ]
         },
@@ -4420,12 +5509,21 @@
           "sentences": [
             "LADY BRACKNELL.",
             "To speak frankly, I am not in favour of long engagements.",
-            "They give people the opportunity of finding out each other’s character before marriage, which I think is never advisable."
+            "They give"
           ]
-        },
+        }
+      ],
+      "sentence_count": 54,
+      "word_count": 309
+    },
+    {
+      "number": "85",
+      "title": "I beg your pardon for interrupting you, Lady Bracknell, but this",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "I beg your pardon for interrupting you, Lady Bracknell, but this engagement is quite out of the question.",
+            "engagement is quite out of the question.",
             "I am Miss Cardew’s guardian, and she cannot marry without my consent until she comes of age.",
             "That consent I absolutely decline to give."
           ]
@@ -4441,7 +5539,22 @@
         },
         {
           "sentences": [
-            "It pains me very much to have to speak frankly to you, Lady Bracknell, about your nephew, but the fact is that I do not approve at all of his moral character.",
+            "JACK.",
+            "It pains me very much to have to speak frankly to you, Lady Bracknell,"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 79
+    },
+    {
+      "number": "86",
+      "title": "about your nephew, but the fact is that I do not approve at all of his",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "moral character.",
             "I suspect him of being untruthful.",
             "Algernon and Cecily look at him in indignant amazement."
           ]
@@ -4457,32 +5570,36 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I fear there can be no possible doubt about the matter.",
-            "This afternoon during my temporary absence in London on an important question of romance, he obtained admission to my house by means of the false pretence of being my brother.",
-            "Under an assumed name he drank, I’ve just been informed by my butler, an entire pint bottle of my Perrier-Jouet, Brut, ’89; wine I was specially reserving for myself.",
-            "Continuing his disgraceful deception, he succeeded in the course of the afternoon in alienating the affections of my only ward.",
-            "He subsequently stayed to tea, and devoured every single muffin.",
-            "And what makes his conduct all the more heartless is, that he was perfectly well aware from the first that I have no brother, that I never had a brother, and that I don’t intend to have a brother, not even of any kind.",
+            "This afternoon"
+          ]
+        }
+      ],
+      "sentence_count": 11,
+      "word_count": 42
+    },
+    {
+      "number": "87",
+      "title": "that I have no brother, that I never had a brother, and that I don’t",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "intend to have a brother, not even of any kind.",
             "I distinctly told him so myself yesterday afternoon."
           ]
         },
         {
           "sentences": [
             "LADY BRACKNELL.",
-            "Mr. Worthing, after careful consideration I have decided entirely"
+            "Ahem!",
+            "Mr. Worthing, after careful consideration I have decided entirely to overlook my nephew’s conduct to you."
           ]
-        }
-      ],
-      "sentence_count": 584,
-      "word_count": 3920
-    },
-    {
-      "number": "4",
-      "title": "overlook my nephew’s conduct to you.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
+            "JACK.",
             "That is very generous of you, Lady Bracknell.",
             "My own decision, however, is unalterable.",
             "I decline to give my consent."
@@ -4499,26 +5616,29 @@
         },
         {
           "sentences": [
-            "CECILY.",
-            "Well, I am really only eighteen, but I always admit to twenty when I go"
+            "CECILY."
           ]
         }
       ],
-      "sentence_count": 10,
-      "word_count": 52
+      "sentence_count": 15,
+      "word_count": 75
     },
     {
-      "number": "5",
-      "title": "evening parties.",
-      "type": "letter",
+      "number": "88",
+      "title": "Well, I am really only eighteen, but I always admit to twenty when I go",
+      "type": "story",
       "paragraphs": [
+        {
+          "sentences": [
+            "to evening parties."
+          ]
+        },
         {
           "sentences": [
             "LADY BRACKNELL.",
             "You are perfectly right in making some slight alteration.",
             "Indeed, no woman should ever be quite accurate about her age.",
-            "It looks so calculating...",
-            "In a meditative manner.",
+            "It looks so calculating... In a meditative manner.",
             "Eighteen, but admitting to twenty at evening parties.",
             "Well, it will not be very long before you are of age and free from the restraints of tutelage.",
             "So I don’t think your guardian’s consent is, after all, a matter of any importance."
@@ -4526,7 +5646,21 @@
         },
         {
           "sentences": [
-            "Pray excuse me, Lady Bracknell, for interrupting you again, but it is only fair to tell you that according to the terms of her grandfather’s will Miss Cardew does not come legally of age till she is thirty-five."
+            "JACK."
+          ]
+        }
+      ],
+      "sentence_count": 9,
+      "word_count": 76
+    },
+    {
+      "number": "89",
+      "title": "only fair to tell you that according to the terms of her grandfather’s",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "will Miss Cardew does not come legally of age till she is thirty-five."
           ]
         },
         {
@@ -4534,10 +5668,21 @@
             "LADY BRACKNELL.",
             "That does not seem to me to be a grave objection.",
             "Thirty-five is a very attractive age.",
-            "London society is full of women of the very highest birth who have, of their own free choice, remained thirty-five for years.",
-            "Lady Dumbleton is an instance in point.",
-            "To my own knowledge she has been thirty-five ever since she arrived at the age of forty, which was many years ago now.",
-            "I see no reason why our dear Cecily should not be even still more attractive at the age you mention than she is at present.",
+            "London society is full of women of the very highest"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 42
+    },
+    {
+      "number": "90",
+      "title": "be even still more attractive at the age you mention than she is at",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "present.",
             "There will be a large accumulation of property."
           ]
         },
@@ -4578,13 +5723,21 @@
         {
           "sentences": [
             "LADY BRACKNELL.",
-            "My dear Mr. Worthing, as Miss Cardew states positively that she cannot wait till she is thirty-five—a remark which I am bound to say seems to me to show a somewhat impatient nature—I would beg of you to reconsider your decision."
+            "My dear Mr. Worthing, as Miss Cardew states positively that she cannot"
           ]
-        },
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 111
+    },
+    {
+      "number": "91",
+      "title": "The moment you consent to my marriage with Gwendolen, I will most",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "But my dear Lady Bracknell, the matter is entirely in your own hands.",
-            "The moment you consent to my marriage with Gwendolen, I will most gladly allow your nephew to form an alliance with my ward."
+            "gladly allow your nephew to form an alliance with my ward."
           ]
         },
         {
@@ -4596,6 +5749,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Then a passionate celibacy is all that any of us can look forward to."
           ]
         },
@@ -4641,27 +5795,21 @@
             "The idea is grotesque and irreligious!",
             "Algernon, I forbid you to be baptized.",
             "I will not hear of such excesses.",
-            "Lord Bracknell would be highly displeased if he learned that that was the way in which you wasted your time and money."
+            "Lord Bracknell"
           ]
-        },
+        }
+      ],
+      "sentence_count": 27,
+      "word_count": 162
+    },
+    {
+      "number": "92",
+      "title": "that for the last hour and a half Miss Prism has been waiting for me in",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "CHASUBLE.",
-            "Am I to understand then that there are to be no christenings at all this afternoon?"
-          ]
-        },
-        {
-          "sentences": [
-            "I don’t think that, as things are now, it would be of much practical value to either of us, Dr. Chasuble."
-          ]
-        },
-        {
-          "sentences": [
-            "CHASUBLE.",
-            "I am grieved to hear such sentiments from you, Mr. Worthing.",
-            "They savour of the heretical views of the Anabaptists, views that I have completely refuted in four of my unpublished sermons.",
-            "However, as your present mood seems to be one peculiarly secular, I will return to the church at once.",
-            "Indeed, I have just been informed by the pew-opener that for the last hour and a half Miss Prism has been waiting for me in the vestry."
+            "the vestry."
           ]
         },
         {
@@ -4710,6 +5858,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Interposing.",
             "Miss Prism, Lady Bracknell, has been for the last three years Miss Cardew’s esteemed governess and valued companion."
           ]
@@ -4755,10 +5904,21 @@
             "Where is that baby?",
             "General consternation.",
             "The Canon starts back in horror.",
-            "Algernon and Jack pretend to be anxious to shield Cecily and Gwendolen from hearing the details of a terrible public scandal.",
-            "Twenty-eight years ago, Prism, you left Lord Bracknell’s house, Number 104, Upper Grosvenor Street, in charge of a perambulator that contained a baby of the male sex.",
-            "You never returned.",
-            "A few weeks later, through the elaborate investigations of the Metropolitan police, the perambulator was discovered at midnight, standing by itself in a remote corner of Bayswater.",
+            "Algernon and Jack pretend to be anxious to shield"
+          ]
+        }
+      ],
+      "sentence_count": 48,
+      "word_count": 260
+    },
+    {
+      "number": "93",
+      "title": "the perambulator was discovered at midnight, standing by itself in a",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "remote corner of Bayswater.",
             "It contained the manuscript of a three-volume novel of more than usually revolting sentimentality.",
             "Miss Prism starts in involuntary indignation.",
             "But the baby was not there!",
@@ -4774,13 +5934,26 @@
             "Lady Bracknell, I admit with shame that I do not know.",
             "I only wish I did.",
             "The plain facts of the case are these.",
-            "On the morning of the day you mention, a day that is for ever branded on my memory, I prepared as usual to take the baby out in its perambulator.",
-            "I had also with me a somewhat old, but capacious hand-bag in which I had intended to place the manuscript of a work of fiction that I had written during my few unoccupied hours.",
-            "In a moment of mental abstraction, for which I never can forgive myself, I deposited the manuscript in the basinette, and placed the baby in the hand-bag."
+            "On the morning of the day"
+          ]
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 75
+    },
+    {
+      "number": "94",
+      "title": "can forgive myself, I deposited the manuscript in the basinette, and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "placed the baby in the hand-bag."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Who has been listening attentively.",
             "But where did you deposit the hand-bag?"
           ]
@@ -4793,18 +5966,33 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Miss Prism, this is a matter of no small importance to me.",
             "I insist on knowing where you deposited the hand-bag that contained that infant."
           ]
         },
         {
           "sentences": [
-            "MISS PRISM.",
-            "I left it in the cloak-room of one of the larger railway stations in London."
+            "MISS PRISM."
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 55
+    },
+    {
+      "number": "95",
+      "title": "I left it in the cloak-room of one of the larger railway stations in",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "London."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "What railway station?"
           ]
         },
@@ -4819,6 +6007,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "I must retire to my room for a moment.",
             "Gwendolen, wait here for me."
           ]
@@ -4840,7 +6029,21 @@
           "sentences": [
             "LADY BRACKNELL.",
             "I dare not even suspect, Dr. Chasuble.",
-            "I need hardly tell you that in families of high position strange coincidences are not supposed to occur.",
+            "I need hardly tell you that in"
+          ]
+        }
+      ],
+      "sentence_count": 19,
+      "word_count": 78
+    },
+    {
+      "number": "96",
+      "title": "families of high position strange coincidences are not supposed to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "occur.",
             "They are hardly considered the thing."
           ]
         },
@@ -4895,6 +6098,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Rushing over to Miss Prism.",
             "Is this the hand-bag, Miss Prism?",
             "Examine it carefully before you speak.",
@@ -4906,7 +6110,20 @@
             "MISS PRISM.",
             "Calmly.",
             "It seems to be mine.",
-            "Yes, here is the injury it received through the upsetting of a Gower Street omnibus in younger and happier days.",
+            "Yes, here is the injury it received"
+          ]
+        }
+      ],
+      "sentence_count": 32,
+      "word_count": 151
+    },
+    {
+      "number": "97",
+      "title": "through the upsetting of a Gower Street omnibus in younger and happier",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "Here is the stain on the lining caused by the explosion of a temperance beverage, an incident that occurred at Leamington.",
             "And here, on the lock, are my initials.",
             "I had forgotten that in an extravagant mood I had had them placed there.",
@@ -4917,6 +6134,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "In a pathetic voice.",
             "Miss Prism, more is restored to you than this hand-bag.",
             "I was the baby you placed in it."
@@ -4925,11 +6143,13 @@
         {
           "sentences": [
             "MISS PRISM.",
-            "Amazed."
+            "Amazed.",
+            "You?"
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Embracing her.",
             "Yes... mother!"
           ]
@@ -4944,6 +6164,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Unmarried!",
             "I do not deny that is a serious blow.",
             "But after all, who has the right to cast a stone against one who has suffered?",
@@ -4964,19 +6185,33 @@
         },
         {
           "sentences": [
+            "JACK.",
             "After a pause.",
             "Lady Bracknell, I hate to seem inquisitive, but would you kindly inform me who I am?"
           ]
         },
         {
           "sentences": [
-            "LADY BRACKNELL.",
-            "I am afraid that the news I have to give you will not altogether please you.",
+            "LADY BRACKNELL."
+          ]
+        }
+      ],
+      "sentence_count": 37,
+      "word_count": 219
+    },
+    {
+      "number": "98",
+      "title": "I am afraid that the news I have to give you will not altogether please",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "You are the son of my poor sister, Mrs. Moncrieff, and consequently Algernon’s elder brother."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Algy’s elder brother!",
             "Then I have a brother after all.",
             "I knew I had a brother!",
@@ -5013,8 +6248,8 @@
         },
         {
           "sentences": [
-            "Good heavens!...",
-            "I had quite forgotten that point.",
+            "JACK.",
+            "Good heavens!... I had quite forgotten that point.",
             "Your decision on the subject of my name is irrevocable, I suppose?"
           ]
         },
@@ -5032,6 +6267,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Then the question had better be cleared up at once.",
             "Aunt Augusta, a moment.",
             "At the time when Miss Prism left me in the hand-bag, had I been christened already?"
@@ -5039,12 +6275,26 @@
         },
         {
           "sentences": [
-            "LADY BRACKNELL.",
-            "Every luxury that money could buy, including christening, had been lavished on you by your fond and doting parents."
+            "LADY BRACKNELL."
+          ]
+        }
+      ],
+      "sentence_count": 34,
+      "word_count": 212
+    },
+    {
+      "number": "99",
+      "title": "Every luxury that money could buy, including christening, had been",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "lavished on you by your fond and doting parents."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "Then I was christened!",
             "That is settled.",
             "Now, what name was I given?",
@@ -5059,6 +6309,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Irritably.",
             "Yes, but what was my father’s Christian name?"
           ]
@@ -5071,11 +6322,27 @@
             "But I have no doubt he had one.",
             "He was eccentric, I admit.",
             "But only in later years.",
-            "And that was the result of the Indian climate, and marriage, and indigestion, and other things of that kind."
+            "And that was the result of"
+          ]
+        }
+      ],
+      "sentence_count": 18,
+      "word_count": 91
+    },
+    {
+      "number": "100",
+      "title": "the Indian climate, and marriage, and indigestion, and other things of",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "that kind."
           ]
         },
         {
           "sentences": [
+            "JACK.",
+            "Algy!",
             "Can’t you recollect what our father’s Christian name was?"
           ]
         },
@@ -5088,23 +6355,31 @@
         },
         {
           "sentences": [
-            "His name would appear in the Army Lists of the period, I suppose, Aunt Augusta?"
+            "JACK."
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 33
+    },
+    {
+      "number": "101",
+      "title": "The General was essentially a man of peace, except in his domestic",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "LADY BRACKNELL.",
-            "The General was essentially a man of peace, except in his domestic life.",
             "But I have no doubt his name would appear in any military directory."
           ]
         },
         {
           "sentences": [
+            "JACK.",
             "The Army Lists of the last forty years are here.",
             "These delightful records should have been my constant study.",
             "Rushes to bookcase and tears the books out.",
-            "Generals...",
-            "Mallam, Maxbohm, Magley, what ghastly names they have—Markby, Migsby, Mobbs, Moncrieff!",
+            "M.",
+            "Generals... Mallam, Maxbohm, Magley, what ghastly names they have—Markby, Migsby, Mobbs, Moncrieff!",
             "Lieutenant 1840, Captain, Lieutenant-Colonel, Colonel, General 1869, Christian names, Ernest John.",
             "Puts book very quietly down and speaks quite calmly.",
             "I always told you, Gwendolen, my name was Ernest, didn’t I?",
@@ -5114,8 +6389,21 @@
         },
         {
           "sentences": [
-            "LADY BRACKNELL.",
-            "Yes, I remember now that the General was called Ernest, I knew I had some particular reason for disliking the name."
+            "LADY BRACKNELL."
+          ]
+        }
+      ],
+      "sentence_count": 13,
+      "word_count": 99
+    },
+    {
+      "number": "102",
+      "title": "Yes, I remember now that the General was called Ernest, I knew I had",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "some particular reason for disliking the name."
           ]
         },
         {
@@ -5128,7 +6416,21 @@
         },
         {
           "sentences": [
-            "Gwendolen, it is a terrible thing for a man to find out suddenly that all his life he has been speaking nothing but the truth.",
+            "JACK."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 25
+    },
+    {
+      "number": "103",
+      "title": "Gwendolen, it is a terrible thing for a man to find out suddenly that",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "all his life he has been speaking nothing but the truth.",
             "Can you forgive me?"
           ]
         },
@@ -5141,6 +6443,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "My own one!"
           ]
         },
@@ -5170,6 +6473,7 @@
         },
         {
           "sentences": [
+            "JACK.",
             "Gwendolen!",
             "Embraces her.",
             "At last!"
@@ -5183,14 +6487,18 @@
         },
         {
           "sentences": [
-            "On the contrary, Aunt Augusta, I’ve now realised for the first time in my life the vital Importance of Being Earnest."
+            "JACK."
           ]
-        },
-        {
-          "sentences": [
-            "TABLEAU"
-          ]
-        },
+        }
+      ],
+      "sentence_count": 26,
+      "word_count": 69
+    },
+    {
+      "number": "104",
+      "title": "TABLEAU",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
             "*** END OF THE PROJECT GUTENBERG EBOOK THE IMPORTANCE OF BEING EARNEST ***"
@@ -5200,159 +6508,86 @@
           "sentences": [
             "***** This file should be named 844-0. txt or 844-0. zip ***** This and all associated files of various formats will be found in:  https://www. gutenberg. org/8/4/844/"
           ]
-        },
+        }
+      ],
+      "sentence_count": 2,
+      "word_count": 40
+    },
+    {
+      "number": "105",
+      "title": "Updated editions will replace the previous one--the old editions will",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "Updated editions will replace the previous one--the old editions will be renamed."
+            "be renamed."
           ]
         },
         {
           "sentences": [
-            "Creating the works from print editions not protected by U.S. copyright law means that no one owns a United States copyright in these works, so the Foundation (and you!) can copy and distribute it in the United States without permission and without paying copyright royalties.",
-            "Special rules, set forth in the General Terms of Use part of this license, apply to copying and distributing Project Gutenberg-tm electronic works to protect the PROJECT GUTENBERG-tm concept and trademark.",
-            "Project Gutenberg is a registered trademark, and may not be used if you charge for an eBook, except by following the terms of the trademark license, including paying royalties for use of the Project Gutenberg trademark.",
-            "If you do not charge anything for copies of this eBook, complying with the trademark license is very easy.",
-            "You may use this eBook for nearly any purpose such as creation of derivative works, reports, performances and research.",
-            "Project Gutenberg eBooks may be modified and printed and given away--you may do practically ANYTHING in the United States with eBooks not protected by U.S. copyright law.",
-            "Redistribution is subject to the trademark license, especially commercial redistribution."
+            "Creating the works from print editions not protected by U.S. copyright law means that no one owns a United States copyright in these works, so the Foundation (and you!) can copy and distribute it in the"
+          ]
+        }
+      ],
+      "sentence_count": 2,
+      "word_count": 38
+    },
+    {
+      "number": "106",
+      "title": "same format with its attached full Project Gutenberg-tm License when",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "you share it without charge with others."
           ]
         },
         {
           "sentences": [
-            "START: FULL LICENSE"
-          ]
-        },
-        {
-          "sentences": [
-            "THE FULL PROJECT GUTENBERG LICENSE PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK"
-          ]
-        },
-        {
-          "sentences": [
-            "To protect the Project Gutenberg-tm mission of promoting the free distribution of electronic works, by using or distributing this work (or any other work associated in any way with the phrase \"Project Gutenberg\"), you agree to comply with all the terms of the Full Project Gutenberg-tm License available with this file or online at www. gutenberg. org/license."
-          ]
-        },
-        {
-          "sentences": [
-            "Section 1.",
-            "General Terms of Use and Redistributing Project Gutenberg-tm electronic works"
-          ]
-        },
-        {
-          "sentences": [
-            "By reading or using any part of this Project Gutenberg-tm electronic work, you indicate that you have read, understand, agree to and accept all the terms of this license and intellectual property (trademark/copyright) agreement.",
-            "If you do not agree to abide by all the terms of this agreement, you must cease using and return or destroy all copies of Project Gutenberg-tm electronic works in your possession.",
-            "If you paid a fee for obtaining a copy of or access to a Project Gutenberg-tm electronic work and you do not agree to be bound by the terms of this agreement, you may obtain a refund from the person or entity to whom you paid the fee as set forth in paragraph 1.E.8."
-          ]
-        },
-        {
-          "sentences": [
-            "\"Project Gutenberg\" is a registered trademark.",
-            "It may only be used on or associated in any way with an electronic work by people who agree to be bound by the terms of this agreement.",
-            "There are a few things that you can do with most Project Gutenberg-tm electronic works even without complying with the full terms of this agreement.",
-            "See paragraph 1.C below.",
-            "There are a lot of things you can do with Project Gutenberg-tm electronic works if you follow the terms of this agreement and help preserve free future access to Project Gutenberg-tm electronic works.",
-            "See paragraph 1.E below."
-          ]
-        },
-        {
-          "sentences": [
-            "The Project Gutenberg Literary Archive Foundation (\"the Foundation\" or PGLAF), owns a compilation copyright in the collection of Project Gutenberg-tm electronic works.",
-            "Nearly all the individual works in the collection are in the public domain in the United States.",
-            "If an individual work is unprotected by copyright law in the United States and you are located in the United States, we do not claim a right to prevent you from copying, distributing, performing, displaying or creating derivative works based on the work as long as all references to Project Gutenberg are removed.",
-            "Of course, we hope that you will support the Project Gutenberg-tm mission of promoting free access to electronic works by freely sharing Project Gutenberg-tm works in compliance with the terms of this agreement for keeping the Project Gutenberg-tm name associated with the work.",
-            "You can easily comply with the terms of this agreement by keeping this work in the same format with its attached full Project Gutenberg-tm License when you share it without charge with others."
-          ]
-        },
-        {
-          "sentences": [
+            "1.D.",
             "The copyright laws of the place where you are located also govern what you can do with this work.",
             "Copyright laws in most countries are in a constant state of change.",
-            "If you are outside the United States, check the laws of your country in addition to the terms of this agreement before downloading, copying, displaying, performing, distributing or creating derivative works based on this work or any other Project Gutenberg-tm work.",
-            "The Foundation makes no representations concerning the copyright status of any work in any country other than the United States."
+            "If you are outside the United States,"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 46
+    },
+    {
+      "number": "107",
+      "title": "representations concerning the copyright status of any work in any",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "country other than the United States."
           ]
         },
         {
           "sentences": [
+            "1.E.",
             "Unless you have removed all references to Project Gutenberg:"
           ]
         },
         {
           "sentences": [
             "1.E.1.",
-            "The following sentence, with active links to, or other immediate access to, the full Project Gutenberg-tm License must appear prominently whenever any copy of a Project Gutenberg-tm work (any work on which the phrase \"Project Gutenberg\" appears, or with which the phrase \"Project Gutenberg\" is associated) is accessed, displayed, performed, viewed, copied or distributed:"
+            "The following sentence, with active links to, or other"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 26
+    },
+    {
+      "number": "108",
+      "title": "electronic work is discovered and reported to you within 90 days of",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "This eBook is for the use of anyone anywhere in the United States and  most other parts of the world at no cost and with almost no  restrictions whatsoever.",
-            "You may copy it, give it away or re-use it  under the terms of the Project Gutenberg License included with this  eBook or online at www. gutenberg. org.",
-            "If you are not located in the  United States, you will have to check the laws of the country where  you are located before using this eBook."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.2.",
-            "If an individual Project Gutenberg-tm electronic work is derived from texts not protected by U.S. copyright law (does not contain a notice indicating that it is posted with permission of the copyright holder), the work can be copied and distributed to anyone in the United States without paying any fees or charges.",
-            "If you are redistributing or providing access to a work with the phrase \"Project Gutenberg\" associated with or appearing on the work, you must comply either with the requirements of paragraphs 1.E. through 1.E. or obtain permission for the use of the work and the Project Gutenberg-tm trademark as set forth in paragraphs 1.E. or 1.E.9."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.3.",
-            "If an individual Project Gutenberg-tm electronic work is posted with the permission of the copyright holder, your use and distribution must comply with both paragraphs 1.E. through 1.E. and any additional terms imposed by the copyright holder.",
-            "Additional terms will be linked to the Project Gutenberg-tm License for all works posted with the permission of the copyright holder found at the beginning of this work."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.4.",
-            "Do not unlink or detach or remove the full Project Gutenberg-tm License terms from this work, or any files containing a part of this work or any other work associated with Project Gutenberg-tm."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.5.",
-            "Do not copy, display, perform, distribute or redistribute this electronic work, or any part of this electronic work, without prominently displaying the sentence set forth in paragraph 1.E. with active links or immediate access to the full terms of the Project Gutenberg-tm License."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.6.",
-            "You may convert to and distribute this work in any binary, compressed, marked up, nonproprietary or proprietary form, including any word processing or hypertext form.",
-            "However, if you provide access to or distribute copies of a Project Gutenberg-tm work in a format other than \"Plain Vanilla ASCII\" or other format used in the official version posted on the official Project Gutenberg-tm website (www. gutenberg. org), you must, at no additional cost, fee or expense to the user, provide a copy, a means of exporting a copy, or a means of obtaining a copy upon request, of the work in its original \"Plain Vanilla ASCII\" or other form.",
-            "Any alternate format must include the full Project Gutenberg-tm License as specified in paragraph 1.E.1."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.7.",
-            "Do not charge a fee for access to, viewing, displaying, performing, copying or distributing any Project Gutenberg-tm works unless you comply with paragraph 1.E. or 1.E.9."
-          ]
-        },
-        {
-          "sentences": [
-            "1.E.8.",
-            "You may charge a reasonable fee for copies of or providing access to or distributing Project Gutenberg-tm electronic works provided that:"
-          ]
-        },
-        {
-          "sentences": [
-            "* You pay a royalty fee of 20% of the gross profits you derive from  the use of Project Gutenberg-tm works calculated using the method  you already use to calculate your applicable taxes.",
-            "The fee is owed  to the owner of the Project Gutenberg-tm trademark, but he has  agreed to donate royalties under this paragraph to the Project  Gutenberg Literary Archive Foundation.",
-            "Royalty payments must be paid  within days following each date on which you prepare (or are  legally required to prepare) your periodic tax returns.",
-            "Royalty  payments should be clearly marked as such and sent to the Project  Gutenberg Literary Archive Foundation at the address specified in  Section 4, \"Information about donations to the Project Gutenberg  Literary Archive Foundation.\""
-          ]
-        },
-        {
-          "sentences": [
-            "* You provide a full refund of any money paid by a user who notifies  you in writing (or by e-mail) within days of receipt that s/he  does not agree to the terms of the full Project Gutenberg-tm  License.",
-            "You must require such a user to return or destroy all  copies of the works possessed in a physical medium and discontinue  all use of and all access to other copies of Project Gutenberg-tm  works."
-          ]
-        },
-        {
-          "sentences": [
-            "* You provide, in accordance with paragraph 1.F.3, a full refund of  any money paid for a work or a replacement copy, if a defect in the  electronic work is discovered and reported to you within days of  receipt of the work."
+            "receipt of the work."
           ]
         },
         {
@@ -5363,127 +6598,47 @@
         {
           "sentences": [
             "1.E.9.",
-            "If you wish to charge a fee or distribute a Project Gutenberg-tm electronic work or group of works on different terms than are set forth in this agreement, you must obtain permission in writing from the Project Gutenberg Literary Archive Foundation, the manager of the Project Gutenberg-tm trademark.",
+            "If you wish to charge a fee or distribute a Project"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 33
+    },
+    {
+      "number": "109",
+      "title": "from the Project Gutenberg Literary Archive Foundation, the manager of",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "the Project Gutenberg-tm trademark.",
             "Contact the Foundation as set forth in Section below."
           ]
         },
         {
           "sentences": [
+            "1.F."
+          ]
+        },
+        {
+          "sentences": [
             "1.F.1.",
-            "Project Gutenberg volunteers and employees expend considerable effort to identify, do copyright research on, transcribe and proofread works not protected by U.S. copyright law in creating the Project Gutenberg-tm collection.",
-            "Despite these efforts, Project Gutenberg-tm electronic works, and the medium on which they may be stored, may contain \"Defects,\" such as, but not limited to, incomplete, inaccurate or corrupt data, transcription errors, a copyright or other intellectual property infringement, a defective or damaged disk or other medium, a computer virus, or computer codes that damage or cannot be read by your equipment."
+            "Project Gutenberg volunteers and employees expend considerable"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 22
+    },
+    {
+      "number": "110",
+      "title": "Please check the Project Gutenberg web pages for current donation",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "1.F.2.",
-            "LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the \"Right of Replacement or Refund\" described in paragraph 1.F.3, the Project Gutenberg Literary Archive Foundation, the owner of the Project Gutenberg-tm trademark, and any other party distributing a Project Gutenberg-tm electronic work under this agreement, disclaim all liability to you for damages, costs and expenses, including legal fees.",
-            "YOU AGREE THAT YOU HAVE NO REMEDIES FOR NEGLIGENCE, STRICT LIABILITY, BREACH OF WARRANTY OR BREACH OF CONTRACT EXCEPT THOSE PROVIDED IN PARAGRAPH 1.F.3.",
-            "YOU AGREE THAT THE FOUNDATION, THE TRADEMARK OWNER, AND ANY DISTRIBUTOR UNDER THIS AGREEMENT WILL NOT BE LIABLE TO YOU FOR ACTUAL, DIRECT, INDIRECT, CONSEQUENTIAL, PUNITIVE OR INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH DAMAGE."
-          ]
-        },
-        {
-          "sentences": [
-            "1.F.3.",
-            "LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a defect in this electronic work within days of receiving it, you can receive a refund of the money (if any) you paid for it by sending a written explanation to the person you received the work from.",
-            "If you received the work on a physical medium, you must return the medium with your written explanation.",
-            "The person or entity that provided you with the defective work may elect to provide a replacement copy in lieu of a refund.",
-            "If you received the work electronically, the person or entity providing it to you may choose to give you a second opportunity to receive the work electronically in lieu of a refund.",
-            "If the second copy is also defective, you may demand a refund in writing without further opportunities to fix the problem."
-          ]
-        },
-        {
-          "sentences": [
-            "1.F.4.",
-            "Except for the limited right of replacement or refund set forth in paragraph 1.F.3, this work is provided to you 'AS-IS', WITH NO OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PURPOSE."
-          ]
-        },
-        {
-          "sentences": [
-            "1.F.5.",
-            "Some states do not allow disclaimers of certain implied warranties or the exclusion or limitation of certain types of damages.",
-            "If any disclaimer or limitation set forth in this agreement violates the law of the state applicable to this agreement, the agreement shall be interpreted to make the maximum disclaimer or limitation permitted by the applicable state law.",
-            "The invalidity or unenforceability of any provision of this agreement shall not void the remaining provisions."
-          ]
-        },
-        {
-          "sentences": [
-            "1.F.6.",
-            "INDEMNITY - You agree to indemnify and hold the Foundation, the trademark owner, any agent or employee of the Foundation, anyone providing copies of Project Gutenberg-tm electronic works in accordance with this agreement, and any volunteers associated with the production, promotion and distribution of Project Gutenberg-tm electronic works, harmless from all liability, costs and expenses, including legal fees, that arise directly or indirectly from any of the following which you do or cause to occur: (a) distribution of this or any Project Gutenberg-tm work, (b) alteration, modification, or additions or deletions to any Project Gutenberg-tm work, and (c) any Defect you cause."
-          ]
-        },
-        {
-          "sentences": [
-            "Section 2.",
-            "Information about the Mission of Project Gutenberg-tm"
-          ]
-        },
-        {
-          "sentences": [
-            "Project Gutenberg-tm is synonymous with the free distribution of electronic works in formats readable by the widest variety of computers including obsolete, old, middle-aged and new computers.",
-            "It exists because of the efforts of hundreds of volunteers and donations from people in all walks of life."
-          ]
-        },
-        {
-          "sentences": [
-            "Volunteers and financial support to provide volunteers with the assistance they need are critical to reaching Project Gutenberg-tm's goals and ensuring that the Project Gutenberg-tm collection will remain freely available for generations to come.",
-            "In 2001, the Project Gutenberg Literary Archive Foundation was created to provide a secure and permanent future for Project Gutenberg-tm and future generations.",
-            "To learn more about the Project Gutenberg Literary Archive Foundation and how your efforts and donations can help, see Sections and and the Foundation information page at www. gutenberg. org"
-          ]
-        },
-        {
-          "sentences": [
-            "Section 3.",
-            "Information about the Project Gutenberg Literary Archive Foundation"
-          ]
-        },
-        {
-          "sentences": [
-            "The Project Gutenberg Literary Archive Foundation is a non-profit 501(c)(3) educational corporation organized under the laws of the state of Mississippi and granted tax exempt status by the Internal Revenue Service.",
-            "The Foundation's EIN or federal tax identification number is 64-6221541.",
-            "Contributions to the Project Gutenberg Literary Archive Foundation are tax deductible to the full extent permitted by U.S. federal laws and your state's laws."
-          ]
-        },
-        {
-          "sentences": [
-            "The Foundation's business office is located at North West, Salt Lake City, UT 84116, (801) 596-1887.",
-            "Email contact links and up to date contact information can be found at the Foundation's website and official page at www. gutenberg. org/contact"
-          ]
-        },
-        {
-          "sentences": [
-            "Section 4.",
-            "Information about Donations to the Project Gutenberg Literary Archive Foundation"
-          ]
-        },
-        {
-          "sentences": [
-            "Project Gutenberg-tm depends upon and cannot survive without widespread public support and donations to carry out its mission of increasing the number of public domain and licensed works that can be freely distributed in machine-readable form accessible by the widest array of equipment including outdated equipment.",
-            "Many small donations ($ to $5,000) are particularly important to maintaining tax exempt status with the IRS."
-          ]
-        },
-        {
-          "sentences": [
-            "The Foundation is committed to complying with the laws regulating charities and charitable donations in all states of the United States.",
-            "Compliance requirements are not uniform and it takes a considerable effort, much paperwork and many fees to meet and keep up with these requirements.",
-            "We do not solicit donations in locations where we have not received written confirmation of compliance.",
-            "To SEND DONATIONS or determine the status of compliance for any particular state visit www. gutenberg. org/donate"
-          ]
-        },
-        {
-          "sentences": [
-            "While we cannot and do not solicit contributions from states where we have not met the solicitation requirements, we know of no prohibition against accepting unsolicited donations from donors in such states who approach us with offers to donate."
-          ]
-        },
-        {
-          "sentences": [
-            "International donations are gratefully accepted, but we cannot make any statements concerning tax treatment of donations received from outside the United States.",
-            "U.S. laws alone swamp our small staff."
-          ]
-        },
-        {
-          "sentences": [
-            "Please check the Project Gutenberg web pages for current donation methods and addresses.",
+            "methods and addresses.",
             "Donations are accepted in a number of other ways including checks, online payments and credit card donations.",
             "To donate, please visit: www. gutenberg. org/donate"
           ]
@@ -5497,39 +6652,22 @@
         {
           "sentences": [
             "Professor Michael S.",
-            "Hart was the originator of the Project Gutenberg-tm concept of a library of electronic works that could be freely shared with anyone.",
-            "For forty years, he produced and distributed Project Gutenberg-tm eBooks with only a loose network of volunteer support."
-          ]
-        },
-        {
-          "sentences": [
-            "Project Gutenberg-tm eBooks are often created from several printed editions, all of which are confirmed as not protected by copyright in the U.S. unless a copyright notice is included.",
-            "Thus, we do not necessarily keep eBooks in compliance with any particular paper edition."
-          ]
-        },
-        {
-          "sentences": [
-            "Most people start at our website which has the main PG search facility: www. gutenberg. org"
-          ]
-        },
-        {
-          "sentences": [
-            "This website includes information about Project Gutenberg-tm, including how to make donations to the Project Gutenberg Literary Archive Foundation, how to help produce our new eBooks, and how to subscribe to our email newsletter to hear about new eBooks."
+            "Hart was the originator of the Project"
           ]
         }
       ],
-      "sentence_count": 441,
-      "word_count": 5241
+      "sentence_count": 7,
+      "word_count": 46
     }
   ],
   "statistics": {
-    "total_chapters": 5,
-    "total_paragraphs": 780,
-    "total_sentences": 2348,
-    "total_words": 18012,
-    "average_sentences_per_chapter": 469.6,
-    "average_paragraphs_per_chapter": 156.0,
-    "average_sentences_per_paragraph": 3.01025641025641,
-    "average_words_per_sentence": 7.671209540034072
+    "total_chapters": 110,
+    "total_paragraphs": 822,
+    "total_sentences": 2373,
+    "total_words": 12666,
+    "average_sentences_per_chapter": 21.572727272727274,
+    "average_paragraphs_per_chapter": 7.472727272727273,
+    "average_sentences_per_paragraph": 2.886861313868613,
+    "average_words_per_sentence": 5.337547408343869
   }
 }

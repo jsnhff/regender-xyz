@@ -39,18 +39,9 @@
         },
         {
           "sentences": [
-            "Immediately, and according to custom, the ramparts of Fort Saint-Jean were covered with spectators; it is always an event at Marseilles for a ship to come into port, especially when this ship, like the _Pharaon_, has been built, rigged, and laden at the old Phocee docks, and belongs"
+            "Immediately, and according to custom, the ramparts of Fort Saint-Jean were covered with spectators; it is always an event at Marseilles for a ship to come into port, especially when this ship, like the _Pharaon_, has been built, rigged, and laden at the old Phocee docks, and belongs to an owner of the city."
           ]
-        }
-      ],
-      "sentence_count": 3,
-      "word_count": 94
-    },
-    {
-      "number": "3",
-      "title": "an owner of the city.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The ship drew on and had safely passed the strait, which some volcanic shock has made between the Calasareigne and Jaros islands; had doubled Pomègue, and approached the harbor under topsails, jib, and spanker, but so slowly and sedately that the idlers, with that instinct which is the forerunner of evil, asked one another what misfortune could have happened on board.",
@@ -728,8 +719,8 @@
           ]
         }
       ],
-      "sentence_count": 184,
-      "word_count": 3022
+      "sentence_count": 187,
+      "word_count": 3122
     },
     {
       "number": "2",
@@ -1043,6 +1034,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Morrel has always been exceedingly kind to me,” replied Dantès."
           ]
         },
@@ -1344,8 +1336,8 @@
           ]
         }
       ],
-      "sentence_count": 159,
-      "word_count": 2475
+      "sentence_count": 160,
+      "word_count": 2476
     },
     {
       "number": "3",
@@ -2501,6 +2493,7 @@
         {
           "sentences": [
             "During this time, Dantès, at the opposite side of the table, had been occupied in similarly placing his most honored guests.",
+            "M.",
             "Morrel was seated at his right hand, Danglars at his left; while, at a sign from Edmond, the rest of the company ranged themselves as they found it most agreeable."
           ]
         },
@@ -2657,6 +2650,7 @@
           "sentences": [
             "“Certainly,” continued Danglars, “the sacrifice was no trifling one, when the beauty of the bride is concerned.",
             "Upon my soul, that future captain of mine is a lucky dog!",
+            "Gad!",
             "I only wish he would let me take his place.”"
           ]
         },
@@ -2733,6 +2727,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Morrel felt that further resistance or remonstrance was useless.",
             "He saw before him an officer delegated to enforce the law, and perfectly well knew that it would be as unavailing to seek pity from a magistrate decked with his official scarf, as to address a petition to some cold marble effigy.",
             "Old Dantès, however, sprang forward.",
@@ -2807,18 +2802,9 @@
         },
         {
           "sentences": [
-            "“Adieu, adieu, dearest Edmond!” cried Mercédès, stretching out her arms"
+            "“Adieu, adieu, dearest Edmond!” cried Mercédès, stretching out her arms to him from the balcony."
           ]
-        }
-      ],
-      "sentence_count": 120,
-      "word_count": 3383
-    },
-    {
-      "number": "8",
-      "title": "him from the balcony.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The prisoner heard the cry, which sounded like the sob of a broken heart, and leaning from the coach he called out, “Good-bye, Mercédès—we shall soon meet again!” Then the vehicle disappeared round one of the turnings of Fort Saint Nicholas."
@@ -3220,8 +3206,8 @@
           ]
         }
       ],
-      "sentence_count": 116,
-      "word_count": 2112
+      "sentence_count": 239,
+      "word_count": 5503
     },
     {
       "number": "6",
@@ -3232,32 +3218,14 @@
           "sentences": [
             "In one of the aristocratic mansions built by Puget in the Rue du Grand Cours opposite the Medusa fountain, a second marriage feast was being celebrated, almost at the same hour with the nuptial repast given by Dantès.",
             "In this case, however, although the occasion of the entertainment was similar, the company was strikingly dissimilar.",
-            "Instead of a rude mixture of sailors, soldiers, and those belonging to the humblest grade of life, the present assembly was composed of the very flower of Marseilles society,—magistrates who had resigned their office during the usurper’s reign; officers who had deserted from the imperial army and joined forces with Condé; and younger members of families, brought up to hate and execrate the man whom five years of exile would convert into a martyr, and fifteen of restoration elevate"
+            "Instead of a rude mixture of sailors, soldiers, and those belonging to the humblest grade of life, the present assembly was composed of the very flower of Marseilles society,—magistrates who had resigned their office during the usurper’s reign; officers who had deserted from the imperial army and joined forces with Condé; and younger members of families, brought up to hate and execrate the man whom five years of exile would convert into a martyr, and fifteen of restoration elevate to the rank of a god."
           ]
-        }
-      ],
-      "sentence_count": 3,
-      "word_count": 134
-    },
-    {
-      "number": "10",
-      "title": "the rank of a god.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
-            "The guests were still at table, and the heated and energetic conversation that prevailed betrayed the violent and vindictive passions that then agitated each dweller of the South, where unhappily, for five centuries religious strife had long given increased bitterness"
+            "The guests were still at table, and the heated and energetic conversation that prevailed betrayed the violent and vindictive passions that then agitated each dweller of the South, where unhappily, for five centuries religious strife had long given increased bitterness to the violence of party feeling."
           ]
-        }
-      ],
-      "sentence_count": 1,
-      "word_count": 40
-    },
-    {
-      "number": "11",
-      "title": "the violence of party feeling.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The emperor, now king of the petty Island of Elba, after having held sovereign sway over one-half of the world, counting as his subjects a small population of five or six thousand souls,—after having been accustomed to hear the “_Vive Napoléons_” of a hundred and twenty millions of human beings, uttered in ten different languages,—was looked upon here as a ruined man, separated forever from any fresh connection with France or claim to her throne."
@@ -3297,6 +3265,7 @@
           "sentences": [
             "“Never mind, dearest mother,” said a young and lovely girl, with a profusion of light brown hair, and eyes that seemed to float in liquid crystal, “’tis all my fault for seizing upon M. de Villefort, so as to prevent his listening to what you said.",
             "But there—now take him—he is your own for as long as you like.",
+            "M.",
             "Villefort, I beg to remind you my mother speaks to you.”"
           ]
         },
@@ -3766,8 +3735,8 @@
           ]
         }
       ],
-      "sentence_count": 147,
-      "word_count": 3977
+      "sentence_count": 152,
+      "word_count": 4164
     },
     {
       "number": "7",
@@ -4127,6 +4096,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Noirtier, Rue Coq-Héron, No. 13,” murmured he, growing still paler."
           ]
         },
@@ -4347,8 +4317,8 @@
           ]
         }
       ],
-      "sentence_count": 180,
-      "word_count": 3463
+      "sentence_count": 181,
+      "word_count": 3464
     },
     {
       "number": "8",
@@ -4437,20 +4407,7 @@
         {
           "sentences": [
             "The officer opened the door, which was locked, and, without speaking a word, answered Dantès’ question; for he saw between the ranks of the soldiers a passage formed from the carriage to the port.",
-            "The two gendarmes who were opposite to him descended first, then he was ordered"
-          ]
-        }
-      ],
-      "sentence_count": 29,
-      "word_count": 608
-    },
-    {
-      "number": "14",
-      "title": "alight and the gendarmes on each side of him followed his example.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "The two gendarmes who were opposite to him descended first, then he was ordered to alight and the gendarmes on each side of him followed his example.",
             "They advanced towards a boat, which a custom-house officer held by a chain, near the quay."
           ]
         },
@@ -5001,8 +4958,8 @@
           ]
         }
       ],
-      "sentence_count": 159,
-      "word_count": 2547
+      "sentence_count": 188,
+      "word_count": 3168
     },
     {
       "number": "9",
@@ -5318,6 +5275,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Morrel had not readily given up the fight.",
             "He had learned that Dantès had been taken to prison, and he had gone to all his friends, and the influential persons of the city; but the report was already in circulation that Dantès was arrested as a Bonapartist agent; and as the most sanguine looked upon any attempt of Napoleon to remount the throne as impossible, he met with nothing but refusal, and had returned home in despair, declaring that the matter was serious and that nothing more could be done."
           ]
@@ -5351,8 +5309,8 @@
           ]
         }
       ],
-      "sentence_count": 97,
-      "word_count": 1814
+      "sentence_count": 98,
+      "word_count": 1815
     },
     {
       "number": "10",
@@ -5505,6 +5463,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Dandré leaned very respectfully on the back of a chair with his two hands, and said:"
           ]
         },
@@ -5526,6 +5485,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Dandré looked at Louis XVIII., who, employed in writing a note, did not even raise his head. “Bonaparte,” continued the baron, “is mortally wearied, and passes whole days in watching his miners at work at Porto-Longone.”"
           ]
         },
@@ -5949,8 +5909,8 @@
           ]
         }
       ],
-      "sentence_count": 145,
-      "word_count": 2755
+      "sentence_count": 147,
+      "word_count": 2757
     },
     {
       "number": "11",
@@ -6500,7 +6460,9 @@
       "paragraphs": [
         {
           "sentences": [
+            "M.",
             "Noirtier—for it was, indeed, he who entered—looked after the servant until the door was closed, and then, fearing, no doubt, that he might be overheard in the antechamber, he opened the door again, nor was the precaution useless, as appeared from the rapid retreat of Germain, who proved that he was not exempt from the sin which ruined our first parents.",
+            "M.",
             "Noirtier then took the trouble to close and bolt the antechamber door, then that of the bedchamber, and then extended his hand to Villefort, who had followed all his motions with surprise which he could not conceal."
           ]
         },
@@ -6975,8 +6937,8 @@
           ]
         }
       ],
-      "sentence_count": 136,
-      "word_count": 2533
+      "sentence_count": 138,
+      "word_count": 2535
     },
     {
       "number": "13",
@@ -6985,6 +6947,7 @@
       "paragraphs": [
         {
           "sentences": [
+            "M.",
             "Noirtier was a true prophet, and things progressed rapidly, as he had predicted.",
             "Everyone knows the history of the famous return from Elba, a return which was unprecedented in the past, and will probably remain without a counterpart in the future."
           ]
@@ -7040,6 +7003,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Morrel, I believe?” said Villefort."
           ]
         },
@@ -7391,6 +7355,7 @@
             "Caderousse was, like Fernand, enrolled in the army, but, being married and eight years older, he was merely sent to the frontier.",
             "Old Dantès, who was only sustained by hope, lost all hope at Napoleon’s downfall.",
             "Five months after he had been separated from his son, and almost at the hour of his arrest, he breathed his last in Mercédès’ arms.",
+            "M.",
             "Morrel paid the expenses of his funeral, and a few small debts the poor old man had contracted."
           ]
         },
@@ -7400,8 +7365,8 @@
           ]
         }
       ],
-      "sentence_count": 124,
-      "word_count": 2443
+      "sentence_count": 127,
+      "word_count": 2446
     },
     {
       "number": "14",
@@ -7690,12 +7655,14 @@
         },
         {
           "sentences": [
+            "“M.",
             "Villefort.",
             "See him, and hear what he says.”"
           ]
         },
         {
           "sentences": [
+            "“M.",
             "Villefort is no longer at Marseilles; he is now at Toulouse.”"
           ]
         },
@@ -8097,8 +8064,8 @@
           ]
         }
       ],
-      "sentence_count": 180,
-      "word_count": 3087
+      "sentence_count": 182,
+      "word_count": 3089
     },
     {
       "number": "15",
@@ -9474,20 +9441,7 @@
         {
           "sentences": [
             "“There was formerly a fireplace in my dungeon,” replied Faria, “but it was closed up long ere I became an occupant of this prison.",
-            "Still, it must have been many years in use, for it was thickly covered with a coating of soot; this soot I dissolved in a portion of the wine brought"
-          ]
-        }
-      ],
-      "sentence_count": 166,
-      "word_count": 4065
-    },
-    {
-      "number": "23",
-      "title": "me every Sunday, and I assure you a better ink cannot be desired.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Still, it must have been many years in use, for it was thickly covered with a coating of soot; this soot I dissolved in a portion of the wine brought to me every Sunday, and I assure you a better ink cannot be desired.",
             "For very important notes, for which closer attention is required, I pricked one of my fingers, and wrote with my own blood.”"
           ]
         },
@@ -9512,8 +9466,8 @@
           ]
         }
       ],
-      "sentence_count": 5,
-      "word_count": 67
+      "sentence_count": 171,
+      "word_count": 4146
     },
     {
       "number": "17",
@@ -9533,18 +9487,9 @@
         },
         {
           "sentences": [
-            "“It is well,” said the abbé; “we have some hours before us—it is now just a quarter past twelve o’clock.” Instinctively Dantès turned round to observe by what watch or clock the abbé had been able so accurately"
+            "“It is well,” said the abbé; “we have some hours before us—it is now just a quarter past twelve o’clock.” Instinctively Dantès turned round to observe by what watch or clock the abbé had been able so accurately to specify the hour."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 163
-    },
-    {
-      "number": "25",
-      "title": "specify the hour.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Look at this ray of light which enters by my window,” said the abbé, “and then observe the lines traced on the wall.",
@@ -10973,8 +10918,8 @@
           ]
         }
       ],
-      "sentence_count": 407,
-      "word_count": 7526
+      "sentence_count": 411,
+      "word_count": 7693
     },
     {
       "number": "18",
@@ -12351,20 +12296,7 @@
         },
         {
           "sentences": [
-            "These words rang in Dantès’ ears, even beneath the waves; he hastened"
-          ]
-        }
-      ],
-      "sentence_count": 22,
-      "word_count": 514
-    },
-    {
-      "number": "30",
-      "title": "cleave his way through them to see if he had not lost his strength.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "These words rang in Dantès’ ears, even beneath the waves; he hastened to cleave his way through them to see if he had not lost his strength.",
             "He found with pleasure that his captivity had taken away nothing of his power, and that he was still master of that element on whose bosom he had so often sported as a boy."
           ]
         },
@@ -12487,18 +12419,9 @@
         {
           "sentences": [
             "As Dantès (his eyes turned in the direction of the Château d’If) uttered this prayer, he saw off the farther point of the Island of Pomègue a small vessel with lateen sail skimming the sea like a gull in search of prey; and with his sailor’s eye he knew it to be a Genoese tartan.",
-            "She was coming out of Marseilles harbor, and was standing out"
+            "She was coming out of Marseilles harbor, and was standing out to sea rapidly, her sharp prow cleaving through the waves."
           ]
-        }
-      ],
-      "sentence_count": 59,
-      "word_count": 1205
-    },
-    {
-      "number": "31",
-      "title": "sea rapidly, her sharp prow cleaving through the waves.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Oh,” cried Edmond, “to think that in half an hour I could join her, did I not fear being questioned, detected, and conveyed back to Marseilles!",
@@ -12917,8 +12840,8 @@
           ]
         }
       ],
-      "sentence_count": 125,
-      "word_count": 1952
+      "sentence_count": 206,
+      "word_count": 3696
     },
     {
       "number": "22",
@@ -13183,18 +13106,9 @@
             "At seven o’clock in the evening all was ready, and at ten minutes past seven they doubled the lighthouse just as the beacon was kindled.",
             "The sea was calm, and, with a fresh breeze from the south-east, they sailed beneath a bright blue sky, in which God also lighted up in turn his beacon lights, each of which is a world.",
             "Dantès told them that all hands might turn in, and he would take the helm.",
-            "When the Maltese (for so they called Dantès) had said this, it was sufficient, and all went"
+            "When the Maltese (for so they called Dantès) had said this, it was sufficient, and all went to their bunks contentedly."
           ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 485
-    },
-    {
-      "number": "34",
-      "title": "their bunks contentedly.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "This frequently happened.",
@@ -13513,8 +13427,8 @@
           ]
         }
       ],
-      "sentence_count": 113,
-      "word_count": 2528
+      "sentence_count": 131,
+      "word_count": 3017
     },
     {
       "number": "24",
@@ -13572,18 +13486,9 @@
           "sentences": [
             "Suddenly an idea flashed across his mind.",
             "Instead of raising it, thought he, they have lowered it.",
-            "And he sprang from the rock in order"
+            "And he sprang from the rock in order to inspect the base on which it had formerly stood."
           ]
-        }
-      ],
-      "sentence_count": 22,
-      "word_count": 549
-    },
-    {
-      "number": "36",
-      "title": "inspect the base on which it had formerly stood.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He soon perceived that a slope had been formed, and the rock had slid along this until it stopped at the spot it now occupied.",
@@ -13909,8 +13814,8 @@
           ]
         }
       ],
-      "sentence_count": 112,
-      "word_count": 2600
+      "sentence_count": 134,
+      "word_count": 3159
     },
     {
       "number": "25",
@@ -15099,6 +15004,7 @@
         {
           "sentences": [
             "“From day to day he lived on alone, and more and more solitary.",
+            "M.",
             "Morrel and Mercédès came to see him, but his door was closed; and, although I was certain he was at home, he would not make any answer.",
             "One day, when, contrary to his custom, he had admitted Mercédès, and the poor girl, in spite of her own grief and despair, endeavored to console him, he said to her,—‘Be assured, my dear daughter, he is dead; and instead of expecting him, it is he who is awaiting us; I am quite happy, for I am the oldest, and of course shall see him first.’"
           ]
@@ -15372,6 +15278,7 @@
         {
           "sentences": [
             "“What!",
+            "M.",
             "Morrel unhappy?” exclaimed the abbé."
           ]
         },
@@ -15898,8 +15805,8 @@
           ]
         }
       ],
-      "sentence_count": 257,
-      "word_count": 5097
+      "sentence_count": 259,
+      "word_count": 5099
     },
     {
       "number": "28",
@@ -15925,20 +15832,7 @@
             "Morrel.",
             "He has lost four or five vessels, and suffered by three or four bankruptcies; but it is not for me, although I am a creditor myself to the amount of ten thousand francs, to give any information as to the state of his finances.",
             "Ask of me, as mayor, what is my opinion of M.",
-            "Morrel, and I shall say that he is a man honorable to the last degree, and who has up"
-          ]
-        }
-      ],
-      "sentence_count": 10,
-      "word_count": 233
-    },
-    {
-      "number": "41",
-      "title": "this time fulfilled every engagement with scrupulous punctuality.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Morrel, and I shall say that he is a man honorable to the last degree, and who has up to this time fulfilled every engagement with scrupulous punctuality.",
             "This is all I can say, sir; if you wish to learn more, address yourself to M. de Boville, the inspector of prisons, No. 15, Rue de Nouailles; he has, I believe, two hundred thousand francs in Morrel’s hands, and if there be any grounds for apprehension, as this is a greater amount than mine, you will most probably find him better informed than myself.”"
           ]
         },
@@ -15950,18 +15844,9 @@
         {
           "sentences": [
             "M. de Boville was in his private room, and the Englishman, on perceiving him, made a gesture of surprise, which seemed to indicate that it was not the first time he had been in his presence.",
-            "As to M. de Boville, he was in such a state of despair, that it was evident all the faculties of his mind, absorbed in the thought which occupied him at the moment, did not allow either his memory or his imagination to stray"
+            "As to M. de Boville, he was in such a state of despair, that it was evident all the faculties of his mind, absorbed in the thought which occupied him at the moment, did not allow either his memory or his imagination to stray to the past."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 169
-    },
-    {
-      "number": "42",
-      "title": "the past.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The Englishman, with the coolness of his nation, addressed him in terms nearly similar to those with which he had accosted the mayor of Marseilles."
@@ -16448,8 +16333,8 @@
           ]
         }
       ],
-      "sentence_count": 121,
-      "word_count": 1891
+      "sentence_count": 135,
+      "word_count": 2305
     },
     {
       "number": "29",
@@ -16544,6 +16429,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Morrel is in his room, is he not, Mademoiselle Julie?” said the cashier."
           ]
         },
@@ -17228,8 +17114,8 @@
           ]
         }
       ],
-      "sentence_count": 227,
-      "word_count": 4293
+      "sentence_count": 228,
+      "word_count": 4294
     },
     {
       "number": "30",
@@ -17830,20 +17716,8 @@
         },
         {
           "sentences": [
-            "“Oh, yes, yes, I bless you in my own name, and in the name of three generations of irreproachable men, who say through me, ‘The edifice which misfortune has destroyed, Providence may build up again.’ On seeing me die such a death, the most inexorable will have pity on you."
-          ]
-        }
-      ],
-      "sentence_count": 205,
-      "word_count": 3785
-    },
-    {
-      "number": "45",
-      "title": "you, perhaps, they will accord the time they have refused to me.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“Oh, yes, yes, I bless you in my own name, and in the name of three generations of irreproachable men, who say through me, ‘The edifice which misfortune has destroyed, Providence may build up again.’ On seeing me die such a death, the most inexorable will have pity on you.",
+            "To you, perhaps, they will accord the time they have refused to me.",
             "Then do your best to keep our name free from dishonor.",
             "Go to work, labor, young man, struggle ardently and courageously; live, yourself, your mother and sister, with the most rigid economy, so that from day to day the property of those whom I leave in your hands may augment and fructify.",
             "Reflect how glorious a day it will be, how grand, how solemn, that day of complete restoration, on which you will say in this very office, ‘My father died because he could not do what I have this day done; but he died calmly and peaceably, because in dying he knew what I should do.’”"
@@ -18162,8 +18036,8 @@
           ]
         }
       ],
-      "sentence_count": 103,
-      "word_count": 1807
+      "sentence_count": 309,
+      "word_count": 5605
     },
     {
       "number": "31",
@@ -18654,20 +18528,7 @@
             "Everyone obeyed.",
             "For a man who, like Franz, viewed his position in its true light, it was a grave one.",
             "He was alone in the darkness with sailors whom he did not know, and who had no reason to be devoted to him; who knew that he had several thousand francs in his belt, and who had often examined his weapons,—which were very beautiful,—if not with envy, at least with curiosity.",
-            "On the other hand, he was about to land, without any other escort than these men, on an island which had, indeed, a very religious name, but which did not seem to Franz likely"
-          ]
-        }
-      ],
-      "sentence_count": 127,
-      "word_count": 2735
-    },
-    {
-      "number": "47",
-      "title": "afford him much hospitality, thanks to the smugglers and bandits.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "On the other hand, he was about to land, without any other escort than these men, on an island which had, indeed, a very religious name, but which did not seem to Franz likely to afford him much hospitality, thanks to the smugglers and bandits.",
             "The history of the scuttled vessels, which had appeared improbable during the day, seemed very probable at night; placed as he was between two possible sources of danger, he kept his eye on the crew, and his gun in his hand."
           ]
         },
@@ -19540,8 +19401,8 @@
           ]
         }
       ],
-      "sentence_count": 253,
-      "word_count": 5837
+      "sentence_count": 380,
+      "word_count": 8583
     },
     {
       "number": "32",
@@ -19558,20 +19419,7 @@
         },
         {
           "sentences": [
-            "He advanced several paces towards the point whence the light came, and"
-          ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 93
-    },
-    {
-      "number": "49",
-      "title": "all the excitement of his dream succeeded the calmness of reality.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He advanced several paces towards the point whence the light came, and to all the excitement of his dream succeeded the calmness of reality.",
             "He found that he was in a grotto, went towards the opening, and through a kind of fanlight saw a blue sea and an azure sky.",
             "The air and water were shining in the beams of the morning sun; on the shore the sailors were sitting, chatting and laughing; and at ten yards from them the boat was at anchor, undulating gracefully on the water."
           ]
@@ -19865,8 +19713,8 @@
           ]
         }
       ],
-      "sentence_count": 94,
-      "word_count": 2155
+      "sentence_count": 99,
+      "word_count": 2260
     },
     {
       "number": "33",
@@ -20766,18 +20614,9 @@
             "“But the chief, without taking the money, made a sign to him to follow.",
             "The old man obeyed.",
             "They both advanced beneath the trees, through whose branches streamed the moonlight.",
-            "Cucumetto stopped at last, and pointed"
+            "Cucumetto stopped at last, and pointed to two persons grouped at the foot of a tree."
           ]
-        }
-      ],
-      "sentence_count": 276,
-      "word_count": 5499
-    },
-    {
-      "number": "51",
-      "title": "two persons grouped at the foot of a tree.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“‘There,’ said he, ‘demand thy child of Carlini; he will tell thee what has become of her;’ and he returned to his companions."
@@ -21608,8 +21447,8 @@
           ]
         }
       ],
-      "sentence_count": 269,
-      "word_count": 5447
+      "sentence_count": 545,
+      "word_count": 10956
     },
     {
       "number": "34",
@@ -21637,18 +21476,9 @@
         {
           "sentences": [
             "But however the mind of the young man might be absorbed in these reflections, they were at once dispersed at the sight of the dark frowning ruins of the stupendous Colosseum, through the various openings of which the pale moonlight played and flickered like the unearthly gleam from the eyes of the wandering dead.",
-            "The carriage stopped near the Meta Sudans; the door was opened, and the young men, eagerly alighting, found themselves opposite a _cicerone_, who appeared"
+            "The carriage stopped near the Meta Sudans; the door was opened, and the young men, eagerly alighting, found themselves opposite a _cicerone_, who appeared to have sprung up from the ground, so unexpected was his appearance."
           ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 414
-    },
-    {
-      "number": "53",
-      "title": "have sprung up from the ground, so unexpected was his appearance.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The usual guide from the hotel having followed them, they had paid two conductors, nor is it possible, at Rome, to avoid this abundant supply of guides; besides the ordinary _cicerone_, who seizes upon you directly you set foot in your hotel, and never quits you while you remain in the city, there is also a special _cicerone_ belonging to each monument—nay, almost to each part of a monument.",
@@ -23182,8 +23012,8 @@
           ]
         }
       ],
-      "sentence_count": 420,
-      "word_count": 10327
+      "sentence_count": 428,
+      "word_count": 10753
     },
     {
       "number": "35",
@@ -23315,6 +23145,7 @@
           "sentences": [
             "“Not at all; on the contrary, you will give me great pleasure.",
             "You will, one or other of you, perhaps both, return it to me at Paris.",
+            "M.",
             "Bertuccio, lay covers for three.”"
           ]
         },
@@ -24002,8 +23833,8 @@
           ]
         }
       ],
-      "sentence_count": 247,
-      "word_count": 5277
+      "sentence_count": 248,
+      "word_count": 5278
     },
     {
       "number": "36",
@@ -24198,20 +24029,7 @@
             "At one of these encounters, accidentally or purposely, Albert’s mask fell off.",
             "He instantly rose and cast the remainder of the bouquets into the carriage.",
             "Doubtless one of the charming females Albert had detected beneath their coquettish disguise was touched by his gallantry; for, as the carriage of the two friends passed her, she threw a bunch of violets.",
-            "Albert seized it, and as Franz had no reason"
-          ]
-        }
-      ],
-      "sentence_count": 63,
-      "word_count": 1285
-    },
-    {
-      "number": "56",
-      "title": "suppose it was meant for him, he suffered Albert to retain it.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Albert seized it, and as Franz had no reason to suppose it was meant for him, he suffered Albert to retain it.",
             "Albert placed it in his button-hole, and the carriage went triumphantly on."
           ]
         },
@@ -24629,18 +24447,9 @@
         {
           "sentences": [
             "At this moment a fresh visitor entered, and, according to custom, Franz gave up his seat to him.",
-            "This circumstance had, moreover, the effect of changing the conversation; an hour afterwards the two friends returned"
+            "This circumstance had, moreover, the effect of changing the conversation; an hour afterwards the two friends returned to their hotel."
           ]
-        }
-      ],
-      "sentence_count": 106,
-      "word_count": 1581
-    },
-    {
-      "number": "57",
-      "title": "their hotel.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Signor Pastrini had already set about procuring their disguises for the morrow; and he assured them that they would be perfectly satisfied.",
@@ -24907,18 +24716,9 @@
             "Albert was constantly expatiating on their good fortune in meeting such a man.",
             "Franz was less enthusiastic; but the count exercised over him also the ascendency a strong mind always acquires over a mind less domineering.",
             "He thought several times of the project the count had of visiting Paris; and he had no doubt but that, with his eccentric character, his characteristic face, and his colossal fortune, he would produce a great effect there.",
-            "And yet he did not wish"
+            "And yet he did not wish to be at Paris when the count was there."
           ]
-        }
-      ],
-      "sentence_count": 105,
-      "word_count": 2248
-    },
-    {
-      "number": "58",
-      "title": "be at Paris when the count was there.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The evening passed as evenings mostly pass at Italian theatres; that is, not in listening to the music, but in paying visits and conversing.",
@@ -25059,8 +24859,8 @@
           ]
         }
       ],
-      "sentence_count": 59,
-      "word_count": 1200
+      "sentence_count": 333,
+      "word_count": 6339
     },
     {
       "number": "37",
@@ -26221,18 +26021,9 @@
         },
         {
           "sentences": [
-            "Vampa looked at Albert with a kind of admiration; he was not insensible"
+            "Vampa looked at Albert with a kind of admiration; he was not insensible to such a proof of courage."
           ]
-        }
-      ],
-      "sentence_count": 305,
-      "word_count": 4990
-    },
-    {
-      "number": "60",
-      "title": "such a proof of courage.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“You are right, your excellency,” he said; “this must be one of your friends.”"
@@ -26469,8 +26260,8 @@
           ]
         }
       ],
-      "sentence_count": 59,
-      "word_count": 970
+      "sentence_count": 364,
+      "word_count": 5966
     },
     {
       "number": "38",
@@ -27345,6 +27136,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Beauchamp,” announced the servant. “Come in, come in,” said Albert, rising and advancing to meet the young man. “Here is Debray, who detests you without reading you, so he says.”"
           ]
         },
@@ -27404,8 +27196,8 @@
           ]
         }
       ],
-      "sentence_count": 136,
-      "word_count": 2716
+      "sentence_count": 137,
+      "word_count": 2717
     },
     {
       "number": "40",
@@ -29585,18 +29377,9 @@
         },
         {
           "sentences": [
-            "“So young,—it is impossible,” said Mercédès, replying at the same time"
+            "“So young,—it is impossible,” said Mercédès, replying at the same time to what Albert said as well as to her own private reflection."
           ]
-        }
-      ],
-      "sentence_count": 174,
-      "word_count": 4438
-    },
-    {
-      "number": "65",
-      "title": "what Albert said as well as to her own private reflection.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“It is the truth, however.",
@@ -29687,8 +29470,8 @@
           ]
         }
       ],
-      "sentence_count": 29,
-      "word_count": 602
+      "sentence_count": 203,
+      "word_count": 5052
     },
     {
       "number": "42",
@@ -30358,6 +30141,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Bertuccio,” said the count, “I am very glad to tell you, that while you gesticulate, you wring your hands and roll your eyes like a man possessed by a devil who will not leave him; and I have always observed, that the devil most obstinate to be expelled is a secret.",
             "I knew you were a Corsican.",
             "I knew you were gloomy, and always brooding over some old history of the vendetta; and I overlooked that in Italy, because in Italy those things are thought nothing of.",
@@ -30591,8 +30375,8 @@
           ]
         }
       ],
-      "sentence_count": 135,
-      "word_count": 2339
+      "sentence_count": 136,
+      "word_count": 2340
     },
     {
       "number": "44",
@@ -30868,18 +30652,9 @@
             "Then he became alarmed, and dared not stay any longer at Nîmes, so he solicited a change of residence, and, as he was in reality very influential, he was nominated to Versailles.",
             "But, as you know, a Corsican who has sworn to avenge himself cares not for distance, so his carriage, fast as it went, was never above half a day’s journey before me, who followed him on foot.",
             "The most important thing was, not to kill him only—for I had an opportunity of doing so a hundred times—but to kill him without being discovered—at least, without being arrested.",
-            "I no longer belonged"
+            "I no longer belonged to myself, for I had my sister-in-law to protect and provide for."
           ]
-        }
-      ],
-      "sentence_count": 92,
-      "word_count": 1446
-    },
-    {
-      "number": "69",
-      "title": "myself, for I had my sister-in-law to protect and provide for.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“For three months I watched M. de Villefort, for three months he took not a step out-of-doors without my following him.",
@@ -31211,20 +30986,7 @@
         },
         {
           "sentences": [
-            "“The boy triumphed, and this victory rendered him so audacious, that all the money of Assunta, whose affection for him seemed to increase as he became more unworthy of it, was spent in caprices she knew not how"
-          ]
-        }
-      ],
-      "sentence_count": 126,
-      "word_count": 3110
-    },
-    {
-      "number": "70",
-      "title": "contend against, and follies she had not the courage to prevent.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“The boy triumphed, and this victory rendered him so audacious, that all the money of Assunta, whose affection for him seemed to increase as he became more unworthy of it, was spent in caprices she knew not how to contend against, and follies she had not the courage to prevent.",
             "When I was at Rogliano everything went on properly, but no sooner was my back turned than Benedetto became master, and everything went ill.",
             "When he was only eleven, he chose his companions from among the young men of eighteen or twenty, the worst characters in Bastia, or, indeed, in Corsica, and they had already, for some mischievous pranks, been several times threatened with a prosecution.",
             "I became alarmed, as any prosecution might be attended with serious consequences.",
@@ -31881,8 +31643,8 @@
           ]
         }
       ],
-      "sentence_count": 189,
-      "word_count": 3759
+      "sentence_count": 407,
+      "word_count": 8339
     },
     {
       "number": "45",
@@ -32222,18 +31984,9 @@
           "sentences": [
             "“Two months passed away in hopeless expectation on my part, while I must do the magistrate the justice to say that he used every means to obtain information of the person I declared could exculpate me if he would.",
             "Caderousse still evaded all pursuit, and I had resigned myself to what seemed my inevitable fate.",
-            "My trial was to come on at the approaching assizes; when, on the 8th of September—that is to say, precisely three months and five days after the events which had perilled my life—the Abbé Busoni, whom I never ventured to believe I should see, presented himself at the prison doors, saying he understood one of the prisoners wished to speak to him; he added, that having learned at Marseilles the particulars of my imprisonment, he hastened"
+            "My trial was to come on at the approaching assizes; when, on the 8th of September—that is to say, precisely three months and five days after the events which had perilled my life—the Abbé Busoni, whom I never ventured to believe I should see, presented himself at the prison doors, saying he understood one of the prisoners wished to speak to him; he added, that having learned at Marseilles the particulars of my imprisonment, he hastened to comply with my desire."
           ]
-        }
-      ],
-      "sentence_count": 104,
-      "word_count": 2621
-    },
-    {
-      "number": "72",
-      "title": "comply with my desire.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“You may easily imagine with what eagerness I welcomed him, and how minutely I related the whole of what I had seen and heard.",
@@ -32522,8 +32275,8 @@
           ]
         }
       ],
-      "sentence_count": 107,
-      "word_count": 2694
+      "sentence_count": 211,
+      "word_count": 5320
     },
     {
       "number": "46",
@@ -33045,18 +32798,9 @@
         },
         {
           "sentences": [
-            "Again Danglars bit his lips; he saw that he was no match for Monte Cristo in an argument of this sort, and he therefore hastened to turn"
+            "Again Danglars bit his lips; he saw that he was no match for Monte Cristo in an argument of this sort, and he therefore hastened to turn to subjects more congenial."
           ]
-        }
-      ],
-      "sentence_count": 154,
-      "word_count": 2963
-    },
-    {
-      "number": "74",
-      "title": "subjects more congenial.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Permit me to inform you, Count,” said he, bowing, “that I have received a letter of advice from Thomson & French, of Rome.”"
@@ -33451,8 +33195,8 @@
           ]
         }
       ],
-      "sentence_count": 113,
-      "word_count": 2078
+      "sentence_count": 267,
+      "word_count": 5045
     },
     {
       "number": "47",
@@ -33466,6 +33210,7 @@
             "The truth was, it had been entirely overlooked in the plan arranged and followed out by M.",
             "Danglars and his architect, who had been selected to aid the baron in the great work of improvement solely because he was the most fashionable and celebrated decorator of the day.",
             "The decorations of the boudoir had then been left entirely to Madame Danglars and Lucien Debray.",
+            "M.",
             "Danglars, however, while possessing a great admiration for the antique, as it was understood during the time of the Directory, entertained the most sovereign contempt for the simple elegance of his wife’s favorite sitting-room, where, by the way, he was never permitted to intrude, unless, indeed, he excused his own appearance by ushering in some more agreeable visitor than himself; and even then he had rather the air and manner of a person who was himself introduced, than that of being the presenter of another, his reception being cordial or frigid, in proportion as the person who accompanied him chanced to please or displease the baroness."
           ]
         },
@@ -34155,8 +33900,8 @@
           ]
         }
       ],
-      "sentence_count": 219,
-      "word_count": 5146
+      "sentence_count": 220,
+      "word_count": 5147
     },
     {
       "number": "48",
@@ -34585,6 +34330,7 @@
             "Come, if so you will, count, and continue this conversation at my house, any day you may be willing to see an adversary capable of understanding and anxious to refute you, and I will show you my father, M.",
             "Noirtier de Villefort, one of the most fiery Jacobins of the French Revolution; that is to say, he had the most remarkable audacity, seconded by a most powerful organization—a man who has not, perhaps, like yourself seen all the kingdoms of the earth, but who has helped to overturn one of the greatest; in fact, a man who believed himself, like you, one of the envoys, not of God, but of a supreme being; not of Providence, but of fate.",
             "Well, sir, the rupture of a blood-vessel on the lobe of the brain has destroyed all this, not in a day, not in an hour, but in a second.",
+            "M.",
             "Noirtier, who, on the previous night, was the old Jacobin, the old senator, the old Carbonaro, laughing at the guillotine, the cannon, and the dagger—M.",
             "Noirtier, playing with revolutions—M.",
             "Noirtier, for whom France was a vast chess-board, from which pawns, rooks, knights, and queens were to disappear, so that the king was checkmated—M.",
@@ -34650,8 +34396,8 @@
           ]
         }
       ],
-      "sentence_count": 162,
-      "word_count": 4494
+      "sentence_count": 163,
+      "word_count": 4495
     },
     {
       "number": "49",
@@ -35074,6 +34820,7 @@
         {
           "sentences": [
             "“He was a merchant, monsieur, and had succeeded to the business of my poor father.",
+            "M.",
             "Morrel, at his death, left 500, francs, which were divided between my sister and myself, for we were his only children.",
             "Her husband, who, when he married her, had no other patrimony than his noble probity, his first-rate ability, and his spotless reputation, wished to possess as much as his wife.",
             "He labored and toiled until he had amassed 250, francs; six years sufficed to achieve this object.",
@@ -35491,8 +35238,8 @@
           ]
         }
       ],
-      "sentence_count": 156,
-      "word_count": 3413
+      "sentence_count": 157,
+      "word_count": 3414
     },
     {
       "number": "51",
@@ -35684,6 +35431,7 @@
           "sentences": [
             "“Valentine,” replied the young man, deeply affected, “I will not say you are all I love in the world, for I dearly prize my sister and brother-in-law; but my affection for them is calm and tranquil, in no manner resembling what I feel for you.",
             "When I think of you my heart beats fast, the blood burns in my veins, and I can hardly breathe; but I solemnly promise you to restrain all this ardor, this fervor and intensity of feeling, until you yourself shall require me to render them available in serving or assisting you.",
+            "M.",
             "Franz is not expected to return home for a year to come, I am told; in that time many favorable and unforeseen chances may befriend us.",
             "Let us, then, hope for the best; hope is so sweet a comforter.",
             "Meanwhile, Valentine, while reproaching me with selfishness, think a little what you have been to me—the beautiful but cold resemblance of a marble Venus.",
@@ -35862,20 +35610,8 @@
         {
           "sentences": [
             "“Brutal politics, I must confess.” said Maximilian; “but don’t attach any serious importance, dear, to what your father said.",
-            "My father was not a bit behind yours in that sort of talk. ‘Why,’ said he, ‘does not the emperor, who has devised so many clever and efficient modes of improving the art of war, organize a regiment of lawyers, judges and legal practitioners, sending them in the hottest fire the enemy could maintain, and using them to save better men?’ You see, my dear, that for picturesque expression and generosity of spirit there is not much"
-          ]
-        }
-      ],
-      "sentence_count": 142,
-      "word_count": 4323
-    },
-    {
-      "number": "80",
-      "title": "choose between the language of either party. But what did M.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "My father was not a bit behind yours in that sort of talk. ‘Why,’ said he, ‘does not the emperor, who has devised so many clever and efficient modes of improving the art of war, organize a regiment of lawyers, judges and legal practitioners, sending them in the hottest fire the enemy could maintain, and using them to save better men?’ You see, my dear, that for picturesque expression and generosity of spirit there is not much to choose between the language of either party.",
+            "But what did M.",
             "Danglars say to this outburst on the part of the procureur?”"
           ]
         },
@@ -35941,8 +35677,8 @@
           ]
         }
       ],
-      "sentence_count": 18,
-      "word_count": 554
+      "sentence_count": 162,
+      "word_count": 4890
     },
     {
       "number": "52",
@@ -38349,6 +38085,7 @@
             "“Ah, Haitians,—that is quite another thing!",
             "Haitians are the _écarté_ of French stock-jobbing.",
             "We may like bouillotte, delight in whist, be enraptured with boston, and yet grow tired of them all; but we always come back to _écarté_—it is not only a game, it is a _hors-d’œuvre_!",
+            "M.",
             "Danglars sold yesterday at 405, and pockets 300, francs.",
             "Had he but waited till today, the price would have fallen to 205, and instead of gaining 300, francs, he would have lost or 25,000.”"
           ]
@@ -38464,6 +38201,7 @@
         {
           "sentences": [
             "“Then,” said the count, “I am emboldened to speak openly to you.",
+            "M.",
             "Danglars is my banker; M. de Villefort has overwhelmed me with politeness in return for a service which a casual piece of good fortune enabled me to render him.",
             "I predict from all this an avalanche of dinners and routs.",
             "Now, in order not to presume on this, and also to be beforehand with them, I have, if agreeable to you, thought of inviting M. and Madame Danglars, and M. and Madame de Villefort, to my country-house at Auteuil.",
@@ -38898,8 +38636,8 @@
           ]
         }
       ],
-      "sentence_count": 235,
-      "word_count": 4054
+      "sentence_count": 237,
+      "word_count": 4056
     },
     {
       "number": "55",
@@ -40689,18 +40427,9 @@
             "Set out immediately for Paris, and demand of the Count of Monte Cristo, Avenue des Champs-Élysées, No. 30, the son whom you had by the Marchesa Corsinari, and who was taken from you at five years of age.",
             "This son is named Andrea Cavalcanti.",
             "In order that you may not doubt the kind intention of the writer of this letter, you will find enclosed an order for 2, francs, payable in Florence, at Signor Gozzi’s; also a letter of introduction to the Count of Monte Cristo, on whom I give you a draft of 48, francs.",
-            "Remember"
+            "Remember to go to the count on the 26th May at seven o’clock in the evening."
           ]
-        }
-      ],
-      "sentence_count": 162,
-      "word_count": 3291
-    },
-    {
-      "number": "86",
-      "title": "go to the count on the 26th May at seven o’clock in the evening.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“(Signed) ‘Abbé Busoni.’”"
@@ -40985,6 +40714,11 @@
         },
         {
           "sentences": [
+            "“I?”"
+          ]
+        },
+        {
+          "sentences": [
             "“Yes, you,” said the count, at the same time advancing towards Andrea, and slipping a packet of bank-notes into the young man’s hand."
           ]
         },
@@ -41114,8 +40848,8 @@
           ]
         }
       ],
-      "sentence_count": 100,
-      "word_count": 1053
+      "sentence_count": 263,
+      "word_count": 4360
     },
     {
       "number": "57",
@@ -41835,8 +41569,10 @@
         },
         {
           "sentences": [
+            "M.",
             "Noirtier was sitting in an armchair, which moved upon casters, in which he was wheeled into the room in the morning, and in the same way drawn out again at night.",
             "He was placed before a large glass, which reflected the whole apartment, and so, without any attempt to move, which would have been impossible, he could see all who entered the room and everything which was going on around him.",
+            "M.",
             "Noirtier, although almost as immovable as a corpse, looked at the new-comers with a quick and intelligent expression, perceiving at once, by their ceremonious courtesy, that they were come on business of an unexpected and official character."
           ]
         },
@@ -41993,18 +41729,9 @@
           "sentences": [
             "M. and Madame de Villefort bowed and left the room, giving orders that Valentine should be summoned to her grandfather’s presence, and feeling sure that she would have much to do to restore calmness to the perturbed spirit of the invalid.",
             "Valentine, with a color still heightened by emotion, entered the room just after her parents had quitted it.",
-            "One look was sufficient to tell her that her grandfather was suffering, and that there was much on his mind which he was wishing"
+            "One look was sufficient to tell her that her grandfather was suffering, and that there was much on his mind which he was wishing to communicate to her."
           ]
-        }
-      ],
-      "sentence_count": 58,
-      "word_count": 1879
-    },
-    {
-      "number": "89",
-      "title": "communicate to her.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Dear grandpapa,” cried she, “what has happened?",
@@ -42035,6 +41762,7 @@
         {
           "sentences": [
             "“Are you displeased with me?” cried Valentine in astonishment.",
+            "M.",
             "Noirtier again closed his eyes."
           ]
         },
@@ -42384,8 +42112,8 @@
           ]
         }
       ],
-      "sentence_count": 98,
-      "word_count": 1384
+      "sentence_count": 159,
+      "word_count": 3270
     },
     {
       "number": "59",
@@ -42452,6 +42180,7 @@
         {
           "sentences": [
             "“Well, sir, by the help of two signs, with which I will acquaint you presently, you may ascertain with perfect certainty that my grandfather is still in the full possession of all his mental faculties.",
+            "M.",
             "Noirtier, being deprived of voice and motion, is accustomed to convey his meaning by closing his eyes when he wishes to signify ‘yes,’ and to wink when he means ‘no.’ You now know quite enough to enable you to converse with M.",
             "Noirtier;—try.”"
           ]
@@ -42561,18 +42290,9 @@
         {
           "sentences": [
             "Valentine named all the letters of the alphabet until she came to W.",
-            "At this letter the eloquent eye of Noirtier gave her notice that she was"
+            "At this letter the eloquent eye of Noirtier gave her notice that she was to stop."
           ]
-        }
-      ],
-      "sentence_count": 52,
-      "word_count": 917
-    },
-    {
-      "number": "91",
-      "title": "stop.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“It is very evident that it is the letter W which M.",
@@ -42793,6 +42513,7 @@
         {
           "sentences": [
             "“Oh!” said Madame de Villefort, “there is not much doubt on that subject.",
+            "M.",
             "Noirtier tenderly loves his granddaughter, Mademoiselle de Villefort; it is she who has nursed and tended him for six years, and has, by her devoted attention, fully secured the affection, I had almost said the gratitude, of her grandfather, and it is but just that she should reap the fruit of her devotion.”"
           ]
         },
@@ -43088,8 +42809,8 @@
           ]
         }
       ],
-      "sentence_count": 138,
-      "word_count": 2104
+      "sentence_count": 192,
+      "word_count": 3025
     },
     {
       "number": "60",
@@ -43163,6 +42884,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Noirtier?",
             "But I thought you told me he had become entirely paralyzed, and that all his faculties were completely destroyed?”"
           ]
@@ -43800,8 +43522,8 @@
           ]
         }
       ],
-      "sentence_count": 187,
-      "word_count": 3604
+      "sentence_count": 188,
+      "word_count": 3605
     },
     {
       "number": "61",
@@ -44724,6 +44446,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Bertuccio had outdone himself in the taste displayed in furnishing, and in the rapidity with which it was executed.",
             "It is told that the Duc d’Antin removed in a single night a whole avenue of trees that annoyed Louis XIV.; in three days M.",
             "Bertuccio planted an entirely bare court with poplars, large spreading sycamores to shade the different parts of the house, and in the foreground, instead of the usual paving-stones, half hidden by the grass, there extended a lawn but that morning laid down, and upon which the water was yet glistening.",
@@ -44828,6 +44551,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "Certainly not,” replied the count. “No; I should only regret if the horse had not proved good.”"
           ]
         },
@@ -45340,8 +45064,8 @@
           ]
         }
       ],
-      "sentence_count": 176,
-      "word_count": 2865
+      "sentence_count": 178,
+      "word_count": 2867
     },
     {
       "number": "63",
@@ -45402,6 +45126,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Château-Renaud, who has lived in Russia, will tell you the name of one, and Major Cavalcanti, who is an Italian, will tell you the name of the other.”"
           ]
         },
@@ -45746,18 +45471,9 @@
         },
         {
           "sentences": [
-            "Madame Danglars half fainted on the arm of Villefort, who was obliged"
+            "Madame Danglars half fainted on the arm of Villefort, who was obliged to support himself against the wall."
           ]
-        }
-      ],
-      "sentence_count": 121,
-      "word_count": 2356
-    },
-    {
-      "number": "96",
-      "title": "support himself against the wall.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Ah, madame,” cried Debray, “what is the matter with you? how pale you look!”"
@@ -46066,8 +45782,8 @@
           ]
         }
       ],
-      "sentence_count": 71,
-      "word_count": 1006
+      "sentence_count": 193,
+      "word_count": 3369
     },
     {
       "number": "64",
@@ -46603,6 +46319,11 @@
         },
         {
           "sentences": [
+            "“I?”"
+          ]
+        },
+        {
+          "sentences": [
             "“Yes, you.”"
           ]
         },
@@ -46756,8 +46477,8 @@
           ]
         }
       ],
-      "sentence_count": 189,
-      "word_count": 3035
+      "sentence_count": 190,
+      "word_count": 3036
     },
     {
       "number": "65",
@@ -46791,6 +46512,7 @@
         {
           "sentences": [
             "“No, Hermine,” replied Debray; “you cannot make me believe that; on the contrary, you were in excellent spirits when you arrived at the count’s.",
+            "M.",
             "Danglars was disagreeable, certainly, but I know how much you care for his ill-humor.",
             "Someone has vexed you; I will allow no one to annoy you.”"
           ]
@@ -46915,6 +46637,7 @@
           "sentences": [
             "And yet, as she could scarcely breathe, she rose and went towards a looking-glass. “I am frightful tonight,” she said.",
             "Debray rose, smiling, and was about to contradict the baroness upon this latter point, when the door opened suddenly.",
+            "M.",
             "Danglars appeared; Debray reseated himself.",
             "At the noise of the door Madame Danglars turned round, and looked upon her husband with an astonishment she took no trouble to conceal."
           ]
@@ -46953,6 +46676,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Lucien,” said the baroness, “I assure you I have no desire to sleep, and that I have a thousand things to tell you this evening, which you must listen to, even though you slept while hearing me.”"
           ]
         },
@@ -47096,6 +46820,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "What could put such an idea into your head?”"
           ]
         },
@@ -47339,6 +47064,7 @@
             "Why did he kill himself instead of you?",
             "Because he had no cash to save.",
             "My life belongs to my cash.",
+            "M.",
             "Debray has made me lose 700, francs; let him bear his share of the loss, and we will go on as before; if not, let him become bankrupt for the 250, livres, and do as all bankrupts do—disappear.",
             "He is a charming fellow, I allow, when his news is correct; but when it is not, there are fifty others in the world who would do better than he.”"
           ]
@@ -47355,8 +47081,8 @@
           ]
         }
       ],
-      "sentence_count": 190,
-      "word_count": 3560
+      "sentence_count": 195,
+      "word_count": 3565
     },
     {
       "number": "66",
@@ -47375,18 +47101,9 @@
         },
         {
           "sentences": [
-            "On leaving the Chamber, Danglars, who had shown violent marks of agitation during the sitting, and been more bitter than ever against the ministry, re-entered his carriage, and told the coachman to drive"
+            "On leaving the Chamber, Danglars, who had shown violent marks of agitation during the sitting, and been more bitter than ever against the ministry, re-entered his carriage, and told the coachman to drive to the Avenue des Champs-Élysées, No. 30."
           ]
-        }
-      ],
-      "sentence_count": 7,
-      "word_count": 191
-    },
-    {
-      "number": "100",
-      "title": "the Avenue des Champs-Élysées, No. 30.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Monte Cristo was at home; only he was engaged with someone and begged Danglars to wait for a moment in the drawing-room.",
@@ -48186,8 +47903,8 @@
           ]
         }
       ],
-      "sentence_count": 206,
-      "word_count": 3067
+      "sentence_count": 213,
+      "word_count": 3265
     },
     {
       "number": "67",
@@ -48935,6 +48652,7 @@
         {
           "sentences": [
             "“Willingly.",
+            "M.",
             "Danglars dined with me.”"
           ]
         },
@@ -49224,6 +48942,7 @@
         {
           "sentences": [
             "“Then make yourself quite easy.",
+            "M.",
             "Danglars would give double that sum to attain the same end.”"
           ]
         },
@@ -49291,6 +49010,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Cavalcanti’s father will be gone.”"
           ]
         },
@@ -49585,8 +49305,8 @@
           ]
         }
       ],
-      "sentence_count": 198,
-      "word_count": 2199
+      "sentence_count": 201,
+      "word_count": 2202
     },
     {
       "number": "69",
@@ -51159,18 +50879,9 @@
             "A minute afterwards the blinds were thrown open, and through the jessamine and clematis that overhung the window one could see the garden ornamented with lanterns, and the supper laid under the tent.",
             "Dancers, players, talkers, all uttered an exclamation of joy—everyone inhaled with delight the breeze that floated in.",
             "At the same time Mercédès reappeared, paler than before, but with that imperturbable expression of countenance which she sometimes wore.",
-            "She went straight"
+            "She went straight to the group of which her husband formed the centre."
           ]
-        }
-      ],
-      "sentence_count": 203,
-      "word_count": 2858
-    },
-    {
-      "number": "105",
-      "title": "the group of which her husband formed the centre.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Do not detain those gentlemen here, count,” she said; “they would prefer, I should think, to breathe in the garden rather than suffocate here, since they are not playing.”"
@@ -51200,8 +50911,8 @@
           ]
         }
       ],
-      "sentence_count": 8,
-      "word_count": 164
+      "sentence_count": 211,
+      "word_count": 3032
     },
     {
       "number": "71",
@@ -51798,6 +51509,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Noirtier wishes to see you tonight, he said, in an undertone."
           ]
         },
@@ -52407,8 +52119,8 @@
           ]
         }
       ],
-      "sentence_count": 235,
-      "word_count": 4140
+      "sentence_count": 236,
+      "word_count": 4141
     },
     {
       "number": "73",
@@ -52506,6 +52218,7 @@
           "sentences": [
             "“What do you say, Maximilian?” asked Valentine. “What do you mean by a struggle?",
             "Oh, it would be a sacrilege.",
+            "What?",
             "I resist my father’s order, and my dying grandmother’s wish?",
             "Impossible!”"
           ]
@@ -52850,6 +52563,7 @@
         {
           "sentences": [
             "“No,” said Maximilian, “you shall not leave him.",
+            "M.",
             "Noirtier has evinced, you say, a kind feeling towards me.",
             "Well, before you leave, tell him all; his consent would be your justification in God’s sight.",
             "As soon as we are married, he shall come and live with us, instead of one child, he shall have two.",
@@ -53018,18 +52732,9 @@
           "sentences": [
             "It is easy to suppose that Morrel’s agitation would not escape the count’s penetrating eye.",
             "Monte Cristo was more affectionate than ever,—indeed, his manner was so kind that several times Morrel was on the point of telling him all.",
-            "But he recalled the promise he had made"
+            "But he recalled the promise he had made to Valentine, and kept his secret."
           ]
-        }
-      ],
-      "sentence_count": 198,
-      "word_count": 3454
-    },
-    {
-      "number": "109",
-      "title": "Valentine, and kept his secret.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The young man read Valentine’s letter twenty times in the course of the day.",
@@ -53620,6 +53325,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Franz arrived to sign the contract just as my dear grandmother was dying.”"
           ]
         },
@@ -54080,18 +53786,9 @@
         },
         {
           "sentences": [
-            "“What do you wish, sir?” asked Morrel; “that I should renew my promise of remaining tranquil?” Noirtier’s eye remained fixed and firm, as if to imply that a promise did not suffice; then it passed from his face"
+            "“What do you wish, sir?” asked Morrel; “that I should renew my promise of remaining tranquil?” Noirtier’s eye remained fixed and firm, as if to imply that a promise did not suffice; then it passed from his face to his hands."
           ]
-        }
-      ],
-      "sentence_count": 321,
-      "word_count": 5544
-    },
-    {
-      "number": "110",
-      "title": "his hands.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Shall I swear to you, sir?” asked Maximilian."
@@ -54169,8 +53866,8 @@
           ]
         }
       ],
-      "sentence_count": 20,
-      "word_count": 236
+      "sentence_count": 542,
+      "word_count": 9246
     },
     {
       "number": "74",
@@ -54293,6 +53990,7 @@
         {
           "sentences": [
             "“The time and place are but ill-suited for an introduction.” said Albert; “but we are not superstitious.",
+            "M.",
             "Morrel, allow me to present to you M.",
             "Franz d’Épinay, a delightful travelling companion, with whom I made the tour of Italy.",
             "My dear Franz, M.",
@@ -54306,18 +54004,9 @@
         },
         {
           "sentences": [
-            "“Mademoiselle de Villefort is in deep sorrow, is she not?” said Debray"
+            "“Mademoiselle de Villefort is in deep sorrow, is she not?” said Debray to Franz."
           ]
-        }
-      ],
-      "sentence_count": 44,
-      "word_count": 978
-    },
-    {
-      "number": "112",
-      "title": "Franz.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Extremely,” replied he; “she looked so pale this morning, I scarcely knew her.”"
@@ -54681,8 +54370,8 @@
           ]
         }
       ],
-      "sentence_count": 126,
-      "word_count": 2160
+      "sentence_count": 171,
+      "word_count": 3141
     },
     {
       "number": "75",
@@ -54720,18 +54409,9 @@
             "He motioned to Valentine to approach.",
             "In a moment, thanks to her habit of conversing with her grandfather, she understood that he asked for a key.",
             "Then his eye was fixed on the drawer of a small chest between the windows.",
-            "She opened the drawer, and found a key; and, understanding that was what he wanted, again watched his eyes, which turned toward an old secretaire which had been neglected for many years and was supposed"
+            "She opened the drawer, and found a key; and, understanding that was what he wanted, again watched his eyes, which turned toward an old secretaire which had been neglected for many years and was supposed to contain nothing but useless documents."
           ]
-        }
-      ],
-      "sentence_count": 14,
-      "word_count": 192
-    },
-    {
-      "number": "114",
-      "title": "contain nothing but useless documents.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Shall I open the secretaire?” asked Valentine."
@@ -55305,8 +54985,8 @@
           ]
         }
       ],
-      "sentence_count": 180,
-      "word_count": 3521
+      "sentence_count": 194,
+      "word_count": 3719
     },
     {
       "number": "76",
@@ -55322,6 +55002,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Andrea at his departure inherited all the papers which proved that he had indeed the honor of being the son of the Marquis Bartolomeo and the Marchioness Oliva Corsinari.",
             "He was now fairly launched in that Parisian society which gives such ready access to foreigners, and treats them, not as they really are, but as they wish to be considered.",
             "Besides, what is required of a young man in Paris?",
@@ -55336,6 +55017,7 @@
           "sentences": [
             "Such was the state of society in Paris at the period we bring before our readers, when Monte Cristo went one evening to pay M.",
             "Danglars a visit.",
+            "M.",
             "Danglars was out, but the count was asked to go and see the baroness, and he accepted the invitation.",
             "It was never without a nervous shudder, since the dinner at Auteuil, and the events which followed it, that Madame Danglars heard Monte Cristo’s name announced.",
             "If he did not come, the painful sensation became most intense; if, on the contrary, he appeared, his noble countenance, his brilliant eyes, his amiability, his polite attention even towards Madame Danglars, soon dispelled every impression of fear.",
@@ -55474,6 +55156,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Debray had told you——”"
           ]
         },
@@ -55615,6 +55298,7 @@
         {
           "sentences": [
             "You are mistaken.",
+            "M.",
             "Albert would not do us the honor to be jealous; he does not like Eugénie sufficiently.",
             "Besides, I care not for his displeasure.”"
           ]
@@ -56095,12 +55779,13 @@
         },
         {
           "sentences": [
+            "M.",
             "Cavalcanti remained master of the field."
           ]
         }
       ],
-      "sentence_count": 229,
-      "word_count": 3367
+      "sentence_count": 234,
+      "word_count": 3372
     },
     {
       "number": "77",
@@ -56806,18 +56491,9 @@
         },
         {
           "sentences": [
-            "“On what subject shall I converse with her?” said Albert, in a low tone"
+            "“On what subject shall I converse with her?” said Albert, in a low tone to Monte Cristo."
           ]
-        }
-      ],
-      "sentence_count": 178,
-      "word_count": 2718
-    },
-    {
-      "number": "117",
-      "title": "Monte Cristo.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Just what you please; you may speak of her country and of her youthful reminiscences, or if you like it better you can talk of Rome, Naples, or Florence.”"
@@ -56961,18 +56637,9 @@
         },
         {
           "sentences": [
-            "Haydée answered his remark with a melancholy smile. “You wish me, then,"
+            "Haydée answered his remark with a melancholy smile. “You wish me, then, to relate the history of my past sorrows?” said she."
           ]
-        }
-      ],
-      "sentence_count": 34,
-      "word_count": 850
-    },
-    {
-      "number": "118",
-      "title": "relate the history of my past sorrows?” said she.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I beg you to do so,” replied Albert."
@@ -57013,18 +56680,9 @@
         },
         {
           "sentences": [
-            "Albert, without knowing why, started on hearing these words pronounced with such a haughty and dignified accent; it appeared to him as if there was something supernaturally gloomy and terrible in the expression which gleamed from the brilliant eyes of Haydée at this moment; she appeared like a Pythoness evoking a spectre, as she recalled to his mind the remembrance of the fearful death of this man,"
+            "Albert, without knowing why, started on hearing these words pronounced with such a haughty and dignified accent; it appeared to him as if there was something supernaturally gloomy and terrible in the expression which gleamed from the brilliant eyes of Haydée at this moment; she appeared like a Pythoness evoking a spectre, as she recalled to his mind the remembrance of the fearful death of this man, to the news of which all Europe had listened with horror."
           ]
-        }
-      ],
-      "sentence_count": 19,
-      "word_count": 486
-    },
-    {
-      "number": "119",
-      "title": "the news of which all Europe had listened with horror.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Soon,” said Haydée, “we halted on our march, and found ourselves on the borders of a lake.",
@@ -57345,18 +57003,9 @@
         },
         {
           "sentences": [
-            "“When my mother recovered her senses we were before the seraskier. ‘Kill,’ said she, ‘but spare the honor of the widow of Ali.’—‘It is not"
+            "“When my mother recovered her senses we were before the seraskier. ‘Kill,’ said she, ‘but spare the honor of the widow of Ali.’—‘It is not to me to whom you must address yourself,’ said Kourchid."
           ]
-        }
-      ],
-      "sentence_count": 127,
-      "word_count": 3665
-    },
-    {
-      "number": "120",
-      "title": "me to whom you must address yourself,’ said Kourchid.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“‘To whom, then?’—‘To your new master.’"
@@ -57422,8 +57071,8 @@
           ]
         }
       ],
-      "sentence_count": 16,
-      "word_count": 294
+      "sentence_count": 374,
+      "word_count": 8047
     },
     {
       "number": "78",
@@ -57552,18 +57201,9 @@
           "sentences": [
             "During the time occupied by the interview we have just detailed, Madame de Villefort had gone to visit M.",
             "Noirtier.",
-            "The old man looked at her with that stern and forbidding expression with which he was accustomed"
+            "The old man looked at her with that stern and forbidding expression with which he was accustomed to receive her."
           ]
-        }
-      ],
-      "sentence_count": 49,
-      "word_count": 1103
-    },
-    {
-      "number": "122",
-      "title": "receive her.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Sir,” said she, “it is superfluous for me to tell you that Valentine’s marriage is broken off, since it was here that the affair was concluded.”"
@@ -59012,6 +58652,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Albert de Morcerf,” said Beauchamp, rising in his turn, “I cannot throw you out of window for three weeks—that is to say, for twenty-four days to come—nor have you any right to split my skull open till that time has elapsed.",
             "Today is the 29th of August; the 21st of September will, therefore, be the conclusion of the term agreed on, and till that time arrives—and it is the advice of a gentleman which I am about to give you—till then we will refrain from growling and barking like two dogs chained within sight of each other.”"
           ]
@@ -59039,8 +58680,8 @@
           ]
         }
       ],
-      "sentence_count": 358,
-      "word_count": 6115
+      "sentence_count": 408,
+      "word_count": 7222
     },
     {
       "number": "79",
@@ -59050,6 +58691,7 @@
         {
           "sentences": [
             "Morrel was, in fact, very happy.",
+            "M.",
             "Noirtier had just sent for him, and he was in such haste to know the reason of his doing so that he had not stopped to take a cab, placing infinitely more dependence on his own two legs than on the four legs of a cab-horse.",
             "He had therefore set off at a furious rate from the Rue Meslay, and was hastening with rapid strides in the direction of the Faubourg Saint-Honoré."
           ]
@@ -60078,8 +59720,8 @@
           ]
         }
       ],
-      "sentence_count": 282,
-      "word_count": 4000
+      "sentence_count": 283,
+      "word_count": 4001
     },
     {
       "number": "80",
@@ -60202,6 +59844,7 @@
         },
         {
           "sentences": [
+            "M.",
             "Noirtier?”"
           ]
         },
@@ -60251,6 +59894,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Noirtier,” resumed M. d’Avrigny in the same pitiless tone,—“M.",
             "Noirtier had once made a will against you—against your family—in favor of the poor, in fact; M.",
             "Noirtier is spared, because nothing is expected from him.",
@@ -60443,8 +60087,8 @@
           ]
         }
       ],
-      "sentence_count": 120,
-      "word_count": 1976
+      "sentence_count": 122,
+      "word_count": 1978
     },
     {
       "number": "81",
@@ -60840,18 +60484,9 @@
         },
         {
           "sentences": [
-            "This address was accompanied by a look which was by no means difficult"
+            "This address was accompanied by a look which was by no means difficult to understand."
           ]
-        }
-      ],
-      "sentence_count": 112,
-      "word_count": 2080
-    },
-    {
-      "number": "126",
-      "title": "understand.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Well,” said Andrea, “admitting your love, why do you want me to breakfast with you?”"
@@ -61873,18 +61508,10 @@
         },
         {
           "sentences": [
-            "“Two,—one here and one there.” Andrea sketched two windows in the room, which formed an angle on the plan, and appeared as a small square added"
+            "“Two,—one here and one there.” Andrea sketched two windows in the room, which formed an angle on the plan, and appeared as a small square added to the rectangle of the bedroom.",
+            "Caderousse became thoughtful."
           ]
-        }
-      ],
-      "sentence_count": 248,
-      "word_count": 2601
-    },
-    {
-      "number": "127",
-      "title": "the rectangle of the bedroom. Caderousse became thoughtful.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Does he often go to Auteuil?” added he."
@@ -62024,6 +61651,7 @@
         {
           "sentences": [
             "“Now see here, will that be all?",
+            "Eh?",
             "And will you not torment me any more?”"
           ]
         },
@@ -62034,18 +61662,10 @@
         },
         {
           "sentences": [
-            "Caderousse had become so gloomy that Andrea feared he should be obliged"
+            "Caderousse had become so gloomy that Andrea feared he should be obliged to notice the change.",
+            "He redoubled his gayety and carelessness."
           ]
-        }
-      ],
-      "sentence_count": 36,
-      "word_count": 323
-    },
-    {
-      "number": "128",
-      "title": "notice the change. He redoubled his gayety and carelessness.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“How sprightly you are,” said Caderousse; “One would say you were already in possession of your property.”"
@@ -62079,6 +61699,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "What an idea!",
             "I, who am going to give you another piece of good advice.”"
           ]
@@ -62260,8 +61881,8 @@
           ]
         }
       ],
-      "sentence_count": 49,
-      "word_count": 596
+      "sentence_count": 449,
+      "word_count": 5623
     },
     {
       "number": "82",
@@ -62477,18 +62098,9 @@
           "sentences": [
             "Inured as men may be to danger, forewarned as they may be of peril, they understand, by the fluttering of the heart and the shuddering of the frame, the enormous difference between a dream and a reality, between the project and the execution.",
             "However, Monte Cristo only made a sign to apprise Ali, who, understanding that danger was approaching from the other side, drew nearer to his master.",
-            "Monte Cristo was eager"
+            "Monte Cristo was eager to ascertain the strength and number of his enemies."
           ]
-        }
-      ],
-      "sentence_count": 68,
-      "word_count": 1451
-    },
-    {
-      "number": "130",
-      "title": "ascertain the strength and number of his enemies.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The window whence the noise proceeded was opposite the opening by which the count could see into the dressing-room.",
@@ -63361,8 +62973,8 @@
           ]
         }
       ],
-      "sentence_count": 219,
-      "word_count": 2988
+      "sentence_count": 287,
+      "word_count": 4448
     },
     {
       "number": "83",
@@ -64316,6 +63928,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Cavalcanti’s?” asked Beauchamp."
           ]
         },
@@ -64354,6 +63967,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "Silence, purveyor of gossip, do not spread that report.",
             "I make a match?",
             "No, you do not know me; I have done all in my power to oppose it.”"
@@ -64542,6 +64156,7 @@
         {
           "sentences": [
             "“Well, viscount, there will be in my courtyard this evening a good travelling britzka, with four post-horses, in which one may rest as in a bed.",
+            "M.",
             "Beauchamp, it holds four very well, will you accompany us?”"
           ]
         },
@@ -65101,8 +64716,8 @@
           ]
         }
       ],
-      "sentence_count": 221,
-      "word_count": 3407
+      "sentence_count": 224,
+      "word_count": 3410
     },
     {
       "number": "86",
@@ -65935,6 +65550,11 @@
         },
         {
           "sentences": [
+            "“I?”"
+          ]
+        },
+        {
+          "sentences": [
             "“Yes; you!",
             "How came it known?”"
           ]
@@ -66112,8 +65732,8 @@
           ]
         }
       ],
-      "sentence_count": 143,
-      "word_count": 2207
+      "sentence_count": 144,
+      "word_count": 2208
     },
     {
       "number": "88",
@@ -66547,6 +66167,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "Nothing—at least personally,” said Monte Cristo."
           ]
         },
@@ -66710,6 +66331,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Beauchamp,” interposed this strange man, “the Count of Monte Cristo bows to none but the Count of Monte Cristo himself.",
             "Say no more, I entreat you.",
             "I do what I please, M.",
@@ -66832,8 +66454,8 @@
           ]
         }
       ],
-      "sentence_count": 211,
-      "word_count": 3248
+      "sentence_count": 213,
+      "word_count": 3250
     },
     {
       "number": "89",
@@ -68014,6 +67636,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Morrel,” said Château-Renaud, “will you apprise the Count of Monte Cristo that M. de Morcerf is arrived, and we are at his disposal?”"
           ]
         },
@@ -68156,8 +67779,8 @@
           ]
         }
       ],
-      "sentence_count": 242,
-      "word_count": 4085
+      "sentence_count": 243,
+      "word_count": 4086
     },
     {
       "number": "91",
@@ -68927,6 +68550,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Albert de Morcerf is no coward!” said Monte Cristo."
           ]
         },
@@ -69090,8 +68714,8 @@
           ]
         }
       ],
-      "sentence_count": 175,
-      "word_count": 3070
+      "sentence_count": 176,
+      "word_count": 3071
     },
     {
       "number": "93",
@@ -69580,18 +69204,9 @@
         },
         {
           "sentences": [
-            "More rapidly than thought, he darted down the Rue Matignon, and thence"
+            "More rapidly than thought, he darted down the Rue Matignon, and thence to the Avenue des Champs-Élysées."
           ]
-        }
-      ],
-      "sentence_count": 9,
-      "word_count": 208
-    },
-    {
-      "number": "143",
-      "title": "the Avenue des Champs-Élysées.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Meanwhile M. de Villefort arrived in a hired cabriolet at M. d’Avrigny’s door.",
@@ -70398,8 +70013,8 @@
           ]
         }
       ],
-      "sentence_count": 221,
-      "word_count": 3652
+      "sentence_count": 230,
+      "word_count": 3865
     },
     {
       "number": "95",
@@ -70672,6 +70287,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Cavalcanti,” continued Danglars, “is about to marry you, and will place in my hands his fortune, amounting to three million livres.”"
           ]
         },
@@ -70857,8 +70473,8 @@
           ]
         }
       ],
-      "sentence_count": 154,
-      "word_count": 3259
+      "sentence_count": 155,
+      "word_count": 3260
     },
     {
       "number": "96",
@@ -71391,6 +71007,7 @@
           "sentences": [
             "Madame Danglars was chatting at a short distance with Debray, Beauchamp, and Château-Renaud.",
             "Debray was admitted to the house for this grand ceremony, but on the same plane with everyone else, and without any particular privilege.",
+            "M.",
             "Danglars, surrounded by deputies and men connected with the revenue, was explaining a new theory of taxation which he intended to adopt when the course of events had compelled the government to call him into the ministry.",
             "Andrea, on whose arm hung one of the most consummate dandies of the Opera, was explaining to him rather cleverly, since he was obliged to be bold to appear at ease, his future projects, and the new luxuries he meant to introduce to Parisian fashions with his hundred and seventy-five thousand livres per annum."
           ]
@@ -71649,8 +71266,8 @@
           ]
         }
       ],
-      "sentence_count": 219,
-      "word_count": 3693
+      "sentence_count": 220,
+      "word_count": 3694
     },
     {
       "number": "97",
@@ -71684,6 +71301,7 @@
         {
           "sentences": [
             "“Ah, what a dreadful thing,” said the young musician; “who would have suspected it?",
+            "M.",
             "Andrea Cavalcanti a murderer—a galley-slave escaped—a convict!”"
           ]
         },
@@ -71786,6 +71404,7 @@
         },
         {
           "sentences": [
+            "“M.",
             "Léon d’Armilly, twenty years of age; profession, artist; hair black, eyes black; travelling with his sister.”"
           ]
         },
@@ -72129,12 +71748,13 @@
         {
           "sentences": [
             "These words were lost in the noise which the carriage made in rolling over the pavement of La Villette.",
+            "M.",
             "Danglars no longer had a daughter."
           ]
         }
       ],
-      "sentence_count": 135,
-      "word_count": 2154
+      "sentence_count": 138,
+      "word_count": 2157
     },
     {
       "number": "98",
@@ -73276,20 +72896,7 @@
             "Well, be it so; let me blush for the faults you know, and perhaps—perhaps for even more than those!",
             "But having sinned myself,—it may be more deeply than others,—I never rest till I have torn the disguises from my fellow-creatures, and found out their weaknesses.",
             "I have always found them; and more,—I repeat it with joy, with triumph,—I have always found some proof of human perversity or error.",
-            "Every criminal I condemn seems"
-          ]
-        }
-      ],
-      "sentence_count": 154,
-      "word_count": 3017
-    },
-    {
-      "number": "149",
-      "title": "me living evidence that I am not a hideous exception to the rest.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Every criminal I condemn seems to me living evidence that I am not a hideous exception to the rest.",
             "Alas, alas, alas; all the world is wicked; let us therefore strike at wickedness!”"
           ]
         },
@@ -73400,8 +73007,8 @@
           ]
         }
       ],
-      "sentence_count": 27,
-      "word_count": 377
+      "sentence_count": 181,
+      "word_count": 3408
     },
     {
       "number": "100",
@@ -74416,18 +74023,9 @@
         {
           "sentences": [
             "Maximilian tried to speak, but he could articulate nothing; he staggered, and supported himself against the wainscot.",
-            "Then he pointed"
+            "Then he pointed to the door."
           ]
-        }
-      ],
-      "sentence_count": 94,
-      "word_count": 1885
-    },
-    {
-      "number": "153",
-      "title": "the door.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Yes, yes, yes!” continued the old man."
@@ -74468,8 +74066,8 @@
           ]
         }
       ],
-      "sentence_count": 11,
-      "word_count": 103
+      "sentence_count": 105,
+      "word_count": 1991
     },
     {
       "number": "103",
@@ -76229,6 +75827,11 @@
         },
         {
           "sentences": [
+            "“I?”"
+          ]
+        },
+        {
+          "sentences": [
             "“Your fingers are stained with ink.”"
           ]
         },
@@ -76762,8 +76365,8 @@
           ]
         }
       ],
-      "sentence_count": 231,
-      "word_count": 4456
+      "sentence_count": 232,
+      "word_count": 4457
     },
     {
       "number": "106",
@@ -77652,18 +77255,9 @@
           "sentences": [
             "The courtyard of this quarter is enclosed by enormous walls, over which the sun glances obliquely, when it deigns to penetrate into this gulf of moral and physical deformity.",
             "On this paved yard are to be seen,—pacing to and fro from morning till night, pale, careworn, and haggard, like so many shadows,—the men whom justice holds beneath the steel she is sharpening.",
-            "There, crouched against the side of the wall which attracts and retains the most heat, they may be seen sometimes talking to one another, but more frequently alone, watching the door, which sometimes opens to call forth one from the gloomy assemblage, or"
+            "There, crouched against the side of the wall which attracts and retains the most heat, they may be seen sometimes talking to one another, but more frequently alone, watching the door, which sometimes opens to call forth one from the gloomy assemblage, or to throw in another outcast from society."
           ]
-        }
-      ],
-      "sentence_count": 7,
-      "word_count": 203
-    },
-    {
-      "number": "159",
-      "title": "throw in another outcast from society.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The court of Saint-Bernard has its own particular apartment for the reception of guests; it is a long rectangle, divided by two upright gratings placed at a distance of three feet from one another to prevent a visitor from shaking hands with or passing anything to the prisoners.",
@@ -78174,8 +77768,8 @@
           ]
         }
       ],
-      "sentence_count": 157,
-      "word_count": 2402
+      "sentence_count": 164,
+      "word_count": 2612
     },
     {
       "number": "108",
@@ -78827,6 +78421,7 @@
         {
           "sentences": [
             "In the eyes of many, Benedetto appeared, if not a victim to, at least an instance of, the fallibility of the law.",
+            "M.",
             "Cavalcanti, his father, had been seen in Paris, and it was expected that he would re-appear to claim the illustrious outcast.",
             "Many, also, who were not aware of the circumstances attending his withdrawal from Paris, were struck with the worthy appearance, the gentlemanly bearing, and the knowledge of the world displayed by the old patrician, who certainly played the nobleman very well, so long as he said nothing, and made no arithmetical calculations."
           ]
@@ -79026,6 +78621,11 @@
           "sentences": [
             "“Come,” he said, “it is only a veiled lady, some foreign princess, perhaps the mother of Cavalcanti.",
             "But you were just speaking on a very interesting topic, Beauchamp.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I?”"
           ]
         },
         {
@@ -79314,8 +78914,8 @@
           ]
         }
       ],
-      "sentence_count": 133,
-      "word_count": 1967
+      "sentence_count": 135,
+      "word_count": 1969
     },
     {
       "number": "110",
@@ -79880,18 +79480,9 @@
             "Villefort leaped out of the carriage, and saw that his servants were surprised at his early return; he could read no other expression on their features.",
             "Neither of them spoke to him; they merely stood aside to let him pass by, as usual, nothing more.",
             "As he passed by M.",
-            "Noirtier’s room, he perceived two figures through the half-open door; but he experienced no curiosity"
+            "Noirtier’s room, he perceived two figures through the half-open door; but he experienced no curiosity to know who was visiting his father; anxiety carried him on further."
           ]
-        }
-      ],
-      "sentence_count": 50,
-      "word_count": 997
-    },
-    {
-      "number": "164",
-      "title": "know who was visiting his father; anxiety carried him on further.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Come,” he said, as he ascended the stairs leading to his wife’s room, “nothing is changed here.”"
@@ -80306,8 +79897,8 @@
           ]
         }
       ],
-      "sentence_count": 121,
-      "word_count": 2038
+      "sentence_count": 171,
+      "word_count": 3047
     },
     {
       "number": "112",
@@ -81163,18 +80754,9 @@
         {
           "sentences": [
             "There had been no prisoners confined in the Château d’If since the revolution of July; it was only inhabited by a guard, kept there for the prevention of smuggling.",
-            "A concierge waited at the door to exhibit"
+            "A concierge waited at the door to exhibit to visitors this monument of curiosity, once a scene of terror."
           ]
-        }
-      ],
-      "sentence_count": 36,
-      "word_count": 887
-    },
-    {
-      "number": "167",
-      "title": "visitors this monument of curiosity, once a scene of terror.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The count inquired whether any of the ancient jailers were still there; but they had all been pensioned, or had passed on to some other employment.",
@@ -81946,8 +81528,8 @@
           ]
         }
       ],
-      "sentence_count": 214,
-      "word_count": 3313
+      "sentence_count": 250,
+      "word_count": 4211
     },
     {
       "number": "114",
@@ -83481,18 +83063,9 @@
         },
         {
           "sentences": [
-            "“Then I forgive you,” said the man, dropping his cloak, and advancing"
+            "“Then I forgive you,” said the man, dropping his cloak, and advancing to the light."
           ]
-        }
-      ],
-      "sentence_count": 107,
-      "word_count": 1410
-    },
-    {
-      "number": "171",
-      "title": "the light.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“The Count of Monte Cristo!” said Danglars, more pale from terror than he had been just before from hunger and misery."
@@ -83546,8 +83119,8 @@
           ]
         }
       ],
-      "sentence_count": 16,
-      "word_count": 282
+      "sentence_count": 123,
+      "word_count": 1695
     },
     {
       "number": "117",
@@ -84632,13 +84205,13 @@
     }
   ],
   "statistics": {
-    "total_chapters": 173,
-    "total_paragraphs": 14697,
-    "total_sentences": 24277,
-    "total_words": 459115,
-    "average_sentences_per_chapter": 140.32947976878611,
-    "average_paragraphs_per_chapter": 84.95375722543352,
-    "average_sentences_per_paragraph": 1.6518337075593659,
-    "average_words_per_sentence": 18.91152119289863
+    "total_chapters": 119,
+    "total_paragraphs": 14691,
+    "total_sentences": 24360,
+    "total_words": 459628,
+    "average_sentences_per_chapter": 204.7058823529412,
+    "average_paragraphs_per_chapter": 123.45378151260505,
+    "average_sentences_per_paragraph": 1.658158055952624,
+    "average_words_per_sentence": 18.86814449917898
   }
 }

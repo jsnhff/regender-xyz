@@ -159,7 +159,8 @@ def save_json_book(data: Dict[str, Any], output_path: str):
 
 def transform_single_book(input_file: str, output_file: Optional[str] = None, 
                          text_output: Optional[str] = None, transform_type: str = "comprehensive",
-                         model: str = "gpt-4o-mini", provider: Optional[str] = None, quiet: bool = False):
+                         model: str = "gpt-4o-mini", provider: Optional[str] = None, 
+                         character_file: Optional[str] = None, quiet: bool = False):
     """Transform a single JSON book."""
     if not quiet:
         print(f"\n{CYAN}📖 Processing: {input_file}{RESET}")
@@ -193,6 +194,9 @@ def transform_single_book(input_file: str, output_file: Optional[str] = None,
         else:
             print(f"🤖 Model: {model}")
     
+    if character_file and not quiet:
+        print(f"📋 Characters: {character_file}")
+    
     # Transform the book
     try:
         # Use actual model name from provider if available
@@ -206,13 +210,28 @@ def transform_single_book(input_file: str, output_file: Optional[str] = None,
                 pass
         
         start_time = time.time()
-        transformed_data = transform_book(
-            book_data,
-            transform_type=transform_type,
-            model=actual_model,
-            provider=provider,
-            verbose=not quiet
-        )
+        
+        if character_file:
+            # Use character-based transformation
+            from book_transform.utils import transform_with_characters
+            transformed_data = transform_with_characters(
+                book_data,
+                character_file=character_file,
+                transform_type=transform_type,
+                model=actual_model,
+                provider=provider,
+                verbose=not quiet
+            )
+        else:
+            # Standard transformation
+            transformed_data = transform_book(
+                book_data,
+                transform_type=transform_type,
+                model=actual_model,
+                provider=provider,
+                verbose=not quiet
+            )
+        
         elapsed = time.time() - start_time
         
         if not quiet:
@@ -235,6 +254,41 @@ def transform_single_book(input_file: str, output_file: Optional[str] = None,
     except Exception as e:
         print(f"{RED}Error during transformation: {e}{RESET}")
         sys.exit(1)
+
+
+def analyze_characters_command(input_file: str, output_file: str, 
+                              model: str = "gpt-4o-mini", provider: Optional[str] = None):
+    """Analyze and save character data from a book."""
+    print(f"\n{CYAN}📖 Analyzing characters in: {input_file}{RESET}")
+    
+    # Load book
+    book_data = load_json_book(input_file)
+    
+    # Analyze characters
+    from book_characters import analyze_book_characters
+    characters, context = analyze_book_characters(
+        book_data,
+        model=model,
+        provider=provider,
+        verbose=True
+    )
+    
+    # Save character data
+    character_data = {
+        'metadata': {
+            'source_book': input_file,
+            'analysis_model': model,
+            'analysis_provider': provider,
+            'character_count': len(characters)
+        },
+        'characters': characters,
+        'context': context
+    }
+    
+    save_json_book(character_data, output_file)
+    
+    print(f"\n{GREEN}✓ Saved {len(characters)} characters to: {output_file}{RESET}")
+    return characters
 
 
 def batch_transform(input_dir: str = "books/json", output_dir: str = "books/output",
@@ -378,8 +432,16 @@ def main():
                                 default='comprehensive', help='Transformation type')
     transform_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
     transform_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider to use')
+    transform_parser.add_argument('--characters', help='Pre-analyzed character file to use')
     transform_parser.add_argument('--batch', action='store_true', help='Process directory of files')
     transform_parser.add_argument('--limit', type=int, help='Limit number of files in batch mode')
+    
+    # Analyze characters command
+    analyze_parser = subparsers.add_parser('analyze-characters', help='Analyze and save character data')
+    analyze_parser.add_argument('input', help='Input JSON book file')
+    analyze_parser.add_argument('-o', '--output', required=True, help='Output character file')
+    analyze_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
+    analyze_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider')
     
     # Pipeline command
     pipeline_parser = subparsers.add_parser('pipeline', help='Run complete pipeline')
@@ -420,7 +482,10 @@ def main():
                 input_path = Path(args.input)
                 output_file = str(input_path.parent / f"{input_path.stem}_transformed.json")
             
-            transform_single_book(args.input, output_file, args.text, args.type, args.model, args.provider)
+            transform_single_book(args.input, output_file, args.text, args.type, args.model, args.provider, args.characters)
+    
+    elif args.command == 'analyze-characters':
+        analyze_characters_command(args.input, args.output, args.model, args.provider)
     
     elif args.command == 'pipeline':
         pipeline(args.count, args.type, args.model)

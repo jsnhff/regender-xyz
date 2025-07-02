@@ -149,8 +149,7 @@
         },
         {
           "sentences": [
-            "“And here...",
-            "I am again on the same errand,” Raskolnikov continued, a little disconcerted and surprised at the old woman’s mistrust. “Perhaps she is always like that though, only I did not notice it the other time,” he thought with an uneasy feeling."
+            "“And here... I am again on the same errand,” Raskolnikov continued, a little disconcerted and surprised at the old woman’s mistrust. “Perhaps she is always like that though, only I did not notice it the other time,” he thought with an uneasy feeling."
           ]
         },
         {
@@ -180,18 +179,9 @@
         {
           "sentences": [
             "“Lizaveta’s work,” thought the young man.",
-            "There was not a speck of dust"
+            "There was not a speck of dust to be seen in the whole flat."
           ]
-        }
-      ],
-      "sentence_count": 94,
-      "word_count": 1990
-    },
-    {
-      "number": "2",
-      "title": "be seen in the whole flat.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“It’s in the houses of spiteful old widows that one finds such cleanliness,” Raskolnikov thought again, and he stole a curious glance at the cotton curtain over the door leading into another tiny room, in which stood the old woman’s bed and chest of drawers and into which he had never looked before.",
@@ -401,8 +391,8 @@
           ]
         }
       ],
-      "sentence_count": 76,
-      "word_count": 1329
+      "sentence_count": 169,
+      "word_count": 3326
     },
     {
       "number": "II",
@@ -462,8 +452,7 @@
         {
           "sentences": [
             "“A student then, or formerly a student,” cried the clerk. “Just what I thought!",
-            "I’m a man of experience, immense experience, sir,” and he tapped his forehead with his fingers in self-approval. “You’ve been a student or have attended some learned institution!...",
-            "But allow me....”  He got up, staggered, took up his jug and glass, and sat down beside the young man, facing him a little sideways.",
+            "I’m a man of experience, immense experience, sir,” and he tapped his forehead with his fingers in self-approval. “You’ve been a student or have attended some learned institution!... But allow me....”  He got up, staggered, took up his jug and glass, and sat down beside the young man, facing him a little sideways.",
             "He was drunk, but spoke fluently and boldly, only occasionally losing the thread of his sentences and drawling his words.",
             "He pounced upon Raskolnikov as greedily as though he too had not spoken to a soul for a month."
           ]
@@ -620,17 +609,16 @@
             "Do you understand, sir, do you understand what it means when you have absolutely nowhere to turn?",
             "No, that you don’t understand yet....",
             "And for a whole year, I performed my duties conscientiously and faithfully, and did not touch this” (he tapped the jug with his finger), “for I have feelings.",
-            "But even so, I could not please her; and then I lost my place too, and that through no fault of mine but through changes in the office; and then I did touch it!...",
-            "It will be a year and a half ago soon since we found ourselves at last after many wanderings and numerous calamities in this magnificent capital, adorned with innumerable monuments.",
+            "But even so, I could not please her; and then I lost my place too, and that through no fault of mine but through changes in the office; and then I did touch it!... It will be a year and a half ago soon since we found ourselves at last after many wanderings and numerous calamities in this magnificent capital, adorned with innumerable monuments.",
             "Here I obtained a situation....",
             "I obtained it and I lost it again.",
             "Do you understand?",
             "This time it was through my own fault I lost it: for my weakness had come out....",
             "We have now part of a room at Amalia Fyodorovna Lippevechsel’s; and what we live upon and what we pay our rent with, I could not say.",
             "There are a lot of people living there besides ourselves.",
-            "Dirt and disorder, a perfect Bedlam... hm... yes...",
-            "And meanwhile my daughter by my first wife has grown up; and what my daughter has had to put up with from her step-mother whilst she was growing up, I won’t speak of.",
+            "Dirt and disorder, a perfect Bedlam... hm... yes... And meanwhile my daughter by my first wife has grown up; and what my daughter has had to put up with from her step-mother whilst she was growing up, I won’t speak of.",
             "For, though Katerina Ivanovna is full of generous feelings, she is a spirited lady, irritable and short-tempered....",
+            "Yes.",
             "But it’s no use going over that!",
             "Sonia, as you may well fancy, has had no education.",
             "I did make an effort four years ago to give her a course of geography and universal history, but as I was not very well up in those subjects myself and we had no suitable books, and what books we had... hm, anyway we have not even those now, so all our instruction came to an end.",
@@ -639,8 +627,8 @@
           ]
         }
       ],
-      "sentence_count": 145,
-      "word_count": 2902
+      "sentence_count": 143,
+      "word_count": 2903
     },
     {
       "number": "III",
@@ -1068,7 +1056,7 @@
         },
         {
           "sentences": [
-            "But I should like to know why mother has written to me about ‘our most rising generation’?",
+            "“... But I should like to know why mother has written to me about ‘our most rising generation’?",
             "Simply as a descriptive touch, or with the idea of prepossessing me in favour of Mr. Luzhin?",
             "Oh, the cunning of them!",
             "I should like to know one thing more: how far they were open with one another that day and night and all this time since?",
@@ -1510,6 +1498,7 @@
             "Have not I seen cases like that?",
             "And how have they been brought to it?",
             "Why, they’ve all come to it like that.",
+            "Ugh!",
             "But what does it matter?",
             "That’s as it should be, they tell us.",
             "A certain percentage, they tell us, must every year go... that way... to the devil, I suppose, so that the rest may remain chaste, and not be interfered with.",
@@ -1566,8 +1555,8 @@
           ]
         }
       ],
-      "sentence_count": 305,
-      "word_count": 5081
+      "sentence_count": 306,
+      "word_count": 5083
     },
     {
       "number": "V",
@@ -1577,8 +1566,7 @@
         {
           "sentences": [
             "“Of course, I’ve been meaning lately to go to Razumihin’s to ask for work, to ask him to get me lessons or something...” Raskolnikov thought, “but what help can he be to me now?",
-            "Suppose he gets me lessons, suppose he shares his last farthing with me, if he has any farthings, so that I could get some boots and make myself tidy enough to give lessons... hm...",
-            "Well and what then?",
+            "Suppose he gets me lessons, suppose he shares his last farthing with me, if he has any farthings, so that I could get some boots and make myself tidy enough to give lessons... hm... Well and what then?",
             "What shall I do with the few coppers I earn?",
             "That’s not what I want now.",
             "It’s really absurd for me to go to Razumihin....”"
@@ -2101,7 +2089,7 @@
           ]
         }
       ],
-      "sentence_count": 226,
+      "sentence_count": 225,
       "word_count": 4197
     },
     {
@@ -2332,18 +2320,9 @@
         },
         {
           "sentences": [
-            "“Afterwards,” he said with an effort, closing his eyes again and turning"
+            "“Afterwards,” he said with an effort, closing his eyes again and turning to the wall."
           ]
-        }
-      ],
-      "sentence_count": 106,
-      "word_count": 1712
-    },
-    {
-      "number": "8",
-      "title": "the wall.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Nastasya stood over him."
@@ -2593,8 +2572,7 @@
         {
           "sentences": [
             "And there was the fourth storey, here was the door, here was the flat opposite, the empty one.",
-            "The flat underneath the old woman’s was apparently empty also; the visiting card nailed on the door had been torn off--they had gone away!...",
-            "He was out of breath.",
+            "The flat underneath the old woman’s was apparently empty also; the visiting card nailed on the door had been torn off--they had gone away!... He was out of breath.",
             "For one instant the thought floated through his mind, “Shall I go back?” But he made no answer and began listening at the old woman’s door, a dead silence.",
             "Then he listened again on the staircase, listened long and intently... then looked about him for the last time, pulled himself together, drew himself up, and once more tried the axe in the noose. “Am I very pale?”  he wondered. “Am I not evidently agitated?",
             "She is mistrustful....",
@@ -2623,8 +2601,8 @@
           ]
         }
       ],
-      "sentence_count": 154,
-      "word_count": 3309
+      "sentence_count": 259,
+      "word_count": 5024
     },
     {
       "number": "VII",
@@ -2647,8 +2625,7 @@
         },
         {
           "sentences": [
-            "“Good evening, Alyona Ivanovna,” he began, trying to speak easily, but his voice would not obey him, it broke and shook. “I have come...",
-            "I have brought something... but we’d better come in... to the light....”"
+            "“Good evening, Alyona Ivanovna,” he began, trying to speak easily, but his voice would not obey him, it broke and shook. “I have come... I have brought something... but we’d better come in... to the light....”"
           ]
         },
         {
@@ -2667,8 +2644,7 @@
         },
         {
           "sentences": [
-            "“Why, Alyona Ivanovna, you know me...",
-            "Raskolnikov... here, I brought you the pledge I promised the other day...” And he held out the pledge."
+            "“Why, Alyona Ivanovna, you know me... Raskolnikov... here, I brought you the pledge I promised the other day...” And he held out the pledge."
           ]
         },
         {
@@ -2919,6 +2895,7 @@
         {
           "sentences": [
             "The steps sounded very far off, at the very bottom of the stairs, but he remembered quite clearly and distinctly that from the first sound he began for some reason to suspect that this was someone coming _there_, to the fourth floor, to the old woman.",
+            "Why?",
             "Were the sounds somehow peculiar, significant?",
             "The steps were heavy, even and unhurried.",
             "Now _he_ had passed the first floor, now he was mounting higher, it was growing more and more distinct!",
@@ -3048,8 +3025,7 @@
         {
           "sentences": [
             "“Hm....",
-            "Damn it all!...",
-            "We might ask....",
+            "Damn it all!... We might ask....",
             "But you know she never does go anywhere.”"
           ]
         },
@@ -3295,8 +3271,8 @@
           ]
         }
       ],
-      "sentence_count": 311,
-      "word_count": 4880
+      "sentence_count": 309,
+      "word_count": 4881
     },
     {
       "number": "I",
@@ -3567,8 +3543,7 @@
         },
         {
           "sentences": [
-            "“To the police?...",
-            "What for?...”"
+            "“To the police?... What for?...”"
           ]
         },
         {
@@ -3620,13 +3595,13 @@
         {
           "sentences": [
             "“You’d better have some tea!",
+            "Yes?",
             "I’ll bring it, there’s some left.”"
           ]
         },
         {
           "sentences": [
-            "“No...",
-            "I’m going; I’ll go at once,” he muttered, getting on to his feet."
+            "“No... I’m going; I’ll go at once,” he muttered, getting on to his feet."
           ]
         },
         {
@@ -3702,8 +3677,7 @@
             "“No, it’s too much for me...” he thought.",
             "His legs shook. “From fear,”  he muttered.",
             "His head swam and ached with fever. “It’s a trick!",
-            "They want to decoy me there and confound me over everything,” he mused, as he went out on to the stairs--“the worst of it is I’m almost light-headed...",
-            "I may blurt out something stupid...”"
+            "They want to decoy me there and confound me over everything,” he mused, as he went out on to the stairs--“the worst of it is I’m almost light-headed... I may blurt out something stupid...”"
           ]
         },
         {
@@ -3735,18 +3709,9 @@
             "It had lately been moved to new rooms on the fourth floor of a new house.",
             "He had been once for a moment in the old office but long ago.",
             "Turning in at the gateway, he saw on the right a flight of stairs which a peasant was mounting with a book in his hand. “A house-porter, no doubt; so then, the office is here,” and he began ascending the stairs on the chance.",
-            "He did not want"
+            "He did not want to ask questions of anyone."
           ]
-        }
-      ],
-      "sentence_count": 163,
-      "word_count": 2363
-    },
-    {
-      "number": "11",
-      "title": "ask questions of anyone.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I’ll go in, fall on my knees, and confess everything...” he thought, as he reached the fourth floor."
@@ -4018,6 +3983,7 @@
         {
           "sentences": [
             "“You shameful hussy!” he shouted suddenly at the top of his voice. (The lady in mourning had left the office.) “What was going on at your house last night?",
+            "Eh!",
             "A disgrace again, you’re a scandal to the whole street.",
             "Fighting and drinking again.",
             "Do you want the house of correction?",
@@ -4090,7 +4056,7 @@
         },
         {
           "sentences": [
-            "So I tell you this, most respectable Luise Ivanovna, and I tell it you for the last time,” the assistant went on. “If there is a scandal in your honourable house once again, I will put you yourself in the lock-up, as it is called in polite society.",
+            "“... So I tell you this, most respectable Luise Ivanovna, and I tell it you for the last time,” the assistant went on. “If there is a scandal in your honourable house once again, I will put you yourself in the lock-up, as it is called in polite society.",
             "Do you hear?",
             "So a literary man, an author took five roubles for his coat-tail in an ‘honourable house’?",
             "A nice set, these authors!”"
@@ -4103,6 +4069,7 @@
             "And there was another of them on a steamer last week used the most disgraceful language to the respectable family of a civil councillor, his wife and daughter.",
             "And there was one of them turned out of a confectioner’s shop the other day.",
             "They are like that, authors, literary men, students, town-criers....",
+            "Pfoo!",
             "You get along!",
             "I shall look in upon you myself one day.",
             "Then you had better be careful!",
@@ -4146,8 +4113,7 @@
         },
         {
           "sentences": [
-            "Raskolnikov had a sudden desire to say something exceptionally pleasant to them all. “Excuse me, Captain,” he began easily, suddenly addressing Nikodim Fomitch, “will you enter into my position?...",
-            "I am ready to ask pardon, if I have been ill-mannered.",
+            "Raskolnikov had a sudden desire to say something exceptionally pleasant to them all. “Excuse me, Captain,” he began easily, suddenly addressing Nikodim Fomitch, “will you enter into my position?... I am ready to ask pardon, if I have been ill-mannered.",
             "I am a poor student, sick and shattered (shattered was the word he used) by poverty.",
             "I am not studying, because I cannot keep myself now, but I shall get money....",
             "I have a mother and sister in the province of X.",
@@ -4167,8 +4133,7 @@
           "sentences": [
             "“Yes, yes.",
             "I perfectly agree with you.",
-            "But allow me to explain...”  Raskolnikov put in again, still addressing Nikodim Fomitch, but trying his best to address Ilya Petrovitch also, though the latter persistently appeared to be rummaging among his papers and to be contemptuously oblivious of him. “Allow me to explain that I have been living with her for nearly three years and at first... at first... for why should I not confess it, at the very beginning I promised to marry her daughter, it was a verbal promise, freely given... she was a girl... indeed, I liked her, though I was not in love with her... a youthful affair in fact... that is, I mean to say, that my landlady gave me credit freely in those days, and I led a life of...",
-            "I was very heedless...”"
+            "But allow me to explain...”  Raskolnikov put in again, still addressing Nikodim Fomitch, but trying his best to address Ilya Petrovitch also, though the latter persistently appeared to be rummaging among his papers and to be contemptuously oblivious of him. “Allow me to explain that I have been living with her for nearly three years and at first... at first... for why should I not confess it, at the very beginning I promised to marry her daughter, it was a verbal promise, freely given... she was a girl... indeed, I liked her, though I was not in love with her... a youthful affair in fact... that is, I mean to say, that my landlady gave me credit freely in those days, and I led a life of... I was very heedless...”"
           ]
         },
         {
@@ -4179,8 +4144,7 @@
         {
           "sentences": [
             "“But excuse me, excuse me.",
-            "It is for me to explain... how it all happened...",
-            "In my turn... though I agree with you... it is unnecessary.",
+            "It is for me to explain... how it all happened... In my turn... though I agree with you... it is unnecessary.",
             "But a year ago, the girl died of typhus.",
             "I remained lodging there as before, and when my landlady moved into her present quarters, she said to me... and in a friendly way... that she had complete trust in me, but still, would I not give her an I O U for one hundred and fifteen roubles, all the debt I owed her.",
             "She said if only I gave her that, she would trust me again, as much as I liked, and that she would never, never--those were her own words--make use of that I O U till I could pay of myself... and now, when I have lost my lessons and have nothing to eat, she takes action against me.",
@@ -4436,8 +4400,8 @@
           ]
         }
       ],
-      "sentence_count": 264,
-      "word_count": 4345
+      "sentence_count": 424,
+      "word_count": 6717
     },
     {
       "number": "II",
@@ -4550,8 +4514,7 @@
           "sentences": [
             "“Damn it all!” he thought suddenly, in a fit of ungovernable fury. “If it has begun, then it has begun.",
             "Hang the new life!",
-            "Good Lord, how stupid it is!...",
-            "And what lies I told to-day!",
+            "Good Lord, how stupid it is!... And what lies I told to-day!",
             "How despicably I fawned upon that wretched Ilya Petrovitch!",
             "But that is all folly!",
             "What do I care for them all, and my fawning upon them!",
@@ -4946,8 +4909,7 @@
         {
           "sentences": [
             "“I heard it myself....",
-            "I was not asleep...",
-            "I was sitting up,” he said still more timidly. “I listened a long while.",
+            "I was not asleep... I was sitting up,” he said still more timidly. “I listened a long while.",
             "The assistant superintendent came....",
             "Everyone ran out on to the stairs from all the flats.”"
           ]
@@ -4968,8 +4930,7 @@
         },
         {
           "sentences": [
-            "“Give me something to drink...",
-            "Nastasya.”"
+            "“Give me something to drink... Nastasya.”"
           ]
         },
         {
@@ -4980,7 +4941,7 @@
           ]
         }
       ],
-      "sentence_count": 259,
+      "sentence_count": 256,
       "word_count": 4155
     },
     {
@@ -5113,8 +5074,7 @@
         },
         {
           "sentences": [
-            "“Yes, I remember...",
-            "Vahrushin,” Raskolnikov said dreamily."
+            "“Yes, I remember... Vahrushin,” Raskolnikov said dreamily."
           ]
         },
         {
@@ -5446,26 +5406,16 @@
             "How could you let things come to such a pass that she gave up sending you your dinner?",
             "And that I O U?",
             "You must have been mad to sign an I O U.",
-            "And that promise of marriage when her daughter, Natalya Yegorovna, was alive?...",
-            "I know all about it!",
+            "And that promise of marriage when her daughter, Natalya Yegorovna, was alive?... I know all about it!",
             "But I see that’s a delicate matter and I am an ass; forgive me.",
             "But, talking of foolishness, do you know Praskovya Pavlovna is not nearly so foolish as you would think at first sight?”"
           ]
         },
         {
           "sentences": [
-            "“No,” mumbled Raskolnikov, looking away, but feeling that it was better"
+            "“No,” mumbled Raskolnikov, looking away, but feeling that it was better to keep up the conversation."
           ]
-        }
-      ],
-      "sentence_count": 177,
-      "word_count": 2350
-    },
-    {
-      "number": "14",
-      "title": "keep up the conversation.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“She isn’t, is she?” cried Razumihin, delighted to get an answer out of him. “But she is not very clever either, eh?",
@@ -5535,8 +5485,7 @@
         },
         {
           "sentences": [
-            "“What’s the matter with you?...",
-            "What are you upset about?",
+            "“What’s the matter with you?... What are you upset about?",
             "He wanted to make your acquaintance because I talked to him a lot about you....",
             "How could I have found out so much except from him?",
             "He is a capital fellow, brother, first-rate... in his own way, of course.",
@@ -5616,8 +5565,7 @@
         {
           "sentences": [
             "“Good God, only tell me one thing: do they know of it yet or not?",
-            "What if they know it and are only pretending, mocking me while I am laid up, and then they will come in and tell me that it’s been discovered long ago and that they have only...",
-            "What am I to do now?",
+            "What if they know it and are only pretending, mocking me while I am laid up, and then they will come in and tell me that it’s been discovered long ago and that they have only... What am I to do now?",
             "That’s what I’ve forgotten, as though on purpose; forgotten it all at once, I remembered a minute ago.”"
           ]
         },
@@ -5637,6 +5585,7 @@
             "The police office!",
             "And why am I sent for to the police office?",
             "Where’s the notice?",
+            "Bah!",
             "I am mixing it up; that was then.",
             "I looked at my sock then, too, but now... now I have been ill.",
             "But what did Zametov come for?",
@@ -5654,10 +5603,8 @@
             "I understand!",
             "Ah, here is my coat--they passed that over!",
             "And here is money on the table, thank God!",
-            "And here’s the I O U...",
-            "I’ll take the money and go and take another lodging.",
-            "They won’t find me!...",
-            "Yes, but the address bureau?",
+            "And here’s the I O U... I’ll take the money and go and take another lodging.",
+            "They won’t find me!... Yes, but the address bureau?",
             "They’ll find me, Razumihin will find me.",
             "Better escape altogether... far away... to America, and let them do their worst!",
             "And take the I O U... it would be of use there....",
@@ -5893,12 +5840,12 @@
         },
         {
           "sentences": [
-            "The door opened and a tall, stout man whose appearance seemed familiar"
+            "The door opened and a tall, stout man whose appearance seemed familiar to Raskolnikov came in."
           ]
         }
       ],
-      "sentence_count": 234,
-      "word_count": 2921
+      "sentence_count": 406,
+      "word_count": 5281
     },
     {
       "number": "IV",
@@ -6015,8 +5962,7 @@
             "“He’s been stagnating all his life as a district postmaster; gets a little pension.",
             "He is sixty-five--not worth talking about....",
             "But I am fond of him.",
-            "Porfiry Petrovitch, the head of the Investigation Department here...",
-            "But you know him.”"
+            "Porfiry Petrovitch, the head of the Investigation Department here... But you know him.”"
           ]
         },
         {
@@ -6188,8 +6134,7 @@
         {
           "sentences": [
             "“Maybe I am, but we will get him off anyway,” shouted Razumihin, bringing his fist down on the table. “What’s the most offensive is not their lying--one can always forgive lying--lying is a delightful thing, for it leads to truth--what is offensive is that they lie and worship their own lying....",
-            "I respect Porfiry, but...",
-            "What threw them out at first?",
+            "I respect Porfiry, but... What threw them out at first?",
             "The door was locked, and when they came back with the porter it was open.",
             "So it followed that Koch and Pestryakov were the murderers--that was their logic!”"
           ]
@@ -6222,6 +6167,7 @@
         {
           "sentences": [
             "“Anyway, one can’t hold one’s tongue when one has a feeling, a tangible feeling, that one might be a help if only....",
+            "Eh!",
             "Do you know the details of the case?”"
           ]
         },
@@ -6434,10 +6380,8 @@
         },
         {
           "sentences": [
-            "“Hm!...",
-            "So the only evidence for the defence is that they were beating one another and laughing.",
-            "That constitutes a strong presumption, but...",
-            "How do you explain the facts yourself?”"
+            "“Hm!... So the only evidence for the defence is that they were beating one another and laughing.",
+            "That constitutes a strong presumption, but... How do you explain the facts yourself?”"
           ]
         },
         {
@@ -6480,8 +6424,8 @@
           ]
         }
       ],
-      "sentence_count": 262,
-      "word_count": 4062
+      "sentence_count": 259,
+      "word_count": 4063
     },
     {
       "number": "V",
@@ -6691,7 +6635,7 @@
         },
         {
           "sentences": [
-            "Any minute.",
+            "“... Any minute.",
             "I have found a lodging for them on their arrival.”"
           ]
         },
@@ -6725,8 +6669,7 @@
         },
         {
           "sentences": [
-            "“I could not, of course, find out so much about it, for I am a stranger in Petersburg myself,” Pyotr Petrovitch replied huffily. “However, the two rooms are exceedingly clean, and as it is for so short a time...",
-            "I have already taken a permanent, that is, our future flat,” he said, addressing Raskolnikov, “and I am having it done up.",
+            "“I could not, of course, find out so much about it, for I am a stranger in Petersburg myself,” Pyotr Petrovitch replied huffily. “However, the two rooms are exceedingly clean, and as it is for so short a time... I have already taken a permanent, that is, our future flat,” he said, addressing Raskolnikov, “and I am having it done up.",
             "And meanwhile I am myself cramped for room in a lodging with my friend Andrey Semyonovitch Lebeziatnikov, in the flat of Madame Lippevechsel; it was he who told me of Bakaleyev’s house, too...”"
           ]
         },
@@ -6856,8 +6799,7 @@
         },
         {
           "sentences": [
-            "“Oh, my dear sir... how could I?...",
-            "Come, that’s enough,” Razumihin concluded, and he turned abruptly to Zossimov to continue their previous conversation."
+            "“Oh, my dear sir... how could I?... Come, that’s enough,” Razumihin concluded, and he turned abruptly to Zossimov to continue their previous conversation."
           ]
         },
         {
@@ -6868,8 +6810,7 @@
         },
         {
           "sentences": [
-            "“I trust our acquaintance,” he said, addressing Raskolnikov, “may, upon your recovery and in view of the circumstances of which you are aware, become closer...",
-            "Above all, I hope for your return to health...”"
+            "“I trust our acquaintance,” he said, addressing Raskolnikov, “may, upon your recovery and in view of the circumstances of which you are aware, become closer... Above all, I hope for your return to health...”"
           ]
         },
         {
@@ -7040,8 +6981,7 @@
         {
           "sentences": [
             "“Upon my word,” Luzhin cried wrathfully and irritably, crimson with confusion, “to distort my words in this way!",
-            "Excuse me, allow me to assure you that the report which has reached you, or rather, let me say, has been conveyed to you, has no foundation in truth, and I... suspect who... in a word... this arrow... in a word, your mamma...",
-            "She seemed to me in other things, with all her excellent qualities, of a somewhat high-flown and romantic way of thinking....",
+            "Excuse me, allow me to assure you that the report which has reached you, or rather, let me say, has been conveyed to you, has no foundation in truth, and I... suspect who... in a word... this arrow... in a word, your mamma... She seemed to me in other things, with all her excellent qualities, of a somewhat high-flown and romantic way of thinking....",
             "But I was a thousand miles from supposing that she would misunderstand and misrepresent things in so fanciful a way....",
             "And indeed... indeed...”"
           ]
@@ -7059,8 +6999,7 @@
         },
         {
           "sentences": [
-            "“Why, if ever again... you dare to mention a single word... about my mother...",
-            "I shall send you flying downstairs!”"
+            "“Why, if ever again... you dare to mention a single word... about my mother... I shall send you flying downstairs!”"
           ]
         },
         {
@@ -7201,8 +7140,8 @@
           ]
         }
       ],
-      "sentence_count": 248,
-      "word_count": 3970
+      "sentence_count": 243,
+      "word_count": 3971
     },
     {
       "number": "VI",
@@ -7474,11 +7413,9 @@
             "She was a pock-marked wench of thirty, covered with bruises, with her upper lip swollen.",
             "She made her criticism quietly and earnestly. “Where is it,” thought Raskolnikov. “Where is it I’ve read that someone condemned to death says or thinks, an hour before his death, that if he had to live on some high rock, on such a narrow ledge that he’d only room to stand, and the ocean, everlasting darkness, everlasting solitude, everlasting tempest around him, if he had to remain standing on a square yard of space all his life, a thousand years, eternity, it were better to live so than to die at once!",
             "Only to live, to live and live!",
-            "Life, whatever it may be!...",
-            "How true it is!",
+            "Life, whatever it may be!... How true it is!",
             "Good God, how true!",
-            "Man is a vile creature!...",
-            "And vile is he who calls him vile for that,” he added a moment later."
+            "Man is a vile creature!... And vile is he who calls him vile for that,” he added a moment later."
           ]
         },
         {
@@ -7695,8 +7632,7 @@
         },
         {
           "sentences": [
-            "“I’ll explain that afterwards, but now, my boy, I declare to you... no, better ‘I confess’...",
-            "No, that’s not right either; ‘I make a deposition and you take it.’ I depose that I was reading, that I was looking and searching....” he screwed up his eyes and paused. “I was searching--and came here on purpose to do it--for news of the murder of the old pawnbroker woman,” he articulated at last, almost in a whisper, bringing his face exceedingly close to the face of Zametov.",
+            "“I’ll explain that afterwards, but now, my boy, I declare to you... no, better ‘I confess’... No, that’s not right either; ‘I make a deposition and you take it.’ I depose that I was reading, that I was looking and searching....” he screwed up his eyes and paused. “I was searching--and came here on purpose to do it--for news of the murder of the old pawnbroker woman,” he articulated at last, almost in a whisper, bringing his face exceedingly close to the face of Zametov.",
             "Zametov looked at him steadily, without moving or drawing his face away.",
             "What struck Zametov afterwards as the strangest part of it all was that silence followed for exactly a minute, and that they gazed at one another all the while."
           ]
@@ -7733,6 +7669,7 @@
         {
           "sentences": [
             "Or what?",
+            "What?",
             "Come, tell me!”"
           ]
         },
@@ -7759,6 +7696,7 @@
         {
           "sentences": [
             "“What!",
+            "Tea?",
             "Oh, yes....” Raskolnikov sipped the glass, put a morsel of bread in his mouth and, suddenly looking at Zametov, seemed to remember everything and pulled himself together.",
             "At the same moment his face resumed its original mocking expression.",
             "He went on drinking tea."
@@ -7866,6 +7804,7 @@
         },
         {
           "sentences": [
+            "You?",
             "Do you suppose you could catch him?",
             "You’ve a tough job!",
             "A great point for you is whether a man is spending money or not.",
@@ -8041,8 +7980,7 @@
           "sentences": [
             "“Alone?",
             "When you are not able to walk, when your face is as white as a sheet and you are gasping for breath!",
-            "Idiot!...",
-            "What have you been doing in the Palais de Cristal?",
+            "Idiot!... What have you been doing in the Palais de Cristal?",
             "Own up at once!”"
           ]
         },
@@ -8126,6 +8064,8 @@
         {
           "sentences": [
             "“Beat?",
+            "Whom?",
+            "Me?",
             "I’d twist his nose off at the mere idea!",
             "Potchinkov’s house, 47, Babushkin’s flat....”"
           ]
@@ -8182,8 +8122,7 @@
         },
         {
           "sentences": [
-            "“Confound it,” he went on almost aloud. “He talked sensibly but yet...",
-            "I am a fool!",
+            "“Confound it,” he went on almost aloud. “He talked sensibly but yet... I am a fool!",
             "As if madmen didn’t talk sensibly!",
             "And this was just what Zossimov seemed afraid of.” He struck his finger on his forehead. “What if... how could I let him go off alone?",
             "He may drown himself....",
@@ -8607,7 +8546,7 @@
         }
       ],
       "sentence_count": 560,
-      "word_count": 7496
+      "word_count": 7501
     },
     {
       "number": "VII",
@@ -8743,13 +8682,11 @@
         {
           "sentences": [
             "“You wouldn’t believe, you can’t imagine, Polenka,” she said, walking about the room, “what a happy luxurious life we had in my papa’s house and how this drunkard has brought me, and will bring you all, to ruin!",
-            "Papa was a civil colonel and only a step from being a governor; so that everyone who came to see him said, ‘We look upon you, Ivan Mihailovitch, as our governor!’ When I... when...” she coughed violently, “oh, cursed life,” she cried, clearing her throat and pressing her hands to her breast, “when I... when at the last ball... at the marshal’s...",
-            "Princess Bezzemelny saw me--who gave me the blessing when your father and I were married, Polenka--she asked at once ‘Isn’t that the pretty girl who danced the shawl dance at the breaking-up?’ (You must mend that tear, you must take your needle and darn it as I showed you, or to-morrow--cough, cough, cough--he will make the hole bigger,” she articulated with effort.) “Prince Schegolskoy, a kammerjunker, had just come from Petersburg then... he danced the mazurka with me and wanted to make me an offer next day; but I thanked him in flattering expressions and told him that my heart had long been another’s.",
+            "Papa was a civil colonel and only a step from being a governor; so that everyone who came to see him said, ‘We look upon you, Ivan Mihailovitch, as our governor!’ When I... when...” she coughed violently, “oh, cursed life,” she cried, clearing her throat and pressing her hands to her breast, “when I... when at the last ball... at the marshal’s... Princess Bezzemelny saw me--who gave me the blessing when your father and I were married, Polenka--she asked at once ‘Isn’t that the pretty girl who danced the shawl dance at the breaking-up?’ (You must mend that tear, you must take your needle and darn it as I showed you, or to-morrow--cough, cough, cough--he will make the hole bigger,” she articulated with effort.) “Prince Schegolskoy, a kammerjunker, had just come from Petersburg then... he danced the mazurka with me and wanted to make me an offer next day; but I thanked him in flattering expressions and told him that my heart had long been another’s.",
             "That other was your father, Polya; papa was fearfully angry....",
             "Is the water ready?",
             "Give me the shirt, and the stockings!",
-            "Lida,” said she to the youngest one, “you must manage without your chemise to-night... and lay your stockings out with it...",
-            "I’ll wash them together....",
+            "Lida,” said she to the youngest one, “you must manage without your chemise to-night... and lay your stockings out with it... I’ll wash them together....",
             "How is it that drunken vagabond doesn’t come in?",
             "He has worn his shirt till it looks like a dish-clout, he has torn it to rags!",
             "I’d do it all together, so as not to have to work two nights running!",
@@ -8790,8 +8727,7 @@
         },
         {
           "sentences": [
-            "“For God’s sake be calm, don’t be frightened!” he said, speaking quickly, “he was crossing the road and was run over by a carriage, don’t be frightened, he will come to, I told them bring him here...",
-            "I’ve been here already, you remember?",
+            "“For God’s sake be calm, don’t be frightened!” he said, speaking quickly, “he was crossing the road and was run over by a carriage, don’t be frightened, he will come to, I told them bring him here... I’ve been here already, you remember?",
             "He will come to; I’ll pay!”"
           ]
         },
@@ -8862,8 +8798,7 @@
           "sentences": [
             "“You might let him die in peace, at least,” she shouted at the crowd, “is it a spectacle for you to gape at?",
             "With cigarettes! (Cough, cough, cough!) You might as well keep your hats on....",
-            "And there is one in his hat!...",
-            "Get away!",
+            "And there is one in his hat!... Get away!",
             "You should respect the dead, at least!”"
           ]
         },
@@ -9028,8 +8963,7 @@
           "sentences": [
             "“Not the faintest!",
             "He is at the last gasp....",
-            "His head is badly injured, too...",
-            "I could bleed him if you like, but... it would be useless.",
+            "His head is badly injured, too... Hm... I could bleed him if you like, but... it would be useless.",
             "He is bound to die within the next five or ten minutes.”"
           ]
         },
@@ -9151,8 +9085,7 @@
             "That’s words and only words!",
             "Forgive!",
             "If he’d not been run over, he’d have come home to-day drunk and his only shirt dirty and in rags and he’d have fallen asleep like a log, and I should have been sousing and rinsing till daybreak, washing his rags and the children’s and then drying them by the window and as soon as it was daylight I should have been darning them.",
-            "That’s how I spend my nights!...",
-            "What’s the use of talking of forgiveness!",
+            "That’s how I spend my nights!... What’s the use of talking of forgiveness!",
             "I have forgiven as it is!”"
           ]
         },
@@ -9231,9 +9164,7 @@
             "Believe me, he spoke of you with passionate reverence.",
             "From that evening, when I learnt how devoted he was to you all and how he loved and respected you especially, Katerina Ivanovna, in spite of his unfortunate weakness, from that evening we became friends....",
             "Allow me now... to do something... to repay my debt to my dead friend.",
-            "Here are twenty roubles, I think--and if that can be of any assistance to you, then...",
-            "I... in short, I will come again, I will be sure to come again...",
-            "I shall, perhaps, come again to-morrow....",
+            "Here are twenty roubles, I think--and if that can be of any assistance to you, then... I... in short, I will come again, I will be sure to come again... I shall, perhaps, come again to-morrow....",
             "Good-bye!”"
           ]
         },
@@ -9263,8 +9194,7 @@
         },
         {
           "sentences": [
-            "“Yes...",
-            "I’m covered with blood,” Raskolnikov said with a peculiar air; then he smiled, nodded and went downstairs."
+            "“Yes... I’m covered with blood,” Raskolnikov said with a peculiar air; then he smiled, nodded and went downstairs."
           ]
         },
         {
@@ -9400,8 +9330,7 @@
         },
         {
           "sentences": [
-            "“I am very weak at this moment, but...",
-            "I believe my illness is all over.",
+            "“I am very weak at this moment, but... I believe my illness is all over.",
             "I knew it would be over when I went out.",
             "By the way, Potchinkov’s house is only a few steps away.",
             "I certainly must go to Razumihin even if it were not close by... let him win his bet!",
@@ -9454,15 +9383,13 @@
         {
           "sentences": [
             "Goodness only knows!",
-            "Some friend of uncle’s, I expect, or perhaps he has come without being invited...",
-            "I’ll leave uncle with them, he is an invaluable person, pity I can’t introduce you to him now.",
+            "Some friend of uncle’s, I expect, or perhaps he has come without being invited... I’ll leave uncle with them, he is an invaluable person, pity I can’t introduce you to him now.",
             "But confound them all now!",
             "They won’t notice me, and I need a little fresh air, for you’ve come just in the nick of time--another two minutes and I should have come to blows!",
             "They are talking such a lot of wild stuff... you simply can’t imagine what men will say!",
             "Though why shouldn’t you imagine?",
             "Don’t we talk nonsense ourselves?",
-            "And let them... that’s the way to learn not to!...",
-            "Wait a minute, I’ll fetch Zossimov.”"
+            "And let them... that’s the way to learn not to!... Wait a minute, I’ll fetch Zossimov.”"
           ]
         },
         {
@@ -9506,8 +9433,7 @@
           "sentences": [
             "“Yes, and he did well.",
             "Now I understand what it all means and so does Zametov....",
-            "Well, the fact is, Rodya... the point is...",
-            "I am a little drunk now....",
+            "Well, the fact is, Rodya... the point is... I am a little drunk now....",
             "But that’s... no matter... the point is that this idea... you understand? was just being hatched in their brains... you understand?",
             "That is, no one ventured to say it aloud, because the idea is too absurd and especially since the arrest of that painter, that bubble’s burst and gone for ever.",
             "But why are they such fools?",
@@ -9554,9 +9480,7 @@
           "sentences": [
             "“Oh, not mad.",
             "I must have said too much, brother....",
-            "What struck him, you see, was that only that subject seemed to interest you; now it’s clear why it did interest you; knowing all the circumstances... and how that irritated you and worked in with your illness...",
-            "I am a little drunk, brother, only, confound him, he has some idea of his own...",
-            "I tell you, he’s mad on mental diseases.",
+            "What struck him, you see, was that only that subject seemed to interest you; now it’s clear why it did interest you; knowing all the circumstances... and how that irritated you and worked in with your illness... I am a little drunk, brother, only, confound him, he has some idea of his own... I tell you, he’s mad on mental diseases.",
             "But don’t you mind him...”"
           ]
         },
@@ -9567,8 +9491,7 @@
         },
         {
           "sentences": [
-            "“Listen, Razumihin,” began Raskolnikov, “I want to tell you plainly: I’ve just been at a death-bed, a clerk who died...",
-            "I gave them all my money... and besides I’ve just been kissed by someone who, if I had killed anyone, would just the same... in fact I saw someone else there... with a flame-coloured feather... but I am talking nonsense; I am very weak, support me... we shall be at the stairs directly...”"
+            "“Listen, Razumihin,” began Raskolnikov, “I want to tell you plainly: I’ve just been at a death-bed, a clerk who died... I gave them all my money... and besides I’ve just been kissed by someone who, if I had killed anyone, would just the same... in fact I saw someone else there... with a flame-coloured feather... but I am talking nonsense; I am very weak, support me... we shall be at the stairs directly...”"
           ]
         },
         {
@@ -9609,8 +9532,7 @@
         },
         {
           "sentences": [
-            "“She is never in my room at this time and she must be in bed long ago, but...",
-            "I don’t care!",
+            "“She is never in my room at this time and she must be in bed long ago, but... I don’t care!",
             "Good-bye!”"
           ]
         },
@@ -9673,8 +9595,7 @@
         },
         {
           "sentences": [
-            "Anxiety, cries of horror, moans...",
-            "Razumihin who was standing in the doorway flew into the room, seized the sick man in his strong arms and in a moment had him on the sofa."
+            "Anxiety, cries of horror, moans... Razumihin who was standing in the doorway flew into the room, seized the sick man in his strong arms and in a moment had him on the sofa."
           ]
         },
         {
@@ -9692,8 +9613,8 @@
           ]
         }
       ],
-      "sentence_count": 461,
-      "word_count": 6916
+      "sentence_count": 443,
+      "word_count": 6917
     },
     {
       "number": "I",
@@ -9716,8 +9637,7 @@
         },
         {
           "sentences": [
-            "“Go home... with him,” he said in a broken voice, pointing to Razumihin, “good-bye till to-morrow; to-morrow everything...",
-            "Is it long since you arrived?”"
+            "“Go home... with him,” he said in a broken voice, pointing to Razumihin, “good-bye till to-morrow; to-morrow everything... Is it long since you arrived?”"
           ]
         },
         {
@@ -9749,8 +9669,7 @@
           "sentences": [
             "“I can’t have it!",
             "I can’t have it!” he repeated irritably, “don’t worry me!",
-            "Enough, go away...",
-            "I can’t stand it!”"
+            "Enough, go away... I can’t stand it!”"
           ]
         },
         {
@@ -9777,8 +9696,7 @@
         },
         {
           "sentences": [
-            "“Yes... he was so kind...",
-            "Dounia, I promised Luzhin I’d throw him downstairs and told him to go to hell....”"
+            "“Yes... he was so kind... Dounia, I promised Luzhin I’d throw him downstairs and told him to go to hell....”"
           ]
         },
         {
@@ -9811,10 +9729,9 @@
         {
           "sentences": [
             "“You think I am delirious?",
-            "You are marrying Luzhin for _my_ sake.",
+            "No... You are marrying Luzhin for _my_ sake.",
             "But I won’t accept the sacrifice.",
-            "And so write a letter before to-morrow, to refuse him...",
-            "Let me read it in the morning and that will be the end of it!”"
+            "And so write a letter before to-morrow, to refuse him... Let me read it in the morning and that will be the end of it!”"
           ]
         },
         {
@@ -9824,8 +9741,7 @@
         },
         {
           "sentences": [
-            "“Dounia, you are hasty, too, be quiet, to-morrow...",
-            "Don’t you see...”  the mother interposed in dismay. “Better come away!”"
+            "“Dounia, you are hasty, too, be quiet, to-morrow... Don’t you see...”  the mother interposed in dismay. “Better come away!”"
           ]
         },
         {
@@ -9844,8 +9760,7 @@
         },
         {
           "sentences": [
-            "“Good-bye till to-morrow, brother,” said Dounia compassionately--“let us go, mother...",
-            "Good-bye, Rodya.”"
+            "“Good-bye till to-morrow, brother,” said Dounia compassionately--“let us go, mother... Good-bye, Rodya.”"
           ]
         },
         {
@@ -9895,8 +9810,7 @@
           "sentences": [
             "“And Avdotya Romanovna can’t possibly be left in those lodgings without you.",
             "Just think where you are staying!",
-            "That blackguard Pyotr Petrovitch couldn’t find you better lodgings...",
-            "But you know I’ve had a little to drink, and that’s what makes me... swear; don’t mind it....”"
+            "That blackguard Pyotr Petrovitch couldn’t find you better lodgings... But you know I’ve had a little to drink, and that’s what makes me... swear; don’t mind it....”"
           ]
         },
         {
@@ -9936,11 +9850,9 @@
             "And I’ll spend the night here, in the passage, he won’t hear me, and I’ll tell Zossimov to sleep at the landlady’s, to be at hand.",
             "Which is better for him: you or the doctor?",
             "So come home then!",
-            "But the landlady is out of the question; it’s all right for me, but it’s out of the question for you: she wouldn’t take you, for she’s... for she’s a fool...",
-            "She’d be jealous on my account of Avdotya Romanovna and of you, too, if you want to know... of Avdotya Romanovna certainly.",
+            "But the landlady is out of the question; it’s all right for me, but it’s out of the question for you: she wouldn’t take you, for she’s... for she’s a fool... She’d be jealous on my account of Avdotya Romanovna and of you, too, if you want to know... of Avdotya Romanovna certainly.",
             "She is an absolutely, absolutely unaccountable character!",
-            "But I am a fool, too!...",
-            "No matter!",
+            "But I am a fool, too!... No matter!",
             "Come along!",
             "Do you trust me?",
             "Come, do you trust me or not?”"
@@ -9970,21 +9882,16 @@
         {
           "sentences": [
             "“Ah, I see you think I am in such a condition!” Razumihin broke in upon her thoughts, guessing them, as he strolled along the pavement with huge steps, so that the two ladies could hardly keep up with him, a fact he did not observe, however. “Nonsense!",
-            "That is...",
-            "I am drunk like a fool, but that’s not it; I am not drunk from wine.",
-            "It’s seeing you has turned my head...",
-            "But don’t mind me!",
+            "That is... I am drunk like a fool, but that’s not it; I am not drunk from wine.",
+            "It’s seeing you has turned my head... But don’t mind me!",
             "Don’t take any notice: I am talking nonsense, I am not worthy of you....",
             "I am utterly unworthy of you!",
             "The minute I’ve taken you home, I’ll pour a couple of pailfuls of water over my head in the gutter here, and then I shall be all right....",
             "If only you knew how I love you both!",
             "Don’t laugh, and don’t be angry!",
             "You may be angry with anyone, but not with me!",
-            "I am his friend, and therefore I am your friend, too, I want to be...",
-            "I had a presentiment...",
-            "Last year there was a moment... though it wasn’t a presentiment really, for you seem to have fallen from heaven.",
-            "And I expect I shan’t sleep all night...",
-            "Zossimov was afraid a little time ago that he would go mad... that’s why he mustn’t be irritated.”"
+            "I am his friend, and therefore I am your friend, too, I want to be... I had a presentiment... Last year there was a moment... though it wasn’t a presentiment really, for you seem to have fallen from heaven.",
+            "And I expect I shan’t sleep all night... Zossimov was afraid a little time ago that he would go mad... that’s why he mustn’t be irritated.”"
           ]
         },
         {
@@ -10001,6 +9908,7 @@
           "sentences": [
             "“Yes, but it’s not so, not a bit of it.",
             "He gave him some medicine, a powder, I saw it, and then your coming here....",
+            "Ah!",
             "It would have been better if you had come to-morrow.",
             "It’s a good thing we went away.",
             "And in an hour Zossimov himself will report to you about everything.",
@@ -10086,6 +9994,7 @@
             "Do you know the sort of people they take in here?",
             "And you his betrothed!",
             "You are his betrothed?",
+            "Yes?",
             "Well, then, I’ll tell you, your _fiancé_ is a scoundrel.”"
           ]
         },
@@ -10136,8 +10045,7 @@
         {
           "sentences": [
             "Dounia, goodness knows whether he will come!",
-            "How could I bring myself to leave Rodya?...",
-            "And how different, how different I had fancied our meeting!",
+            "How could I bring myself to leave Rodya?... And how different, how different I had fancied our meeting!",
             "How sullen he was, as though not pleased to see us....”"
           ]
         },
@@ -10287,9 +10195,7 @@
             "You are a feeble, nervous wretch, and a mass of whims, you’re getting fat and lazy and can’t deny yourself anything--and I call that dirty because it leads one straight into the dirt.",
             "You’ve let yourself get so slack that I don’t know how it is you are still a good, even a devoted doctor.",
             "You--a doctor--sleep on a feather bed and get up at night to your patients!",
-            "In another three or four years you won’t get up for your patients...",
-            "But hang it all, that’s not the point!...",
-            "You are going to spend to-night in the landlady’s flat here. (Hard work I’ve had to persuade her!) And I’ll be in the kitchen.",
+            "In another three or four years you won’t get up for your patients... But hang it all, that’s not the point!... You are going to spend to-night in the landlady’s flat here. (Hard work I’ve had to persuade her!) And I’ll be in the kitchen.",
             "So here’s a chance for you to get to know her better....",
             "It’s not as you think!",
             "There’s not a trace of anything of the sort, brother...!”"
@@ -10304,8 +10210,7 @@
           "sentences": [
             "“Here you have modesty, brother, silence, bashfulness, a savage virtue... and yet she’s sighing and melting like wax, simply melting!",
             "Save me from her, by all that’s unholy!",
-            "She’s most prepossessing...",
-            "I’ll repay you, I’ll do anything....”"
+            "She’s most prepossessing... I’ll repay you, I’ll do anything....”"
           ]
         },
         {
@@ -10391,8 +10296,7 @@
           "sentences": [
             "“Ach, I can’t make you understand!",
             "You see, you are made for each other!",
-            "I have often been reminded of you!...",
-            "You’ll come to it in the end!",
+            "I have often been reminded of you!... You’ll come to it in the end!",
             "So does it matter whether it’s sooner or later?",
             "There’s the feather-bed element here, brother--ach! and not only that!",
             "There’s an attraction here--here you have the end of the world, an anchorage, a quiet haven, the navel of the earth, the three fishes that are the foundation of the world, the essence of pancakes, of savoury fish-pies, of the evening samovar, of soft sighs and warm shawls, and hot stoves to sleep on--as snug as though you were dead, and yet you’re alive--the advantages of both at once!",
@@ -10406,8 +10310,8 @@
           ]
         }
       ],
-      "sentence_count": 349,
-      "word_count": 5073
+      "sentence_count": 332,
+      "word_count": 5076
     },
     {
       "number": "II",
@@ -10432,8 +10336,7 @@
             "So there must be something in him.",
             "The lodgings?",
             "But after all how could he know the character of the lodgings?",
-            "He was furnishing a flat...",
-            "Foo! how despicable it all was!",
+            "He was furnishing a flat... Foo! how despicable it all was!",
             "And what justification was it that he was drunk?",
             "Such a stupid excuse was even more degrading!",
             "In wine is truth, and the truth had all come out, “that is, all the uncleanness of his coarse and envious heart”!",
@@ -10530,15 +10433,14 @@
             "“That’s nonsense, I tell you, how could I think it seriously?",
             "You, yourself, described him as a monomaniac when you fetched me to him... and we added fuel to the fire yesterday, you did, that is, with your story about the painter; it was a nice conversation, when he was, perhaps, mad on that very point!",
             "If only I’d known what happened then at the police station and that some wretch... had insulted him with this suspicion!",
-            "I would not have allowed that conversation yesterday.",
+            "Hm... I would not have allowed that conversation yesterday.",
             "These monomaniacs will make a mountain out of a mole-hill... and see their fancies as solid realities....",
             "As far as I remember, it was Zametov’s story that cleared up half the mystery, to my mind.",
             "Why, I know one case in which a hypochondriac, a man of forty, cut the throat of a little boy of eight, because he couldn’t endure the jokes he made every day at table!",
             "And in this case his rags, the insolent police officer, the fever and this suspicion!",
             "All that working upon a man half frantic with hypochondria, and with his morbid exceptional vanity!",
             "That may well have been the starting-point of illness.",
-            "Well, bother it all!...",
-            "And, by the way, that Zametov certainly is a nice fellow, but hm... he shouldn’t have told all that last night.",
+            "Well, bother it all!... And, by the way, that Zametov certainly is a nice fellow, but hm... he shouldn’t have told all that last night.",
             "He is an awful chatterbox!”"
           ]
         },
@@ -10718,8 +10620,7 @@
             "“You may both be mistaken about Rodya,” Pulcheria Alexandrovna remarked, slightly piqued. “I am not talking of our present difficulty, Dounia.",
             "What Pyotr Petrovitch writes in this letter and what you and I have supposed may be mistaken, but you can’t imagine, Dmitri Prokofitch, how moody and, so to say, capricious he is.",
             "I never could depend on what he would do when he was only fifteen.",
-            "And I am sure that he might do something now that nobody else would think of doing...",
-            "Well, for instance, do you know how a year and a half ago he astounded me and gave me a shock that nearly killed me, when he had the idea of marrying that girl--what was her name--his landlady’s daughter?”"
+            "And I am sure that he might do something now that nobody else would think of doing... Well, for instance, do you know how a year and a half ago he astounded me and gave me a shock that nearly killed me, when he had the idea of marrying that girl--what was her name--his landlady’s daughter?”"
           ]
         },
         {
@@ -10797,18 +10698,9 @@
           "sentences": [
             "He crimsoned and ceased speaking.",
             "Avdotya Romanovna flushed, but did not break the silence.",
-            "She had not uttered a word from the moment they began"
+            "She had not uttered a word from the moment they began to speak of Luzhin."
           ]
-        }
-      ],
-      "sentence_count": 174,
-      "word_count": 2941
-    },
-    {
-      "number": "21",
-      "title": "speak of Luzhin.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Without her support Pulcheria Alexandrovna obviously did not know what to do.",
@@ -10832,8 +10724,7 @@
             "But this morning this note came from him.",
             "You’d better read it yourself; there is one point in it which worries me very much... you will soon see what that is, and... tell me your candid opinion, Dmitri Prokofitch!",
             "You know Rodya’s character better than anyone and no one can advise us better than you can.",
-            "Dounia, I must tell you, made her decision at once, but I still don’t feel sure how to act and I...",
-            "I’ve been waiting for your opinion.”"
+            "Dounia, I must tell you, made her decision at once, but I still don’t feel sure how to act and I... I’ve been waiting for your opinion.”"
           ]
         },
         {
@@ -10859,6 +10750,7 @@
         },
         {
           "sentences": [
+            "“P.",
             "LUZHIN.”"
           ]
         },
@@ -10891,6 +10783,7 @@
         {
           "sentences": [
             "“He was not himself yesterday,” Razumihin said thoughtfully, “if you only knew what he was up to in a restaurant yesterday, though there was sense in it too....",
+            "Hm!",
             "He did say something, as we were going home yesterday evening, about a dead man and a girl, but I didn’t understand a word....",
             "But last night, I myself...”"
           ]
@@ -11015,8 +10908,8 @@
           ]
         }
       ],
-      "sentence_count": 77,
-      "word_count": 1476
+      "sentence_count": 249,
+      "word_count": 4424
     },
     {
       "number": "III",
@@ -11032,18 +10925,9 @@
           "sentences": [
             "He had come in ten minutes earlier and was sitting in the same place as before, on the sofa.",
             "Raskolnikov was sitting in the opposite corner, fully dressed and carefully washed and combed, as he had not been for some time past.",
-            "The room was immediately crowded, yet Nastasya managed"
+            "The room was immediately crowded, yet Nastasya managed to follow the visitors in and stayed to listen."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 61
-    },
-    {
-      "number": "23",
-      "title": "follow the visitors in and stayed to listen.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Raskolnikov really was almost well, as compared with his condition the day before, but he was still pale, listless, and sombre.",
@@ -11160,10 +11044,8 @@
         {
           "sentences": [
             "“And how well he does it all,” the mother was thinking to herself. “What generous impulses he has, and how simply, how delicately he put an end to all the misunderstanding with his sister--simply by holding out his hand at the right minute and looking at her like that....",
-            "And what fine eyes he has, and how fine his whole face is!...",
-            "He is even better looking than Dounia....",
-            "But, good heavens, what a suit--how terribly he’s dressed!...",
-            "Vasya, the messenger boy in Afanasy Ivanitch’s shop, is better dressed!",
+            "And what fine eyes he has, and how fine his whole face is!... He is even better looking than Dounia....",
+            "But, good heavens, what a suit--how terribly he’s dressed!... Vasya, the messenger boy in Afanasy Ivanitch’s shop, is better dressed!",
             "I could rush at him and hug him... weep over him--but I am afraid....",
             "Oh, dear, he’s so strange!",
             "He’s talking kindly, but I’m afraid!",
@@ -11175,8 +11057,7 @@
             "“Oh, Rodya, you wouldn’t believe,” she began suddenly, in haste to answer his words to her, “how unhappy Dounia and I were yesterday!",
             "Now that it’s all over and done with and we are quite happy again--I can tell you.",
             "Fancy, we ran here almost straight from the train to embrace you and that woman--ah, here she is!",
-            "Good morning, Nastasya!...",
-            "She told us at once that you were lying in a high fever and had just run away from the doctor in delirium, and they were looking for you in the streets.",
+            "Good morning, Nastasya!... She told us at once that you were lying in a high fever and had just run away from the doctor in delirium, and they were looking for you in the streets.",
             "You can’t imagine how we felt!",
             "I couldn’t help thinking of the tragic end of Lieutenant Potanchikov, a friend of your father’s--you can’t remember him, Rodya--who ran out in the same way in a high fever and fell into the well in the court-yard and they couldn’t pull him out till next day.",
             "Of course, we exaggerated things.",
@@ -11208,9 +11089,7 @@
         },
         {
           "sentences": [
-            "“I’ve only just waked up, and wanted to go to you, but was delayed owing to my clothes; I forgot yesterday to ask her...",
-            "Nastasya... to wash out the blood...",
-            "I’ve only just dressed.”"
+            "“I’ve only just waked up, and wanted to go to you, but was delayed owing to my clothes; I forgot yesterday to ask her... Nastasya... to wash out the blood... I’ve only just dressed.”"
           ]
         },
         {
@@ -11277,8 +11156,7 @@
         },
         {
           "sentences": [
-            "“What?” Raskolnikov seemed to wake up. “Oh...",
-            "I got spattered with blood helping to carry him to his lodging.",
+            "“What?” Raskolnikov seemed to wake up. “Oh... I got spattered with blood helping to carry him to his lodging.",
             "By the way, mamma, I did an unpardonable thing yesterday.",
             "I was literally out of my mind.",
             "I gave away all the money you sent me... to his wife for the funeral.",
@@ -11507,8 +11385,7 @@
         },
         {
           "sentences": [
-            "“Well, if you remembered something; that’s all right!...",
-            "I was beginning to think...” muttered Zossimov, getting up from the sofa. “It is time for me to be off.",
+            "“Well, if you remembered something; that’s all right!... I was beginning to think...” muttered Zossimov, getting up from the sofa. “It is time for me to be off.",
             "I will look in again perhaps... if I can...” He made his bows, and went out."
           ]
         },
@@ -11520,8 +11397,7 @@
         {
           "sentences": [
             "“Yes, excellent, splendid, well-educated, intelligent,” Raskolnikov began, suddenly speaking with surprising rapidity, and a liveliness he had not shown till then. “I can’t remember where I met him before my illness....",
-            "I believe I have met him somewhere----...",
-            "And this is a good man, too,” he nodded at Razumihin. “Do you like him, Dounia?” he asked her; and suddenly, for some unknown reason, laughed."
+            "I believe I have met him somewhere----... And this is a good man, too,” he nodded at Razumihin. “Do you like him, Dounia?” he asked her; and suddenly, for some unknown reason, laughed."
           ]
         },
         {
@@ -11548,6 +11424,7 @@
         {
           "sentences": [
             "“You need not at all.",
+            "Stay.",
             "Zossimov has gone, so you must.",
             "Don’t go.",
             "What’s the time?",
@@ -11642,11 +11519,11 @@
         },
         {
           "sentences": [
+            "Now?",
             "Oh, yes....",
             "You ask about her?",
             "No... that’s all now, as it were, in another world... and so long ago.",
-            "And indeed everything happening here seems somehow far away.” He looked attentively at them. “You, now...",
-            "I seem to be looking at you from a thousand miles away... but, goodness knows why we are talking of that!",
+            "And indeed everything happening here seems somehow far away.” He looked attentively at them. “You, now... I seem to be looking at you from a thousand miles away... but, goodness knows why we are talking of that!",
             "And what’s the use of asking about it?” he added with annoyance, and biting his nails, fell into dreamy silence again."
           ]
         },
@@ -11872,8 +11749,7 @@
             "In all this I see a too hasty desire to slander me and to raise dissension between us.",
             "It is expressed again in legal jargon, that is to say, with a too obvious display of the aim, and with a very naïve eagerness.",
             "He is a man of intelligence, but to act sensibly, intelligence is not enough.",
-            "It all shows the man and...",
-            "I don’t think he has a great esteem for you.",
+            "It all shows the man and... I don’t think he has a great esteem for you.",
             "I tell you this simply to warn you, because I sincerely wish for your good...”"
           ]
         },
@@ -11937,8 +11813,8 @@
           ]
         }
       ],
-      "sentence_count": 352,
-      "word_count": 4909
+      "sentence_count": 348,
+      "word_count": 4981
     },
     {
       "number": "IV",
@@ -11989,7 +11865,7 @@
         },
         {
           "sentences": [
-            "I... have come for one minute.",
+            "“I... I... have come for one minute.",
             "Forgive me for disturbing you,” she began falteringly. “I come from Katerina Ivanovna, and she had no one to send.",
             "Katerina Ivanovna told me to beg you... to be at the service... in the morning... at Mitrofanievsky... and then... to us... to her... to do her the honour... she told me to beg you...” Sonia stammered and ceased speaking."
           ]
@@ -12162,18 +12038,9 @@
         },
         {
           "sentences": [
-            "Pulcheria Alexandrovna meant to greet Sonia, too; but it somehow failed"
+            "Pulcheria Alexandrovna meant to greet Sonia, too; but it somehow failed to come off, and she went in a flutter out of the room."
           ]
-        }
-      ],
-      "sentence_count": 88,
-      "word_count": 1292
-    },
-    {
-      "number": "25",
-      "title": "come off, and she went in a flutter out of the room.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But Avdotya Romanovna seemed to await her turn, and following her mother out, gave Sonia an attentive, courteous bow.",
@@ -12235,6 +12102,7 @@
             "You are the very portrait of him, and not so much in face as in soul.",
             "You are both melancholy, both morose and hot-tempered, both haughty and both generous....",
             "Surely he can’t be an egoist, Dounia.",
+            "Eh?",
             "When I think of what is in store for us this evening, my heart sinks!”"
           ]
         },
@@ -12262,8 +12130,7 @@
             "But where is one to get a breath of air here?",
             "The very streets here feel like shut-up rooms.",
             "Good heavens! what a town!... stay... this side... they will crush you--carrying something.",
-            "Why, it is a piano they have got, I declare... how they push!...",
-            "I am very much afraid of that young woman, too.”"
+            "Why, it is a piano they have got, I declare... how they push!... I am very much afraid of that young woman, too.”"
           ]
         },
         {
@@ -12343,8 +12210,7 @@
             "We have no secrets.",
             "You are not in our way.",
             "I want to have another word or two with you.",
-            "Listen!” he turned suddenly to Razumihin again. “You know that... what’s his name...",
-            "Porfiry Petrovitch?”"
+            "Listen!” he turned suddenly to Razumihin again. “You know that... what’s his name... Porfiry Petrovitch?”"
           ]
         },
         {
@@ -12356,8 +12222,7 @@
         },
         {
           "sentences": [
-            "“Is not he managing that case... you know, about that murder?...",
-            "You were speaking about it yesterday.”"
+            "“Is not he managing that case... you know, about that murder?... You were speaking about it yesterday.”"
           ]
         },
         {
@@ -12376,6 +12241,7 @@
             "You know what women are.",
             "So tell me what to do.",
             "I know I ought to have given notice at the police station, but would it not be better to go straight to Porfiry?",
+            "Eh?",
             "What do you think?",
             "The matter might be settled more quickly.",
             "You see, mother may ask for it before dinner.”"
@@ -12636,8 +12502,7 @@
         {
           "sentences": [
             "“Oh, it’s not exactly... you see, since you’ve been ill I happen to have mentioned you several times....",
-            "So, when he heard about you... about your being a law student and not able to finish your studies, he said, ‘What a pity!’ And so I concluded... from everything together, not only that; yesterday Zametov... you know, Rodya, I talked some nonsense on the way home to you yesterday, when I was drunk...",
-            "I am afraid, brother, of your exaggerating it, you see.”"
+            "So, when he heard about you... about your being a law student and not able to finish your studies, he said, ‘What a pity!’ And so I concluded... from everything together, not only that; yesterday Zametov... you know, Rodya, I talked some nonsense on the way home to you yesterday, when I was drunk... I am afraid, brother, of your exaggerating it, you see.”"
           ]
         },
         {
@@ -12650,8 +12515,7 @@
         {
           "sentences": [
             "“Yes, yes....",
-            "That is, pooh, no!...",
-            "But all that I said (and there was something else too) it was all nonsense, drunken nonsense.”"
+            "That is, pooh, no!... But all that I said (and there was something else too) it was all nonsense, drunken nonsense.”"
           ]
         },
         {
@@ -12701,8 +12565,7 @@
         {
           "sentences": [
             "“The most important thing, does Porfiry know that I was at the old hag’s flat yesterday... and asked about the blood?",
-            "I must find that out instantly, as soon as I go in, find out from his face; otherwise...",
-            "I’ll find out, if it’s my ruin.”"
+            "I must find that out instantly, as soon as I go in, find out from his face; otherwise... I’ll find out, if it’s my ruin.”"
           ]
         },
         {
@@ -12764,6 +12627,7 @@
             "“You are like a summer rose.",
             "And if only you knew how it suits you; a Romeo over six foot high!",
             "And how you’ve washed to-day--you cleaned your nails, I declare.",
+            "Eh?",
             "That’s something unheard of!",
             "Why, I do believe you’ve got pomatum on your hair!",
             "Bend down.”"
@@ -12787,8 +12651,8 @@
           ]
         }
       ],
-      "sentence_count": 252,
-      "word_count": 2865
+      "sentence_count": 337,
+      "word_count": 4174
     },
     {
       "number": "V",
@@ -12824,20 +12688,7 @@
         {
           "sentences": [
             "Raskolnikov was still laughing, with his hand in Porfiry Petrovitch’s, but anxious not to overdo it, awaited the right moment to put a natural end to it.",
-            "Razumihin, completely put to confusion by upsetting the table and smashing the glass, gazed gloomily at the fragments, cursed and turned sharply to the window where he stood looking out with his back"
-          ]
-        }
-      ],
-      "sentence_count": 16,
-      "word_count": 287
-    },
-    {
-      "number": "27",
-      "title": "the company with a fiercely scowling countenance, seeing nothing.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Razumihin, completely put to confusion by upsetting the table and smashing the glass, gazed gloomily at the fragments, cursed and turned sharply to the window where he stood looking out with his back to the company with a fiercely scowling countenance, seeing nothing.",
             "Porfiry Petrovitch laughed and was ready to go on laughing, but obviously looked for explanations.",
             "Zametov had been sitting in the corner, but he rose at the visitors’ entrance and was standing in expectation with a smile on his lips, though he looked with surprise and even it seemed incredulity at the whole scene and at Raskolnikov with a certain embarrassment.",
             "Zametov’s unexpected presence struck Raskolnikov unpleasantly."
@@ -12873,11 +12724,11 @@
         },
         {
           "sentences": [
-            "“Oh, you sharp lawyer!...",
-            "Damn you all!” snapped Razumihin, and suddenly bursting out laughing himself, he went up to Porfiry with a more cheerful face as though nothing had happened. “That’ll do!",
+            "“Oh, you sharp lawyer!... Damn you all!” snapped Razumihin, and suddenly bursting out laughing himself, he went up to Porfiry with a more cheerful face as though nothing had happened. “That’ll do!",
             "We are all fools.",
             "To come to business.",
             "This is my friend Rodion Romanovitch Raskolnikov; in the first place he has heard of you and wants to make your acquaintance, and secondly, he has a little matter of business with you.",
+            "Bah!",
             "Zametov, what brought you here?",
             "Have you met before?",
             "Have you known each other long?”"
@@ -12936,8 +12787,7 @@
         },
         {
           "sentences": [
-            "“That’s just the point, that at the present moment,” Raskolnikov tried his utmost to feign embarrassment, “I am not quite in funds... and even this trifling sum is beyond me...",
-            "I only wanted, you see, for the present to declare that the things are mine, and that when I have money....”"
+            "“That’s just the point, that at the present moment,” Raskolnikov tried his utmost to feign embarrassment, “I am not quite in funds... and even this trifling sum is beyond me... I only wanted, you see, for the present to declare that the things are mine, and that when I have money....”"
           ]
         },
         {
@@ -13114,18 +12964,9 @@
             "“Nonsense!",
             "Don’t you believe it!",
             "But you don’t believe it anyway,”  Raskolnikov let slip in his anger.",
-            "But Porfiry Petrovitch did not seem"
+            "But Porfiry Petrovitch did not seem to catch those strange words."
           ]
-        }
-      ],
-      "sentence_count": 97,
-      "word_count": 1475
-    },
-    {
-      "number": "28",
-      "title": "catch those strange words.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“But how could you have gone out if you hadn’t been delirious?”  Razumihin got hot suddenly. “What did you go out for?",
@@ -13584,6 +13425,7 @@
         },
         {
           "sentences": [
+            "“I... I do.",
             "Why do you ask all this?”"
           ]
         },
@@ -13688,8 +13530,7 @@
         },
         {
           "sentences": [
-            "“Well, brother, if you are really serious...",
-            "You are right, of course, in saying that it’s not new, that it’s like what we’ve read and heard a thousand times already; but what is really original in all this, and is exclusively your own, to my horror, is that you sanction bloodshed _in the name of conscience_, and, excuse my saying so, with such fanaticism....",
+            "“Well, brother, if you are really serious... You are right, of course, in saying that it’s not new, that it’s like what we’ve read and heard a thousand times already; but what is really original in all this, and is exclusively your own, to my horror, is that you sanction bloodshed _in the name of conscience_, and, excuse my saying so, with such fanaticism....",
             "That, I take it, is the point of your article.",
             "But that sanction of bloodshed _by conscience_ is to my mind... more terrible than the official, legal sanction of bloodshed....”"
           ]
@@ -13815,8 +13656,7 @@
         },
         {
           "sentences": [
-            "“Well, you see...",
-            "I really don’t know how to express it properly....",
+            "“Well, you see... I really don’t know how to express it properly....",
             "It’s a playful, psychological idea....",
             "When you were writing your article, surely you couldn’t have helped, he-he! fancying yourself... just a little, an ‘extraordinary’ man, uttering a _new word_ in your sense....",
             "That’s so, isn’t it?”"
@@ -13834,8 +13674,7 @@
         },
         {
           "sentences": [
-            "“And, if so, could you bring yourself in case of worldly difficulties and hardship or for some service to humanity--to overstep obstacles?...",
-            "For instance, to rob and murder?”"
+            "“And, if so, could you bring yourself in case of worldly difficulties and hardship or for some service to humanity--to overstep obstacles?... For instance, to rob and murder?”"
           ]
         },
         {
@@ -13907,8 +13746,7 @@
             "“Oh, why?",
             "That’s not necessary for the present.",
             "You misunderstand me.",
-            "I lose no opportunity, you see, and...",
-            "I’ve talked with all who had pledges....",
+            "I lose no opportunity, you see, and... I’ve talked with all who had pledges....",
             "I obtained evidence from some of them, and you are the last....",
             "Yes, by the way,” he cried, seemingly suddenly delighted, “I just remember, what was I thinking of?” he turned to Razumihin, “you were talking my ears off about that Nikolay... of course, I know, I know very well,” he turned to Raskolnikov, “that the fellow is innocent, but what is one to do?",
             "We had to trouble Dmitri too....",
@@ -13932,8 +13770,7 @@
             "“Painters?",
             "No, I didn’t see them,” Raskolnikov answered slowly, as though ransacking his memory, while at the same instant he was racking every nerve, almost swooning with anxiety to conjecture as quickly as possible where the trap lay and not to overlook anything. “No, I didn’t see them, and I don’t think I noticed a flat like that open....",
             "But on the fourth storey” (he had mastered the trap now and was triumphant) “I remember now that someone was moving out of the flat opposite Alyona Ivanovna’s....",
-            "I remember...",
-            "I remember it clearly.",
+            "I remember... I remember it clearly.",
             "Some porters were carrying out a sofa and they squeezed me against the wall.",
             "But painters... no, I don’t remember that there were any painters, and I don’t think that there was a flat open anywhere, no, there wasn’t.”"
           ]
@@ -13959,18 +13796,9 @@
         {
           "sentences": [
             "The last words were uttered in the passage.",
-            "Porfiry Petrovitch saw them"
+            "Porfiry Petrovitch saw them to the door with excessive politeness."
           ]
-        }
-      ],
-      "sentence_count": 376,
-      "word_count": 5185
-    },
-    {
-      "number": "29",
-      "title": "the door with excessive politeness.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "They went out into the street gloomy and sullen, and for some steps they did not say a word.",
@@ -13978,8 +13806,8 @@
           ]
         }
       ],
-      "sentence_count": 2,
-      "word_count": 24
+      "sentence_count": 486,
+      "word_count": 6996
     },
     {
       "number": "VI",
@@ -14005,8 +13833,7 @@
         {
           "sentences": [
             "“You are suspicious.",
-            "That is why you weighed their words... h’m... certainly, I agree, Porfiry’s tone was rather strange, and still more that wretch Zametov!...",
-            "You are right, there was something about him--but why?"
+            "That is why you weighed their words... h’m... certainly, I agree, Porfiry’s tone was rather strange, and still more that wretch Zametov!... You are right, there was something about him--but why?"
           ]
         },
         {
@@ -14402,8 +14229,7 @@
             "I didn’t kill a human being, but a principle!",
             "I killed the principle, but I didn’t overstep, I stopped on this side....",
             "I was only capable of killing.",
-            "And it seems I wasn’t even capable of that...",
-            "Principle?",
+            "And it seems I wasn’t even capable of that... Principle?",
             "Why was that fool Razumihin abusing the socialists?",
             "They are industrious, commercial people; ‘the happiness of all’ is their case.",
             "No, life is only given to me once and I shall never have it again; I don’t want to wait for ‘the happiness of all.’ I want to live myself, or else better not live at all.",
@@ -14420,8 +14246,7 @@
             "The abjectness!",
             "I understand the ‘prophet’ with his sabre, on his steed: Allah commands and ‘trembling’ creation must obey!",
             "The ‘prophet’ is right, he is right when he sets a battery across the street and blows up the innocent and the guilty without deigning to explain!",
-            "It’s for you to obey, trembling creation, and not _to have desires_, for that’s not for you!...",
-            "I shall never, never forgive the old woman!”"
+            "It’s for you to obey, trembling creation, and not _to have desires_, for that’s not for you!... I shall never, never forgive the old woman!”"
           ]
         },
         {
@@ -14439,8 +14264,7 @@
             "That’s just what I might do.... _She_ must be the same as I am,” he added, straining himself to think, as it were struggling with delirium. “Ah, how I hate the old woman now!",
             "I feel I should kill her again if she came to life!",
             "Poor Lizaveta!",
-            "Why did she come in?...",
-            "It’s strange though, why is it I scarcely ever think of her, as though I hadn’t killed her?",
+            "Why did she come in?... It’s strange though, why is it I scarcely ever think of her, as though I hadn’t killed her?",
             "Lizaveta!",
             "Sonia!",
             "Poor gentle things, with gentle eyes....",
@@ -14546,7 +14370,7 @@
           ]
         }
       ],
-      "sentence_count": 283,
+      "sentence_count": 279,
       "word_count": 4270
     },
     {
@@ -14645,8 +14469,7 @@
         {
           "sentences": [
             "“What of it?",
-            "What of it?” cried Svidrigaïlov, laughing openly. “But this is what the French call _bonne guerre_, and the most innocent form of deception!...",
-            "But still you have interrupted me; one way or another, I repeat again: there would never have been any unpleasantness except for what happened in the garden.",
+            "What of it?” cried Svidrigaïlov, laughing openly. “But this is what the French call _bonne guerre_, and the most innocent form of deception!... But still you have interrupted me; one way or another, I repeat again: there would never have been any unpleasantness except for what happened in the garden.",
             "Marfa Petrovna...”"
           ]
         },
@@ -14783,8 +14606,7 @@
             "I’ve been lounging about for the last three days, and I’ve seen them, or they’ve seen me.",
             "That’s a matter of course.",
             "I am well dressed and reckoned not a poor man; the emancipation of the serfs hasn’t affected me; my property consists chiefly of forests and water meadows.",
-            "The revenue has not fallen off; but...",
-            "I am not going to see them, I was sick of them long ago.",
+            "The revenue has not fallen off; but... I am not going to see them, I was sick of them long ago.",
             "I’ve been here three days and have called on no one....",
             "What a town it is!",
             "How has it come into existence among us, tell me that?",
@@ -14854,7 +14676,7 @@
         },
         {
           "sentences": [
-            "No, oh, no,” muttered Svidrigaïlov really seeming to be deep in thought."
+            "“I... No, oh, no,” muttered Svidrigaïlov really seeming to be deep in thought."
           ]
         },
         {
@@ -15407,14 +15229,20 @@
           ]
         }
       ],
-      "sentence_count": 336,
-      "word_count": 4928
+      "sentence_count": 334,
+      "word_count": 4929
     },
     {
-      "number": "32",
-      "title": "arrive before Luzhin.",
-      "type": "letter",
+      "number": "II",
+      "title": "",
+      "type": "chapter",
       "paragraphs": [
+        {
+          "sentences": [
+            "It was nearly eight o’clock.",
+            "The two young men hurried to Bakaleyev’s, to arrive before Luzhin."
+          ]
+        },
         {
           "sentences": [
             "“Why, who was that?” asked Razumihin, as soon as they were in the street."
@@ -15481,8 +15309,7 @@
         },
         {
           "sentences": [
-            "“Hm!... that’s all right,” muttered Raskolnikov. “Do you know, I fancied...",
-            "I keep thinking that it may have been an hallucination.”"
+            "“Hm!... that’s all right,” muttered Raskolnikov. “Do you know, I fancied... I keep thinking that it may have been an hallucination.”"
           ]
         },
         {
@@ -15510,8 +15337,7 @@
         },
         {
           "sentences": [
-            "“Ach, Rodya, you have been upset again!...",
-            "But what did he say, what did he come for?”"
+            "“Ach, Rodya, you have been upset again!... But what did he say, what did he come for?”"
           ]
         },
         {
@@ -15703,21 +15529,7 @@
         },
         {
           "sentences": [
-            "“Quite so, but what drove him, or rather perhaps disposed him,"
-          ]
-        }
-      ],
-      "sentence_count": 123,
-      "word_count": 1801
-    },
-    {
-      "number": "33",
-      "title": "suicide was the systematic persecution and severity of Mr.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "Svidrigaïlov.”"
+            "“Quite so, but what drove him, or rather perhaps disposed him, to suicide was the systematic persecution and severity of Mr. Svidrigaïlov.”"
           ]
         },
         {
@@ -15880,8 +15692,7 @@
           "sentences": [
             "“Avdotya Romanovna,” Luzhin declared huffily, “your words are of too much consequence to me; I will say more, they are offensive in view of the position I have the honour to occupy in relation to you.",
             "To say nothing of your strange and offensive setting me on a level with an impertinent boy, you admit the possibility of breaking your promise to me.",
-            "You say ‘you or he,’ showing thereby of how little consequence I am in your eyes...",
-            "I cannot let this pass considering the relationship and... the obligations existing between us.”"
+            "You say ‘you or he,’ showing thereby of how little consequence I am in your eyes... I cannot let this pass considering the relationship and... the obligations existing between us.”"
           ]
         },
         {
@@ -15898,8 +15709,7 @@
           "sentences": [
             "“Love for the future partner of your life, for your husband, ought to outweigh your love for your brother,” he pronounced sententiously, “and in any case I cannot be put on the same level....",
             "Although I said so emphatically that I would not speak openly in your brother’s presence, nevertheless, I intend now to ask your honoured mother for a necessary explanation on a point of great importance closely affecting my dignity.",
-            "Your son,” he turned to Pulcheria Alexandrovna, “yesterday in the presence of Mr. Razsudkin (or...",
-            "I think that’s it? excuse me, I have forgotten your surname”) (he bowed politely to Razumihin), “insulted me by misrepresenting the idea I expressed to you in a private conversation, drinking coffee, that is, that marriage with a poor girl who has had experience of trouble is more advantageous from the conjugal point of view than with one who has lived in luxury, since it is more profitable for the moral character.",
+            "Your son,” he turned to Pulcheria Alexandrovna, “yesterday in the presence of Mr. Razsudkin (or... I think that’s it? excuse me, I have forgotten your surname”) (he bowed politely to Razumihin), “insulted me by misrepresenting the idea I expressed to you in a private conversation, drinking coffee, that is, that marriage with a poor girl who has had experience of trouble is more advantageous from the conjugal point of view than with one who has lived in luxury, since it is more profitable for the moral character.",
             "Your son intentionally exaggerated the significance of my words and made them ridiculous, accusing me of malicious intentions, and, as far as I could see, relied upon your correspondence with him.",
             "I shall consider myself happy, Pulcheria Alexandrovna, if it is possible for you to convince me of an opposite conclusion, and thereby considerately reassure me.",
             "Kindly let me know in what terms precisely you repeated my words in your letter to Rodion Romanovitch.”"
@@ -16072,8 +15882,7 @@
         },
         {
           "sentences": [
-            "“But you have bound me, Pulcheria Alexandrovna,” Luzhin stormed in a frenzy, “by your promise, and now you deny it and... besides...",
-            "I have been led on account of that into expenses....”"
+            "“But you have bound me, Pulcheria Alexandrovna,” Luzhin stormed in a frenzy, “by your promise, and now you deny it and... besides... I have been led on account of that into expenses....”"
           ]
         },
         {
@@ -16129,8 +15938,8 @@
           ]
         }
       ],
-      "sentence_count": 141,
-      "word_count": 2708
+      "sentence_count": 260,
+      "word_count": 4535
     },
     {
       "number": "III",
@@ -16163,8 +15972,7 @@
             "He brooded with relish, in profound secret, over the image of a girl--virtuous, poor (she must be poor), very young, very pretty, of good birth and education, very timid, one who had suffered much, and was completely humbled before him, one who would all her life look on him as her saviour, worship him, admire him and only him.",
             "How many scenes, how many amorous episodes he had imagined on this seductive and playful theme, when his work was over!",
             "And, behold, the dream of so many years was all but realised; the beauty and education of Avdotya Romanovna had impressed him; her helpless position had been a great allurement; in her he had found even more than he dreamed of.",
-            "Here was a girl of pride, character, virtue, of education and breeding superior to his own (he felt that), and this creature would be slavishly grateful all her life for his heroic condescension, and would humble herself in the dust before him, and he would have absolute, unbounded power over her!...",
-            "Not long before, he had, too, after long reflection and hesitation, made an important change in his career and was now entering on a wider circle of business.",
+            "Here was a girl of pride, character, virtue, of education and breeding superior to his own (he felt that), and this creature would be slavishly grateful all her life for his heroic condescension, and would humble herself in the dust before him, and he would have absolute, unbounded power over her!... Not long before, he had, too, after long reflection and hesitation, made an important change in his career and was now entering on a wider circle of business.",
             "With this change his cherished dreams of rising into a higher class of society seemed likely to be realised....",
             "He was, in fact, determined to try his fortune in Petersburg.",
             "He knew that women could do a very great deal.",
@@ -16172,6 +15980,7 @@
             "This sudden horrible rupture affected him like a clap of thunder; it was like a hideous joke, an absurdity.",
             "He had only been a tiny bit masterful, had not even time to speak out, had simply made a joke, been carried away--and it had ended so seriously.",
             "And, of course, too, he did love Dounia in his own way; he already possessed her in his dreams--and all at once!",
+            "No!",
             "The next day, the very next day, it must all be set right, smoothed over, settled.",
             "Above all he must crush that conceited milksop who was the cause of it all.",
             "With a sick feeling he could not help recalling Razumihin too, but, he soon reassured himself on that score; as though a fellow like that could be put on a level with him!",
@@ -16331,8 +16140,7 @@
             "Take me into partnership, and I assure you we’ll plan a capital enterprise.",
             "Listen!",
             "I’ll explain it all in detail to you, the whole project!",
-            "It all flashed into my head this morning, before anything had happened...",
-            "I tell you what; I have an uncle, I must introduce him to you (a most accommodating and respectable old man).",
+            "It all flashed into my head this morning, before anything had happened... I tell you what; I have an uncle, I must introduce him to you (a most accommodating and respectable old man).",
             "This uncle has got a capital of a thousand roubles, and he lives on his pension and has no need of that money.",
             "For the last two years he has been bothering me to borrow it from him and pay him six per cent interest.",
             "I know what that means; he simply wants to help me.",
@@ -16449,19 +16257,16 @@
         },
         {
           "sentences": [
-            "“I meant to say... as I was coming here...",
-            "I meant to tell you, mother, and you, Dounia, that it would be better for us to part for a time.",
+            "“I meant to say... as I was coming here... I meant to tell you, mother, and you, Dounia, that it would be better for us to part for a time.",
             "I feel ill, I am not at peace....",
             "I will come afterwards, I will come of myself... when it’s possible.",
             "I remember you and love you....",
             "Leave me, leave me alone.",
-            "I decided this even before...",
-            "I’m absolutely resolved on it.",
+            "I decided this even before... I’m absolutely resolved on it.",
             "Whatever may come to me, whether I come to ruin or not, I want to be alone.",
             "Forget me altogether, it’s better.",
             "Don’t inquire about me.",
-            "When I can, I’ll come of myself or...",
-            "I’ll send for you.",
+            "When I can, I’ll come of myself or... I’ll send for you.",
             "Perhaps it will all come back, but now if you love me, give me up... else I shall begin to hate you, I feel it....",
             "Good-bye!”"
           ]
@@ -16578,8 +16383,8 @@
           ]
         }
       ],
-      "sentence_count": 208,
-      "word_count": 3027
+      "sentence_count": 204,
+      "word_count": 3028
     },
     {
       "number": "IV",
@@ -16625,8 +16430,7 @@
         {
           "sentences": [
             "A minute later Sonia, too, came in with the candle, set down the candlestick and, completely disconcerted, stood before him inexpressibly agitated and apparently frightened by his unexpected visit.",
-            "The colour rushed suddenly to her pale face and tears came into her eyes...",
-            "She felt sick and ashamed and happy, too....",
+            "The colour rushed suddenly to her pale face and tears came into her eyes... She felt sick and ashamed and happy, too....",
             "Raskolnikov turned away quickly and sat on a chair by the table.",
             "He scanned the room in a rapid glance."
           ]
@@ -16662,8 +16466,7 @@
         },
         {
           "sentences": [
-            "“Yes,” muttered Sonia, “oh yes, it is,” she added, hastily, as though in that lay her means of escape. “My landlady’s clock has just struck...",
-            "I heard it myself....”"
+            "“Yes,” muttered Sonia, “oh yes, it is,” she added, hastily, as though in that lay her means of escape. “My landlady’s clock has just struck... I heard it myself....”"
           ]
         },
         {
@@ -17434,18 +17237,10 @@
         },
         {
           "sentences": [
-            "Sonia heard Raskolnikov’s request distrustfully and moved hesitatingly"
+            "Sonia heard Raskolnikov’s request distrustfully and moved hesitatingly to the table.",
+            "She took the book however."
           ]
-        }
-      ],
-      "sentence_count": 315,
-      "word_count": 3864
-    },
-    {
-      "number": "36",
-      "title": "the table. She took the book however.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Haven’t you read it?” she asked, looking up at him across the table."
@@ -17493,8 +17288,7 @@
         {
           "sentences": [
             "“Yes, I shall.",
-            "I was at church last week, too...",
-            "I had a requiem service.”"
+            "I was at church last week, too... I had a requiem service.”"
           ]
         },
         {
@@ -17582,8 +17376,7 @@
             "Raskolnikov saw in part why Sonia could not bring herself to read to him and the more he saw this, the more roughly and irritably he insisted on her doing so.",
             "He understood only too well how painful it was for her to betray and unveil all that was her _own_.",
             "He understood that these feelings really were her _secret treasure_, which she had kept perhaps for years, perhaps from childhood, while she lived with an unhappy father and a distracted stepmother crazed by grief, in the midst of starving children and unseemly abuse and reproaches.",
-            "But at the same time he knew now and knew for certain that, although it filled her with dread and suffering, yet she had a tormenting desire to read and to read to _him_ that he might hear it, and to read _now_ whatever might come of it!...",
-            "He read this in her eyes, he could see it in her intense emotion.",
+            "But at the same time he knew now and knew for certain that, although it filled her with dread and suffering, yet she had a tormenting desire to read and to read to _him_ that he might hear it, and to read _now_ whatever might come of it!... He read this in her eyes, he could see it in her intense emotion.",
             "She mastered herself, controlled the spasm in her throat and went on reading the eleventh chapter of St. John.",
             "She went on to the nineteenth verse:"
           ]
@@ -17880,8 +17673,7 @@
             "What, you don’t understand?",
             "You’ll understand later....",
             "Freedom and power, and above all, power!",
-            "Over all trembling creation and all the ant-heap!...",
-            "That’s the goal, remember that!",
+            "Over all trembling creation and all the ant-heap!... That’s the goal, remember that!",
             "That’s my farewell message.",
             "Perhaps it’s the last time I shall speak to you.",
             "If I don’t come to-morrow, you’ll hear of it all, and then remember these words.",
@@ -17922,8 +17714,7 @@
           "sentences": [
             "“Good heavens, how does he know who killed Lizaveta?",
             "What did those words mean?",
-            "It’s awful!” But at the same time _the idea_ did not enter her head, not for a moment! “Oh, he must be terribly unhappy!...",
-            "He has abandoned his mother and sister....",
+            "It’s awful!” But at the same time _the idea_ did not enter her head, not for a moment! “Oh, he must be terribly unhappy!... He has abandoned his mother and sister....",
             "What for?",
             "What has happened?",
             "And what had he in his mind?",
@@ -17949,8 +17740,8 @@
           ]
         }
       ],
-      "sentence_count": 190,
-      "word_count": 2221
+      "sentence_count": 500,
+      "word_count": 6093
     },
     {
       "number": "V",
@@ -18117,12 +17908,10 @@
             "“Good heavens!",
             "What do you mean?",
             "What shall I question you about?”  cackled Porfiry Petrovitch with a change of tone, instantly leaving off laughing. “Please don’t disturb yourself,” he began fidgeting from place to place and fussily making Raskolnikov sit down. “There’s no hurry, there’s no hurry, it’s all nonsense.",
-            "Oh, no, I’m very glad you’ve come to see me at last...",
-            "I look upon you simply as a visitor.",
+            "Oh, no, I’m very glad you’ve come to see me at last... I look upon you simply as a visitor.",
             "And as for my confounded laughter, please excuse it, Rodion Romanovitch.",
             "Rodion Romanovitch?",
-            "That is your name?...",
-            "It’s my nerves, you tickled me so with your witty observation; I assure you, sometimes I shake with laughter like an india-rubber ball for half an hour at a time....",
+            "That is your name?... It’s my nerves, you tickled me so with your witty observation; I assure you, sometimes I shake with laughter like an india-rubber ball for half an hour at a time....",
             "I’m often afraid of an attack of paralysis.",
             "Do sit down.",
             "Please do, or I shall think you are angry...”"
@@ -18141,8 +17930,7 @@
             "What is the reason of it?",
             "Whether it is the lack of public interest, or whether it is we are so honest we don’t want to deceive one another, I don’t know.",
             "What do you think?",
-            "Do put down your cap, it looks as if you were just going, it makes me uncomfortable...",
-            "I am so delighted...”"
+            "Do put down your cap, it looks as if you were just going, it makes me uncomfortable... I am so delighted...”"
           ]
         },
         {
@@ -18153,11 +17941,8 @@
         {
           "sentences": [
             "“I can’t offer you coffee here; but why not spend five minutes with a friend?” Porfiry pattered on, “and you know all these official duties... please don’t mind my running up and down, excuse it, my dear fellow, I am very much afraid of offending you, but exercise is absolutely indispensable for me.",
-            "I’m always sitting and so glad to be moving about for five minutes...",
-            "I suffer from my sedentary life...",
-            "I always intend to join a gymnasium; they say that officials of all ranks, even Privy Councillors, may be seen skipping gaily there; there you have it, modern science... yes, yes....",
-            "But as for my duties here, inquiries and all such formalities... you mentioned inquiries yourself just now...",
-            "I assure you these interrogations are sometimes more embarrassing for the interrogator than for the interrogated....",
+            "I’m always sitting and so glad to be moving about for five minutes... I suffer from my sedentary life... I always intend to join a gymnasium; they say that officials of all ranks, even Privy Councillors, may be seen skipping gaily there; there you have it, modern science... yes, yes....",
+            "But as for my duties here, inquiries and all such formalities... you mentioned inquiries yourself just now... I assure you these interrogations are sometimes more embarrassing for the interrogator than for the interrogated....",
             "You made the observation yourself just now very aptly and wittily.” (Raskolnikov had made no observation of the kind.) “One gets into a muddle!",
             "A regular muddle!",
             "One keeps harping on the same note, like a drum!",
@@ -18166,6 +17951,7 @@
             "Every prisoner on trial, even the rudest peasant, knows that they begin by disarming him with irrelevant questions (as you so happily put it) and then deal him a knock-down blow, he-he-he!--your felicitous comparison, he-he!",
             "So you really imagined that I meant by ‘government quarters’... he-he!",
             "You are an ironical person.",
+            "Come.",
             "I won’t go on!",
             "Ah, by the way, yes!",
             "One word leads to another.",
@@ -18196,8 +17982,7 @@
           "sentences": [
             "“You are certainly quite right about it,” Porfiry began gaily, looking with extraordinary simplicity at Raskolnikov (which startled him and instantly put him on his guard); “certainly quite right in laughing so wittily at our legal forms, he-he!",
             "Some of these elaborate psychological methods are exceedingly ridiculous and perhaps useless, if one adheres too closely to the forms.",
-            "Yes...",
-            "I am talking of forms again.",
+            "Yes... I am talking of forms again.",
             "Well, if I recognise, or more strictly speaking, if I suspect someone or other to be a criminal in any case entrusted to me... you’re reading for the law, of course, Rodion Romanovitch?”"
           ]
         },
@@ -18247,8 +18032,7 @@
             "It may be so with a simple peasant, but with one of our sort, an intelligent man cultivated on a certain side, it’s a dead certainty.",
             "For, my dear fellow, it’s a very important matter to know on what side a man is cultivated.",
             "And then there are nerves, there are nerves, you have overlooked them!",
-            "Why, they are all sick, nervous and irritable!...",
-            "And then how they all suffer from spleen!",
+            "Why, they are all sick, nervous and irritable!... And then how they all suffer from spleen!",
             "That I assure you is a regular gold-mine for us.",
             "And it’s no anxiety to me, his running about the town free!",
             "Let him, let him walk about for a bit!",
@@ -18427,8 +18211,7 @@
           "sentences": [
             "“Yes, you’ve had a little attack!",
             "You’ll bring back your illness again, my dear fellow,” Porfiry Petrovitch cackled with friendly sympathy, though he still looked rather disconcerted. “Good heavens, you must take more care of yourself!",
-            "Dmitri Prokofitch was here, came to see me yesterday--I know, I know, I’ve a nasty, ironical temper, but what they made of it!...",
-            "Good heavens, he came yesterday after you’d been.",
+            "Dmitri Prokofitch was here, came to see me yesterday--I know, I know, I’ve a nasty, ironical temper, but what they made of it!... Good heavens, he came yesterday after you’d been.",
             "We dined and he talked and talked away, and I could only throw up my hands in despair!",
             "Did he come from you?",
             "But do sit down, for mercy’s sake, sit down!”"
@@ -18460,8 +18243,7 @@
             "That’s so, isn’t it?",
             "I have guessed how you feel, haven’t I?",
             "Only in that way you’ll lose your head and Razumihin’s, too; he’s too _good_ a man for such a position, you must know that.",
-            "You are ill and he is good and your illness is infectious for him...",
-            "I’ll tell you about it when you are more yourself....",
+            "You are ill and he is good and your illness is infectious for him... I’ll tell you about it when you are more yourself....",
             "But do sit down, for goodness’ sake.",
             "Please rest, you look shocking, do sit down.”"
           ]
@@ -18515,8 +18297,7 @@
             "“Yes, I hear and understand.",
             "You said yesterday you were not delirious, you were particularly emphatic about it!",
             "I understand all you can tell me!",
-            "A-ach!...",
-            "Listen, Rodion Romanovitch, my dear fellow.",
+            "A-ach!... Listen, Rodion Romanovitch, my dear fellow.",
             "If you were actually a criminal, or were somehow mixed up in this damnable business, would you insist that you were not delirious but in full possession of your faculties?",
             "And so emphatically and persistently?",
             "Would it be possible?",
@@ -18618,6 +18399,7 @@
           "sentences": [
             "“I am lying?” Porfiry repeated, apparently incensed, but preserving a good-humoured and ironical face, as though he were not in the least concerned at Raskolnikov’s opinion of him. “I am lying... but how did I treat you just now, I, the examining lawyer?",
             "Prompting you and giving you every means for your defence; illness, I said, delirium, injury, melancholy and the police officers and all the rest of it?",
+            "Ah!",
             "He-he-he!",
             "Though, indeed, all those psychological means of defence are not very reliable and cut both ways: illness, delirium, I don’t remember--that’s all right, but why, my good sir, in your illness and in your delirium were you haunted by just those delusions and not by any others?",
             "There may have been others, eh?",
@@ -18666,6 +18448,7 @@
         {
           "sentences": [
             "“Hush!",
+            "Hush!",
             "They’ll overhear!",
             "I warn you seriously, take care of yourself.",
             "I am not joking,” Porfiry whispered, but this time there was not the look of old womanish good nature and alarm in his face.",
@@ -18789,8 +18572,7 @@
           "sentences": [
             "“Ah, they’re coming,” cried Raskolnikov. “You’ve sent for them!",
             "You expected them!",
-            "Well, produce them all: your deputies, your witnesses, what you like!...",
-            "I am ready!”"
+            "Well, produce them all: your deputies, your witnesses, what you like!... I am ready!”"
           ]
         },
         {
@@ -18799,8 +18581,8 @@
           ]
         }
       ],
-      "sentence_count": 429,
-      "word_count": 6987
+      "sentence_count": 420,
+      "word_count": 6990
     },
     {
       "number": "VI",
@@ -18880,8 +18662,7 @@
         {
           "sentences": [
             "“Go away, it’s too soon!",
-            "Wait till you are sent for!...",
-            "Why have you brought him so soon?” Porfiry Petrovitch muttered, extremely annoyed, and as it were thrown out of his reckoning."
+            "Wait till you are sent for!... Why have you brought him so soon?” Porfiry Petrovitch muttered, extremely annoyed, and as it were thrown out of his reckoning."
           ]
         },
         {
@@ -18995,8 +18776,7 @@
         },
         {
           "sentences": [
-            "“It was to put them off the scent...",
-            "I ran after Mitka,” Nikolay replied hurriedly, as though he had prepared the answer."
+            "“It was to put them off the scent... I ran after Mitka,” Nikolay replied hurriedly, as though he had prepared the answer."
           ]
         },
         {
@@ -19012,9 +18792,7 @@
         },
         {
           "sentences": [
-            "“My dear Rodion Romanovitch, excuse me!” he flew up to him, “this won’t do; I’m afraid you must go... it’s no good your staying...",
-            "I will... you see, what a surprise!...",
-            "Good-bye!”"
+            "“My dear Rodion Romanovitch, excuse me!” he flew up to him, “this won’t do; I’m afraid you must go... it’s no good your staying... I will... you see, what a surprise!... Good-bye!”"
           ]
         },
         {
@@ -19102,14 +18880,12 @@
         },
         {
           "sentences": [
-            "“You must forgive me, Porfiry Petrovitch, for what has just passed...",
-            "I lost my temper,” began Raskolnikov, who had so far regained his courage that he felt irresistibly inclined to display his coolness."
+            "“You must forgive me, Porfiry Petrovitch, for what has just passed... I lost my temper,” began Raskolnikov, who had so far regained his courage that he felt irresistibly inclined to display his coolness."
           ]
         },
         {
           "sentences": [
-            "“Don’t mention it, don’t mention it,” Porfiry replied, almost gleefully. “I myself, too...",
-            "I have a wicked temper, I admit it!",
+            "“Don’t mention it, don’t mention it,” Porfiry replied, almost gleefully. “I myself, too... I have a wicked temper, I admit it!",
             "But we shall meet again.",
             "If it’s God’s will, we may see a great deal of one another.”"
           ]
@@ -19385,6 +19161,7 @@
         {
           "sentences": [
             "“Where?",
+            "What?",
             "When?”"
           ]
         },
@@ -19457,8 +19234,8 @@
           ]
         }
       ],
-      "sentence_count": 225,
-      "word_count": 2729
+      "sentence_count": 220,
+      "word_count": 2730
     },
     {
       "number": "I",
@@ -19500,6 +19277,7 @@
             "They could not have refused me so easily!",
             "They are the sort of people that would feel bound to return money and presents if they broke it off; and they would find it hard to do it!",
             "And their conscience would prick them: how can we dismiss a man who has hitherto been so generous and delicate?....",
+            "H’m!",
             "I’ve made a blunder.”"
           ]
         },
@@ -19703,8 +19481,7 @@
             "“No, it’s only the second, really!",
             "But what if it were the fourth, what if it were the fifteenth, that’s all nonsense!",
             "And if ever I regretted the death of my father and mother, it is now, and I sometimes think if my parents were living what a protest I would have aimed at them!",
-            "I would have done something on purpose...",
-            "I would have shown them!",
+            "I would have done something on purpose... I would have shown them!",
             "I would have astonished them!",
             "I am really sorry there is no one!”"
           ]
@@ -19811,8 +19588,7 @@
             "Good heavens, how... crude you still are!",
             "We are striving for the freedom of women and you have only one idea in your head....",
             "Setting aside the general question of chastity and feminine modesty as useless in themselves and indeed prejudices, I fully accept her chastity with me, because that’s for her to decide.",
-            "Of course if she were to tell me herself that she wanted me, I should think myself very lucky, because I like the girl very much; but as it is, no one has ever treated her more courteously than I, with more respect for her dignity...",
-            "I wait in hopes, that’s all!”"
+            "Of course if she were to tell me herself that she wanted me, I should think myself very lucky, because I like the girl very much; but as it is, no one has ever treated her more courteously than I, with more respect for her dignity... I wait in hopes, that’s all!”"
           ]
         },
         {
@@ -19864,6 +19640,7 @@
             "How vexed I am that when I was expounding our system, I referred prematurely to the question of personal privacy!",
             "It’s always a stumbling-block to people like you, they turn it into ridicule before they understand it.",
             "And how proud they are of it, too!",
+            "Tfoo!",
             "I’ve often maintained that that question should not be approached by a novice till he has a firm faith in the system.",
             "And tell me, please, what do you find so shameful even in cesspools?",
             "I should be the first to be ready to clean out any cesspool you like.",
@@ -19901,9 +19678,7 @@
         {
           "sentences": [
             "“You’d better tell me this,” Pyotr Petrovitch interrupted with haughty displeasure, “can you... or rather are you really friendly enough with that young person to ask her to step in here for a minute?",
-            "I think they’ve all come back from the cemetery...",
-            "I heard the sound of steps...",
-            "I want to see her, that young person.”"
+            "I think they’ve all come back from the cemetery... I heard the sound of steps... I want to see her, that young person.”"
           ]
         },
         {
@@ -19914,8 +19689,7 @@
         {
           "sentences": [
             "“Oh, I want to.",
-            "I am leaving here to-day or to-morrow and therefore I wanted to speak to her about...",
-            "However, you may be present during the interview.",
+            "I am leaving here to-day or to-morrow and therefore I wanted to speak to her about... However, you may be present during the interview.",
             "It’s better you should be, indeed.",
             "For there’s no knowing what you might imagine.”"
           ]
@@ -19948,6 +19722,8 @@
         {
           "sentences": [
             "“Raskolnikov?",
+            "Yes.",
+            "Why?",
             "Yes, he is there.",
             "I saw him just come in...."
           ]
@@ -19965,8 +19741,7 @@
             "“I understand!” Lebeziatnikov saw the point. “Yes, you are right....",
             "Of course, I am convinced personally that you have no reason to be uneasy, but... still, you are right.",
             "Certainly I’ll stay.",
-            "I’ll stand here at the window and not be in your way...",
-            "I think you are right...”"
+            "I’ll stand here at the window and not be in your way... I think you are right...”"
           ]
         },
         {
@@ -19999,8 +19774,7 @@
         },
         {
           "sentences": [
-            "“Yes...",
-            "I’ll tell her... at once.”"
+            "“Yes... I’ll tell her... at once.”"
           ]
         },
         {
@@ -20064,15 +19838,13 @@
             "“Not in the slightest, and indeed it’s an absurdity!",
             "I merely hinted at her obtaining temporary assistance as the widow of an official who had died in the service--if only she has patronage... but apparently your late parent had not served his full term and had not indeed been in the service at all of late.",
             "In fact, if there could be any hope, it would be very ephemeral, because there would be no claim for assistance in that case, far from it....",
-            "And she is dreaming of a pension already, he-he-he!...",
-            "A go-ahead lady!”"
+            "And she is dreaming of a pension already, he-he-he!... A go-ahead lady!”"
           ]
         },
         {
           "sentences": [
             "“Yes, she is.",
-            "For she is credulous and good-hearted, and she believes everything from the goodness of her heart and... and... and she is like that... yes...",
-            "You must excuse her,” said Sonia, and again she got up to go."
+            "For she is credulous and good-hearted, and she believes everything from the goodness of her heart and... and... and she is like that... yes... You must excuse her,” said Sonia, and again she got up to go."
           ]
         },
         {
@@ -20099,8 +19871,7 @@
         },
         {
           "sentences": [
-            "“Yes, yes...",
-            "God will repay you for it,” faltered Sonia, gazing intently at Pyotr Petrovitch."
+            "“Yes, yes... God will repay you for it,” faltered Sonia, gazing intently at Pyotr Petrovitch."
           ]
         },
         {
@@ -20216,8 +19987,8 @@
           ]
         }
       ],
-      "sentence_count": 382,
-      "word_count": 6124
+      "sentence_count": 376,
+      "word_count": 6128
     },
     {
       "number": "II",
@@ -20329,8 +20100,7 @@
             "Won’t you have some vodka?",
             "Look, he’s jumped up and is making his bows, they must be quite starved, poor things.",
             "Never mind, let them eat!",
-            "They don’t make a noise, anyway, though I’m really afraid for our landlady’s silver spoons...",
-            "Amalia Ivanovna!” she addressed her suddenly, almost aloud, “if your spoons should happen to be stolen, I won’t be responsible, I warn you!",
+            "They don’t make a noise, anyway, though I’m really afraid for our landlady’s silver spoons... Amalia Ivanovna!” she addressed her suddenly, almost aloud, “if your spoons should happen to be stolen, I won’t be responsible, I warn you!",
             "Ha-ha-ha!” She laughed turning to Raskolnikov, and again nodding towards the landlady, in high glee at her sally. “She didn’t understand, she didn’t understand again!",
             "Look how she sits with her mouth open!",
             "An owl, a real owl!",
@@ -20458,20 +20228,7 @@
         },
         {
           "sentences": [
-            "“Allow me to ask what are you alluding to,” began the clerk, “that is"
-          ]
-        }
-      ],
-      "sentence_count": 133,
-      "word_count": 3222
-    },
-    {
-      "number": "41",
-      "title": "say, whose... about whom... did you say just now... But I don’t care!",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“Allow me to ask what are you alluding to,” began the clerk, “that is to say, whose... about whom... did you say just now... But I don’t care!",
             "That’s nonsense!",
             "Widow!",
             "I forgive you....",
@@ -20574,8 +20331,8 @@
           ]
         }
       ],
-      "sentence_count": 43,
-      "word_count": 1681
+      "sentence_count": 175,
+      "word_count": 4917
     },
     {
       "number": "III",
@@ -20595,8 +20352,7 @@
           "sentences": [
             "“Allow me, madam....",
             "Allow me.” Pyotr Petrovitch waved her off. “Your papa as you are well aware I had not the honour of knowing” (someone laughed aloud) “and I do not intend to take part in your everlasting squabbles with Amalia Ivanovna....",
-            "I have come here to speak of my own affairs... and I want to have a word with your stepdaughter, Sofya...",
-            "Ivanovna, I think it is?",
+            "I have come here to speak of my own affairs... and I want to have a word with your stepdaughter, Sofya... Ivanovna, I think it is?",
             "Allow me to pass.”"
           ]
         },
@@ -20671,6 +20427,7 @@
             "You will admit that recollecting your embarrassment, your eagerness to get away and the fact that you kept your hands for some time on the table, and taking into consideration your social position and the habits associated with it, I was, so to say, with horror and positively against my will, _compelled_ to entertain a suspicion--a cruel, but justifiable suspicion!",
             "I will add further and repeat that in spite of my positive conviction, I realise that I run a certain risk in making this accusation, but as you see, I could not let it pass.",
             "I have taken action and I will tell you why: solely, madam, solely owing to your black ingratitude!",
+            "Why!",
             "I invite you for the benefit of your destitute relative, I present you with my donation of ten roubles and you, on the spot, repay me for all that with such an action.",
             "It is too bad!",
             "You need a lesson.",
@@ -20770,6 +20527,7 @@
         {
           "sentences": [
             "“What!",
+            "Mad?",
             "Am I mad?",
             "Idiot!” shrieked Katerina Ivanovna. “You are an idiot yourself, pettifogging lawyer, base man!",
             "Sonia, Sonia take his money!",
@@ -20802,8 +20560,7 @@
         {
           "sentences": [
             "“I am ready, I’ll be responsible... but calm yourself, madam, calm yourself.",
-            "I see that you are not so submissive!...",
-            "Well, well, but as to that...” Luzhin muttered, “that ought to be before the police... though indeed there are witnesses enough as it is....",
+            "I see that you are not so submissive!... Well, well, but as to that...” Luzhin muttered, “that ought to be before the police... though indeed there are witnesses enough as it is....",
             "I am ready....",
             "But in any case it’s difficult for a man... on account of her sex....",
             "But with the help of Amalia Ivanovna... though, of course, it’s not the way to do things....",
@@ -20814,6 +20571,7 @@
           "sentences": [
             "“As you will!",
             "Let anyone who likes search her!” cried Katerina Ivanovna. “Sonia, turn out your pockets!",
+            "See!",
             "Look, monster, the pocket is empty, here was her handkerchief!",
             "Here is the other pocket, look!",
             "D’you see, d’you see?”"
@@ -21238,6 +20996,7 @@
           "sentences": [
             "“What!",
             "As though that godless calumny was not enough--this vile creature attacks me!",
+            "What!",
             "On the day of my husband’s funeral I am turned out of my lodging!",
             "After eating my bread and salt she turns me into the street, with my orphans!",
             "Where am I to go?” wailed the poor woman, sobbing and gasping. “Good God!” she cried with flashing eyes, “is there no justice upon earth?",
@@ -21269,8 +21028,8 @@
           ]
         }
       ],
-      "sentence_count": 370,
-      "word_count": 5516
+      "sentence_count": 372,
+      "word_count": 5520
     },
     {
       "number": "IV",
@@ -21359,8 +21118,7 @@
         },
         {
           "sentences": [
-            "“But...",
-            "Katerina Ivanovna?”"
+            "“But... Katerina Ivanovna?”"
           ]
         },
         {
@@ -21733,8 +21491,7 @@
           "sentences": [
             "“No, no, never, nowhere!” cried Sonia. “I will follow you, I will follow you everywhere.",
             "Oh, my God!",
-            "Oh, how miserable I am!...",
-            "Why, why didn’t I know you before!",
+            "Oh, how miserable I am!... Why, why didn’t I know you before!",
             "Why didn’t you come before?",
             "Oh, dear!”"
           ]
@@ -21747,8 +21504,7 @@
         {
           "sentences": [
             "“Yes, now!",
-            "What’s to be done now?...",
-            "Together, together!” she repeated as it were unconsciously, and she hugged him again. “I’ll follow you to Siberia!”"
+            "What’s to be done now?... Together, together!” she repeated as it were unconsciously, and she hugged him again. “I’ll follow you to Siberia!”"
           ]
         },
         {
@@ -21781,8 +21537,7 @@
           "sentences": [
             "“What’s the meaning of it?",
             "Where am I?” she said in complete bewilderment, as though still unable to recover herself. “How could you, you, a man like you....",
-            "How could you bring yourself to it?...",
-            "What does it mean?”"
+            "How could you bring yourself to it?... What does it mean?”"
           ]
         },
         {
@@ -22098,15 +21853,13 @@
             "I preferred lying still and thinking.",
             "And I kept thinking....",
             "And I had dreams all the time, strange dreams of all sorts, no need to describe!",
-            "Only then I began to fancy that...",
-            "No, that’s not it!",
+            "Only then I began to fancy that... No, that’s not it!",
             "Again I am telling you wrong!",
             "You see I kept asking myself then: why am I so stupid that if others are stupid--and I know they are--yet I won’t be wiser?",
             "Then I saw, Sonia, that if one waits for everyone to get wiser it will take too long....",
             "Afterwards I understood that that would never come to pass, that men won’t change and that nobody can alter it and that it’s not worth wasting effort over it.",
             "Yes, that’s so.",
-            "That’s the law of their nature, Sonia,... that’s so!...",
-            "And I know now, Sonia, that whoever is strong in mind and spirit will have power over them.",
+            "That’s the law of their nature, Sonia,... that’s so!... And I know now, Sonia, that whoever is strong in mind and spirit will have power over them.",
             "Anyone who is greatly daring is right in their eyes.",
             "He who despises most things will be a lawgiver among them and he who dares most of all will be most in the right!",
             "So it has been till now and so it will always be.",
@@ -22126,7 +21879,7 @@
             "There is only one thing, one thing needful: one has only to dare!",
             "Then for the first time in my life an idea took shape in my mind which no one had ever thought of before me, no one!",
             "I saw clear as daylight how strange it is that not a single person living in this mad world has had the daring to go straight for it all and send it flying to the devil!",
-            "I wanted _to have the daring_... and I killed her.",
+            "I... I wanted _to have the daring_... and I killed her.",
             "I only wanted to have the daring, Sonia!",
             "That was the whole cause of it!”"
           ]
@@ -22230,20 +21983,7 @@
         },
         {
           "sentences": [
-            "“What are you to do?” she cried, jumping up, and her eyes that had been full of tears suddenly began to shine. “Stand up!” (She seized him by the shoulder, he got up, looking at her almost bewildered.) “Go at once, this very minute, stand at the cross-roads, bow down, first kiss the earth which you have defiled and then bow down to all the world and say"
-          ]
-        }
-      ],
-      "sentence_count": 388,
-      "word_count": 5589
-    },
-    {
-      "number": "44",
-      "title": "all men aloud, ‘I am a murderer!’ Then God will send you life again.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“What are you to do?” she cried, jumping up, and her eyes that had been full of tears suddenly began to shine. “Stand up!” (She seized him by the shoulder, he got up, looking at her almost bewildered.) “Go at once, this very minute, stand at the cross-roads, bow down, first kiss the earth which you have defiled and then bow down to all the world and say to all men aloud, ‘I am a murderer!’ Then God will send you life again.",
             "Will you go, will you go?” she asked him, trembling all over, snatching his two hands, squeezing them tight in hers and gazing at him with eyes full of fire."
           ]
         },
@@ -22437,8 +22177,8 @@
           ]
         }
       ],
-      "sentence_count": 82,
-      "word_count": 966
+      "sentence_count": 464,
+      "word_count": 6571
     },
     {
       "number": "V",
@@ -22452,10 +22192,7 @@
         },
         {
           "sentences": [
-            "“I’ve come to you, Sofya Semyonovna,” he began. “Excuse me...",
-            "I thought I should find you,” he said, addressing Raskolnikov suddenly, “that is, I didn’t mean anything... of that sort...",
-            "But I just thought...",
-            "Katerina Ivanovna has gone out of her mind,” he blurted out suddenly, turning from Raskolnikov to Sonia."
+            "“I’ve come to you, Sofya Semyonovna,” he began. “Excuse me... I thought I should find you,” he said, addressing Raskolnikov suddenly, “that is, I didn’t mean anything... of that sort... But I just thought... Katerina Ivanovna has gone out of her mind,” he blurted out suddenly, turning from Raskolnikov to Sonia."
           ]
         },
         {
@@ -22538,12 +22275,10 @@
             "Raskolnikov went into his little room and stood still in the middle of it.",
             "Why had he come back here?",
             "He looked at the yellow and tattered paper, at the dust, at his sofa....",
-            "From the yard came a loud continuous knocking; someone seemed to be hammering...",
-            "He went to the window, rose on tiptoe and looked out into the yard for a long time with an air of absorbed attention.",
+            "From the yard came a loud continuous knocking; someone seemed to be hammering... He went to the window, rose on tiptoe and looked out into the yard for a long time with an air of absorbed attention.",
             "But the yard was empty and he could not see who was hammering.",
             "In the house on the left he saw some open windows; on the window-sills were pots of sickly-looking geraniums.",
-            "Linen was hung out of the windows...",
-            "He knew it all by heart.",
+            "Linen was hung out of the windows... He knew it all by heart.",
             "He turned away and sat down on the sofa."
           ]
         },
@@ -22807,8 +22542,7 @@
           "sentences": [
             "“A boarding-school, ha-ha-ha!",
             "A castle in the air,” cried Katerina Ivanovna, her laugh ending in a cough. “No, Rodion Romanovitch, that dream is over!",
-            "All have forsaken us!...",
-            "And that general....",
+            "All have forsaken us!... And that general....",
             "You know, Rodion Romanovitch, I threw an inkpot at him--it happened to be standing in the waiting-room by the paper where you sign your name.",
             "I wrote my name, threw it at him and ran away.",
             "Oh, the scoundrels, the scoundrels!",
@@ -22824,8 +22558,7 @@
             "Why, I’ve taught you, you know some phrases.",
             "Else how are you to show that you are of good family, well brought-up children, and not at all like other organ-grinders?",
             "We aren’t going to have a Punch and Judy show in the street, but to sing a genteel song....",
-            "Ah, yes,...",
-            "What are we to sing?",
+            "Ah, yes,... What are we to sing?",
             "You keep putting me out, but we... you see, we are standing here, Rodion Romanovitch, to find something to sing and get money, something Kolya can dance to....",
             "For, as you can fancy, our performance is all impromptu....",
             "We must talk it over and rehearse it all thoroughly, and then we shall go to Nevsky, where there are far more people of good society, and we shall be noticed at once.",
@@ -22883,8 +22616,7 @@
         {
           "sentences": [
             "“I thank you, honoured sir,” she began loftily. “The causes that have induced us (take the money, Polenka: you see there are generous and honourable people who are ready to help a poor gentlewoman in distress).",
-            "You see, honoured sir, these orphans of good family--I might even say of aristocratic connections--and that wretch of a general sat eating grouse... and stamped at my disturbing him. ‘Your excellency,’ I said, ‘protect the orphans, for you knew my late husband, Semyon Zaharovitch, and on the very day of his death the basest of scoundrels slandered his only daughter.’...",
-            "That policeman again!",
+            "You see, honoured sir, these orphans of good family--I might even say of aristocratic connections--and that wretch of a general sat eating grouse... and stamped at my disturbing him. ‘Your excellency,’ I said, ‘protect the orphans, for you knew my late husband, Semyon Zaharovitch, and on the very day of his death the basest of scoundrels slandered his only daughter.’... That policeman again!",
             "Protect me,” she cried to the official. “Why is that policeman edging up to me?",
             "We have only just run away from one of them.",
             "What do you want, fool?”"
@@ -22944,8 +22676,7 @@
         {
           "sentences": [
             "“Bring them back, bring them back, Sonia!",
-            "Oh stupid, ungrateful children!...",
-            "Polenka! catch them....",
+            "Oh stupid, ungrateful children!... Polenka! catch them....",
             "It’s for your sakes I...”"
           ]
         },
@@ -23004,8 +22735,7 @@
         },
         {
           "sentences": [
-            "“This way, this way, to my room!” Sonia implored. “I live here!...",
-            "See, that house, the second from here....",
+            "“This way, this way, to my room!” Sonia implored. “I live here!... See, that house, the second from here....",
             "Come to me, make haste,” she turned from one to the other. “Send for the doctor!",
             "Oh, dear!”"
           ]
@@ -23144,8 +22874,7 @@
         },
         {
           "sentences": [
-            "“In the heat of midday!... in the vale!... of Dagestan!...",
-            "With lead in my breast!...”"
+            "“In the heat of midday!... in the vale!... of Dagestan!... With lead in my breast!...”"
           ]
         },
         {
@@ -23271,7 +23000,7 @@
           ]
         }
       ],
-      "sentence_count": 385,
+      "sentence_count": 374,
       "word_count": 5042
     },
     {
@@ -23307,18 +23036,9 @@
         {
           "sentences": [
             "But during the two or three days after Katerina Ivanovna’s death, he had two or three times met Svidrigaïlov at Sonia’s lodging, where he had gone aimlessly for a moment.",
-            "They exchanged a few words and made no reference to the vital subject, as though they were tacitly agreed not"
+            "They exchanged a few words and made no reference to the vital subject, as though they were tacitly agreed not to speak of it for a time."
           ]
-        }
-      ],
-      "sentence_count": 19,
-      "word_count": 453
-    },
-    {
-      "number": "47",
-      "title": "speak of it for a time.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Katerina Ivanovna’s body was still lying in the coffin, Svidrigaïlov was busy making arrangements for the funeral.",
@@ -23530,8 +23250,7 @@
         },
         {
           "sentences": [
-            "“What did you say to her...",
-            "I mean, about me?”"
+            "“What did you say to her... I mean, about me?”"
           ]
         },
         {
@@ -23562,8 +23281,7 @@
             "Ach, damn it!",
             "But where do you mean to go?",
             "Of course, if it’s all a secret, never mind....",
-            "But I...",
-            "I shall find out the secret... and I am sure that it must be some ridiculous nonsense and that you’ve made it all up.",
+            "But I... I shall find out the secret... and I am sure that it must be some ridiculous nonsense and that you’ve made it all up.",
             "Anyway you are a capital fellow, a capital fellow!...”"
           ]
         },
@@ -23667,9 +23385,7 @@
         {
           "sentences": [
             "“What next?",
-            "You ask me why it interests me!...",
-            "Well, I heard it from Porfiry, among others...",
-            "It was from him I heard almost all about it.”"
+            "You ask me why it interests me!... Well, I heard it from Porfiry, among others... It was from him I heard almost all about it.”"
           ]
         },
         {
@@ -23703,9 +23419,7 @@
           "sentences": [
             "“Yes, yes; good-bye.",
             "I’ll tell you all about it another time, but now I’m busy.",
-            "There was a time when I fancied...",
-            "But no matter, another time!...",
-            "What need is there for me to drink now?",
+            "There was a time when I fancied... But no matter, another time!... What need is there for me to drink now?",
             "You have made me drunk without wine.",
             "I am drunk, Rodya!",
             "Good-bye, I’m going.",
@@ -23720,14 +23434,13 @@
         {
           "sentences": [
             "“He’s a political conspirator, there’s not a doubt about it,” Razumihin decided, as he slowly descended the stairs. “And he’s drawn his sister in; that’s quite, quite in keeping with Avdotya Romanovna’s character.",
-            "There are interviews between them!...",
-            "She hinted at it too...",
-            "So many of her words.... and hints... bear that meaning!",
+            "There are interviews between them!... She hinted at it too... So many of her words.... and hints... bear that meaning!",
             "And how else can all this tangle be explained?",
-            "And I was almost thinking...",
-            "Good heavens, what I thought!",
+            "Hm!",
+            "And I was almost thinking... Good heavens, what I thought!",
             "Yes, I took leave of my senses and I wronged him!",
             "It was his doing, under the lamp in the corridor that day.",
+            "Pfoo!",
             "What a crude, nasty, vile idea on my part!",
             "Nikolay is a brick, for confessing....",
             "And how clear it all is now!",
@@ -23762,8 +23475,7 @@
         },
         {
           "sentences": [
-            "“And Svidrigaïlov was a riddle...",
-            "He worried him, that was true, but somehow not on the same point.",
+            "“And Svidrigaïlov was a riddle... He worried him, that was true, but somehow not on the same point.",
             "He might still have a struggle to come with Svidrigaïlov.",
             "Svidrigaïlov, too, might be a means of escape; but Porfiry was a different matter."
           ]
@@ -23842,8 +23554,8 @@
           ]
         }
       ],
-      "sentence_count": 254,
-      "word_count": 3330
+      "sentence_count": 265,
+      "word_count": 3792
     },
     {
       "number": "II",
@@ -23974,6 +23686,7 @@
             "Through whom, how, and when those rumours came to me... and how they affected you, I need not go into.",
             "My suspicions were aroused by a complete accident, which might just as easily not have happened.",
             "What was it?",
+            "Hm!",
             "I believe there is no need to go into that either.",
             "Those rumours and that accident led to one idea in my mind.",
             "I admit it openly--for one may as well make a clean breast of it--I was the first to pitch on you.",
@@ -24020,7 +23733,8 @@
             "I was expecting you.",
             "But you simply bowled Zametov over and... well, you see, it all lies in this--that this damnable psychology can be taken two ways!",
             "Well, I kept expecting you, and so it was, you came!",
-            "My heart was fairly throbbing."
+            "My heart was fairly throbbing.",
+            "Ach!"
           ]
         },
         {
@@ -24543,8 +24257,8 @@
           ]
         }
       ],
-      "sentence_count": 392,
-      "word_count": 5553
+      "sentence_count": 394,
+      "word_count": 5555
     },
     {
       "number": "III",
@@ -24561,18 +24275,9 @@
         },
         {
           "sentences": [
-            "On the way, one question particularly worried him: had Svidrigaïlov been"
+            "On the way, one question particularly worried him: had Svidrigaïlov been to Porfiry’s?"
           ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 50
-    },
-    {
-      "number": "50",
-      "title": "Porfiry’s?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "As far as he could judge, he would swear to it, that he had not.",
@@ -24583,6 +24288,7 @@
           "sentences": [
             "But if he had not been yet, would he go?",
             "Meanwhile, for the present he fancied he couldn’t.",
+            "Why?",
             "He could not have explained, but if he could, he would not have wasted much thought over it at the moment.",
             "It all worried him and at the same time he could not attend to it.",
             "Strange to say, none would have believed it perhaps, but he only felt a faint vague anxiety about his immediate future.",
@@ -24651,18 +24357,10 @@
             "From whom could she get letters in Petersburg?",
             "Luzhin, perhaps?",
             "It’s true Razumihin was there to protect her, but Razumihin knew nothing of the position.",
-            "Perhaps it was his duty"
+            "Perhaps it was his duty to tell Razumihin?",
+            "He thought of it with repugnance."
           ]
-        }
-      ],
-      "sentence_count": 49,
-      "word_count": 603
-    },
-    {
-      "number": "51",
-      "title": "tell Razumihin? He thought of it with repugnance.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "In any case he must see Svidrigaïlov as soon as possible, he decided finally.",
@@ -24946,8 +24644,7 @@
           "sentences": [
             "“How can I tell you?",
             "How do I know?",
-            "You see in what a tavern I spend all my time and it’s my enjoyment, that’s to say it’s no great enjoyment, but one must sit somewhere; that poor Katia now--you saw her?...",
-            "If only I had been a glutton now, a club gourmand, but you see I can eat this.”"
+            "You see in what a tavern I spend all my time and it’s my enjoyment, that’s to say it’s no great enjoyment, but one must sit somewhere; that poor Katia now--you saw her?... If only I had been a glutton now, a club gourmand, but you see I can eat this.”"
           ]
         },
         {
@@ -24965,8 +24662,7 @@
             "That was why I hid myself just now like a schoolboy, for I was afraid you would hinder me.",
             "But I believe,” he pulled out his watch, “I can spend an hour with you.",
             "It’s half-past four now.",
-            "If only I’d been something, a landowner, a father, a cavalry officer, a photographer, a journalist...",
-            "I am nothing, no specialty, and sometimes I am positively bored.",
+            "If only I’d been something, a landowner, a father, a cavalry officer, a photographer, a journalist... I am nothing, no specialty, and sometimes I am positively bored.",
             "I really thought you would tell me something new.”"
           ]
         },
@@ -25100,7 +24796,7 @@
         },
         {
           "sentences": [
-            "“Oh, don’t talk of them; there have been no more in Petersburg, confound them!” he cried with an air of irritation. “Let’s rather talk of that... though...",
+            "“Oh, don’t talk of them; there have been no more in Petersburg, confound them!” he cried with an air of irritation. “Let’s rather talk of that... though... H’m!",
             "I have not much time, and can’t stay long with you, it’s a pity!",
             "I should have found plenty to tell you.”"
           ]
@@ -25179,8 +24875,8 @@
           ]
         }
       ],
-      "sentence_count": 227,
-      "word_count": 3121
+      "sentence_count": 281,
+      "word_count": 3787
     },
     {
       "number": "IV",
@@ -25466,8 +25162,7 @@
             "She comes in, curtseys, you can fancy, still in a short frock--an unopened bud!",
             "Flushing like a sunset--she had been told, no doubt.",
             "I don’t know how you feel about female faces, but to my mind these sixteen years, these childish eyes, shyness and tears of bashfulness are better than beauty; and she is a perfect little picture, too.",
-            "Fair hair in little curls, like a lamb’s, full little rosy lips, tiny feet, a charmer!...",
-            "Well, we made friends.",
+            "Fair hair in little curls, like a lamb’s, full little rosy lips, tiny feet, a charmer!... Well, we made friends.",
             "I told them I was in a hurry owing to domestic circumstances, and the next day, that is the day before yesterday, we were betrothed.",
             "When I go now I take her on my knee at once and keep her there....",
             "Well, she flushes like a sunset and I kiss her every minute.",
@@ -25615,7 +25310,7 @@
           ]
         }
       ],
-      "sentence_count": 275,
+      "sentence_count": 274,
       "word_count": 4381
     },
     {
@@ -25856,18 +25551,9 @@
             "He seemed to be approaching cautiously.",
             "He did not go on to the bridge, but stood aside on the pavement, doing all he could to avoid Raskolnikov’s seeing him.",
             "He had observed Dounia for some time and had been making signs to her.",
-            "She fancied he was signalling to beg her not"
+            "She fancied he was signalling to beg her not to speak to her brother, but to come to him."
           ]
-        }
-      ],
-      "sentence_count": 120,
-      "word_count": 1289
-    },
-    {
-      "number": "54",
-      "title": "speak to her brother, but to come to him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "That was what Dounia did.",
@@ -25963,8 +25649,7 @@
             "Madame Resslich, my landlady, has the next room.",
             "Now, look this way.",
             "I will show you my chief piece of evidence: this door from my bedroom leads into two perfectly empty rooms, which are to let.",
-            "Here they are...",
-            "You must look into them with some attention.”"
+            "Here they are... You must look into them with some attention.”"
           ]
         },
         {
@@ -26302,7 +25987,7 @@
         {
           "sentences": [
             "“You... one word from you, and he is saved.",
-            "I’ll save him.",
+            "I... I’ll save him.",
             "I have money and friends.",
             "I’ll send him away at once.",
             "I’ll get a passport, two passports, one for him and one for me.",
@@ -26405,8 +26090,7 @@
             "You would be simply submitting to circumstances, to violence, in fact, if we must use that word.",
             "Think about it.",
             "Your brother’s and your mother’s fate are in your hands.",
-            "I will be your slave... all my life...",
-            "I will wait here.”"
+            "I will be your slave... all my life... I will wait here.”"
           ]
         },
         {
@@ -26540,7 +26224,7 @@
         {
           "sentences": [
             "“Let me be,” she cried in despair. “I swear I’ll shoot again.",
-            "I’ll kill you.”"
+            "I... I’ll kill you.”"
           ]
         },
         {
@@ -26661,8 +26345,8 @@
           ]
         }
       ],
-      "sentence_count": 396,
-      "word_count": 4214
+      "sentence_count": 514,
+      "word_count": 5515
     },
     {
       "number": "VI",
@@ -26952,8 +26636,7 @@
             "This reminded him of the bridge over the Little Neva and he felt cold again as he had when standing there. “I never have liked water,” he thought, “even in a landscape,” and he suddenly smiled again at a strange idea: “Surely now all these questions of taste and comfort ought not to matter, but I’ve become more particular, like an animal that picks out a special place... for such an occasion.",
             "I ought to have gone into the Petrovsky Park!",
             "I suppose it seemed dark, cold, ha-ha!",
-            "As though I were seeking pleasant sensations!...",
-            "By the way, why haven’t I put out the candle?” he blew it out. “They’ve gone to bed next door,” he thought, not seeing the light at the crack. “Well, now, Marfa Petrovna, now is the time for you to turn up; it’s dark, and the very time and place for you.",
+            "As though I were seeking pleasant sensations!... By the way, why haven’t I put out the candle?” he blew it out. “They’ve gone to bed next door,” he thought, not seeing the light at the crack. “Well, now, Marfa Petrovna, now is the time for you to turn up; it’s dark, and the very time and place for you.",
             "But now you won’t come!”"
           ]
         },
@@ -27083,20 +26766,8 @@
         },
         {
           "sentences": [
-            "“What folly to trouble myself,” he decided suddenly with an oppressive feeling of annoyance. “What idiocy!” In vexation he took up the candle"
-          ]
-        }
-      ],
-      "sentence_count": 241,
-      "word_count": 4454
-    },
-    {
-      "number": "56",
-      "title": "see whether the child was asleep. He raised the blanket carefully.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“What folly to trouble myself,” he decided suddenly with an oppressive feeling of annoyance. “What idiocy!” In vexation he took up the candle to go and look for the ragged attendant again and make haste to go away. “Damn the child!” he thought as he opened the door, but he turned again to see whether the child was asleep.",
+            "He raised the blanket carefully.",
             "The child was sleeping soundly, she had got warm under the blanket, and her pale cheeks were flushed.",
             "But strange to say that flush seemed brighter and coarser than the rosy cheeks of childhood. “It’s a flush of fever,” thought Svidrigaïlov.",
             "It was like the flush from drinking, as though she had been given a full glass to drink.",
@@ -27107,18 +26778,9 @@
             "The corners of her mouth quivered, as though she were trying to control them.",
             "But now she quite gave up all effort, now it was a grin, a broad grin; there was something shameless, provocative in that quite unchildish face; it was depravity, it was the face of a harlot, the shameless face of a French harlot.",
             "Now both eyes opened wide; they turned a glowing, shameless glance upon him; they laughed, invited him....",
-            "There was something infinitely hideous and shocking in that laugh, in those eyes, in such nastiness in the face of a child. “What, at five years old?” Svidrigaïlov muttered in genuine horror. “What does it mean?” And now she turned to him, her little face all aglow, holding out her arms.... “Accursed child!” Svidrigaïlov cried, raising his hand"
+            "There was something infinitely hideous and shocking in that laugh, in those eyes, in such nastiness in the face of a child. “What, at five years old?” Svidrigaïlov muttered in genuine horror. “What does it mean?” And now she turned to him, her little face all aglow, holding out her arms.... “Accursed child!” Svidrigaïlov cried, raising his hand to strike her, but at that moment he woke up."
           ]
-        }
-      ],
-      "sentence_count": 11,
-      "word_count": 249
-    },
-    {
-      "number": "57",
-      "title": "strike her, but at that moment he woke up.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He was in the same bed, still wrapped in the blanket.",
@@ -27250,8 +26912,8 @@
           ]
         }
       ],
-      "sentence_count": 54,
-      "word_count": 646
+      "sentence_count": 306,
+      "word_count": 5400
     },
     {
       "number": "VII",
@@ -27441,8 +27103,7 @@
             "“That’s what I thought!",
             "I can come with you, you know, if you need me.",
             "And Dounia, too; she loves you, she loves you dearly--and Sofya Semyonovna may come with us if you like.",
-            "You see, I am glad to look upon her as a daughter even...",
-            "Dmitri Prokofitch will help us to go together.",
+            "You see, I am glad to look upon her as a daughter even... Dmitri Prokofitch will help us to go together.",
             "But... where... are you going?”"
           ]
         },
@@ -27506,8 +27167,7 @@
         },
         {
           "sentences": [
-            "“Yes...",
-            "I’ll come.”"
+            "“Yes... I’ll come.”"
           ]
         },
         {
@@ -27601,8 +27261,7 @@
         {
           "sentences": [
             "“I don’t remember clearly.",
-            "You see, sister, I wanted to make up my mind once for all, and several times I walked by the Neva, I remember that I wanted to end it all there, but...",
-            "I couldn’t make up my mind,” he whispered, looking at her mistrustfully again."
+            "You see, sister, I wanted to make up my mind once for all, and several times I walked by the Neva, I remember that I wanted to end it all there, but... I couldn’t make up my mind,” he whispered, looking at her mistrustfully again."
           ]
         },
         {
@@ -27660,18 +27319,9 @@
         },
         {
           "sentences": [
-            "There was a gleam of fire in his lustreless eyes; he seemed to be glad"
+            "There was a gleam of fire in his lustreless eyes; he seemed to be glad to think that he was still proud."
           ]
-        }
-      ],
-      "sentence_count": 177,
-      "word_count": 2256
-    },
-    {
-      "number": "59",
-      "title": "think that he was still proud.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“You don’t think, sister, that I was simply afraid of the water?” he asked, looking into her face with a sinister smile."
@@ -27720,13 +27370,11 @@
         {
           "sentences": [
             "“Crime?",
-            "What crime?” he cried in sudden fury. “That I killed a vile noxious insect, an old pawnbroker woman, of use to no one!...",
-            "Killing her was atonement for forty sins.",
+            "What crime?” he cried in sudden fury. “That I killed a vile noxious insect, an old pawnbroker woman, of use to no one!... Killing her was atonement for forty sins.",
             "She was sucking the life out of poor people.",
             "Was that a crime?",
             "I am not thinking of it and I am not thinking of expiating it, and why are you all rubbing it in on all sides? ‘A crime! a crime!’ Only now I see clearly the imbecility of my cowardice, now that I have decided to face this superfluous disgrace.",
-            "It’s simply because I am contemptible and have nothing in me that I have decided to, perhaps too for my advantage, as that...",
-            "Porfiry... suggested!”"
+            "It’s simply because I am contemptible and have nothing in me that I have decided to, perhaps too for my advantage, as that... Porfiry... suggested!”"
           ]
         },
         {
@@ -27740,8 +27388,7 @@
             "“Which all men shed,” he put in almost frantically, “which flows and has always flowed in streams, which is spilt like champagne, and for which men are crowned in the Capitol and are called afterwards benefactors of mankind.",
             "Look into it more carefully and understand it!",
             "I too wanted to do good to men and would have done hundreds, thousands of good deeds to make up for that one piece of stupidity, not stupidity even, simply clumsiness, for the idea was by no means so stupid as it seems now that it has failed.... (Everything seems stupid when it fails.) By that stupidity I only wanted to put myself into an independent position, to take the first step, to obtain means, and then everything would have been smoothed over by benefits immeasurable in comparison....",
-            "But I...",
-            "I couldn’t carry out even the first step, because I am contemptible, that’s what’s the matter!",
+            "But I... I couldn’t carry out even the first step, because I am contemptible, that’s what’s the matter!",
             "And yet I won’t look at it as you do.",
             "If I had succeeded I should have been crowned with glory, but now I’m trapped.”"
           ]
@@ -27842,8 +27489,8 @@
           ]
         }
       ],
-      "sentence_count": 89,
-      "word_count": 1307
+      "sentence_count": 260,
+      "word_count": 3570
     },
     {
       "number": "VIII",
@@ -27872,8 +27519,7 @@
             "When she had gone, Sonia began to be tortured by the dread of his committing suicide, and Dounia too feared it.",
             "But they had spent the day trying to persuade each other that that could not be, and both were less anxious while they were together.",
             "As soon as they parted, each thought of nothing else.",
-            "Sonia remembered how Svidrigaïlov had said to her the day before that Raskolnikov had two alternatives--Siberia or...",
-            "Besides she knew his vanity, his pride and his lack of faith."
+            "Sonia remembered how Svidrigaïlov had said to her the day before that Raskolnikov had two alternatives--Siberia or... Besides she knew his vanity, his pride and his lack of faith."
           ]
         },
         {
@@ -27913,6 +27559,7 @@
             "But it’s a long story and there’s no need to discuss it.",
             "But do you know what angers me?",
             "It annoys me that all those stupid brutish faces will be gaping at me directly, pestering me with their stupid questions, which I shall have to answer--they’ll point their fingers at me....",
+            "Tfoo!",
             "You know I am not going to Porfiry, I am sick of him.",
             "I’d rather go to my friend, the Explosive Lieutenant; how I shall surprise him, what a sensation I shall make!",
             "But I must be cooler; I’ve become too irritable of late.",
@@ -28044,8 +27691,7 @@
             "I should like to remember this!” slipped into his mind. “Look at this sign!",
             "How shall I read those letters then?",
             "It’s written here ‘Campany,’ that’s a thing to remember, that letter _a_, and to look at it again in a month--how shall I look at it then?",
-            "What shall I be feeling and thinking then?...",
-            "How trivial it all must be, what I am fretting about now!",
+            "What shall I be feeling and thinking then?... How trivial it all must be, what I am fretting about now!",
             "Of course it must all be interesting... in its way... (Ha-ha-ha!",
             "What am I thinking about?) I am becoming a baby, I am showing off to myself; why am I ashamed?",
             "Foo! how people shove! that fat man--a German he must be--who pushed against me, does he know whom he pushed?",
@@ -28179,8 +27825,7 @@
         {
           "sentences": [
             "“A-ah!",
-            "Not a sound was heard, not a sight was seen, but I scent the Russian... how does it go on in the fairy tale...",
-            "I’ve forgotten! ‘At your service!’” a familiar voice cried suddenly."
+            "Not a sound was heard, not a sight was seen, but I scent the Russian... how does it go on in the fairy tale... I’ve forgotten! ‘At your service!’” a familiar voice cried suddenly."
           ]
         },
         {
@@ -28213,8 +27858,7 @@
           "sentences": [
             "“Of course, Raskolnikov.",
             "You didn’t imagine I’d forgotten?",
-            "Don’t think I am like that...",
-            "Rodion Ro--Ro--Rodionovitch, that’s it, isn’t it?”"
+            "Don’t think I am like that... Rodion Ro--Ro--Rodionovitch, that’s it, isn’t it?”"
           ]
         },
         {
@@ -28227,16 +27871,14 @@
             "“Yes, yes, of course, Rodion Romanovitch!",
             "I was just getting at it.",
             "I made many inquiries about you.",
-            "I assure you I’ve been genuinely grieved since that... since I behaved like that... it was explained to me afterwards that you were a literary man... and a learned one too... and so to say the first steps...",
-            "Mercy on us!",
+            "I assure you I’ve been genuinely grieved since that... since I behaved like that... it was explained to me afterwards that you were a literary man... and a learned one too... and so to say the first steps... Mercy on us!",
             "What literary or scientific man does not begin by some originality of conduct!",
             "My wife and I have the greatest respect for literature, in my wife it’s a genuine passion!",
             "Literature and art!",
             "If only a man is a gentleman, all the rest can be gained by talents, learning, good sense, genius.",
             "As for a hat--well, what does a hat matter?",
             "I can buy a hat as easily as I can a bun; but what’s under the hat, what the hat covers, I can’t buy that!",
-            "I was even meaning to come and apologise to you, but thought maybe you’d...",
-            "But I am forgetting to ask you, is there anything you want really?",
+            "I was even meaning to come and apologise to you, but thought maybe you’d... But I am forgetting to ask you, is there anything you want really?",
             "I hear your family have come?”"
           ]
         },
@@ -28258,9 +27900,7 @@
         },
         {
           "sentences": [
-            "“No, I only looked in...",
-            "I came to ask...",
-            "I thought that I should find Zametov here.”"
+            "“No, I only looked in... I came to ask... I thought that I should find Zametov here.”"
           ]
         },
         {
@@ -28274,8 +27914,7 @@
             "He wanted to go in for some examination, but it’s only to talk and boast about it, it will go no further than that.",
             "Of course it’s a very different matter with you or Mr. Razumihin there, your friend.",
             "Your career is an intellectual one and you won’t be deterred by failure.",
-            "For you, one may say, all the attractions of life _nihil est_--you are an ascetic, a monk, a hermit!...",
-            "A book, a pen behind your ear, a learned research--that’s where your spirit soars!",
+            "For you, one may say, all the attractions of life _nihil est_--you are an ascetic, a monk, a hermit!... A book, a pen behind your ear, a learned research--that’s where your spirit soars!",
             "I am the same way myself....",
             "Have you read Livingstone’s Travels?”"
           ]
@@ -28301,25 +27940,12 @@
             "Official duty is one thing but... you are thinking I meant to say _friendship_ is quite another?",
             "No, you’re wrong!",
             "It’s not friendship, but the feeling of a man and a citizen, the feeling of humanity and of love for the Almighty.",
-            "I may be an official, but I am always bound"
-          ]
-        }
-      ],
-      "sentence_count": 238,
-      "word_count": 3094
-    },
-    {
-      "number": "61",
-      "title": "feel myself a man and a citizen.... You were asking about Zametov.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I may be an official, but I am always bound to feel myself a man and a citizen....",
+            "You were asking about Zametov.",
             "Zametov will make a scandal in the French style in a house of bad reputation, over a glass of champagne... that’s all your Zametov is good for!",
             "While I’m perhaps, so to speak, burning with devotion and lofty feelings, and besides I have rank, consequence, a post!",
             "I am married and have children, I fulfil the duties of a man and a citizen, but who is he, may I ask?",
-            "I appeal to you as a man ennobled by education...",
-            "Then these midwives, too, have become extraordinarily numerous.”"
+            "I appeal to you as a man ennobled by education... Then these midwives, too, have become extraordinarily numerous.”"
           ]
         },
         {
@@ -28370,8 +27996,7 @@
         },
         {
           "sentences": [
-            "“Yes...",
-            "I knew him....",
+            "“Yes... I knew him....",
             "He hadn’t been here long.”"
           ]
         },
@@ -28430,8 +28055,7 @@
         },
         {
           "sentences": [
-            "“I only wanted...",
-            "I came to see Zametov.”"
+            "“I only wanted... I came to see Zametov.”"
           ]
         },
         {
@@ -28524,14 +28148,19 @@
           ]
         }
       ],
-      "sentence_count": 82,
-      "word_count": 805
+      "sentence_count": 310,
+      "word_count": 3913
     },
     {
-      "number": "62",
+      "number": "40",
       "title": "EPILOGUE",
       "type": "epilogue",
       "paragraphs": [
+        {
+          "sentences": [
+            "I"
+          ]
+        },
         {
           "sentences": [
             "Siberia.",
@@ -28735,6 +28364,11 @@
           "sentences": [
             "At last the news came (Dounia had indeed noticed signs of alarm and uneasiness in the preceding letters) that he held aloof from everyone, that his fellow prisoners did not like him, that he kept silent for days at a time and was becoming very pale.",
             "In the last letter Sonia wrote that he had been taken very seriously ill and was in the convict ward of the hospital."
+          ]
+        },
+        {
+          "sentences": [
+            "II"
           ]
         },
         {
@@ -29004,18 +28638,10 @@
           "sentences": [
             "On the evening of the same day, when the barracks were locked, Raskolnikov lay on his plank bed and thought of her.",
             "He had even fancied that day that all the convicts who had been his enemies looked at him differently; he had even entered into talk with them and they answered him in a friendly way.",
-            "He remembered that now, and thought it was bound"
+            "He remembered that now, and thought it was bound to be so.",
+            "Wasn’t everything now bound to be changed?"
           ]
-        }
-      ],
-      "sentence_count": 295,
-      "word_count": 5912
-    },
-    {
-      "number": "63",
-      "title": "be so. Wasn’t everything now bound to be changed?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He thought of her.",
@@ -29066,18 +28692,18 @@
           ]
         }
       ],
-      "sentence_count": 25,
-      "word_count": 409
+      "sentence_count": 323,
+      "word_count": 6333
     }
   ],
   "statistics": {
-    "total_chapters": 63,
-    "total_paragraphs": 3864,
-    "total_sentences": 13038,
-    "total_words": 197906,
-    "average_sentences_per_chapter": 206.95238095238096,
-    "average_paragraphs_per_chapter": 61.333333333333336,
-    "average_sentences_per_paragraph": 3.374223602484472,
-    "average_words_per_sentence": 15.179168584138672
+    "total_chapters": 40,
+    "total_paragraphs": 3861,
+    "total_sentences": 12883,
+    "total_words": 198208,
+    "average_sentences_per_chapter": 322.075,
+    "average_paragraphs_per_chapter": 96.525,
+    "average_sentences_per_paragraph": 3.3367003367003365,
+    "average_words_per_sentence": 15.38523635799115
   }
 }

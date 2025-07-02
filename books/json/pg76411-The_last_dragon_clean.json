@@ -876,6 +876,7 @@
         {
           "sentences": [
             "Did I say Grandma was dreaming?",
+            "Yes.",
             "She had been dreaming of things that had happened ever so long ago, before there were automobiles, before there were electric lights, before there were phonographs, before there was Jello and corn-flakes; Oh, before there were many, many things ready and waiting, but not thought of yet.",
             "And as Grandma sat there dreaming, she wore a funny little smile.",
             "It wasn’t only a funny little smile--it was also a wise little smile, and a kind little smile, and somewhere, mixed up in it, was a sad little smile.",
@@ -1171,8 +1172,8 @@
           ]
         }
       ],
-      "sentence_count": 114,
-      "word_count": 2090
+      "sentence_count": 115,
+      "word_count": 2091
     },
     {
       "number": "V",
@@ -1438,6 +1439,7 @@
             "There’s not a breath of wind, and besides it’s too regular for that.",
             "Tap, tap, tap.",
             "Somebody throwing colored creek-pebbles at the windows of the nursery?",
+            "No.",
             "Too regular for that, also.",
             "Must be the tapping of fingers, but what hand could reach way up to the second story?"
           ]
@@ -1676,8 +1678,8 @@
           ]
         }
       ],
-      "sentence_count": 105,
-      "word_count": 1761
+      "sentence_count": 106,
+      "word_count": 1762
     },
     {
       "number": "VII",
@@ -2937,6 +2939,7 @@
         },
         {
           "sentences": [
+            "No!",
             "People in this age used horses almost entirely.",
             "When Peter played Sir Launcelot he rode a horse, too, but that was only a broomstick horse.",
             "Could he ride a real one if it should happen to come along without a rider?",
@@ -3163,8 +3166,8 @@
           ]
         }
       ],
-      "sentence_count": 113,
-      "word_count": 1632
+      "sentence_count": 114,
+      "word_count": 1633
     },
     {
       "number": "XII",
@@ -4906,6 +4909,11 @@
         },
         {
           "sentences": [
+            "END"
+          ]
+        },
+        {
+          "sentences": [
             "TRANSCRIBER’S NOTES:"
           ]
         },
@@ -4941,18 +4949,18 @@
           ]
         }
       ],
-      "sentence_count": 59,
-      "word_count": 1056
+      "sentence_count": 60,
+      "word_count": 1057
     }
   ],
   "statistics": {
     "total_chapters": 18,
-    "total_paragraphs": 799,
-    "total_sentences": 1578,
-    "total_words": 28643,
-    "average_sentences_per_chapter": 87.66666666666667,
-    "average_paragraphs_per_chapter": 44.388888888888886,
-    "average_sentences_per_paragraph": 1.9749687108886107,
-    "average_words_per_sentence": 18.15145754119138
+    "total_paragraphs": 800,
+    "total_sentences": 1582,
+    "total_words": 28647,
+    "average_sentences_per_chapter": 87.88888888888889,
+    "average_paragraphs_per_chapter": 44.44444444444444,
+    "average_sentences_per_paragraph": 1.9775,
+    "average_words_per_sentence": 18.10809102402023
   }
 }

@@ -942,20 +942,9 @@
         {
           "sentences": [
             "“Stop!” faltered Dorian Gray, “stop! you bewilder me.",
-            "I don’t know what"
-          ]
-        }
-      ],
-      "sentence_count": 99,
-      "word_count": 1450
-    },
-    {
-      "number": "4",
-      "title": "say. There is some answer to you, but I cannot find it. Don’t speak.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I don’t know what to say.",
+            "There is some answer to you, but I cannot find it.",
+            "Don’t speak.",
             "Let me think.",
             "Or, rather, let me try not to think.”"
           ]
@@ -1128,8 +1117,7 @@
             "“No, you don’t feel it now.",
             "Some day, when you are old and wrinkled and ugly, when thought has seared your forehead with its lines, and passion branded your lips with its hideous fires, you will feel it, you will feel it terribly.",
             "Now, wherever you go, you charm the world.",
-            "Will it always be so?...",
-            "You have a wonderfully beautiful face, Mr. Gray.",
+            "Will it always be so?... You have a wonderfully beautiful face, Mr. Gray.",
             "Don’t frown.",
             "You have.",
             "And beauty is a form of genius—is higher, indeed, than genius, as it needs no explanation.",
@@ -1155,6 +1143,7 @@
             "Ah! realize your youth while you have it.",
             "Don’t squander the gold of your days, listening to the tedious, trying to improve the hopeless failure, or giving away your life to the ignorant, the common, and the vulgar.",
             "These are the sickly aims, the false ideals, of our age.",
+            "Live!",
             "Live the wonderful life that is in you!",
             "Let nothing be lost upon you.",
             "Be always searching for new sensations.",
@@ -1704,8 +1693,7 @@
         },
         {
           "sentences": [
-            "“And...",
-            "Harry!”"
+            "“And... Harry!”"
           ]
         },
         {
@@ -1741,8 +1729,8 @@
           ]
         }
       ],
-      "sentence_count": 346,
-      "word_count": 4133
+      "sentence_count": 446,
+      "word_count": 5599
     },
     {
       "number": "III",
@@ -1827,8 +1815,7 @@
         },
         {
           "sentences": [
-            "“Kelso’s grandson!” echoed the old gentleman. “Kelso’s grandson!...",
-            "Of course....",
+            "“Kelso’s grandson!” echoed the old gentleman. “Kelso’s grandson!... Of course....",
             "I knew his mother intimately.",
             "I believe I was at her christening.",
             "She was an extraordinarily beautiful girl, Margaret Devereux, and made all the men frantic by running away with a penniless young fellow—a mere nobody, sir, a subaltern in a foot regiment, or something of that kind.",
@@ -2021,8 +2008,7 @@
             "Grace was his, and the white purity of boyhood, and beauty such as old Greek marbles kept for us.",
             "There was nothing that one could not do with him.",
             "He could be made a Titan or a toy.",
-            "What a pity it was that such beauty was destined to fade!...",
-            "And Basil?",
+            "What a pity it was that such beauty was destined to fade!... And Basil?",
             "From a psychological point of view, how interesting he was!",
             "The new manner in art, the fresh mode of looking at life, suggested so strangely by the merely visible presence of one who was unconscious of it all; the silent spirit that dwelt in dim woodland, and walked unseen in open field, suddenly showing herself, Dryadlike and not afraid, because in his soul who sought for her there had been wakened that wonderful vision to which alone are wonderful things revealed; the mere shapes and patterns of things becoming, as it were, refined, and gaining a kind of symbolical value, as though they were themselves patterns of some other and more perfect form whose shadow they made real: how strange it all was!",
             "He remembered something like it in history.",
@@ -2199,6 +2185,7 @@
           "sentences": [
             "“Dear me!” said Lady Agatha, “how you men argue!",
             "I am sure I never can make out what you are talking about.",
+            "Oh!",
             "Harry, I am quite vexed with you.",
             "Why do you try to persuade our nice Mr. Dorian Gray to give up the East End?",
             "I assure you he would be quite invaluable.",
@@ -2277,6 +2264,7 @@
         {
           "sentences": [
             "“Only when one is young,” she answered. “When an old woman like myself blushes, it is a very bad sign.",
+            "Ah!",
             "Lord Henry, I wish you would tell me how to become young again.”"
           ]
         },
@@ -2451,7 +2439,7 @@
         }
       ],
       "sentence_count": 304,
-      "word_count": 4414
+      "word_count": 4416
     },
     {
       "number": "IV",
@@ -3683,20 +3671,7 @@
             "Sibyl, however, was quite unconscious of the effect she was producing.",
             "Her love was trembling in laughter on her lips.",
             "She was thinking of Prince Charming, and, that she might think of him all the more, she did not talk of him, but prattled on about the ship in which Jim was going to sail, about the gold he was certain to find, about the wonderful heiress whose life he was to save from the wicked, red-shirted bushrangers.",
-            "For he was not"
-          ]
-        }
-      ],
-      "sentence_count": 160,
-      "word_count": 1960
-    },
-    {
-      "number": "8",
-      "title": "remain a sailor, or a supercargo, or whatever he was going to be.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "For he was not to remain a sailor, or a supercargo, or whatever he was going to be.",
             "Oh, no!",
             "A sailor’s existence was dreadful.",
             "Fancy being cooped up in a horrid ship, with the hoarse, hump-backed waves trying to get in, and a black wind blowing the masts down and tearing the sails into long screaming ribands!",
@@ -3809,6 +3784,7 @@
             "I feel it.",
             "And it is all his, his only, Prince Charming, my wonderful lover, my god of graces.",
             "But I am poor beside him.",
+            "Poor?",
             "What does that matter?",
             "When poverty creeps in at the door, love flies in through the window.",
             "Our proverbs want rewriting.",
@@ -3940,6 +3916,7 @@
             "How can you say such horrible things?",
             "You don’t know what you are talking about.",
             "You are simply jealous and unkind.",
+            "Ah!",
             "I wish you would fall in love.",
             "Love makes people good, and what you said was wicked.”"
           ]
@@ -4123,8 +4100,8 @@
           ]
         }
       ],
-      "sentence_count": 215,
-      "word_count": 2397
+      "sentence_count": 377,
+      "word_count": 4373
     },
     {
       "number": "VI",
@@ -4699,18 +4676,10 @@
             "Dorian Gray grew pale as he watched her.",
             "He was puzzled and anxious.",
             "Neither of his friends dared to say anything to him.",
-            "She seemed to them"
+            "She seemed to them to be absolutely incompetent.",
+            "They were horribly disappointed."
           ]
-        }
-      ],
-      "sentence_count": 63,
-      "word_count": 903
-    },
-    {
-      "number": "11",
-      "title": "be absolutely incompetent. They were horribly disappointed.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Yet they felt that the true test of any Juliet is the balcony scene of the second act.",
@@ -4960,8 +4929,7 @@
             "I will never think of you.",
             "I will never mention your name.",
             "You don’t know what you were to me, once.",
-            "Why, once...",
-            "Oh, I can’t bear to think of it!",
+            "Why, once... Oh, I can’t bear to think of it!",
             "I wish I had never laid eyes upon you!",
             "You have spoiled the romance of my life.",
             "How little you can know of love, if you say it mars your art!",
@@ -5003,8 +4971,7 @@
             "Don’t go away from me.",
             "I couldn’t bear it.",
             "Oh! don’t go away from me.",
-            "My brother...",
-            "No; never mind.",
+            "My brother... No; never mind.",
             "He didn’t mean it.",
             "He was in jest....",
             "But you, oh! can’t you forgive me for to-night?",
@@ -5201,8 +5168,8 @@
           ]
         }
       ],
-      "sentence_count": 301,
-      "word_count": 3506
+      "sentence_count": 363,
+      "word_count": 4417
     },
     {
       "number": "VIII",
@@ -5463,8 +5430,7 @@
         {
           "sentences": [
             "“Your wife!",
-            "Dorian!...",
-            "Didn’t you get my letter?",
+            "Dorian!... Didn’t you get my letter?",
             "I wrote to you this morning, and sent the note down by my own man.”"
           ]
         },
@@ -5937,7 +5903,7 @@
           ]
         }
       ],
-      "sentence_count": 415,
+      "sentence_count": 414,
       "word_count": 5282
     },
     {
@@ -6520,12 +6486,20 @@
             "And how strange it was that, instead of having been forced to reveal his own secret, he had succeeded, almost by chance, in wresting a secret from his friend!",
             "How much that strange confession explained to him!",
             "The painter’s absurd fits of jealousy, his wild devotion, his extravagant panegyrics, his curious reticences—he understood them all now, and he felt sorry.",
-            "There seemed"
+            "There seemed to him to be something tragic in a friendship so coloured by romance."
+          ]
+        },
+        {
+          "sentences": [
+            "He sighed and touched the bell.",
+            "The portrait must be hidden away at all costs.",
+            "He could not run such a risk of discovery again.",
+            "It had been mad of him to have allowed the thing to remain, even for an hour, in a room to which any of his friends had access."
           ]
         }
       ],
-      "sentence_count": 322,
-      "word_count": 3823
+      "sentence_count": 326,
+      "word_count": 3889
     },
     {
       "number": "X",
@@ -8052,6 +8026,7 @@
             "Most of the servants were at Selby Royal.",
             "His valet had gone to bed....",
             "Paris!",
+            "Yes.",
             "It was to Paris that Basil had gone, and by the midnight train, as he had intended.",
             "With his curious reserved habits, it would be months before any suspicions would be roused.",
             "Months!",
@@ -8143,8 +8118,8 @@
           ]
         }
       ],
-      "sentence_count": 209,
-      "word_count": 2497
+      "sentence_count": 210,
+      "word_count": 2498
     },
     {
       "number": "XIV",
@@ -8353,18 +8328,9 @@
         },
         {
           "sentences": [
-            "A sigh of relief broke from his parched lips, and the colour came back"
+            "A sigh of relief broke from his parched lips, and the colour came back to his cheeks."
           ]
-        }
-      ],
-      "sentence_count": 34,
-      "word_count": 630
-    },
-    {
-      "number": "20",
-      "title": "his cheeks.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Ask him to come in at once, Francis.” He felt that he was himself again.",
@@ -8409,20 +8375,7 @@
         },
         {
           "sentences": [
-            "After a strained moment of silence, he leaned across and said, very quietly, but watching the effect of each word upon the face of him he had sent for, “Alan, in a locked room at the top of this house, a room"
-          ]
-        }
-      ],
-      "sentence_count": 19,
-      "word_count": 231
-    },
-    {
-      "number": "21",
-      "title": "which nobody but myself has access, a dead man is seated at a table.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "After a strained moment of silence, he leaned across and said, very quietly, but watching the effect of each word upon the face of him he had sent for, “Alan, in a locked room at the top of this house, a room to which nobody but myself has access, a dead man is seated at a table.",
             "He has been dead ten hours now.",
             "Don’t stir, and don’t look at me like that.",
             "Who the man is, why he died, how he died, are matters that do not concern you.",
@@ -8434,20 +8387,8 @@
             "“Stop, Gray.",
             "I don’t want to know anything further.",
             "Whether what you have told me is true or not true doesn’t concern me.",
-            "I entirely decline"
-          ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 66
-    },
-    {
-      "number": "22",
-      "title": "be mixed up in your life. Keep your horrible secrets to yourself.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I entirely decline to be mixed up in your life.",
+            "Keep your horrible secrets to yourself.",
             "They don’t interest me any more.”"
           ]
         },
@@ -8592,6 +8533,8 @@
             "“The dead linger sometimes.",
             "The man upstairs will not go away.",
             "He is sitting at the table with bowed head and outstretched arms.",
+            "Alan!",
+            "Alan!",
             "If you don’t come to my assistance, I am ruined.",
             "Why, they will hang me, Alan!",
             "Don’t you understand?",
@@ -8910,8 +8853,8 @@
           ]
         }
       ],
-      "sentence_count": 211,
-      "word_count": 2321
+      "sentence_count": 275,
+      "word_count": 3281
     },
     {
       "number": "XV",
@@ -11247,6 +11190,7 @@
             "“The Home Farm!",
             "Go there at once and meet me.",
             "Tell one of the grooms to bring my horse round.",
+            "No.",
             "Never mind.",
             "I’ll go to the stables myself.",
             "It will save time.”"
@@ -11310,8 +11254,8 @@
           ]
         }
       ],
-      "sentence_count": 274,
-      "word_count": 3321
+      "sentence_count": 275,
+      "word_count": 3322
     },
     {
       "number": "XIX",
@@ -11578,6 +11522,7 @@
             "It’s a habit bores have.",
             "By the way, what has become of that wonderful portrait he did of you?",
             "I don’t think I have ever seen it since he finished it.",
+            "Oh!",
             "I remember your telling me years ago that you had sent it down to Selby, and that it had got mislaid or stolen on the way.",
             "You never got it back?",
             "What a pity! it was really a masterpiece.",
@@ -11846,8 +11791,8 @@
           ]
         }
       ],
-      "sentence_count": 311,
-      "word_count": 3583
+      "sentence_count": 312,
+      "word_count": 3584
     },
     {
       "number": "XX",
@@ -11954,18 +11899,10 @@
           "sentences": [
             "He took the lamp from the table and crept upstairs.",
             "As he unbarred the door, a smile of joy flitted across his strangely young-looking face and lingered for a moment about his lips.",
-            "Yes, he would be good, and the hideous thing that he had hidden away would no longer be a terror"
+            "Yes, he would be good, and the hideous thing that he had hidden away would no longer be a terror to him.",
+            "He felt as if the load had been lifted from him already."
           ]
-        }
-      ],
-      "sentence_count": 67,
-      "word_count": 974
-    },
-    {
-      "number": "29",
-      "title": "him. He felt as if the load had been lifted from him already.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He went in quietly, locking the door behind him, as was his custom, and dragged the purple hanging from the portrait.",
@@ -12005,7 +11942,7 @@
             "Had there been nothing more in his renunciation than that?",
             "There had been something more.",
             "At least he thought so.",
-            "But who could tell?...",
+            "But who could tell?... No.",
             "There had been nothing more.",
             "Through vanity he had spared her.",
             "In hypocrisy he had worn the mask of goodness.",
@@ -12108,18 +12045,18 @@
           ]
         }
       ],
-      "sentence_count": 93,
-      "word_count": 940
+      "sentence_count": 161,
+      "word_count": 1929
     }
   ],
   "statistics": {
-    "total_chapters": 29,
-    "total_paragraphs": 1504,
-    "total_sentences": 5826,
-    "total_words": 78715,
-    "average_sentences_per_chapter": 200.89655172413794,
-    "average_paragraphs_per_chapter": 51.86206896551724,
-    "average_sentences_per_paragraph": 3.8736702127659575,
-    "average_words_per_sentence": 13.51098523858565
+    "total_chapters": 22,
+    "total_paragraphs": 1501,
+    "total_sentences": 5838,
+    "total_words": 78874,
+    "average_sentences_per_chapter": 265.3636363636364,
+    "average_paragraphs_per_chapter": 68.22727272727273,
+    "average_sentences_per_paragraph": 3.889407061958694,
+    "average_words_per_sentence": 13.510448783830078
   }
 }

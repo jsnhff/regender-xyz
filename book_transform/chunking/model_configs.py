@@ -35,6 +35,12 @@ MODEL_CONFIGS = {
         "sentences_per_chunk": 30,  # Fewer sentences for mini model
         "max_chunk_tokens": 2500
     },
+    "grok-3-latest": {
+        "context_window": 131072,  # Large context window
+        "output_limit": 8192,
+        "sentences_per_chunk": 50,  # Increased for efficiency
+        "max_chunk_tokens": 4000
+    },
     
     # Local models (MLX)
     "mistral-7b-instruct": {

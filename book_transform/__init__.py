@@ -6,7 +6,7 @@ including gender swapping and other narrative modifications.
 """
 
 from .transform import BookTransformer, transform_book
-from .character_analyzer import analyze_characters
+# Character analysis moved to book_characters module
 from .llm_transform import transform_text_with_llm, transform_gender_with_context, TRANSFORM_TYPES
 
 # Simple file transformation wrapper

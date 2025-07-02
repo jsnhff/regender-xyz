@@ -10,13 +10,298 @@
   "chapters": [
     {
       "number": "1",
-      "title": "be in use by the enemy or to be destined for early use by the enemy.",
-      "type": "letter",
+      "title": "Strategic Services",
+      "type": "story",
       "paragraphs": [
         {
           "sentences": [
-            "It will be safe for him to assume that almost any product of heavy industry is destined for enemy use, and that the most efficient fuels and lubricants also are destined for enemy use.",
-            "Without special knowledge, however, it would be undesirable for him to attempt destruction of food crops or food products."
+            "(Provisional) STRATEGIC SERVICES FIELD MANUAL No."
+          ]
+        }
+      ],
+      "sentence_count": 1,
+      "word_count": 6
+    },
+    {
+      "number": "2",
+      "title": "Office of Strategic Services",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "Washington, D.",
+            "C.",
+            "January"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 4
+    },
+    {
+      "number": "3",
+      "title": "AR 380-5, pertaining to handling of secret documents, will be complied",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "with in the handling of this Manual."
+          ]
+        },
+        {
+          "sentences": [
+            "William J.",
+            "Donovan"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 10
+    },
+    {
+      "number": "4",
+      "title": "in this kind of work and should then devise his sabotage so as to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "enlarge that “margin for error.”"
+          ]
+        },
+        {
+          "sentences": [
+            "POSSIBLE EFFECTS"
+          ]
+        },
+        {
+          "sentences": [
+            "Acts of simple sabotage are occurring throughout Europe.",
+            "An effort should be made to add to their efficiency, lessen their detectability, and increase their number.",
+            "Acts of simple sabotage, multiplied by"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 38
+    },
+    {
+      "number": "5",
+      "title": "effort, and encourage them to assist openly in periods of Allied",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "invasion and occupation."
+          ]
+        },
+        {
+          "sentences": [
+            "MOTIVATING THE SABOTEUR"
+          ]
+        }
+      ],
+      "sentence_count": 2,
+      "word_count": 6
+    },
+    {
+      "number": "6",
+      "title": "stimulation or assurance, and information and suggestions regarding",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "feasible methods of simple sabotage."
+          ]
+        },
+        {
+          "sentences": [
+            "(1) _Personal Motives_"
+          ]
+        },
+        {
+          "sentences": [
+            "(a) The ordinary citizen very probably has no immediate personal motive for committing simple sabotage.",
+            "Instead, he must be made to anticipate"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 30
+    },
+    {
+      "number": "7",
+      "title": "about personal liberty, freedom of the press, and so on, will not be",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "convincing in most parts of the world.",
+            "In many areas they will not even be comprehensible."
+          ]
+        },
+        {
+          "sentences": [
+            "(b) Since the effect of his own acts is limited, the saboteur may become discouraged unless he feels that he is a member of a large,"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 42
+    },
+    {
+      "number": "8",
+      "title": "saboteur will see many opportunities in his immediate environment which",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "cannot possibly be seen from a distance.",
+            "A state of mind should be encouraged that anything can be sabotaged."
+          ]
+        },
+        {
+          "sentences": [
+            "(b) Among the potential citizen-saboteurs who are to engage in physical destruction, two extreme types may be distinguished.",
+            "On the one hand, there is the man who is not technically trained and employed.",
+            "This man"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 54
+    },
+    {
+      "number": "9",
+      "title": "able to devise methods of simple sabotage which would be appropriate to",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "his own facilities.",
+            "However, this man needs to be stimulated to re-orient his thinking in the direction of destruction.",
+            "Specific examples, which need not be from his own field, should accomplish this."
+          ]
+        },
+        {
+          "sentences": [
+            "(d) Various media may be used to disseminate suggestions and information regarding simple sabotage.",
+            "Among the media which may be"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 52
+    },
+    {
+      "number": "10",
+      "title": "anticipation of a time when they may be able to communicate this",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "information directly."
+          ]
+        },
+        {
+          "sentences": [
+            "(3) _Safety Measures_"
+          ]
+        },
+        {
+          "sentences": [
+            "(a) The amount of activity carried on by the saboteur will be governed"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 18
+    },
+    {
+      "number": "11",
+      "title": "worker in a particular trade or industry you can easily carry and keep",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "such things as wrenches, hammers, emery paper, and the like."
+          ]
+        },
+        {
+          "sentences": [
+            "(2) Try to commit acts for which large numbers of people could be responsible.",
+            "For instance, if you blow out the wiring in a factory at a central fire box, almost anyone could have done it.",
+            "On-the-street"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 47
+    },
+    {
+      "number": "12",
+      "title": "stupidity, ignorance, over-caution, fear of being suspected of",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "sabotage, or weakness and dullness due to undernourishment."
+          ]
+        },
+        {
+          "sentences": [
+            "(4) After you have committed an act of easy sabotage, resist any temptation to wait around and see what happens.",
+            "Loiterers arouse suspicion.",
+            "Of course, there are circumstances when it would be suspicious for you to leave.",
+            "If you commit sabotage on your job, you should naturally stay at your work."
+          ]
+        },
+        {
+          "sentences": [
+            "TOOLS, TARGETS, AND TIMING"
+          ]
+        },
+        {
+          "sentences": [
+            "The citizen-saboteur cannot be closely controlled.",
+            "Nor is it reasonable"
+          ]
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 73
+    },
+    {
+      "number": "13",
+      "title": "situations likewise can be specified, for emphasis at the proper time",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "by the underground press, freedom stations, and cooperating propaganda."
+          ]
+        },
+        {
+          "sentences": [
+            "(1) _Under General Conditions_"
+          ]
+        },
+        {
+          "sentences": [
+            "(a) Simple sabotage is more than malicious mischief, and it should"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 24
+    },
+    {
+      "number": "14",
+      "title": "knowledge, however, it would be undesirable for him to attempt",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "destruction of food crops or food products."
           ]
         },
         {
@@ -28,11 +313,19 @@
           "sentences": [
             "(2) _Prior to a Military Offensive_"
           ]
-        },
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 32
+    },
+    {
+      "number": "15",
+      "title": "spoiling a batch of rubber in the production plant is an act of still",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "During periods which are quiescent in a military sense, such emphasis as can be given to simple sabotage might well center on industrial production, to lessen the flow of materials and equipment to the enemy.",
-            "Slashing a rubber tire on an Army truck may be an act of value; spoiling a batch of rubber in the production plant is an act of still more value."
+            "more value."
           ]
         },
         {
@@ -42,8 +335,21 @@
         },
         {
           "sentences": [
-            "(a) Most significant sabotage for an area which is, or is soon destined to be, a theater of combat operations is that whose effects will be direct and immediate.",
-            "Even if the effects are relatively minor and localized, this type of sabotage is to be preferred to activities whose effects, while widespread, are indirect and delayed."
+            "(a) Most significant sabotage for an area which is, or is soon destined"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 20
+    },
+    {
+      "number": "16",
+      "title": "localized, this type of sabotage is to be preferred to activities whose",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "effects, while widespread, are indirect and delayed."
           ]
         },
         {
@@ -58,13 +364,21 @@
         },
         {
           "sentences": [
-            "(2) Any communications facilities which can be used by the authorities to transmit instructions or morale material should be the objects of simple sabotage.",
-            "These include telephone, telegraph and power systems, radio, newspapers, placards, and public notices."
+            "(2) Any communications facilities which can be used by the authorities"
           ]
-        },
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 45
+    },
+    {
+      "number": "17",
+      "title": "efficient functioning of transportation and communication, also should",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(3) Critical materials, valuable in themselves or necessary to the efficient functioning of transportation and communication, also should become targets for the citizen-saboteur.",
+            "become targets for the citizen-saboteur.",
             "These may include oil, gasoline, tires, food, and water."
           ]
         },
@@ -72,15 +386,19 @@
           "sentences": [
             "SPECIFIC SUGGESTIONS FOR SIMPLE SABOTAGE"
           ]
-        },
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 19
+    },
+    {
+      "number": "18",
+      "title": "A listing of specific acts follows, classified according to types of",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "It will not be possible to evaluate the desirability of simple sabotage in an area without having in mind rather specifically what individual acts and results are embraced by the definition of simple sabotage."
-          ]
-        },
-        {
-          "sentences": [
-            "A listing of specific acts follows, classified according to types of target.",
+            "target.",
             "This list is presented as a growing rather than a complete outline of the methods of simple sabotage.",
             "As new techniques are developed, or new fields explored, it will be elaborated and expanded."
           ]
@@ -89,11 +407,19 @@
           "sentences": [
             "(1) _Buildings_"
           ]
-        },
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 36
+    },
+    {
+      "number": "19",
+      "title": "untrained people as janitors, charwomen, and casual visitors; and, when",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "Warehouses, barracks, offices, hotels, and factory buildings are outstanding targets for simple sabotage.",
-            "They are extremely susceptible to damage, especially by fire; they offer opportunities to such untrained people as janitors, charwomen, and casual visitors; and, when damaged, they present a relatively large handicap to the enemy."
+            "damaged, they present a relatively large handicap to the enemy."
           ]
         },
         {
@@ -105,17 +431,21 @@
         {
           "sentences": [
             "(1) Whenever possible, arrange to have the fire start after you have gone away.",
-            "Use a candle and paper, combination, setting it as close as possible to the inflammable material you want to burn: From a sheet of paper, tear a strip three or four centimeters wide and wrap it around the base of the candle two or three times.",
-            "Twist more sheets of paper into loose ropes and place them around the base of the candle.",
-            "When the candle flame reaches the encircling strip, it will be ignited and in turn will ignite the surrounding paper.",
-            "The size, heat, and duration of the resulting flame will depend on how much paper you use and how much of it you can cramp in a small space."
+            "Use a candle and paper, combination, setting it as close as"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 65
+    },
+    {
+      "number": "20",
+      "title": "celluloid such as you might find in an old comb, into a nest of plain",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) With a flame of this kind, do not attempt to ignite any but rather inflammable materials, such as cotton sacking.",
-            "To light more resistant materials, use a candle plus tightly rolled or twisted paper which has been soaked in gasoline.",
-            "To create a briefer but even hotter flame, put celluloid such as you might find in an old comb, into a nest of plain or saturated paper which is to be fired by a candle."
+            "or saturated paper which is to be fired by a candle."
           ]
         },
         {
@@ -123,7 +453,21 @@
             "(3) To make another type of simple fuse, soak one end of a piece of string in grease.",
             "Rub a generous pinch of gunpowder over the inch of string where greasy string meets clean string.",
             "Then ignite the clean end of the string.",
-            "It will burn slowly without a flame (in much the same way that a cigarette burns) until it reaches the grease and gunpowder; it will then flare up suddenly.",
+            "It will burn slowly without a flame (in much the"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 64
+    },
+    {
+      "number": "21",
+      "title": "same way that a cigarette burns) until it reaches the grease and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "gunpowder; it will then flare up suddenly.",
             "The grease-treated string will then burn with a flame.",
             "The same effect may be achieved by using matches instead of the grease and gunpowder.",
             "Run the string over the match heads, taking care that the string is not pressed or knotted.",
@@ -142,19 +486,21 @@
           "sentences": [
             "(5) In basements where waste is kept, janitors should accumulate oily and greasy waste.",
             "Such waste sometimes ignites spontaneously, but it can easily be lit with a cigarette or match.",
-            "If you are a janitor on night duty, you can be the first to report the fire, but don’t report it too soon."
+            "If you are a janitor on"
           ]
-        },
+        }
+      ],
+      "sentence_count": 12,
+      "word_count": 157
+    },
+    {
+      "number": "22",
+      "title": "shut the windows tightly, turn on the gas, and leave a candle burning",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(6) A clean factory is not susceptible to fire, but a dirty one is.",
-            "Workers should be careless with refuse and janitors should be inefficient in cleaning.",
-            "If enough dirt and trash can be accumulated an otherwise fireproof building will become inflammable."
-          ]
-        },
-        {
-          "sentences": [
-            "(7) Where illuminating gas is used in a room which is vacant at night, shut the windows tightly, turn on the gas, and leave a candle burning in the room, closing the door tightly behind you.",
+            "in the room, closing the door tightly behind you.",
             "After a time, the gas will explode, and a fire may or may not follow."
           ]
         },
@@ -172,6 +518,7 @@
         {
           "sentences": [
             "(2) Forget to provide paper in toilets; put tightly rolled paper, hair, and other obstructions in the W.",
+            "C.",
             "Saturate a sponge with a thick starch or sugar solution.",
             "Squeeze it tightly into a ball, wrap it with string, and dry.",
             "Remove the string when fully dried.",
@@ -181,15 +528,28 @@
         },
         {
           "sentences": [
+            "W.",
             "C. or otherwise introduce into a sewer line.",
             "The sponge will gradually expand to its normal size and plug the sewage system."
           ]
         },
         {
           "sentences": [
-            "(3) Put a coin beneath a bulb in a public building during the daytime, so that fuses will blow out when lights are turned on at night.",
-            "The fuses themselves may be rendered ineffective by putting a coin behind them or loading them with heavy wire.",
-            "Then a short-circuit may either start a fire, damage transformers, or blow out a central fuse which will interrupt distribution of electricity to a large area."
+            "(3) Put a coin beneath a bulb in a public building during the daytime, so that fuses will blow out when lights are turned on at night."
+          ]
+        }
+      ],
+      "sentence_count": 16,
+      "word_count": 172
+    },
+    {
+      "number": "23",
+      "title": "start a fire, damage transformers, or blow out a central fuse which",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "will interrupt distribution of electricity to a large area."
           ]
         },
         {
@@ -210,9 +570,18 @@
         {
           "sentences": [
             "(1) Let cutting tools grow dull.",
-            "They will be inefficient, will slow down production, and may damage the materials and parts you use them on."
+            "They will be inefficient, will slow"
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 50
+    },
+    {
+      "number": "24",
+      "title": "down production, and may damage the materials and parts you use them",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
             "(2) Leave saws slightly twisted when you are not using them.",
@@ -238,38 +607,21 @@
         },
         {
           "sentences": [
-            "(6) You can put a press punch out of order by putting in it more material than it is adjusted for—two blanks instead of one, for example."
+            "(6) You can put a press punch out of order by putting in it more"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 98
+    },
+    {
+      "number": "25",
+      "title": "may be able to lessen the effectiveness of oil by diluting it in",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(7) Power-driven tools like pneumatic drills, riveters, and so on, are never efficient when dirty.",
-            "Lubrication points and electric contacts can easily be fouled by normal accumulations of dirt or the insertion of foreign matter."
-          ]
-        },
-        {
-          "sentences": [
-            "(b) Oil and lubrication systems are not only vulnerable to easy sabotage, but are critical in every machine with moving parts.",
-            "Sabotage of oil and lubrication will slow production or stop work entirely at strategic points in industrial processes."
-          ]
-        },
-        {
-          "sentences": [
-            "(1) Put metal dust or filings, fine sand, ground glass, emery dust (get it by pounding up an emery knife sharpener) and similar hard, gritty substances directly into lubrication systems.",
-            "They will scour smooth surfaces, ruining pistons, cylinder walls, shafts, and bearings.",
-            "They will overheat and stop motors which will need overhauling, new parts, and extensive repairs.",
-            "Such materials, if they are used, should be introduced into lubrication systems past any filters which otherwise would strain them out."
-          ]
-        },
-        {
-          "sentences": [
-            "(2) You can cause wear on any machine by uncovering a filter system, poking a pencil or any other sharp object through the filter mesh, then covering it up again.",
-            "Or, if you can dispose of it quickly, simply remove the filter."
-          ]
-        },
-        {
-          "sentences": [
-            "(3) If you cannot get at the lubrication system or filter directly, you may be able to lessen the effectiveness of oil by diluting it in storage.",
+            "storage.",
             "In this case, almost any liquid will do which will thin the oil.",
             "A small amount of sulphuric acid, varnish, water-glass, or linseed oil will be especially effective."
           ]
@@ -282,31 +634,42 @@
         {
           "sentences": [
             "(5) Put any clogging substance into lubrication systems or, if it will float, into stored oil.",
-            "Twisted combings of human hair, pieces of string, dead insects, and many other common objects will be effective in stopping or hindering the flow of oil through feed lines and filters."
+            "Twisted combings of human hair, pieces of"
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 81
+    },
+    {
+      "number": "26",
+      "title": "an overheated motor, contraction and considerable strain on the engine",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(6) Under some circumstances, you may be able to destroy oil outright rather than interfere with its effectiveness, by removing stop-plugs from lubricating systems or by puncturing the drums and cans in which it is stored."
-          ]
-        },
-        {
-          "sentences": [
-            "(c) Cooling Systems (1.) A water cooling system can be put out of commission in a fairly short time, with considerable damage to an engine or motor, if you put into it several pinches of hard grain, such as rice or wheat.",
-            "They will swell up and choke the circulation of water, and the cooling system will have to be torn down to remove the obstruction.",
-            "Sawdust or hair may also be used to clog a water cooling system."
-          ]
-        },
-        {
-          "sentences": [
-            "(2) If very cold water is quickly introduced into the cooling system of an overheated motor, contraction and considerable strain on the engine housing will result.",
+            "housing will result.",
             "If you can repeat the treatment a few times, cracking and serious damage will result."
           ]
         },
         {
           "sentences": [
             "(3) You can ruin the effectiveness of an air cooling system by plugging dirt and waste into intake or exhaust valves.",
-            "If a belt-run fan is used in the system, make a jagged cut at least half way through the belt; it will slip and finally part under strain and the motor will overheat."
+            "If a belt-run fan is used"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 45
+    },
+    {
+      "number": "27",
+      "title": "in the system, make a jagged cut at least half way through the belt; it",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "will slip and finally part under strain and the motor will overheat."
           ]
         },
         {
@@ -315,13 +678,21 @@
             "They afford a very vulnerable target for simple sabotage activities. (1.) Put several pinches of sawdust or hard grain, such as rice or wheat, into the fuel tank of a gasoline engine.",
             "The particles will choke a feed line so that the engine will stop.",
             "Some time will be required to discover the source of the trouble.",
-            "Although they will be hard to get, crumbs of natural rubber, such as you might find in old rubber bands and pencil erasers, are also effective."
+            "Although"
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 86
+    },
+    {
+      "number": "28",
+      "title": "sticky mess which will completely mire the engine and necessitate",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) If you can accumulate sugar, put it in the fuel tank of a gasoline engine.",
-            "As it burns together with the gasoline, it will turn into a sticky mess which will completely mire the engine and necessitate extensive cleaning and repair.",
+            "extensive cleaning and repair.",
             "Honey and molasses are as good as sugar.",
             "Try to use about 75– grams for each gallons of gasoline."
           ]
@@ -329,13 +700,21 @@
         {
           "sentences": [
             "(3) Other impurities which you can introduce into gasoline will cause rapid engine wear and eventual breakdown.",
-            "Fine particles of pumice, sand, ground glass, and metal dust can easily be introduced into a gasoline tank.",
-            "Be sure that the particles are very fine, so that they will be able to pass through the carburetor jet."
+            "Fine particles of pumice,"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 44
+    },
+    {
+      "number": "29",
+      "title": "reasonably large quantities will dilute gasoline fuel to a point where",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(4) Water, urine, wine, or any other simple liquid you can get in reasonably large quantities will dilute gasoline fuel to a point where no combustion will occur in the cylinder and the engine will not move.",
+            "no combustion will occur in the cylinder and the engine will not move.",
             "One pint to gallons of gasoline is sufficient.",
             "If salt water is used, it will cause corrosion and permanent motor damage."
           ]
@@ -343,31 +722,42 @@
         {
           "sentences": [
             "(5) In the case of Diesel engines, put low flashpoint oil into the fuel tank; the engine will not move.",
-            "If there already is proper oil in the tank when the wrong kind is added, the engine will only limp and sputter along."
+            "If there already is proper oil in the"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 62
+    },
+    {
+      "number": "30",
+      "title": "tank when the wrong kind is added, the engine will only limp and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "sputter along."
           ]
         },
         {
           "sentences": [
             "(6) Fuel lines to gasoline and oil engines frequently pass over the exhaust pipe.",
             "When the machine is at rest, you can stab a small hole in the fuel line and plug the hole with wax.",
-            "As the engine runs and the exhaust tube becomes hot, the wax will be melted; fuel will drip onto the exhaust and a blaze will start."
+            "As the engine runs and the"
           ]
-        },
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 44
+    },
+    {
+      "number": "31",
+      "title": "easily or without risk of injury by unskilled persons who may otherwise",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(7) If you have access to a room where gasoline is stored, remember that gas vapor accumulating in a closed room will explode after a time if you leave a candle burning in the room.",
-            "A good deal of evaporation, however, must occur from the gasoline tins into the air of the room.",
-            "If removal of the tops of the tins does not expose enough gasoline to the air to ensure copious evaporation, you can open lightly constructed tins further with a knife, ice pick or sharpened nail file.",
-            "Or puncture a tiny hole in the tank which will permit gasoline to leak out on the floor.",
-            "This will greatly increase the rate of evaporation.",
-            "Before you light your candle, be sure that windows are closed and the room is as air-tight as you can make it.",
-            "If you can see that windows in a neighboring room are opened wide, you have a chance of setting a large fire which will not only destroy the gasoline but anything else nearby; when the gasoline explodes, the doors of the storage room will be blown open, a draft to the neighboring windows will be created which will whip up a fine conflagration."
-          ]
-        },
-        {
-          "sentences": [
-            "(e) Electric Motors Electric motors (including dynamos) are more restricted than the targets so far discussed.",
-            "They cannot be sabotaged easily or without risk of injury by unskilled persons who may otherwise have good opportunities for destruction."
+            "have good opportunities for destruction."
           ]
         },
         {
@@ -385,17 +775,21 @@
         {
           "sentences": [
             "(3) Remember that dust, dirt, and moisture are enemies of electrical equipment.",
-            "Spill dust and dirt onto the points where the wires in electric motors connect with terminals, and onto insulating parts.",
-            "Inefficient transmission of current and, in some cases, short circuits will result.",
-            "Wet generator motors to produce short circuits."
+            "Spill dust and dirt onto the points where the wires in electric motors connect with terminals, and onto insulating parts."
           ]
-        },
+        }
+      ],
+      "sentence_count": 7,
+      "word_count": 89
+    },
+    {
+      "number": "32",
+      "title": "chisel so that the teeth on adjoining bars meet or nearly meet and",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(4) “Accidentally” bruise the insulation on wire, loosen nuts on connections, make faulty splices and faulty connections in wiring, to waste electric current and reduce the power of electric motors, the power output or cause short circuiting in direct-current motors: Loosen or remove commutator holding rings.",
-            "Sprinkle carbon, graphite, or metal dust on commutators.",
-            "Put a little grease or oil at the contact points of commutators.",
-            "Where commutator bars are close together bridge the gaps between them with metal dust, or sawtooth their edges with a chisel so that the teeth on adjoining bars meet or nearly meet and current can pass from one to the other."
+            "current can pass from one to the other."
           ]
         },
         {
@@ -412,19 +806,21 @@
         },
         {
           "sentences": [
-            "(8) Cause motor stoppage or inefficiency by applying dust mixed with grease to the face of the armature so that it will not make proper contact."
+            "(8) Cause motor stoppage or inefficiency by applying dust mixed with"
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 89
+    },
+    {
+      "number": "33",
+      "title": "case, the motor will stop after running awhile, and in the second, it",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(9) To overheat electric motors, mix sand with heavy grease and smear it between the stator and rotor, or wedge thin metal pieces between them.",
-            "To prevent the efficient generation of current, put floor sweepings, oil, tar, or paint between them."
-          ]
-        },
-        {
-          "sentences": [
-            "(10) In motors using three-phase current, deeply nick one of the lead-in wires with a knife or file when the machine is at rest, or replace one of the three fuses with a blown-out fuse.",
-            "In the first case, the motor will stop after running awhile, and in the second, it will not start."
+            "will not start."
           ]
         },
         {
@@ -434,7 +830,21 @@
         },
         {
           "sentences": [
-            "(1) Transformers of the oil-filled type can be put out of commission if you pour water, salt water, machine-tool coolant, or kerosene into the oil tank."
+            "(1) Transformers of the oil-filled type can be put out of commission if"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 18
+    },
+    {
+      "number": "34",
+      "title": "you pour water, salt water, machine-tool coolant, or kerosene into the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "oil tank."
           ]
         },
         {
@@ -461,12 +871,21 @@
         },
         {
           "sentences": [
-            "(2) In water turbines, insert a large piece of scrap iron in the head of the penstock, just beyond the screening, so that water will carry the damaging material down to the plant equipment."
+            "(2) In water turbines, insert a large piece of scrap iron in the head"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 112
+    },
+    {
+      "number": "35",
+      "title": "of scrap iron into it, to be blasted into the turbine machinery when",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(3) When the steam line to a turbine is opened for repair, put pieces of scrap iron into it, to be blasted into the turbine machinery when steam is up again."
+            "steam is up again."
           ]
         },
         {
@@ -482,10 +901,21 @@
         {
           "sentences": [
             "(1) Reduce the efficiency of steam boilers any way you can.",
-            "Put too much water in them to make them slow-starting, or keep the fire under them low to keep them inefficient.",
-            "Let them dry and turn the fire up; they will crack and be ruined.",
-            "An especially good trick is to keep putting limestone or water containing lime in the boiler; it will deposit lime on the bottom and sides.",
-            "This deposit will provide very good insulation against heat; after enough of it has collected, the boiler will be completely worthless."
+            "Put too"
+          ]
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 45
+    },
+    {
+      "number": "36",
+      "title": "good insulation against heat; after enough of it has collected, the",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "boiler will be completely worthless."
           ]
         },
         {
@@ -502,7 +932,21 @@
         {
           "sentences": [
             "(1) Keep blast furnaces in a condition where they must be frequently shut down for repair.",
-            "In making fire-proof bricks for the inner lining of blast furnaces, put in an extra proportion of tar so that they will wear out quickly and necessitate constant re-lining."
+            "In making fire-proof bricks for the inner lining"
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 36
+    },
+    {
+      "number": "37",
+      "title": "of blast furnaces, put in an extra proportion of tar so that they will",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "wear out quickly and necessitate constant re-lining."
           ]
         },
         {
@@ -512,7 +956,21 @@
         },
         {
           "sentences": [
-            "(3) See that the core in a mold is not properly supported, so that the core gives way or the casting is spoiled because of the incorrect position of the core."
+            "(3) See that the core in a mold is not properly supported, so that the"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 40
+    },
+    {
+      "number": "38",
+      "title": "core gives way or the casting is spoiled because of the incorrect",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "position of the core."
           ]
         },
         {
@@ -542,7 +1000,20 @@
         },
         {
           "sentences": [
-            "(1) A slight blow against your Davy oil lamp will extinguish it, and to light it again you will have to find a place where there is no fire damp.",
+            "(1) A slight blow against your Davy oil lamp will extinguish it, and to"
+          ]
+        }
+      ],
+      "sentence_count": 7,
+      "word_count": 53
+    },
+    {
+      "number": "39",
+      "title": "light it again you will have to find a place where there is no fire",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
             "Take a long time looking for the place."
           ]
         },
@@ -561,8 +1032,21 @@
         {
           "sentences": [
             "(4) Weaken the chain that pulls the bucket conveyers carrying coal.",
-            "A deep dent in the chain made with blows of a pick or shovel will cause it to part under normal strain.",
-            "Once a chain breaks, normally or otherwise take your time about reporting the damage; be slow about taking the chain up for repairs and bringing it back down after repairs."
+            "A"
+          ]
+        }
+      ],
+      "sentence_count": 7,
+      "word_count": 77
+    },
+    {
+      "number": "40",
+      "title": "taking the chain up for repairs and bringing it back down after",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "repairs."
           ]
         },
         {
@@ -593,14 +1077,21 @@
         },
         {
           "sentences": [
-            "(b) Crops and livestock probably will be destroyed only in areas where there are large food surpluses or where the enemy (regime) is known to be requisitioning food."
+            "(b) Crops and livestock probably will be destroyed only in areas where"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 73
+    },
+    {
+      "number": "41",
+      "title": "Spoil stores of grain, fruit and vegetables by soaking them in water so",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(1.) Feed crops to livestock.",
-            "Let crops harvest too early or too late.",
-            "Spoil stores of grain, fruit and vegetables by soaking them in water so that they will rot.",
+            "that they will rot.",
             "Spoil fruit and vegetables by leaving them in the Sun."
           ]
         },
@@ -616,15 +1107,21 @@
         },
         {
           "sentences": [
-            "(1.) Make train travel as inconvenient as possible for enemy personnel.",
-            "Make mistakes in issuing train tickets, leaving portions of the journey uncovered by the ticket book; issue two tickets for the same seat in the train, so that an interesting argument will result; near train time, instead of issuing printed tickets write them out slowly by hand, prolonging the process until the train is nearly ready to leave or has left the station.",
-            "On station bulletin boards announcing train arrivals and departures, see that false and misleading information is given about trains bound for enemy destinations."
+            "(1.) Make train travel as inconvenient as possible for enemy personnel."
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 30
+    },
+    {
+      "number": "42",
+      "title": "very loudly during the night, handle baggage as noisily as possible",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) In trains bound for enemy destinations, attendants should make life as uncomfortable as possible for passengers.",
-            "See that the food is especially bad, take up tickets after midnight, call all station stops very loudly during the night, handle baggage as noisily as possible during the night, and so on."
+            "during the night, and so on."
           ]
         },
         {
@@ -682,12 +1179,21 @@
         },
         {
           "sentences": [
-            "(1) On a curve, take the bolts out of the tie-plates connecting to sections of the outside rail, and scoop away the gravel, cinders, or dirt for a few feet on each side of the connecting joint."
+            "(1) On a curve, take the bolts out of the tie-plates connecting to"
           ]
-        },
+        }
+      ],
+      "sentence_count": 15,
+      "word_count": 191
+    },
+    {
+      "number": "43",
+      "title": "of rail, spread two sections of rail and drive a spike vertically",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) If by disconnecting the tie-plate at a joint and loosening sleeper nails on each side of the joint, it becomes possible to move a sections of rail, spread two sections of rail and drive a spike vertically between them."
+            "between them."
           ]
         },
         {
@@ -767,9 +1273,18 @@
         },
         {
           "sentences": [
-            "(3) In the last car of a passenger train or or a front car of a freight, remove the wadding from a journal box and replace it with oily rags."
+            "(3) In the last car of a passenger train or or a front car of a"
           ]
-        },
+        }
+      ],
+      "sentence_count": 17,
+      "word_count": 138
+    },
+    {
+      "number": "44",
+      "title": "freight, remove the wadding from a journal box and replace it with oily",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
             "(7) _Transportation: Automotive_"
@@ -788,22 +1303,41 @@
         },
         {
           "sentences": [
-            "In areas where traffic is composed primarily of enemy autos, trucks, and motor convoys of various kinds remove danger signals from curves and intersections."
+            "In areas where traffic is composed primarily of enemy autos, trucks,"
           ]
-        },
+        }
+      ],
+      "sentence_count": 5,
+      "word_count": 58
+    },
+    {
+      "number": "45",
+      "title": "Especially when enemy convoys are in the neighborhood, truck drivers",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) When the enemy asks for directions, give him wrong information.",
-            "Especially when enemy convoys are in the neighborhood, truck drivers can spread rumors and give false information about bridges being out, ferries closed, and detours lying ahead."
+            "can spread rumors and give false information about bridges being out, ferries closed, and detours lying ahead."
           ]
         },
         {
           "sentences": [
             "(3) If you can start damage to a heavily traveled road, passing traffic and the elements will do the rest.",
-            "Construction gangs can see that too much sand or water is put in concrete or that the road foundation has soft spots.",
-            "Anyone can scoop ruts in asphalt and macadam roads which turn soft in hot weather; passing trucks will accentuate the ruts to a point where substantial repair will be needed.",
-            "Dirt roads also can be scooped out.",
-            "If you are a road laborer, it will be only a few minutes work to divert a small stream from a sluice so that it runs over and eats away the road."
+            "Construction gangs can see that too"
+          ]
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 43
+    },
+    {
+      "number": "46",
+      "title": "work to divert a small stream from a sluice so that it runs over and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "eats away the road."
           ]
         },
         {
@@ -818,8 +1352,21 @@
         },
         {
           "sentences": [
-            "(1) Bus-driver can go past the stop where the enemy wants to get off.",
-            "Taxi drivers can waste the enemy’s time and make extra money by driving the longest possible route to his destination."
+            "(1) Bus-driver can go past the stop where the enemy wants to get off."
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 33
+    },
+    {
+      "number": "47",
+      "title": "Taxi drivers can waste the enemy’s time and make extra money by driving",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "the longest possible route to his destination."
           ]
         },
         {
@@ -864,7 +1411,21 @@
         },
         {
           "sentences": [
-            "(1) Jam bits of wood into the ignition lock; loosen or exchange connections behind the switchboard; put dirt in spark plugs; damage distributor points."
+            "(1) Jam bits of wood into the ignition lock; loosen or exchange"
+          ]
+        }
+      ],
+      "sentence_count": 10,
+      "word_count": 65
+    },
+    {
+      "number": "48",
+      "title": "connections behind the switchboard; put dirt in spark plugs; damage",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "distributor points."
           ]
         },
         {
@@ -874,14 +1435,21 @@
         },
         {
           "sentences": [
-            "(3) Mechanics can ruin batteries in a number of undetectable ways: Take the valve cap off a cell, and drive a screw driver slantwise into the exposed water vent, shattering the plates of the cell; no damage will show when you put the cap back on.",
-            "Iron or copper filings put into the cells i. e., dropped into the acid, will greatly shorten its life.",
-            "Copper coins or a few pieces of iron will accomplish the same and more slowly."
+            "(3) Mechanics can ruin batteries in a number of undetectable ways: Take"
           ]
-        },
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 29
+    },
+    {
+      "number": "49",
+      "title": "reduces the life of the battery, but the odor of the vinegar may reveal",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "One hundred to cubic centimeters of vinegar in each cell greatly reduces the life of the battery, but the odor of the vinegar may reveal what has happened."
+            "what has happened."
           ]
         },
         {
@@ -908,28 +1476,42 @@
         {
           "sentences": [
             "(1) Slash or puncture tires of unguarded vehicles.",
-            "Put a nail inside a match box or other small box, and set it vertically in front of the back tire of a stationary car; when the car starts off, the nail will go neatly through the tire."
+            "Put a nail inside a"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 73
+    },
+    {
+      "number": "50",
+      "title": "between the tube and the casing the object which caused the flat in the",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) It is easy to damage a tire in a tire repair shop: In fixing flats, spill glass, benzine, caustic soda, or other material inside the casing which will puncture or corrode the tube.",
-            "If you put a gummy substance inside the tube, the next flat will stick the tube to the casing and make it unusable.",
-            "Or, when you fix a flat tire, you can simply leave between the tube and the casing the object which caused the flat in the first place."
+            "first place."
           ]
         },
         {
           "sentences": [
             "(3) In assembling a tire after repair, pump the tube up as fast as you can.",
             "Instead of filling out smoothly, it may crease, in which case it will wear out quickly.",
-            "Or, as you put a tire together, see if you can pinch the tube between the rim of the tire and the rim of the wheel, so that a blow-out will result."
+            "Or, as you put a tire together, see if you can"
           ]
-        },
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 45
+    },
+    {
+      "number": "51",
+      "title": "them out of true with a strong kick, or by driving the car slowly and",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(4) In putting air into tires, see that they are kept below normal pressure, so that more than an ordinary amount of wear will result.",
-            "In filling tires on double wheels, inflate the inner tire to a much higher pressure than the outer one; both will wear out more quickly this way.",
-            "Badly aligned wheels also wear tires out quickly; you can leave wheels out of alignment when they come in for adjustment, or you can spring them out of true with a strong kick, or by driving the car slowly and diagonally into a curb."
+            "diagonally into a curb."
           ]
         },
         {
@@ -956,21 +1538,41 @@
         },
         {
           "sentences": [
-            "(2) Barge and river boat captains should navigate with exceeding caution near locks and bridges, to waste their time and to waste the time of other craft which may have to wait on them.",
-            "If you don’t pump the bilges of ships and barges often enough, they will be slower and harder to navigate.",
+            "(2) Barge and river boat captains should navigate with exceeding"
+          ]
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 92
+    },
+    {
+      "number": "52",
+      "title": "the bilges of ships and barges often enough, they will be slower and",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "harder to navigate.",
             "Barges “accidentally” run aground are an efficient time waster too."
           ]
         },
         {
           "sentences": [
-            "(3) Attendants on swing, draw, or bascule bridges can delay traffic over the bridge or in the waterway underneath by being slow.",
-            "Boat captains can leave unattended draw bridges open in order to hold up road traffic."
+            "(3) Attendants on swing, draw, or bascule bridges can delay traffic over the bridge or in the waterway underneath by being slow."
           ]
-        },
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 35
+    },
+    {
+      "number": "53",
+      "title": "Demagnetize the compass or maladjust it by concealing a large bar of",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(4) Add or subtract compensating magnets to the compass on cargo ships.",
-            "Demagnetize the compass or maladjust it by concealing a large bar of steel or iron near to it."
+            "steel or iron near to it."
           ]
         },
         {
@@ -981,17 +1583,21 @@
         {
           "sentences": [
             "(1) While loading or unloading, handle cargo carelessly in order to cause damage.",
-            "Arrange the cargo so that the weakest and lightest crates and boxes will be at the bottom of the hold, while the heaviest ones are on top of them."
+            "Arrange the cargo so that the weakest and lightest crates"
           ]
-        },
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 31
+    },
+    {
+      "number": "54",
+      "title": "Tie float valves open so that storage tanks will overflow on perishable",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "Put hatch covers and tarpaulins on sloppily, so that rain and deck wash will injure the cargo."
-          ]
-        },
-        {
-          "sentences": [
-            "Tie float valves open so that storage tanks will overflow on perishable goods."
+            "goods."
           ]
         },
         {
@@ -1006,30 +1612,40 @@
         },
         {
           "sentences": [
-            "(1) At office, hotel and exchange switch boards delay putting enemy calls through, give them wrong numbers, cut them off “accidentally,” or forget to disconnect them so that the line cannot be used again."
+            "(1) At office, hotel and exchange switch boards delay putting enemy"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 16
+    },
+    {
+      "number": "55",
+      "title": "calls through, give them wrong numbers, cut them off “accidentally,” or",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "forget to disconnect them so that the line cannot be used again."
           ]
         },
         {
           "sentences": [
             "(2) Hamper official and especially military business by making at least one telephone call a day to an enemy headquarters; when you get them, tell them you have the wrong number."
           ]
-        },
+        }
+      ],
+      "sentence_count": 2,
+      "word_count": 43
+    },
+    {
+      "number": "56",
+      "title": "percent of the cells in half the batteries of the central battery room",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "Call military or police offices and make anonymous false reports of fires, air raids, bombs."
-          ]
-        },
-        {
-          "sentences": [
-            "(3) In offices and buildings used by the enemy, unscrew the earphone of telephone receivers and remove the diaphragm.",
-            "Electricians and telephone repair men can make poor connections and damage insulation so that cross talk and other kinds of electrical interference will make conversations hard or impossible to understand."
-          ]
-        },
-        {
-          "sentences": [
-            "(4) Put the batteries under automatic switchboards out of commission by dropping nails, metal filings, or coins into the cells.",
-            "If you can treat half the batteries in this way, the switchboard will stop working.",
-            "A whole telephone system can be disrupted if you can put percent of the cells in half the batteries of the central battery room out of order."
+            "out of order."
           ]
         },
         {
@@ -1044,8 +1660,21 @@
         },
         {
           "sentences": [
-            "(2) Garble telegrams to enemy destinations so that another telegram will have to be sent or a long distance call will have to be made.",
-            "Sometimes it will be possible to do this by changing a single letter in a word—for example, changing “minimum” to “miximum,” so that the person receiving the telegram will not know whether “minimum” or “maximum” is meant."
+            "(2) Garble telegrams to enemy destinations so that another telegram will have to be sent or a long distance call will have to be made."
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 41
+    },
+    {
+      "number": "57",
+      "title": "receiving the telegram will not know whether “minimum” or “maximum” is",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "meant."
           ]
         },
         {
@@ -1076,7 +1705,21 @@
         },
         {
           "sentences": [
-            "(1) Projector operators can ruin newsreels and other enemy propaganda films by bad focusing, speeding up or slowing down the film and by causing frequent breakage in the film."
+            "(1) Projector operators can ruin newsreels and other enemy propaganda"
+          ]
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 63
+    },
+    {
+      "number": "58",
+      "title": "films by bad focusing, speeding up or slowing down the film and by",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "causing frequent breakage in the film."
           ]
         },
         {
@@ -1087,8 +1730,21 @@
         {
           "sentences": [
             "(3) Anyone can break up a showing of an enemy propaganda film by putting two or three dozen large moths in a paper bag.",
-            "Take the bag to the movies with you, put it on the floor in an empty section of the theater as you go in and leave it open.",
-            "The moths will fly out and climb into the projector beam, so that the film will be obscured by fluttering shadows."
+            "Take the bag to"
+          ]
+        }
+      ],
+      "sentence_count": 4,
+      "word_count": 56
+    },
+    {
+      "number": "59",
+      "title": "climb into the projector beam, so that the film will be obscured by",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "fluttering shadows."
           ]
         },
         {
@@ -1098,21 +1754,21 @@
         },
         {
           "sentences": [
-            "(1) Station engineers will find it quite easy to overmodulate transmissions of talks by persons giving enemy propaganda or instructions, so that they will sound as if they were talking through a heavy cotton blanket with a mouth full of marbles."
+            "(1) Station engineers will find it quite easy to overmodulate"
           ]
-        },
+        }
+      ],
+      "sentence_count": 3,
+      "word_count": 14
+    },
+    {
+      "number": "60",
+      "title": "enemy airfield, they will make ground-to-plane radio communications",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) In your own apartment building, you can interfere with radio reception at times when the enemy wants everybody to listen.",
-            "Take an electric light plug off the end of an electric light cord; take some wire out of the cord and tie it across two terminals of a two-prong plug or three terminals of a four-prong plug.",
-            "Then take it around and put it into as many wall and floor outlets as you can find.",
-            "Each time you insert the plug into a new circuit, you will blow out a fuse and silence all radios running on power from that circuit until a new fuse is put in."
-          ]
-        },
-        {
-          "sentences": [
-            "(3) Damaging insulation on any electrical equipment tends to create radio interference in the immediate neighborhood, particularly on large generators, neon signs, fluorescent lighting, X-ray machines, and power lines.",
-            "If workmen can damage insulation on a high tension line near an enemy airfield, they will make ground-to-plane radio communications difficult and perhaps impossible during long periods of the day."
+            "difficult and perhaps impossible during long periods of the day."
           ]
         },
         {
@@ -1137,10 +1793,21 @@
         },
         {
           "sentences": [
-            "(1.) Linesmen can loosen and dirty insulators to cause power leakage.",
-            "It will be quite easy, too, for them to tie a piece of very heavy string several times back and forth between two parallel transmission lines, winding it several turns around the wire each time.",
-            "Beforehand, the string should be heavily saturated with salt and then dried.",
-            "When it rains, the string becomes a conductor, and a short-circuit will result."
+            "(1.) Linesmen can loosen and dirty insulators to cause power leakage."
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 39
+    },
+    {
+      "number": "61",
+      "title": "it rains, the string becomes a conductor, and a short-circuit will",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "result."
           ]
         },
         {
@@ -1177,26 +1844,26 @@
         },
         {
           "sentences": [
-            "(6) Refer back to matters decided upon at the last meeting and attempt"
-          ]
-        }
-      ],
-      "sentence_count": 355,
-      "word_count": 6140
-    },
-    {
-      "number": "2",
-      "title": "re-open the question of the advisability of that decision.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "(7) Advocate “caution.” Be “reasonable” and urge your fellow-conferees to be “reasonable” and avoid haste which might result in embarrassments or difficulties later on."
+            "(6) Refer back to matters decided upon at the last meeting and attempt to re-open the question of the advisability of that decision."
           ]
         },
         {
           "sentences": [
-            "(8) Be worried about the propriety of any decision—raise the question of whether such action as is contemplated lies within the jurisdiction of the group or whether it might conflict with the policy of some higher echelon."
+            "(7) Advocate “caution.” Be “reasonable” and urge your fellow-conferees"
+          ]
+        }
+      ],
+      "sentence_count": 11,
+      "word_count": 137
+    },
+    {
+      "number": "62",
+      "title": "of the group or whether it might conflict with the policy of some",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "higher echelon."
           ]
         },
         {
@@ -1219,12 +1886,21 @@
         {
           "sentences": [
             "(3) Do everything possible to delay the delivery of orders.",
-            "Even though parts of an order may be ready beforehand, don’t deliver it until it is completely ready."
+            "Even though"
           ]
-        },
+        }
+      ],
+      "sentence_count": 8,
+      "word_count": 42
+    },
+    {
+      "number": "63",
+      "title": "been virtually exhausted, so that the slightest delay in filling your",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(4) Don’t order new working materials until your current stocks have been virtually exhausted, so that the slightest delay in filling your order will mean a shutdown."
+            "order will mean a shutdown."
           ]
         },
         {
@@ -1248,18 +1924,9 @@
         },
         {
           "sentences": [
-            "(8) Make mistakes in routing so that parts and materials will be sent"
+            "(8) Make mistakes in routing so that parts and materials will be sent to the wrong place in the plant."
           ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 239
-    },
-    {
-      "number": "3",
-      "title": "the wrong place in the plant.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "(9) When training new workers, give incomplete or misleading instructions."
@@ -1347,13 +2014,21 @@
         {
           "sentences": [
             "(1) _Work slowly_.",
-            "Think out ways to increase the number of movements necessary on your job: use a light hammer instead of a heavy one, try to make a small wrench do when a big one is necessary, use little force where considerable force is needed, and so on."
+            "Think out ways to increase the number of movements"
           ]
-        },
+        }
+      ],
+      "sentence_count": 31,
+      "word_count": 295
+    },
+    {
+      "number": "64",
+      "title": "doing other measured work, measure dimensions twice as often as you",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(2) Contrive as many interruptions to your work as you can: when changing the material on which you are working, as you would on a lathe or punch, take needless time to do it.",
-            "If you are cutting, shaping or doing other measured work, measure dimensions twice as often as you need to.",
+            "need to.",
             "When you go to the lavatory, spend a longer time there than is necessary."
           ]
         },
@@ -1370,7 +2045,21 @@
         {
           "sentences": [
             "(4) Pretend that instructions are hard to understand, and ask to have them repeated more than once.",
-            "Or pretend that you are particularly anxious to do your work, and pester the foreman with unnecessary questions."
+            "Or pretend that you are particularly"
+          ]
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 67
+    },
+    {
+      "number": "65",
+      "title": "anxious to do your work, and pester the foreman with unnecessary",
+      "type": "story",
+      "paragraphs": [
+        {
+          "sentences": [
+            "questions."
           ]
         },
         {
@@ -1387,13 +2076,21 @@
         {
           "sentences": [
             "(7) Snarl up administration in every possible way.",
-            "Fill out forms illegibly so that they will have to be done over; make mistakes or omit requested information in forms."
+            "Fill out forms"
           ]
-        },
+        }
+      ],
+      "sentence_count": 6,
+      "word_count": 53
+    },
+    {
+      "number": "66",
+      "title": "one meeting for each grievance, bringing up problems which are largely",
+      "type": "story",
+      "paragraphs": [
         {
           "sentences": [
-            "(8) If possible, join or help organize a group for presenting employee problems to the management.",
-            "See that the procedures adopted are as inconvenient as possible for the management, involving the presence of a large number of employees at each presentation, entailing more than one meeting for each grievance, bringing up problems which are largely imaginary, and so on."
+            "imaginary, and so on."
           ]
         },
         {
@@ -1472,18 +2169,18 @@
           ]
         }
       ],
-      "sentence_count": 51,
-      "word_count": 631
+      "sentence_count": 16,
+      "word_count": 151
     }
   ],
   "statistics": {
-    "total_chapters": 3,
-    "total_paragraphs": 254,
-    "total_sentences": 424,
-    "total_words": 7010,
-    "average_sentences_per_chapter": 141.33333333333334,
-    "average_paragraphs_per_chapter": 84.66666666666667,
-    "average_sentences_per_paragraph": 1.669291338582677,
-    "average_words_per_sentence": 16.53301886792453
+    "total_chapters": 66,
+    "total_paragraphs": 291,
+    "total_sentences": 406,
+    "total_words": 4036,
+    "average_sentences_per_chapter": 6.151515151515151,
+    "average_paragraphs_per_chapter": 4.409090909090909,
+    "average_sentences_per_paragraph": 1.395189003436426,
+    "average_words_per_sentence": 9.94088669950739
   }
 }

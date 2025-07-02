@@ -10,9 +10,433 @@
   "chapters": [
     {
       "number": "1",
-      "title": "be obnoxious to not a few considerable Exceptions.",
-      "type": "letter",
+      "title": "",
+      "type": "chapter",
       "paragraphs": [
+        {
+          "sentences": [
+            "﻿The Project Gutenberg eBook of The Sceptical Chymist"
+          ]
+        },
+        {
+          "sentences": [
+            "This ebook is for the use of anyone anywhere in the United States and most other parts of the world at no cost and with almost no restrictions whatsoever.",
+            "You may copy it, give it away or re-use it under the terms of the Project Gutenberg License included with this ebook or online at www. gutenberg. org.",
+            "If you are not located in the United States, you will have to check the laws of the country where you are located before using this eBook."
+          ]
+        },
+        {
+          "sentences": [
+            "Title: The Sceptical Chymist"
+          ]
+        },
+        {
+          "sentences": [
+            "Author: Robert Boyle"
+          ]
+        },
+        {
+          "sentences": [
+            "Release date: October 8, eBook #22914"
+          ]
+        },
+        {
+          "sentences": [
+            "Language: English"
+          ]
+        },
+        {
+          "sentences": [
+            "Credits: E-text prepared by Robert Shimmin, Linda Cantoni, and the Project Gutenberg Online Distributed Proofreading Team"
+          ]
+        },
+        {
+          "sentences": [
+            "*** START OF THE PROJECT GUTENBERG EBOOK THE SCEPTICAL CHYMIST ***"
+          ]
+        },
+        {
+          "sentences": [
+            "E-text prepared by Robert Shimmin, Linda Cantoni, and the Project Gutenberg Online Distributed Proofreading Team (http://www. pgdp. net).",
+            "Color title-page images were generously provided by the University of Pennsylvania Schoenberg Center for Electronic Text & Image (http://dewey. library. upenn. edu/sceti)."
+          ]
+        },
+        {
+          "sentences": [
+            "Transcriber's Notes:"
+          ]
+        },
+        {
+          "sentences": [
+            "This e-book was prepared from a facsimile of the first  edition and contains spelling, capitalization, and punctuation  inconsistencies typical of the era.",
+            "These have been preserved  as they appear in the original."
+          ]
+        },
+        {
+          "sentences": [
+            "Printer errors have also been preserved.",
+            "Those mentioned in  the Errata at the end of the book are noted with Errata:  corrected text.",
+            "Other obvious printer errors are noted with  Transcriber's Note: corrected text where the meaning might  be unclear without the correction.",
+            "See also the printer's note  preceding the Errata, which contains material omitted from the  text (the place where it should be inserted is marked in the  text with a Transcriber's Note)."
+          ]
+        },
+        {
+          "sentences": [
+            "There are a number of sidenotes in this book, most of which  function as footnotes (e. g., citations to other works) and some  of which function as true sidenotes.",
+            "For the sake of clarity,  sidenotes functioning as footnotes have been converted to  numbered footnotes, with number markers at appropriate places  in the text."
+          ]
+        },
+        {
+          "sentences": [
+            "A character with a macron is represented by an equal sign.",
+            "E. g., =a indicates \"a\" with macron."
+          ]
+        },
+        {
+          "sentences": [
+            "A table of contents has been provided for the reader's  convenience."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
+          ]
+        },
+        {
+          "sentences": [
+            "SCEPTICAL CHYMIST:"
+          ]
+        },
+        {
+          "sentences": [
+            "OR"
+          ]
+        },
+        {
+          "sentences": [
+            "CHYMICO-PHYSICAL"
+          ]
+        },
+        {
+          "sentences": [
+            "Doubts & Paradoxes,"
+          ]
+        },
+        {
+          "sentences": [
+            "Touching the"
+          ]
+        },
+        {
+          "sentences": [
+            "SPAGYRIST'S PRINCIPLES"
+          ]
+        },
+        {
+          "sentences": [
+            "Commonly call'd"
+          ]
+        },
+        {
+          "sentences": [
+            "HYPOSTATICAL,"
+          ]
+        },
+        {
+          "sentences": [
+            "As they are wont to be Propos'd and Defended by the Generality of"
+          ]
+        },
+        {
+          "sentences": [
+            "ALCHYMISTS."
+          ]
+        },
+        {
+          "sentences": [
+            "Whereunto is præmis'd Part of another Discourse relating to the same Subject."
+          ]
+        },
+        {
+          "sentences": [
+            "BY"
+          ]
+        },
+        {
+          "sentences": [
+            "The Honourable _ROBERT BOYLE_, Esq;"
+          ]
+        },
+        {
+          "sentences": [
+            "_LONDON,_"
+          ]
+        },
+        {
+          "sentences": [
+            "Printed by _J.",
+            "Cadwell_ for _J.",
+            "Crooke_, and are to be Sold at the _Ship_ in St. _Paul's_ Church-Yard."
+          ]
+        },
+        {
+          "sentences": [
+            "_MDCLXI._"
+          ]
+        },
+        {
+          "sentences": [
+            "CONTENTS"
+          ]
+        },
+        {
+          "sentences": [
+            "A Præface Introductory Physiological Considerations The First Part The Second Part The Third Part The Fourth Part The Fifth Part The Sixth Part The Conclusion Printer's Note Errata"
+          ]
+        },
+        {
+          "sentences": [
+            "A"
+          ]
+        },
+        {
+          "sentences": [
+            "PRÆFACE"
+          ]
+        },
+        {
+          "sentences": [
+            "INTRODUCTORY"
+          ]
+        },
+        {
+          "sentences": [
+            "_To the following Treatise._"
+          ]
+        },
+        {
+          "sentences": [
+            "_To give the Reader an account, Why the following Treatise is suffer'd to pass abroad so maim'd and imperfect, I must inform him that 'tis now long since, that to gratify an ingenious Gentleman, I set down some of the Reasons that kept me from fully acquiescing either in the Peripatetical, or in the Chymical Doctrine, of the Material Principles of mixt Bodies.",
+            "This Discourse some years after falling into the hands of some Learned men, had the good luck to be so favourably receiv'd, and advantageously spoken of by them, that having had more then ordinary Invitations given me to make it publick, I thought fit to review it, that I might retrench some things that seem'd not so fit to be shewn to every Reader, And substitute some of those other things that occurr'd to me of the trials and observations I had since made.",
+            "What became of my papers, I elsewhere mention in a Preface where I complain of it: But since I writ That, I found many sheets that belong'd to the subjects I am now about to discourse of.",
+            "Wherefore seeing that I had then in my hands as much of the first Dialogue as was requisite to state the Case, and serve for an Introduction as well to the conference betwixt_ Carneades _and_ Eleutherius, _as to some other Dialogues, which for certain reasons are not now herewith publish'd, I resolv'd to supply, as well as I could, the Contents of a Paper belonging to the second of the following Discourses, which I could not possibly retrive, though it were the chief of them all.",
+            "And having once more try'd the Opinion of Friends, but not of the same, about this imperfect work, I found it such, that I was content in complyance with their Desires; that not only it should be publish'd, but that it should be publish'd as soon as conveniently might be.",
+            "I had indeed all along the Dialogues spoken of my self, as of a third Person; For, they containing Discourses which were among the first Treatises that I ventur'd long ago to write of matters Philosophical, I had reason to desire, with the Painter, to_ latere pone tabulam, _and hear what men would say of them, before I own'd my self to be their Author.",
+            "But besides that now I find, 'tis not unknown to many who it is that writ them, I am made to believe that 'tis not inexpedient, they should be known to come from a Person not altogether a stranger to Chymical Affairs.",
+            "And I made the lesse scruple to let them come abroad uncompleated, partly, because my affairs and Præ-ingagements to publish divers other Treatises allow'd me small hopes of being able in a great while to compleat these Dialogues.",
+            "And partly, because I am not unapt to think, that they may come abroad seasonably enough, though not for the Authors reputation, yet for other purposes.",
+            "For I observe, that of late Chymistry begins, as indeed it deserves, to be cultivated by Learned Men who before despis'd it; and to be pretended to by many who never cultivated it, that they may be thought not to ignore it: Whence it is come to passe, that divers Chymical Notions about Matters Philosophical are taken for granted and employ'd, and so adopted by very eminent Writers both Naturalists and Physitians.",
+            "Now this I fear may prove somewhat prejudicial to the Advancement of solid Philosophy: For though I am a great Lover of Chymical Experiments, and though I have no mean esteem of divers Chymical Remedies, yet I distinguish these from their Notions about the causes of things, and their manner of Generation.",
+            "And for ought I can hitherto discern, there are a thousand_ Phænomena _in Nature, besides a Multitude of Accidents relating to the humane Body, which will scarcely be clearly & satisfactorily made out by them that confine themselves to deduce things from Salt, Sulphur and Mercury, and the other Notions peculiar to the Chymists, without taking much more Notice than they are wont to do, of the Motions and Figures, of the small Parts of Matter, and the other more Catholick and Fruitful affections of Bodies.",
+            "Wherefore it will not perhaps be now unseasonable to let our_ Carneades _warne Men, not to subscribe to the grand Doctrine of the Chymists touching their three Hypostatical Principles, till they have a little examin'd it, and consider'd, how they can clear it from his Objections, divers of which 'tis like they may never have thought on; since a Chymist scarce would, and none but a Chymist could propose them.",
+            "I hope also it will not be unacceptable to several Ingenious Persons, who are unwilling to determine of any important Controversie, without a previous consideration of what may be said on both sides, and yet have greater desires to understand Chymical Matters, than Opportunities of learning them, to find here together, besides several Experiments of my own purposely made to Illustrate the Doctrine of the Elements, divers others scarce to be met with, otherwise then Scatter'd among many Chymical Books.",
+            "And to Find these Associated Experiments so Deliver'd as that an Ordinary Reader, if he be but Acquainted with the usuall Chymical Termes, may easily enough Understand Them; and even a wary One may safely rely on Them.",
+            "These Things I add, because a Person any Thing vers'd in the Writings of Chymists cannot but Discern by their obscure, Ambiguous, and almost Ænigmatical Way of expressing what they pretend to Teach, that they have no Mind, to be understood at all, but by_ the Sons of Art _(as they call them) nor to be Understood even by these without Difficulty And Hazardous Tryalls.",
+            "Insomuch that some of Them Scarce ever speak so candidly, as when they make use of that known Chymical Sentence;_ Ubi palam locuti fumus, ibi nihil diximus. _And as the obscurity of what some Writers deliver makes it very difficult to be understood; so the Unfaithfulness of too many others makes it unfit to be reli'd on.",
+            "For though unwillingly, Yet I must for the truths sake, and the Readers, warne him not to be forward to believe Chymical Experiments when they are set down only by way of Prescriptions, and not of Relations; that is, unless he that delivers them mentions his doing it upon his own particular knowledge, or upon the Relation of some credible person, avowing it upon his own experience.",
+            "For I am troubled, I must complain, that even Eminent Writers, both Physitians and Philosophers, whom I can easily name, if it be requir'd, have of late suffer'd themselves to be so far impos'd upon, as to Publish and Build upon Chymical Experiments, which questionless they never try'd; for if they had, they would, as well as I, have found them not to be true.",
+            "And indeed it were to be wish'd, that now that those begin to quote Chymical Experiments that are not themselves Acquainted with Chymical Operations, men would Leave off that Indefinite Way of Vouching the Chymists say this, or the Chymists affirme that, and would rather for each Experiment they alledge name the Author or Authors, upon whose credit they relate it; For, by this means they would secure themselves from the suspition of falshood (to which the other Practice Exposes them) and they would Leave the Reader to Judge of what is fit for him to Believe of what is Deliver'd, whilst they employ not their own great names to Countenance doubtfull Relations; and they will also do Justice to the Inventors or Publishers of true Experiments, as well as upon the Obtruders of false ones.",
+            "Whereas by that general Way of quoting the Chymists, the candid Writer is Defrauded of the particular Praise, and the Impostor escapes the Personal Disgrace that is due to him._"
+          ]
+        },
+        {
+          "sentences": [
+            "_The remaining Part of this Præface must be imploy'd in saying something for_ Carneades, _and something for my Self._"
+          ]
+        },
+        {
+          "sentences": [
+            "_And first_, Carneades _hopes that he will be thought to have disputed civilly and Modestly enough for one that was to play the Antagonist and the Sceptick.",
+            "And if he any where seem to sleight his Adversaries Tenents and Arguments, he is willing to have it look'd upon as what he was induc'd to, not so much by his Opinion of them, as the Examples of_ Themistius _and_ Philoponus, _and the custom of such kind of Disputes._"
+          ]
+        },
+        {
+          "sentences": [
+            "_Next, In case that some of his Arguments shall not be thought of the most Cogent sort that may be, he hopes it will be consider'd that it ought not to be Expected, that they should be So.",
+            "For, his Part being chiefly but to propose Doubts and Scruples, he does enough, if he shews that his Adversaries Arguments are not strongly Concluding, though his own be not so neither.",
+            "And if there should appear any disagreement betwixt the things he delivers in divers passages, he hopes it will be consider'd, that it is not necessary that all the things a Sceptick Proposes, should be consonant; since it being his work to Suggest doubts against the Opinion he questions, it is allowable for him to propose two or more severall_ Hypotheses _about the same thing: And to say that it may be accounted for this way, or that way, or the other Way, though these wayes be perhaps inconsistent among Themselves.",
+            "Because it is enough for him, if either of the proposed_ Hypotheses _be but as probable as that he calls a question.",
+            "And if he proposes many that are Each of them probable, he does the more satisfie his doubts, by making it appear the more difficult to be sure, that that which they alwayes differ from is the true.",
+            "And our_ Carneades _by holding the Negative, he has this Advantage, that if among all the Instances he brings to invalidate all the Vulgar Doctrine of those he Disputes with, any one be Irrefragable, that alone is sufficient to overthrow a Doctrine which Universally asserts what he opposes.",
+            "For, it cannot be true, that all Bodies whatsoever that are reckon'd among the Perfectly mixt Ones, are Compounded of such a Determinate Number of such or such Ingredients, in case any one such Body can be produc'd, that is not so compounded; and he hopes too, that Accurateness will be the less expected from him, because his undertaking obliges him to maintain such Opinions in Chymistry, and that chiefly by Chymical Arguments, as are Contrary to the very Principles of the Chymists; From whose writings it is not Therefore like he should receive any intentionall Assistance, except from some Passages of the Bold and Ingenious_ Helmont, _with whom he yet disagrees in many things (which reduce him to explicate Divers Chymical_ Phænomena, _according to other Notions;) And of whose Ratiocinations, not only some seem very Extravagant, but even the Rest are not wont to be as considerable as his Experiments.",
+            "And though it be True indeed, that some_ Aristotelians _have occasionally written against the Chymical Doctrine he Oppugnes, yet since they have done it according to their Principles, And since our_ Carneades _must as well oppose their_ Hypothesis _as that of the Spagyrist, he was fain to fight his Adversaries with their own Weapons, Those of the Peripatetick being Improper, if not hurtfull for a Person of his Tenents; besides that those_ Aristotelians, _(at Least, those he met with,) that have written against the Chymists, seem to have had so little Experimental Knowledge in Chymical Matters, that by their frequent Mistakes and unskilfull Way of Oppugning, they have too often expos'd Themselves to the Derision of their Adversaries, for writing so Confidently against what they appear so little to understand._"
+          ]
+        },
+        {
+          "sentences": [
+            "_And Lastly_, Carneades _hopes, he shall doe the Ingenious this Piece of service, that by having Thus drawn the Chymists Doctrine out of their Dark and Smoakie Laboratories, and both brought it into the open light, and shewn the weakness of their Proofs, that have hitherto been wont to be brought for it, either Judicious Men shall henceforth be allowed calmly and after due information to disbelieve it, or those abler Chymists, that are zealous for the reputation of it, will be oblig'd to speak plainer then hitherto has been done, and maintain it by better Experiments and Arguments then Those_ Carneades _hath examin'd: so That he hopes, the Curious will one Way or other Derive either satisfaction or instruction from his endeavours.",
+            "And as he is ready to make good the profession he makes in the close of his Discourse, he being ready to be better inform'd, so he expects either to be indeed inform'd, or to be let alone.",
+            "For Though if any Truly knowing Chymists shall Think fit in a civil and rational way to shew him any truth touching the matter in Dispute That he yet discernes not,_ Carneades _will not refuse either to admit, or to own a Conviction: yet if any impertinent Person shall, either to get Himself a Name, or for what other end soever, wilfully or carelesly mistake the State of the Controversie, or the sence of his Arguments, or shall rail instead of arguing, as hath been done of Late in Print by divers Chymists;_1 _or lastly, shall write against them in a canting way; I mean, shall express himself in ambiguous or obscure termes, or argue from experiments not intelligibly enough Deliver'd_, Carneades _professes, That he values his time so much, as not to think the answering such Trifles worth the loss of it._"
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 1: G. and F. and H. and others, in their books against one another."
+          ]
+        },
+        {
+          "sentences": [
+            "_And now having said thus much for_ Carneades, _I hope the Reader will give me leave to say something too for my self._"
+          ]
+        },
+        {
+          "sentences": [
+            "_And first, if some morose Readers shall find fault with my having made the Interlocutors upon occasion complement with one another, and that I have almost all along written these Dialogues in a stile more Fashionable then That of meer scholars is wont to be, I hope I shall be excus'd by them that shall consider, that to keep a due_ decorum _in the Discourses, it was fit that in a book written by a Gentleman, and wherein only Gentlemen are introduc'd as speakers, the Language should be more smooth, and the Expressions more civil than is usual in the more Scholastick way of writing.",
+            "And indeed, I am not sorry to have this Opportunity of giving an example how to manage even Disputes with Civility; whence perhaps some Readers will be assisted to discern a Difference betwixt Bluntness of speech and Strength of reason, and find that a man may be a Champion for Truth, without being an Enemy to Civility; and may confute an Opinion without railing at Them that hold it; To whom he that desires to convince and not to provoke them, must make some amends by his Civility to their Persons, for his severity to their mistakes; and must say as little else as he can, to displease them, when he says that they are in an error._"
+          ]
+        },
+        {
+          "sentences": [
+            "_But perhaps other Readers will be less apt to find fault with the Civility of my Disputants, than the Chymists will be, upon the reading of some Passages of the following Dialogue, to accuse_ Carneades _of Asperity.",
+            "But if I have made my Sceptick sometimes speak sleightingly of the Opinions he opposes, I hope it will not be found that I have done any more, than became the Part he was to act of an Opponent: Especially, if what I have made him say be compar'd with what the Prince of the Romane Orators himself makes both great Persons and Friends say of one anothers Opinions, in his excellent Dialogues,_ De Natura Deorum: _And I shall scarce be suspected of Partiality, in the case, by them that take Notice that there is full as much (if not far more) liberty of sleighting their Adversaries Tenents to be met with in the Discourses of those with whom_ Carneades _disputes.",
+            "Nor needed I make the Interlocutors speak otherwise then freely in a Dialogue, wherein it was sufficiently intimated, that I meant not to declare my own Opinion of the Arguments propos'd, much lesse of the whole Controversy it self otherwise than as it may by an attentive Reader be guess'd at by some Passages of_ Carneades: _(I say, some Passages, because I make not all that he says, especially in the heat of Disputation, mine,) partly in this Discourse, and partly in some other Dialogues betwixt the same speakers (though they treat not immediately of the Elements) which have long layn by me, and expect the Entertainment that these present Discourses will meet with.",
+            "And indeed they will much mistake me, that shall conclude from what I now publish, that I am at Defyance with Chymistry, or would make my Readers so.",
+            "I hope the_ Specimina _I have lately publish'd of an attempt to shew the usefulness of Chymical Experiments to Contemplative Philosophers, will give those that shall read them other thoughts of me: & I had a design (but wanted opportunity) to publish with these Papers an Essay I have lying by me, the greater part of which is Apologetical for one sort of Chymists.",
+            "And at least, as for those that know me, I hope the pain I have taken in the fire will both convince them, that I am far from being an Enemy to the Chymists Art, (though I am no friend to many that disgrace it by professing it,) and perswade them to believe me when I declare that I distinguish betwixt those Chymists that are either Cheats, or but Laborants, and the true_ Adepti; _By whom, could I enjoy their Conversation, I would both willingly and thankfully be instructed; especially concerning the Nature and Generation of Metals: And possibly, those that know how little I have remitted of my former addictedness to make Chymical Experiments, will easily believe, that one of the chief Designes of this Sceptical Discourse was, not so much to discredit Chymistry, as to give an occasion and a kind of necessity to the more knowing Artists to lay aside a little of their over-great Reservedness, & either explicate or prove the Chymical Theory better than ordinary Chymists have done, or by enriching us with some of their nobler secrets to evince that Their art is able to make amends even for the deficiencies of their Theory: And thus much I shall here make bold to add, that we shall much undervalue Chymistry, if we imagine, that it cannot teach us things farr more useful, not only to Physick but to Philosophy, than those that are hitherto known to vulgar Chymists.",
+            "And yet as for inferiour Spagyrists themselves, they have by their labours deserv'd so well of the Common-wealth of Learning, that methinks 'tis Pity they should ever misse the Truth which they have so industriously sought.",
+            "And though I be no Admirer of the Theorical Part of their Art, yet my conjectures will much deceive me, if the Practical Part be not much more cultivated than hitherto it has been, and do not both employ Philosophy and Philosophers, and help to make men such.",
+            "Nor would I that have been diverted by other Studies as well as affairs, be thought to pretend being a profound Spagyrist, by finding so many faults in the Doctrine wherein the Generality of Chymists scruples not to Acquiesce: For besides that 'tis most commonly far easier to frame Objections against any propos'd_ Hypothesis, _than to propose an_ Hypothesis _not lyable to Objections (besides this I say) 'tis no such great matter, if whereas Beginners in Chymistry are commonly at once imbu'd with the Theory and Operations of their profession, I who had the good Fortune to Learn the Operations from illiterate Persons, upon whose credit I was not Tempted to take up any opinion about them, should consider things with lesse prejudice, and consequently with other Eyes than the Generality of Learners; And should be more dispos'd to accommodate the_ Phænomena _that occur'd to me to other Notions than to those of the Spagyrists.",
+            "And having at first entertain'd a suspition That the Vulgar Principles were lesse General and comprehensive, or lesse considerately Deduc'd from Chymical Operations, than was believ'd; it was not uneasie for me both to Take notice of divers_ Phænomena, _overlook'd by prepossest Persons, that seem'd not to suite so well with the_ Hermetical _Doctrine; and, to devise some Experiments likely to furnish me with Objections against it, not known to many, that having practis'd Chymistry longer perchance then I have yet liv'd, may have far more Experience, Than I, of particular processes._"
+          ]
+        },
+        {
+          "sentences": [
+            "_To conclude, whether the Notions I have propos'd, and the Experiments I have communicated, be considerable, or not, I willingly leave others to Judge; and This only I shall say for my Self, That I have endeavour'd to deliver matters of Fact, so faithfully, that I may as well assist the lesse skilful Readers to examine the Chymical_ Hypothesis, _as provoke the Spagyrical Philosophers to illustrate it: which if they do, and that either the Chymical opinion, or the Peripatetick, or any other Theory of the Elements differing from that I am most inclin'd to, shall be intelligibly explicated, and duly prov'd to me; what I have hitherto discours'd will not hinder it from making a Proselyte of a Person that Loves Fluctuation of Judgment little enough to be willing to be eas'd of it by any thing but Error._"
+          ]
+        },
+        {
+          "sentences": [
+            "PHYSIOLOGICAL"
+          ]
+        },
+        {
+          "sentences": [
+            "CONSIDERATIONS"
+          ]
+        },
+        {
+          "sentences": [
+            "Touching"
+          ]
+        },
+        {
+          "sentences": [
+            "_The experiments wont to be employed to evince either the IV Peripatetick Elements, or the III Chymical Principles of Mixt Bodies._"
+          ]
+        },
+        {
+          "sentences": [
+            "Part of the First Dialogue."
+          ]
+        },
+        {
+          "sentences": [
+            "I Perceive that divers of my Friends have thought it very strange to hear me speak so irresolvedly, as I have been wont to do, concerning those things which some take to be the Elements, and others to be the Principles of all mixt Bodies.",
+            "But I blush not to acknowledge that I much lesse scruple to confess that I Doubt, when I do so, then to profess that I Know what I do not: And I should have much stronger Expectations then I dare yet entertain, to see Philosophy solidly establish't, if men would more carefully distinguish those things that they know, from those that they ignore or do but think, and then explicate clearly the things they conceive they understand, acknowledge ingenuously what it is they ignore, and profess so candidly their Doubts, that the industry of intelligent persons might be set on work to make further enquiries, and the easiness of less discerning Men might not be impos'd on.",
+            "But because a more particular accompt will probably be expected of my unsatisfyedness not only with the Peripatetick, but with the Chymical Doctrine of the Primitive Ingredients of Bodies: It may possibly serve to satisfy others of the excusableness of my disatisfaction to peruse the ensuing Relation of what passed a while since at a meeting of persons of several opinions, in a place that need not here be named; where the subject whereof we have been speaking, was amply and variously discours'd of."
+          ]
+        },
+        {
+          "sentences": [
+            "It was on one of the fairest dayes of this Summer that the inquisitive _Eleutherius_ came to invite me to make a visit with him to his friend _Carneades_.",
+            "I readily consented to this motion, telling him that if he would but permit me to go first and make an excuse at a place not far off, where I had at that hour appointed to meet, but not about a business either of moment, or that could not well admit of a delay, I would presently wait on him, because of my knowing _Carneades_ to be so conversant with nature and with Furnaces, and so unconfin'd to vulgar Opinions, that he would probably by some ingenious Paradox or other, give our mindes at least a pleasing Exercise, and perhaps enrich them with some solid instruction. _Eleutherius_ then first going with me to the place where my Apology was to be made, I accompanied him to the lodging of _Carneades_, where when we were come, we were told by the Servants, that he was retired with a couple of Friends (whose names they also told us) to one of the Arbours in his Garden, to enjoy under its coole shades a delightful protection from the yet troublesome heat of the Sun."
+          ]
+        },
+        {
+          "sentences": [
+            "_Eleutherius_ being perfectly acquainted with that Garden immediately led me to the Arbour, and relying on the intimate familiarity that had been long cherish'd betwixt him and _Carneades_; in spight of my Reluctancy to what might look like an intrusion upon his privacy, drawing me by the hand, he abruptly entered the Arbour, where we found _Carneades_, _Philoponus_, and _Themistius_, sitting close about a little round Table, on which besides paper, pen, and inke, there lay two or three open Books; _Carneades_ appeared not at all troubled at this surprise, but rising from the Table, received his Friend with open looks and armes, and welcoming me also with his wonted freedom and civility, invited us to rest our selves by him, which, as soon as we had exchanged with his two Friends (who were ours also) the civilities accustomed on such occasions, we did.",
+            "And he presently after we had seated our selves, shutting the Books that lay open, and turning to us with a smiling countenance seemed ready to begin some such unconcerning discourse as is wont to pass or rather waste the time in promiscuous companies."
+          ]
+        },
+        {
+          "sentences": [
+            "But _Eleutherius_ guessing at what he meant to do, prevented him by telling him, I perceive _Carneades_ by the books that you have been now shutting, and much more by the posture wherein I found Persons qualifi'd Errata: so qualify'd to discourse of serious matters; and so accustom'd to do it, that you three were before our coming, engag'd in some Philosophical conference, which I hope you will either prosecute, and allow us to be partakers of, in recompence of the freedome we have us'd in presuming to surprise you, or else give us leave to repair the injury we should otherwise do you, by leaving you to the freedom we have interrupted, and punishing our selves for our boldness by depriving our selves of the happiness of your company.",
+            "With these last words he and I rose up, as if we meant to be gone, But _Carneades_ suddenly laying hold on his arme, and stopping him by it, smileingly told him, We are not so forward to lose good company as you seem to imagine; especially since you are pleas'd to desire to be present at what we shall say, about such a Subject as that You found us considering.",
+            "For that, being the number of the Elements, Principles, or Materiall Ingredients of Bodies, is an enquiry whose truth is of that Importance, and of that Difficulty, that it may as well deserve as require to be searched into by such skilfull Indagators of Nature as your selves.",
+            "And therefore we sent to invite the bold and acute _Leucippus_ to lend us some light by his Atomical Paradox, upon which we expected such pregnant hints, that 'twas not without a great deal of trouble that we had lately word brought us that he was not to be found; and we had likewise begg'd the Assistance of your presence and thoughts, had not the messenger we employ'd to _Leucippus_ inform'd us, that as he was going, he saw you both pass by towards another part of the Town; And this frustrated expectation of _Leucippus_ his company, who told me but last night that he would be ready to give me a meeting where I pleas'd to day, having very long suspended our conference about the freshly mention'd Subject, it was so newly begun when you came in, that we shall scarce need to repeat any thing to acquaint you with what has pass'd betwixt us before your arrival, so that I cannot but look upon it as a fortunate Accident that you should come so seasonably, to be not hearers alone, but we hope Interlocutors at our conference.",
+            "For we shall not only allow of your presence at it, but desire your Assistance in it; which I adde both for other reasons, and because though these learned Gentlemen (sayes he, turning to his two friends) need not fear to discourse before any Auditory, provided it be intelligent enough to understand them, yet for my part (continues he with a new smile,) I shall not dare to vent my unpremeditated thoughts before two such Criticks, unless by promising to take your turnes of speaking, You will allow me mine of quarrelling, with what has been said.",
+            "He and his friends added divers things to convince us that they were both desirous that we should hear them, and resolved against our doing so, unless we allowed them sometimes to hear us. _Elutherius_ Transcriber's Note: Eleutherius after having a while fruitlesly endeavoured to obtain leave to be silent promis'd he would not be so alwayes, provided that he were permitted according to the freedom of his Genious and Principles to side with one of them in the managing of one Argument, and, if he saw cause, with his Antagonist, in the Prosecution of another, without being confin'd to stick to any one party or Opinion, which was after some debate accorded him.",
+            "But I conscious to my own Disability's told them resolutely that _I_ was as much more willing as more fit to be a hearer then a speaker, among such knowing Persons, and on so abstruse a Subject.",
+            "And that therefore I beseeched them without necessitating me to proclaim my weaknesses, to allow me to lessen them by being a silent Auditor of their Discourses: to suffer me to be at which I could present them no motive, save that their instructions would make them in me a more intelligent Admirer.",
+            "I added, that I desir'd not to be idle whilst they were imploy'd, but would if they pleas'd, by writing down in short hand what should be delivered, preserve Discourses that I knew would merit to be lasting.",
+            "At first _Carneades_ and his two friends utterly rejected this motion; and all that my Resoluteness to make use of my ears, not tongue, at their debates, could do, was to make them acquiesce in the Proposition of _Eleutherius_, who thinking himself concern'd, because he brought me thither, to afford me some faint assistance, was content that I should register their Arguments, that I might be the better able after the conclusion of their conference to give them my sence upon the Subject of it, (The number of Elements or Principles:) which he promis'd I should do at the end of the present Debates, if time would permit, or else at our next meeting.",
+            "And this being by him undertaken in my name, though without my consent, the company would by no means receive my Protestation against it, but casting, all at once, their eyes on _Carneades_, they did by that and their unanimous silence, invite him to begin; which (after a short pause, during which he turn'd himself to _Eleutherius_ and me) he did in this manner."
+          ]
+        },
+        {
+          "sentences": [
+            "Notwithstanding the subtile reasonings I have met with in the books of the Peripateticks, and the pretty experiments that have been shew'd me in the Laboratories of Chymists, I am of so diffident, or dull a Nature, as to think that if neither of them can bring more cogent arguments to evince the truth of their assertion then are wont to be brought; a Man may rationally enough retain some doubts concerning the very number of those materiall Ingredients of mixt bodies, which some would have us call Elements, and others principles.",
+            "Indeed when I considered that the Tenents concerning the Elements are as considerable amongst the Doctrines of natural Philosophy as the Elements themselves are among the bodies of the Universe, I expected to find those Opinions solidly establish'd, upon which so many others are superstructed.",
+            "But when I took the pains impartially to examine the bodies themselves that are said to result from the blended Elements, and to torture them into a confession of their constituent Principles, I was quickly induc'd to think that the number of the Elements has been contended about by Philosophers with more earnestness then success.",
+            "This unsatisfiedness of mine has been much wonder'd at, by these two Gentlemen (at which words he pointed at _Themistius_ and _Philoponus_) who though they differ almost as much betwixt themselves about the question we are to consider, as I do from either of them, yet they both agree very well in this, that there is a determinate number of such ingredients as I was just now speaking of, and that what that number is, I say not, may be, (for what may not such as they perswade?) but is wont to be clearly enough demonstrated both by Reason and Experience.",
+            "This has occasion'd our present Conference.",
+            "For our Discourse this afternoon, having fallen from one subject to another, and at length setl'd on this, they proffer'd to demonstrate to me, each of them the truth of his opinion, out of both the Topicks that I have freshly nam'd.",
+            "But on the former (that of Reason strictly so taken) we declin'd insisting at the present, lest we should not have time enough before supper to go thorough the Reasons and Experiments too.",
+            "The latter of which we unanimously thought the most requisite to be seriously examin'd.",
+            "I must desire you then to take notice Gentlemen (continued _Carneades_) that my present business doth not oblige me so to declare my own opinion on the Subject in question, as to assert or deny the truth either of the Peripatetick, or the Chymical Doctrine concerning the number of the Elements, but only to shew you that neither of these Doctrines hath been satisfactorily proved by the arguments commonly alledged on its behalfe.",
+            "So that if I really discern (as perhaps I think I do) that there may be a more rational account then ordinary, given of one of these opinions, I am left free to declare my self of it, notwithstanding my present engagement, it being obvious to all your observation, that a solid truth may be generally maintained by no other, then incompetent Arguments.",
+            "And to this Declaration I hope it will be needless to add, that my task obliges me not to answer the Arguments that may be drawn either for _Themistius_ or _Philoponus's_ Opinion from the Topick of reason, as opposed to experiments; since 'tis these only that I am to examine and not all these neither, but such of them alone as either of them shall think fit to insist on, and as have hitherto been wont to be brought either to prove that 'tis the four Peripatetick Elements, or that 'tis the three Chymical Principles that all compounded bodies consist of.",
+            "These things (adds _Carneades_) I thought my self obliged to premise, partly lest you should do these Gentlemen (pointing at _Themistius_ and _Philoponus_, and smiling on them) the injury of measuring their parts by the arguments they are ready to propose, the lawes of our Conference confining them to make use of those that the vulgar of Philosophers (for even of them there is a vulgar) has drawn up to their hands; and partly, that you should not condemn me of presumption for disputing against persons over whom I can hope for no advantage, that _I_ must not derive from the nature, or rules of our controversy, wherein I have but a negative to defend, and wherein too I am like on several occasions to have the Assistance of one of my disagreeing adversaries against the other."
+          ]
+        },
+        {
+          "sentences": [
+            "_Philoponus_ and _Themistius_ soon returned this complement with civilities of the like nature, in which _Eleutherius_ perceiving them engaged, to prevent the further loss of that time of which they were not like to have very much to spare, he minded them that their present businesse was not to exchange complements, but Arguments: and then addressing his speech to _Carneades_, I esteem it no small happinesse (saies he) that I am come here so luckily this Evening.",
+            "For I have been long disquieted with Doubts concerning this very subject which you are now ready to debate.",
+            "And since a Question of this importance is to be now discussed by persons that maintain such variety of opinions concerning it, and are both so able to enquire after truth, and so ready to embrace it by whomsoever and on what occasion soever it is presented them; I cannot but promise my self that I shall before we part either lose my Doubts or the hopes of ever finding them resolved; _Eleutherius_ paused not here; but to prevent their answer, added almost in the same breath; and I am not a little pleased to find that you are resolved on this occasion to insist rather on Experiments then Syllogismes.",
+            "For I, and no doubt You, have long observed, that those Dialectical subtleties, that the Schoolmen too often employ about Physiological Mysteries, are wont much more to declare the wit of him that uses them, then increase the knowledge or remove the doubts of sober lovers of truth.",
+            "And such captious subtleties do indeed often puzzle and sometimes silence men, but rarely satisfy them.",
+            "Being like the tricks of Jugglers, whereby men doubt not but they are cheated, though oftentimes they cannot declare by what slights they are imposed on.",
+            "And therefore I think you have done very wisely to make it your businesse to consider the _Phænomena_ relating to the present Question, which have been afforded by experiments, especially since it might seem injurious to our senses, by whose mediation we acquire so much of the knowledge we have of things corporal, to have recourse to far-fetched and abstracted Ratiocination Errata: Ratiocinations, to know what are the sensible ingredients of those sensible things that we daily see and handle, and are supposed to have the liberty to untwist (if I may so speak) into the primitive bodies they consist of.",
+            "He annexed that he wished therefore they would no longer delay his expected satisfaction, if they had not, as he feared they had, forgotten something preparatory to their debate; and that was to lay down what should be all along understood by the word Principle or Element. _Carneades_ thank'd him for his admonition, but told him that they had not been unmindful of so requisite a thing.",
+            "But that being Gentlemen and very far from the litigious humour of loving to wrangle about words or terms or notions as empty; they had before his coming in, readily agreed promiscuously to use when they pleased, Elements and Principles as terms equivalent: and to understand both by the one and the other, those primitive and simple Bodies of which the mixt ones are said to be composed, and into which they are ultimately resolved.",
+            "And upon the same account (he added) we agreed to discourse of the opinions to be debated, as we have found them maintained by the Generality of the assertors of the four Elements of the one party, and of those that receive the three Principles on the other, without tying our selves to enquire scrupulously what notion either _Aristotle_ or _Paracelsus_, or this or that Interpreter, or follower of either of those great persons, framed of Elements or Principles; our design being to examine, not what these or those writers thought or taught, but what we find to be the obvious and most general opinion of those, who are willing to be accounted Favourers of the Peripatetick or Chymical Doctrine, concerning this subject."
+          ]
+        },
+        {
+          "sentences": [
+            "I see not (saies _Eleutherius_) why you might not immediately begin to argue, if you were but agreed which of your two friendly Adversaries shall be first heard.",
+            "And it being quickly resolv'd on that _Themistius_ should first propose the Proofs for his Opinion, because it was the antienter, and the more general, he made not the company expect long before he thus addressed himself to _Eleutherius_, as to the Person least interessed in the dispute."
+          ]
+        },
+        {
+          "sentences": [
+            "If you have taken sufficient notice of the late Confession which was made by _Carneades_, and which (though his Civility dressed it up in complementall Expressions) was exacted of him by his Justice, I suppose You will be easily made sensible, that I engage in this Controversie with great and peculiar Disadvantages, besides those which his Parts and my Personal Disabilities would bring to any other cause to be maintained by me against him.",
+            "For he justly apprehending the force of truth, though speaking by no better a tongue then mine, has made it the chief condition of our Duell, that I should lay aside the best Weapons I have, and those I can best handle; Whereas if I were allowed the freedom, in pleading for the four Elements, to employ the Arguments suggested to me by Reason to demonstrate them, I should almost as little doubt of making You a Proselyte to those unsever'd Teachers, Truth and _Aristotle_, as I do of your Candour and your Judgment.",
+            "And I hope you will however consider, that that great Favorite and Interpreter of Nature, _Aristotle_, who was (as his _Organum_ witnesses) the greatest Master of Logick that ever liv'd, disclaim'd the course taken by other petty Philosophers (Antient and Modern) who not attending the Coherence and Consequences of their Opinions, are more sollicitous to make each particular Opinion plausible independently upon the the Transcriber's Note: extra \"the\" in original rest, then to frame them all so, as not only to be consistent together, but to support each other.",
+            "For that great Man in his vast and comprehensive Intellect, so fram'd each of his Notions, that being curiously adapted into one Systeme, they need not each of them any other defence then that which their mutuall Coherence gives them: As 'tis in an Arch, where each single stone, which if sever'd from the rest would be perhaps defenceless, is sufficiently secur'd by the solidity and entireness of the whole Fabrick of which it is a part.",
+            "How justly this may be apply'd to the present case, I could easily shew You, if I were permitted to declare to You, how harmonious _Aristotles_ Doctrine of the Elements is with his other Principles of Philosophy; and how rationally he has deduc'd their number from that of the combinations of the four first Qualities from the kinds of simple Motion belonging to simple bodies, and from I know not how many other Principles and _Phænomena_ of Nature, which so conspire with his Doctrine of the Elements, that they mutually strengthen and support each other.",
+            "But since 'tis forbidden me to insist on Reflections of this kind, I must proceed to tell You, that though the Assertors of the four Elements value Reason so highly, and are furnish'd with Arguments enough drawn from thence, to be satisfi'd that there must be four Elements, though no Man had ever yet made any sensible tryal to discover their Number, yet they are not destitute of Experience to satisfie others that are wont to be more sway'd by their senses then their Reason.",
+            "And I shall proceed to consider the testimony of Experience, when I shall have first advertis'd You, that if Men were as perfectly rational as 'tis to be wish'd they were, this sensible way of Probation would be as needless as 'tis wont to be imperfect.",
+            "For it is much more high and Philosophical to discover things _a priore_, then _a posteriore_.",
+            "And therefore the Peripateticks have not been very sollicitous to gather Experiments to prove their Doctrines, contenting themselves with a few only, to satisfie those that are not capable of a Nobler Conviction.",
+            "And indeed they employ Experiments rather to illustrate then to demonstrate their Doctrines, as Astronomers use Sphæres of pastboard, to descend to the capacities of such as must be taught by their senses, for want of being arriv'd to a clear apprehension of purely Mathematical Notions and Truths.",
+            "I speak thus _Eleutherius_ (adds _Themistius_) only to do right to Reason, and not out of Diffidence of the Experimental proof I am to alledge.",
+            "For though I shall name but one, yet it is such a one as will make all other appear as needless as it self will be found Satisfactory.",
+            "For if You but consider a piece of green-Wood burning in a Chimney, You will readily discern in the disbanded parts of it the four Elements, of which we teach It and other mixt bodies to be compos'd.",
+            "The fire discovers it self in the flame by its own light; the smoke by ascending to the top of the chimney, and there readily vanishing into air, like a River losing it self in the Sea, sufficiently manifests to what Element it belongs and gladly returnes.",
+            "The water in its own form boyling and hissing at the ends of the burning Wood betrayes it self to more then one of our senses; and the ashes by their weight, their firiness, and their dryness, put it past doubt that they belong to the Element of Earth.",
+            "If I spoke (continues _Themistius_) to less knowing Persons, I would perhaps make some Excuse for building upon such an obvious and easie _Analysis_, but 'twould be, I fear, injurious, not to think such an Apology needless to You, who are too judicious either to think it necessary that Experiments to prove obvious truths should be farr fetch'd, or to wonder that among so many mixt Bodies that are compounded of the four Elements, some of them should upon a slight _Analysis_ manifestly exhibite the Ingredients they consist of.",
+            "Especially since it is very agreeable to the Goodness of Nature, to disclose, even in some of the most obvious Experiments that Men make, a Truth so important, and so requisite to be taken notice of by them.",
+            "Besides that our _Analysis_ by how much the more obvious we make it, by so much the more suittable it will be to the Nature of that Doctrine which 'tis alledged to prove, which being as clear and intelligible to the Understanding as obvious to the sense, tis no marvail the learned part of Mankind should so long and so generally imbrace it.",
+            "For this Doctrine is very different from the whimseys of _Chymists_ and other Modern Innovators, of whose _Hypotheses_ we may observe, as Naturalists do of less perfect Animals, that as they are hastily form'd, so they are commonly short liv'd.",
+            "For so these, as they are often fram'd in one week, are perhaps thought fit to be laughed at the next; and being built perchance but upon two or three Experiments are destroyed by a third or fourth, whereas the doctrine of the four Elements was fram'd by _Aristotle_ after he had leasurely considered those Theories of former Philosophers, which are now with great applause revived, as discovered by these latter ages; And had so judiciously detected and supplyed the Errors and defects of former _Hypotheses_ concerning the Elements, that his Doctrine of them has been ever since deservedly embraced by the letter'd part of Mankind: All the Philosophers that preceded him having in their several ages contributed to the compleatness of this Doctrine, as those of succeeding times have acquiesc'd in it.",
+            "Nor has an _Hypothesis_ so deliberately and maturely established been called in Question till in the last Century _Paracelsus_ and some few other sooty Empiricks, rather then (as they are fain to call themselves) Philosophers, having their eyes darken'd, and their Brains troubl'd with the smoke of their own Furnaces, began to rail at the Peripatetick Doctrine, which they were too illiterate to understand, and to tell the credulous World, that they could see but three Ingredients in mixt Bodies; which to gain themselves the repute of Inventors, they endeavoured to disguise by calling them, instead of Earth, and Fire, and Vapour, Salt, Sulphur, and Mercury; to which they gave the canting title of Hypostatical Principles: but when they came to describe them, they shewed how little they understood what they meant by them, by disagreeing as much from one another, as from the truth they agreed in opposing: For they deliver their _Hypotheses_ as darkly as their Processes; and 'tis almost as impossible for any sober Man to find their meaning, as 'tis for them to find their Elixir.",
+            "And indeed nothing has spread their Philosophy, but their great Brags and undertakings; notwithstanding all which, (sayes _Themistius_ smiling) I scarce know any thing they have performed worth wondering at, save that they have been able to draw _Philoponus_ to their Party, and to engage him to the Defence of an unintelligible _Hypothesis_, who knowes so well as he does, that Principles ought to be like Diamonds, as well very clear, as perfectly solid."
+          ]
+        },
+        {
+          "sentences": [
+            "_Themistius_ having after these last words declared by his silence, that he had finished his Discourse, _Carneades_ addressing himself, as his Adversary had done, to _Eleutherius_, returned this Answer to it, I hop'd for Errata: for a Demonstration, but I perceive _Themistius_ hopes to put me off with a Harangue, wherein he cannot have given me a greater Opinion of his Parts, then he has given me Distrust for his _Hypothesis_, since for it even a Man of such Learning can bring no better Arguments.",
+            "The Rhetorical part of his Discourse, though it make not the least part of it, I shall say nothing to, designing to examine only the Argumentative part, and leaving it to _Philoponus_ to answer those passages wherein either _Paracelsus_ or _Chymists_ are concern'd: I shall observe to You, that in what he has said besides, he makes it his Business to do these two things.",
+            "The one to propose and make out an Experiment to demonstrate the common Opinion about the four Elements; And the other, to insinuate divers things which he thinks may repair the weakness of his Argument, from Experience, and upon other Accounts bring some credit to the otherwise defenceless Doctrine he maintains."
+          ]
+        },
+        {
+          "sentences": [
+            "To begin then with his Experiment of the burning Wood, it seems to me to be obnoxious to not a few considerable Exceptions."
+          ]
+        },
         {
           "sentences": [
             "And first, if I would now deal rigidly with my Adversary, I might here make a great Question of the very way of Probation which he and others employ, without the least scruple, to evince, that the Bodies commonly call'd mixt, are made up of Earth, Air, Water, and Fire, which they are pleas'd also to call Elements; namely that upon the suppos'd _Analysis_ made by the fire, of the former sort of _Concretes_, there are wont to emerge Bodies resembling those which they take for the Elements.",
@@ -25,18 +449,9 @@
           "sentences": [
             "At this unexpected objection, not only _Themistius_, but the rest of the company appear'd not a little surpriz'd; but after a while _Philoponus_ conceiving his opinion, as well as that of _Aristotle_, concern'd in that Objection, You cannot sure (sayes he to _Carneades_) propose this Difficulty; not to call it Cavill, otherwise then as an Exercise of wit, and not as laying any weight upon it.",
             "For how can that be separated from a thing that was not existent in it.",
-            "When, for instance, a Refiner mingles Gold and Lead, and exposing this Mixture upon a Cuppell to the violence of the fire, thereby separates it into pure and refulgent Gold and Lead (which driven off together with the Dross of the Gold is thence call'd _Lithargyrium Auri_) can any man doubt that sees these two so differing substances separated from the Mass, that they were existent in it before it was committed"
+            "When, for instance, a Refiner mingles Gold and Lead, and exposing this Mixture upon a Cuppell to the violence of the fire, thereby separates it into pure and refulgent Gold and Lead (which driven off together with the Dross of the Gold is thence call'd _Lithargyrium Auri_) can any man doubt that sees these two so differing substances separated from the Mass, that they were existent in it before it was committed to the fire."
           ]
-        }
-      ],
-      "sentence_count": 7,
-      "word_count": 406
-    },
-    {
-      "number": "2",
-      "title": "the fire.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "I should (replies _Carneades_) allow your Argument to prove something, if, as Men see the Refiners commonly take before hand both Lead and Gold to make the Mass you speak of, so we did see Nature pull down a parcell of the Element of Fire, that is fancy'd to be plac'd I know not how many thousand Leagues off, contiguous to the Orb of the Moon, and to blend it with a quantity of each of the three other Elements, to compose every mixt Body, upon whose Resolution the Fire presents us with Fire, and Earth, and the rest.",
@@ -83,7 +498,17 @@
         },
         {
           "sentences": [
+            "THE"
+          ]
+        },
+        {
+          "sentences": [
             "SCEPTICAL CHYMIST:"
+          ]
+        },
+        {
+          "sentences": [
+            "OR"
           ]
         },
         {
@@ -128,7 +553,17 @@
         },
         {
           "sentences": [
+            "AND"
+          ]
+        },
+        {
+          "sentences": [
             "MERCURY,"
+          ]
+        },
+        {
+          "sentences": [
+            "TO BE"
           ]
         },
         {
@@ -152,6 +587,11 @@
           "sentences": [
             "Printed for _J.",
             "Crooke_, and are to be sold at the Ship in St. _Pauls_ Church-Yard. 1661."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
           ]
         },
         {
@@ -181,7 +621,8 @@
         },
         {
           "sentences": [
-            "Sidenote: Propos."
+            "Sidenote: Propos.",
+            "I."
           ]
         },
         {
@@ -205,7 +646,8 @@
         },
         {
           "sentences": [
-            "Sidenote: Propos."
+            "Sidenote: Propos.",
+            "II."
           ]
         },
         {
@@ -249,7 +691,8 @@
         },
         {
           "sentences": [
-            "Sidenote: Propos."
+            "Sidenote: Propos.",
+            "III."
           ]
         },
         {
@@ -270,7 +713,8 @@
         },
         {
           "sentences": [
-            "Sidenote: Propos."
+            "Sidenote: Propos.",
+            "IV."
           ]
         },
         {
@@ -543,18 +987,9 @@
             "But I dare not _Eleu._ lay much Weight upon this Process, because I have found that if it were True, it would be but seldom Practicable in this Country upon the best Wine: for Though this present Winter hath been Extraordinary Cold, yet in very Keen Frosts accompanied with lasting Snowes, I have not been able in any Measure to Freeze a thin Vial full of Sack; and even with Snow and Salt I could Freeze little more then the Surface of it; and I suppose _Eleu._ that tis not every Degree of Cold that is Capable of Congealing Liquors, which is able to make such an _Analysis_ (if I may so call it) of them by Separating their Aqueous and Spirituous Parts; for I have sometimes, though not often, frozen severally, Red-wine, Urine and Milk, but could not Observe the expected Separation.",
             "And the Dutch-Men that were forc'd to Winter in that Icie Region neer the Artick Circle, call'd _Nova Zembla_, although they relate, as we shall see below, that there was a Separation of Parts made in their frozen Beer about the middle of _November_, yet of the Freezing of their Back Errata: Sack in _December_ following they give but this Account: _Yea and our Sack, which is so hot, was Frozen very hard, so that when we were every Man to have his part, we were forc'd to melt it in the Fire; which we shar'd every second Day, about half a Pinte for a Man, wherewith we were forc'd to sustain our selves._ In which words they imply not, that their Back Errata: Sack was divided by the Frost into differing Substances, after such manner as their Beer had been.",
             "All which notwithstanding, _Eleu._ suppose that it may be made to appear, that even Cold sometimes may _Congregare Homogenea, & Heterogenea Segregare_: and to Manifest this I may tell you, that I did once, purposely cause to be Decocted in fair Water a Plant abounding with Sulphureous and Spirituous Parts, and having expos'd the Decoction to a keen North-Wind in a very Frosty Night, I observ'd, that the more Aqueous Parts of it were turn'd by the next Morning into Ice, towards the innermost part of which, the more Agile and Spirituous parts, as I then conjectur'd, having Retreated, to shun as much as might be their Environing Enemy, they had there preserv'd themselves unfrozen in the Form of a high colour'd Liquor, the Aqueous and Spirituous parts having been so sleightly (Blended rather than) United in the Decoction, that they were easily Separable by such a Degree of Cold as would not have been able to have Divorc'd the Parts of Urine or Wine, which by Fermentation or Digestion are wont, as Tryal has inform'd me, to be more intimately associated each with other.",
-            "But I have already intimated, _Eleutherius_, that I shall not Insist on this Experiment, not only because, having made it but once I may possibly have been mistaken in it; but also (and that principally) because of that much more full and eminent Experiment of the Separative Virtue of extream Cold, that was made, against their Wills, by the foremention'd Dutch men that Winter'd in _Nova Zembla_; the Relation of whose Voyage being a very scarce Book, it will not be amiss to give you that Memorable part of it which concerns our present Theme, as I caus'd the Passage"
+            "But I have already intimated, _Eleutherius_, that I shall not Insist on this Experiment, not only because, having made it but once I may possibly have been mistaken in it; but also (and that principally) because of that much more full and eminent Experiment of the Separative Virtue of extream Cold, that was made, against their Wills, by the foremention'd Dutch men that Winter'd in _Nova Zembla_; the Relation of whose Voyage being a very scarce Book, it will not be amiss to give you that Memorable part of it which concerns our present Theme, as I caus'd the Passage to be extracted out of the Englished Voyage it self."
           ]
-        }
-      ],
-      "sentence_count": 229,
-      "word_count": 13671
-    },
-    {
-      "number": "3",
-      "title": "be extracted out of the Englished Voyage it self.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "\"_Gerard de Veer_, _John Cornelyson_ and Others, sent out of _Amsterdam_, _Anno Dom._ 1596. being forc'd by unseasonable Weather to Winter in _Nova Zembla_, neer Ice-Haven; on the thirteenth of _October_, Three of us (sayes the Relation) went aboard the Ship, and laded a Sled with Beer; but when we had laden it, thinking to go to our House with it, suddenly there arose such a Winde, and so great a Storm and Cold, that we were forc'd to go into the Ship again, because we were not able to stay without; and we could not get the Beer into the Ship again, but were forc'd to let it stand without upon the Sled: the Fourteenth, as we came out of the Ship, we found the Barrel of Beer standing upon the Sled, but it was fast frozen at the Heads; yet by reason of the great Cold, the Beer that purg'd out froze as hard upon the Side of the Barrel, as if it had been glu'd thereon: and in that sort we drew it to our House, and set the Barrel an end, and drank it up; but first we were forc'd to melt the Beer, for there was scarce any unfrozen Beer in the barrel; but in that thick Yiest that was unfrozen lay the Strength of the Beer, so that it was too strong to drink alone, and that which was frozen tasted like Water; and being melted we Mix'd one with the other, and so drank it; but it had neither Strength nor Taste.\""
@@ -565,6 +1000,11 @@
             "And on this Occasion I remember, that having the last very Sharp Winter purposely try'd to Freeze, among other Liquors, some Beer moderately strong, in Glass Vessels, with Snow and Salt, I observ'd, that there came out of the Neck a certain thick Substance, which, it seems, was much better able then the rest of the Liquor (that I found turn'd into Ice) to resist a Frost, and which, by its Colour and consistence seem'd mafestly Transcriber's Note: manifestly enough to be Yiest, whereat, I confess, I somewhat marvail'd, because I did not either discerne by the Taste, or find by Enquiry, that the Beer was at all too New to be very fit to be Drank.",
             "I might confirm the Dutchmens Relation, by what happen'd a while since to a neere Friend of mine, who complained to me, that having Brew'd some Beer or Ale for his own drinking in _Holland_ (where he then dwelt) the Keenness of the late bitter Winter froze the Drink so as to reduce it into Ice, and a small Proportion of a very Strong and Spirituous Liquor.",
             "But I must not entertain you any longer concerning Cold, not onely because you may think I have but lost my way into a Theme which does not directly belong to my present Undertaking; but because I have already enlarg'd my self too much upon the first Consideration I propos'd, though it appears so much a Paradox, that it seem'd to Require that I should say much to keep it from being thought a meere Extravagance; yet since I Undertook but to make the common Assumption of our Chymists and _Aristotelians_ appear Questionable, I hope I have so Perform'd that Task, that I may now Proceed to my Following Considerations, and Insist lesse on them than I have done on the First."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
           ]
         },
         {
@@ -828,18 +1268,9 @@
         },
         {
           "sentences": [
-            "To which I shall add this Convincing Argument, that Experience manifests, and _Aristotle_ Confesses it, that the _Miscibilia_ may be again separated from a mixt Body, as is Obvious in the Chymical Resolutions of Plants and Animalls, which could not be unless they did actually retain their formes in it: For since, according to _Aristotle_, and I think according to truth, there is but one common Mass of all things, which he has been pleas'd to call _Materia Prima_; And since tis not therefore the Matter but the Forme that Constitutes and Discriminates Things, to say that the Elements remain not in a Mixt Body, according to their Formes, but according to their Matter, is not to say that they remain there at all; Since although those Portions of Matter were Earth and water, &c. before they concurr'd, yet the resulting Body being once Constituted, may as well be said to be simple as any of the Elements, the Matter being confessedly of the same Nature in all Bodies, and the Elementary Formes being according"
+            "To which I shall add this Convincing Argument, that Experience manifests, and _Aristotle_ Confesses it, that the _Miscibilia_ may be again separated from a mixt Body, as is Obvious in the Chymical Resolutions of Plants and Animalls, which could not be unless they did actually retain their formes in it: For since, according to _Aristotle_, and I think according to truth, there is but one common Mass of all things, which he has been pleas'd to call _Materia Prima_; And since tis not therefore the Matter but the Forme that Constitutes and Discriminates Things, to say that the Elements remain not in a Mixt Body, according to their Formes, but according to their Matter, is not to say that they remain there at all; Since although those Portions of Matter were Earth and water, &c. before they concurr'd, yet the resulting Body being once Constituted, may as well be said to be simple as any of the Elements, the Matter being confessedly of the same Nature in all Bodies, and the Elementary Formes being according to this _Hypothesis_ perish'd and abolish'd."
           ]
-        }
-      ],
-      "sentence_count": 128,
-      "word_count": 8491
-    },
-    {
-      "number": "4",
-      "title": "this _Hypothesis_ perish'd and abolish'd.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "And lastly, and if we will Consult Chymical Experiments, we shall find the Advantages of the Chymical Doctrine above the Peripatetick Title little less then Palpable.",
@@ -917,6 +1348,11 @@
         },
         {
           "sentences": [
+            "THE"
+          ]
+        },
+        {
+          "sentences": [
             "SCEPTICAL CHYMIST."
           ]
         },
@@ -987,18 +1423,9 @@
         },
         {
           "sentences": [
-            "To all which I may add, that since it appears, by what I observ'd to you of the permanency of Gold and Silver, that even Corpuscles that are not of an Elementary but compounded Nature, may be of so durable a Texture, as to remain indissoluble in the ordinary _Analysis_ that Chymists make of Bodies by the Fire; 'Tis not impossible but that, though there were but three Elements, yet there may be a greater number of Bodies, which the wonted wayes of Anatomy will not discover"
+            "To all which I may add, that since it appears, by what I observ'd to you of the permanency of Gold and Silver, that even Corpuscles that are not of an Elementary but compounded Nature, may be of so durable a Texture, as to remain indissoluble in the ordinary _Analysis_ that Chymists make of Bodies by the Fire; 'Tis not impossible but that, though there were but three Elements, yet there may be a greater number of Bodies, which the wonted wayes of Anatomy will not discover to be no Elementary Bodies."
           ]
-        }
-      ],
-      "sentence_count": 66,
-      "word_count": 5388
-    },
-    {
-      "number": "5",
-      "title": "be no Elementary Bodies.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But, sayes _Carneades_, having thus far, in compliance to you, talk't conjecturally of the number of the Elements, 'tis now time to consider, not of how many Elements it is possible that Nature may compound mix'd Bodies, but (at least as farr as the ordinary Experiments of Chymists will informe us) of how many she doth make them up."
@@ -1124,6 +1551,11 @@
             "But that, as I allow your thinking what you newly told me about Corals, I presume you will allow me, from what I have said already, to deduce this Corollary; That there are divers compound bodies, which may be resolv'd into four such differing Substances, as may as well merit the name of Principles, as those to which the Chymists freely give it.",
             "For since they scruple not to reckon that which I call the compound Spirit of Box, for the spirit, or as others would have it, the Mercury of that Wood, I see not, why the Acid liquor, and the other, should not each of them, especially that last named, be lookt upon as more worthy to be called an Elementary Principle; since it must needs be of a more simple nature then the Liquor, which was found to be divisible into that, and the Acid Spirit.",
             "And this further use (continues _Carneades_) may be made of our experiment to my present purpose, that it may give us a rise to suspect, that since a Liquor reputed by the Chymists to be, without dispute, Homogeneous, is by so slight a way divisible into two distinct and more simple Ingredients, some more skilful or happier Experimenter then I may find a way either further to divide one of these Spirits, or to resolve some or other, if not all, of those other Ingredients of mixt Bodies, that have hitherto pass'd among Chymists for their Elements or Principles."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
           ]
         },
         {
@@ -1296,7 +1728,10 @@
         },
         {
           "sentences": [
-            "Footnote 16: Tyroc."
+            "Footnote 16: Tyroc.",
+            "Chym.",
+            "L. 1.",
+            "C. 4."
           ]
         },
         {
@@ -1414,18 +1849,268 @@
           "sentences": [
             "I had almost forgot to take notice, that there is another sort of Bodies, which though not obtain'd from Concretes by Distillation, many Chymists are wont to call their Sulphur; not only because such substances are, for the most part, high colour'd (whence they are also, and that more properly, called Tinctures) as dissolv'd Sulphurs are wont to be; but especially because they are, for the most part, abstracted and separated from the rest of the Masse by Spirit of Wine: which Liquor those men supposing to be Sulphureous, they conclude, that what it works upon, and abstracts, must be a Sulphur also.",
             "And upon this account they presume, that they can sequester the sulphur even of Minerals and Metalls; from which 'tis known that they cannot by Fire alone separate it.",
-            "To all This I shall answer; That if these sequestred substances where indeed the sulphurs of the Bodies whence they are drawn, there would as well be a great Disparity betwixt Chymical Sulphurs obtain'd by Spirit of Wine, as I have already shewn there is betwixt those obtain'd by Distillation in the forme of Oyles: which will be evident from hence, that not to urge that themselves ascribe distinct vertues to Mineral Tinctures, extolling the Tincture of Gold against such and such Diseases; the Tincture of Antimony, or of its Glass, against others; and the Tincture of Emerauld against others; 'tis plain, that in Tinctures drawn from Vegetables, if the superfluous spirit of Wine be distill'd off, it leaves at the bottom that thicker substance which Chymists use to call the Extract of the"
+            "To all This I shall answer; That if these sequestred substances where indeed the sulphurs of the Bodies whence they are drawn, there would as well be a great Disparity betwixt Chymical Sulphurs obtain'd by Spirit of Wine, as I have already shewn there is betwixt those obtain'd by Distillation in the forme of Oyles: which will be evident from hence, that not to urge that themselves ascribe distinct vertues to Mineral Tinctures, extolling the Tincture of Gold against such and such Diseases; the Tincture of Antimony, or of its Glass, against others; and the Tincture of Emerauld against others; 'tis plain, that in Tinctures drawn from Vegetables, if the superfluous spirit of Wine be distill'd off, it leaves at the bottom that thicker substance which Chymists use to call the Extract of the Vegetable.",
+            "And that these Extracts are endow'd with very differing Qualities according to the Nature of the Particular Bodies that afforded them (though I fear seldom with so much of the specifick vertues as is wont to be imagin'd) is freely confess'd both by Physitians and Chymists.",
+            "But, _Eleutherius_, (sayes _Carneades_) we may here take Notice that the Chymists do as well in this case, as in many others, allow themselves a License to abuse Words: For not again to argue from the differing properties of Tinctures, that they are not exactly pure and Elementary Sulphurs; they would easily appear not to be so much as Sulphur's, although we should allow Chymical Oyles to deserve that Name.",
+            "For however in some Mineral Tinctures the Natural fixtness of the extracted Body does not alwayes suffer it to be easily further resoluble into differing substances; Yet in very many extracts drawn from Vegetables, it may very easily be manifested that the spirit of Wine has not sequestred the sulphureous Ingredient from the saline and Mercurial ones; but has dissolv'd (for I take it to be a Solution) the finer Parts of the Concrete (without making any nice distinction of their being perfectly Sulphureous or not) and united it self with them into a kind of Magistery; which consequently must contain Ingredients or Parts of several sorts.",
+            "For we see that the stones that are rich in vitriol, being often drench'd with rain-Water, the Liquor will then extract a fine and transparent substance coagulable into Vitriol; and yet though this Vitriol be readily dissoluble in Water, it is not a true Elementary Salt, but, as You know, a body resoluble into very differing Parts, whereof one (as I shall have occasion to tell You anon) is yet of a Metalline, and consequently not of an Elementary Nature.",
+            "You may consider also, that common Sulphur is readily dissoluble in Oyle of Turpentine, though notwithstanding its Name it abounds as well, if not as much, in Salt as in true Sulphur; witness the great quantity of saline Liquor it affords being set to flame away under a glasse Bell.",
+            "Nay I have, which perhaps You will think strange, with the same Oyle of Turpentine alone easily enough dissolv'd crude Antimony finely powder'd into a Blood-red Balsam, wherewith perhaps considerable things may be perform'd in Surgery.",
+            "And if it were now Requisite, I could tell You of some other Bodies (such as Perhaps You would not suspect) that I have been able to work upon with certain Chymical Oyles.",
+            "But instead of digressing further I shall make this use of the Example I have nam'd.",
+            "That 'tis not unlikely, but that Spirit of Wine which by its pungent tast, and by some other Qualities that argue it better (especially its Reduciblenesse, according to _Helmont_, into _Alcali_, and Water,) seems to be as well of a Saline as of a Sulphureous Nature, may well be suppos'd Capable of Dissolving Substances That are not meerly Elementary sulphurs, though perhaps they may abound with Parts that are of kin thereunto.",
+            "For I find that Spirit of Wine will dissolve _Gumm Lacca_, _Benzoine_, and the _Resinous_ Parts of _Jallap_, and even of _Guaiacum_; whence we may well suspect that it may from Spices, Herbs, and other lesse compacted Vegetables, extract substances that are not perfect Sulphurs but mixt Bodies.",
+            "And to put it past Dispute, there is many a Vulgar Extract drawn with Spirit of Wine, which committed to Distillation will afford such differing substances as will Loudly proclaim it to have been a very compounded Body.",
+            "So that we may justly suspect, that even in Mineral Tinctures it will not alwaies follow, that because a red substance is drawn from the Concrete by spirit of Wine, that Substance is its true and Elementary Sulphur.",
+            "And though some of these Extracts may perhaps be inflamable; Yet besides that others are not, and besides that their being reduc'd to such Minuteness of Parts may much facilitate their taking Fire; besides this, I say, We see that common Sulphur, common Oyle, Gumm Lac, and many Unctuous and Resinous Bodies, will flame well enough, though they be of very compounded natures: Nay Travellers of Unsuspected Credit assure Us, as a known thing, that in some Northern Countries where Firr trees and Pines abound, the poorer sort of Inhabitants use Long splinters of those Resinous Woods to burne instead of Candles.",
+            "And as for the rednesse wont to be met with in such solutions, I could easily shew, that 'tis not necessary it should proceed from the Sulphur of the Concrete, Dissolv'd by the Spirit of Wine; if I had leasure to manifest how much Chymists are wont to delude themselves and others by the Ignorance of those other causes upon whose account spirit of Wine and other _Menstruums_ may acquire a red or some other high colour.",
+            "But to returne to our Chymical Oyles, supposing that they were exactly pure; Yet I hope they would be, as the best spirit of Wine is, but the more inflamable and deflagrable.",
+            "And therefore since an Oyle can be by the Fire alone immediately turn'd into flame, which is something of a very differing Nature from it: I shall Demand how this Oyle can be a Primogeneal and Incorruptible Body, as most Chymists would have their Principles; Since it is further resoluble into flame, which whether or no it be a portion of the Element of Fire, as an _Aristotelian_ would conclude, is certainly something of a very differing Nature from a Chymical Oyle, since it burnes, and shines, and mounts swiftly upwards; none of which a Chymical Oyle does, whilst it continues such.",
+            "And if it should be Objected, that the Dissipated Parts of this flaming Oyle may be caught and collected again into Oyl or Sulphur; I shall demand, what Chymist appears to have ever done it; and without Examining whether it may not hence be as well said that sulphur is but compacted Fire, as that Fire is but diffus'd Sulphur, I shall leave you to consider whether it may not hence be argu'd, that neither Fire nor Sulphur are primitive and indestructible Bodies; and I shall further observe that, at least it will hence appear that a portion of matter may without being Compounded with new Ingredients, by having the Texture and Motion of its small parts chang'd, be easily, by the means of the Fire, endow'd with new Qualities, more differing from them it had before, then are those which suffice to discriminate the Chymists Principles from one another."
           ]
-        }
-      ],
-      "sentence_count": 242,
-      "word_count": 17000
-    },
-    {
-      "number": "6",
-      "title": "those of their Sect the Title of PHILOSOPHERS.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "We are next to Consider, whether in the Anatomy of mixt Bodies, that which Chymists call the Mercurial part of them be un-compounded, or no.",
+            "But to tell You True, though Chymists do Unanimously affirm that their Resolutions discover a Principle, which they call Mercury, yet I find them to give of it Descriptions so Differing, and so Ænigmaticall, that I, who am not asham'd to confess that I cannot understand what is not sence, must acknowledge to you that I know not what to make of them. _Paracelsus_ himself, and therefore, as you will easily believe, many of his Followers, does somewhere call that Mercury which ascends upon the burning of Wood, as the Peripateticks are wont to take the same smoke for Air; and so seems to define Mercury by Volatility, or (if I may coyne such a Word) Effumability.",
+            "But since, in this Example, both Volatile Salt and Sulphur make part of the smoke, which does indeed consist also both of Phlegmatick and Terrene Corpuscles, this Notion is not to be admitted; And I find that the more sober Chymists themselves disavow it.",
+            "Yet to shew you how little of clearness we are to expect in the accounts even of latter _Spagyrists_, be pleas'd to take notice, that _Beguinus_, even in his _Tyrocinium Chymicum_,20 written for the Instruction of Novices, when he comes to tell us what are meant by the _Tria Prima_, which for their being Principles ought to be defin'd the more accurately and plainly, gives us this Description of Mercury; _Mercurius_ (sayes he) _est liquor ille acidus, permeabilis, penetrabilis, æthereus, ac purissimus, a quo omnis Nutricatio, Sensus, Motus, Vires, Colores, Senectutisque Præproperæ retardatio._ Which words are not so much a Definition of it, as an _Encomium_: and yet _Quercetanus_ in his Description of the same Principle adds to these, divers other _Epithets_.",
+            "But both of them, to skip very many other faults that may be found with their Metaphoricall Descriptions, speak incongruously to the Chymists own Principles.",
+            "For if Mercury be an Acid Liquor, either Hermetical Philosophy must err in ascribing all Tasts to Salt, or else Mercury must not be a Principle, but Compounded of a Saline Ingredient and somewhat else. _Libavius_, though he find great fault with the obscurity of what the Chymists write concerning their Mercurial Principle, does yet but give us such a Negative Description of it, as _Sennertus_, how favourable soever to the _Tria Prima_, is not satisfi'd with.",
+            "And this _Sennertus_ Himself, though the Learnedst Champion for the Hypostatical Principles, does almost as frequently as justly complain of the unsatisfactoriness of what the Chymists teach concerning their Mercury; and yet he himself (but with his wonted modesty) Substitutes instead of the Description of _Libavius_, another, which many Readers, especially if they be not Peripateticks, will not know what to make of.",
+            "For scarce telling us any more, then that in all bodies that which is found besides Salt and Sulphur, and the Elements, or, as they call them, Phlegm and Dead Earth, is that Spirit which in _Aristotles_ Language may be call'd Greek: ousian analogon Errata: ousia analogos tô tôn astrôn stoichaiô Errata: astrôn stoicheiô.",
+            "He sayes that which I confess is not at all satisfactory to me, who do not love to seem to acquiesce in any mans Mystical Doctrines, that I may be thought to understand them."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 20: _Chm.",
+            "Tyrocin. lib. 1.",
+            "Cap. 2._"
+          ]
+        },
+        {
+          "sentences": [
+            "If (sayes _Eleutherius_) I durst presume that the same thing would be thought clear by me, and those that are fond of such cloudy Expressions as You justly Tax the Chymists for, I should venture to offer to Consideration, whether or no, since the Mercurial Principle that arises from Distillation is unanimously asserted to be distinct from the salt and Sulphur of the same Concrete, that may not be call'd the Mercury of a Body, which though it ascend in Distillation, as do the Phlegme and Sulphur, is neither insipid like the former, nor inflamable like the latter.",
+            "And therefore I would substitute to the too much abused Name of Mercury, the more clear and Familiar Appellation of Spirit, which is also now very much made use of even by the Chymists themselves, of our times, though they have not given us so Distinct an Explication, as were fit, of what may be call'd the Spirit of a mixt Body."
+          ]
+        },
+        {
+          "sentences": [
+            "I should not perhaps (sayes _Carneades_) much quarrel with your Notion of Mercury.",
+            "But as for the Chymists, what they can mean, with congruity to their own Principles, by the Mercury of Animals and Vegetables, 'twill not be so easie to find out; for they ascribe Tasts only to the Saline Principle, and consequently would be much put to it to shew what Liquor it is, in the Resolution of Bodies, that not being insipid, for that they call Phlegme, neither is inflamable as Oyle or Sulphur, nor has any Tast; which according to them must proceed from a Mixture, at least, of Salt.",
+            "And if we should take Spirit in the sence of the Word receiv'd among Modern Chymists and Physitians, for any Distill'd Liquor that is neither Phlegme nor oyle, the Appellation would yet appear Ambiguous enough.",
+            "For, plainly, that which first ascends in the Distillation of Wine and Fermented Liquors, is generally as well by Chymists as others reputed a Spirit.",
+            "And yet pure Spirit of Wine being wholly inflamable ought according to them to be reckon'd to the Sulphureous, not the Mercurial Principle.",
+            "And among the other Liquors that go under the name of Spirits, there are divers which seem to belong to the family of Salts, such as are the Spirits of Nitre, Vitriol, Sea-Salt and others, and even the Spirit of Harts-horn, being, as I have try'd, in great part, if not totally reducible into Salt and Phlegme, may be suspected to be but a Volatile Salt disguis'd by the Phlegme mingl'd with it into the forme of a Liquor.",
+            "However if this be a Spirit, it manifestly differs very much from that of Vinager, the Tast of the one being Acid, and the other Salt, and their Mixture in case they be very pure, sometimes occasioning an Effervescence like that of those Liquors the Chymists count most contrary to one another.",
+            "And even among those Liquors that seem to have a better title then those hitherto mention'd, to the name of Spirits, there appears a sensible Diversity; For spirit of Oak, for instance, differs from that of Tartar, and this from that of Box, or of _Guaiacum_.",
+            "And in short, even these spirits as well as other Distill'd Liquors manifest a great Disparity betwixt themselves, either in their Actions on our senses, or in their other operations."
+          ]
+        },
+        {
+          "sentences": [
+            "And (continues _Carneades_) besides this Disparity that is to be met with among those Liquors that the Modernes call spirits, & take for similar bodies, what I have formerly told you concerning the Spirit of Box-wood may let you see that some of those Liquors not only have qualities very differing from others, but may be further resolved into substances differing from one another."
+          ]
+        },
+        {
+          "sentences": [
+            "And since many moderne Chymists and other Naturalists are pleased to take the Mercurial spirit of Bodies for the same Principle, under differing names, I must invite you to observe, with me, the great difference that is conspicuous betwixt all the Vegetable and Animal spirits I have mention'd and running Mercury.",
+            "I speak not of that which is commonly sold in shops that many of themselves will confesse to be a mixt Body; but of that which is separated from Metals, which by some Chymists that seem more Philosophers then the rest, and especially by the above mentioned _Claveus_, is (for distinction sake) called _Mercurius Corporum_.",
+            "Now this Metalline Liquor being one of those three Principles of which Mineral Bodies are by _Spagyrists_ affirmed to be compos'd and to be resoluble into them, the many notorious Differences betwixt them and the Mercuries, as They call Them, of Vegetables and Animals will allow me to inferr, either that Minerals and the other two sorts of Mixt Bodies consist not of the same Elements, or that those Principles whereinto Minerals are immediately resolved, which Chymists with great ostentation shew us as the true principles, of them, are but Secundary Principles, or Mixts of a peculiar sort, which must be themselves reduc'd to a very differing forme, to be of the same kind with Vegetable and Animal Liquors."
+          ]
+        },
+        {
+          "sentences": [
+            "But this is not all; for although I formerly told You how Little Credit there is to be given to the Chymical Processes commonly to be met with, of Extracting the Mercuries of Metals, Yet I will now add, that supposing that the more Judicious of Them do not untruly affirme that they have really drawn true and running Mercury from several Metals (which I wish they had cleerly taught Us how to do also,) yet it may be still doubted whether such extracted Mercuries do not as well differ from common Quicksilver, and from one another, as from the Mercuries of Vegetables and Animalls. _Claveus_,21 in his Apology, speaking of some _experiments_ whereby Metalline Mercuries may be fixt into the nobler metals, adds, that he spake of the Mercuries drawn from metals; because common Quicksilver by reason of its excessive coldnesse and moisture is unfit for that particular kind of operation; for which though a few lines before he prescribes in general the Mercuries of Metalline Bodies, yet he chiefly commends that drawn by art from silver.",
+            "And elsewhere, in the same Book, he tells us, that he himself tryed, that by bare coction the quicksilver of Tin or Pewter (_argentum vivum ex stanno prolicitum_) may by an efficient cause, as he speaks, be turn'd into pure Gold.",
+            "And the Experienc'd _Alexander van Suchten_, somewhere tells us, that by a way he intimates may be made a Mercury of Copper, not of the Silver colour of other Mercuries, but green; to which I shall add, that an eminent person, whose name his travells and learned writings have made famous, lately assur'd me that he had more then once seen the Mercury of Lead (which whatever Authors promise, you will find it very difficult to make, at least in any considerable quantity) fixt into perfect Gold.",
+            "And being by me demanded whether or no any other Mercury would not as well have been changed by the same Operations, he assured me of the Negative."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 21: _Dixi autem de argento vivo a metallis prolicito, quod vulgare ob nimiam frigiditatem & humiditatem nimium concoctioni est contumax, nec ab auro solum alterato coerceri potest._ Gast.",
+            "Clave. in Apoll."
+          ]
+        },
+        {
+          "sentences": [
+            "And since I am fallen upon the mention of the Mercuries of metals, you will perhaps expect (_Eleutherius_!) that I should say something of their two other principles; but must freely confess to you, that what Disparity there may be between the salts and sulphurs of Metals and other Menerals Transcriber's Note: Minerals, I am not my self experienced enough in the separations and examens of them, to venture to determine: (for as for the salts of Metals, I formerly represented it as a thing much to be question'd, whether they have any at all:) And for the processes of separation I find in Authors, if they were (what many of them are not) successfully practicable, as I noted above, yet they are to be performed by the assistance of other bodies, so hardly, if upon any termes at all, separable from them, that it is very difficult to give the separated principles all their due, and no more.",
+            "But the Sulphur of Antimony which is vehemently vomitive, and the strongly scented Anodyne Sulphur of Vitriol inclines me to think that not only Mineral Sulphurs differ from Vegetable ones, but also from one another, retaining much of the nature of their Concretes.",
+            "The salts of metals, and of some sort of minerals, You will easily guesse by Errata: (by the Doubts I formerly express'd, whether metals have any salt at all Errata: all), that I have not been so happy as yet to see, perhaps not for want of curiosity.",
+            "But if _Paracelsus_ did alwaies write so consentaneously to himself that his opinion were _confidently_ to be collected from every place of his writings where he seems to expresse it, I might safely take upon me to tell you, that he both countenances in general what I have delivered in my Fourth main consideration, and in particular warrants me to suspect that there may be a difference in metalline and mineral Salts, as well as we find it in those of other bodies.",
+            "For, _Sulphur_ (sayes he)22 _aliud in auro, aliud in argento, aliud in ferro, aliud in plumbo, stanno, &c. sic aliud in Saphiro, aliud in Smaragdo, aliud in rubino, chrysolito, amethisto, magnete, &c.",
+            "Item aliud in lapidibus, silice, salibus, fontibus, &c. nec vero tot sulphura tantum, sed & totidem salia; sal aliud in metallis, aliud in gemmis, aliud in lapidibus, aliud in salibus, aliud in vitriolo, aliud in alumine: similis etiam Mercurii est ratio.",
+            "Alius in Metallis, alius in Gemmis, &c.",
+            "Ita ut unicuique speciei suus peculiaris Mercurius sit.",
+            "Et tamen res saltem tres sunt; una essentia est sulphur; una est sal; una est Mercurius.",
+            "Addo quod & specialius adhuc singula dividantur; aurum enim non unum, sed multiplex, ut et non unum pyrum, pomum, sed idem multiplex; totidem etiam sulphura auri, salia auri, mercurii auri; idem competit etiam metallis & gemmis; ut quot saphyri præstantiores, lævioris, &c. tot etiam saphyrica sulphura, saphyrica salia, saphyrici Mercurii, &c.",
+            "Idem verum etiam est de turconibus & gemmis aliis universis._ From which passage (_Eleutherius_) I suppose you will think I might without rashness conclude, either that my opinion is favoured by that of _Paracelsus_, or that _Paracelsus_ his opinion was not alwaies the same.",
+            "But because in divers other places of his writings he seems to talk at a differing rate of the three Principles and the four Elements, I shall content my self to inferr from the alledg'd passage, that if his doctrine be not consistent with that Part of mine which it is brought to countenance, it is very difficult to know what his opinion concerning salt, sulphur and mercury, was; and that consequently we had reason about the beginning of our conferences, to decline taking upon us, either to examine or oppose it."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 22: Paracel. de Mineral.",
+            "Tract. 1. pag. 141."
+          ]
+        },
+        {
+          "sentences": [
+            "I know not whether I should on this occasion add, that those very bodies the Chymists call Phlegme and Earth do yet recede from an Elementary simplicity.",
+            "That common Earth and Water frequently do so, notwithstanding the received contrary opinion, is not deny'd by the more wary of the moderne Peripateticks themselves: and certainly, most Earths are much lesse simple bodies then is commonly imagined even by Chymists, who do not so consideratly to prescribe and employ Earths Promiscuously in those distillations that require the mixture of some _caput mortuum_, to hinder the flowing together of the matter, and to retain its grosser parts.",
+            "For I have found some Earths to yield by distillation a Liquor very far from being inodorous or insipid; and 'tis a known observation, that most kinds of fat Earth kept cover'd from the rain, and hindred from spending themselves in the production of vegetables, will in time become impregnated with Salt-Petre."
+          ]
+        },
+        {
+          "sentences": [
+            "But I must remember that the Water and Earths I ought here to speak of, are such as are separated from mixt Bodies by the fire; and therefore to restrain my Discourse to such, I shall tell you, That we see the Phlegme of Vitriol (for instance) is a very effectual remedie against burnes; and I know a very Famous and experienc'd _Physitian_, whose unsuspected secret (himself confess'd to me) it is, for the discussing of hard and Obstinate Tumours.",
+            "The Phlegme of Vinager, though drawn exceeding leasurly in a digesting Furnace, I have purposely made tryall of; and sometimes found it able to draw, though slowly, a saccharine sweetness out of Lead; and as I remember by long Digestion, I dissolv'd Corpals Errata: Corals in it.",
+            "The Phlegme of the sugar of Saturne is said to have very peculiar properties.",
+            "Divers Eminent Chymists teach, that it will dissolve Pearls, which being precipitated by the spirit of the same concrete are thereby (as they say) rendred volatile; which has been confirmed to me, upon his own observation, by a person of great veracity.",
+            "The Phlegme of Wine, and indeed divers other Liquors that are indiscriminately condemnd to be cast away as phlegm, are endow'd with qualities that make them differ both from meer water, and from each other; and whereas the Chymists are pleas'd to call the _caput mortuum_ of what they have distill'd (after they have by affusion of water drawn away its salt) _terra damnata_, or Earth, it may be doubted whether or no those earths are all of them perfectly alike: and it is scarce to be doubted, but that there are some of them which remain yet unreduc'd to an Elementary nature.",
+            "The ashes of wood depriv'd of all the salt, and bone-Ashes, or calcin'd Harts-horn, which Refiners choose to make Tests of, as freest from Salt, seem unlike: and he that shall compare either of these insipid ashes to Lime, and much more to the _calx_ of Talk Transcriber's Note: Talck (though by the affusion of water they be exquisitely dulcify'd) will perhaps see cause to think them things of a somewhat differing nature.",
+            "And it is evident in Colcothar that the exactest calcination, follow'd by an exquisite dulcification, does not alwaies reduce the remaining body into elementary earth; for after the salt or Vitriol (if the Calcination have been too faint) is drawn out of the Colcothar, the residue is not earth, but a mixt body, rich in Medical vertues (as experience has inform'd me) and which _Angelus Sala_ affirmes to be partly reducible into malleable Copper; which I judge very probable: for though when I was making Experiments upon Colcothar, I was destitute of a Furnace capable of giving a heat intense Enough to bring such a Calx to Fusion; yet having conjectur'd that if Colcothar abounded with that Metal, Aqua Fortis would find it out there, I put some dulcifi'd Colcothar into that _Menstruum_, and found the Liquor, according to my Expectation, presently Colour'd as Highly as if it had been an Ordinary Solution of Copper."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
+          ]
+        },
+        {
+          "sentences": [
+            "SCEPTICAL CHYMIST."
+          ]
+        },
+        {
+          "sentences": [
+            "_The Fifth Part._"
+          ]
+        },
+        {
+          "sentences": [
+            "Here _Carneades_ making a pause, I must not deny (sayes his Friend to him) that I think You have sufficiently prov'd that these distinct Substances which Chymists are wont to obtain from Mixt Bodies, by their Vulgar Destillation, are not pure and simple enough to deserve, in Rigour of speaking, the Name of Elements, or Principles.",
+            "But I suppose You have heard, that there are some Modern _Spagyrists_, who give out that they can by further and more Skilfull Purifications, so reduce the separated Ingredients of Mixt Bodies to an Elementary simplicity, That the Oyles (for Instance) extracted from all Mixts shall as perfectly resemble one another, as the Drops of Water do."
+          ]
+        },
+        {
+          "sentences": [
+            "If you remember (replies _Carneades_) that at the Beginning of our Conference with _Philoponus_, I declar'd to him before the rest of the Company, that I would not _engage_ my self at present to do any more then examine the usual proofs alledg'd by Chymists, for the Vulgar doctrine of their three Hypostatical Principles; You will easily perceive that I am not oblig'd to make answer to what you newly propos'd; and that it rather grants, then disproves what I have been contending for: Since by pretending to make so great a change in the reputed Principles that Destillation affords the common _Spagyrists_, 'tis plainly enough presuppos'd, that before such Artificial Depurations be made, the Substances to be made more simple were not yet simple enough to be look'd upon as Elementary; Wherefore in case the _Artists_ you speak of could perform what they give out they can, yet I should not need to be asham'd of having question'd the Vulgar Opinion touching the _tria Prima_.",
+            "And as to the thing it self, I shall freely acknowledge to you, that I love not to be forward in determining things to be impossible, till I know and have consider'd the means by which they are propos'd to be effected.",
+            "And therefore I shall not peremptorily deny either the possibility of what these _Artists_ promise, or my Assent to any just Inference; however destructive to my Conjectures, that may be drawn from their performances.",
+            "But give me leave to tell you withall, that because such promises are wont (as Experience has more then once inform'd me) to be much more easily made, then made good by Chymists, I must withhold my Beliefe from their assertions, till their Experiments exact it; and must not be so easie as to expect before hand, an unlikely thing upon no stronger Inducements then are yet given me: Besides that I have not yet found by what I have heard of these Artists, that though they pretend to bring the several Substances into which the Fire has divided the Concrete, to an exquisite simplicity, They pretend also to be able by the Fire to divide all Concretes, Minerals, and others, into the same number of Distinct Substances.",
+            "And in the mean time I must think it improbable, that they can either truly separate as many differing Bodies from Gold (for Instance) or _Osteocolla_, as we can do from Wine, or Vitriol; or that the Mercury (for Example) of Gold or Saturn would be perfectly of the same Nature with that of Harts-horn; and that the sulphur of Antimony would be but Numerically different from the Distill'd butter or oyle of Roses."
+          ]
+        },
+        {
+          "sentences": [
+            "But suppose (sayes _Eleutherius_) that you should meet with Chymists, who would allow you to take in Earth and Water into the number of the principles of Mixt Bodies; and being also content to change the Ambiguous Name of Mercury for that more intelligible one of spirit, should consequently make the principles of Compound Bodies to be Five; would you not think it something hard to reject so plausible an Opinion, only because the Five substances into which the Fire divides mixt Bodies are not exactly pure, and Homogeneous?",
+            "For my part (Continues _Carneades_) I cannot but think it somewhat strange, in case this Opinion be not true, that it should fall out so luckily, that so great a Variety of Bodies should be Analyz'd by the Fire into just five Distinct substances; which so little differing from the Bodies that bear those names, may so Plausibly be call'd Oyle, Spirit, Salt, Water, and Earth."
+          ]
+        },
+        {
+          "sentences": [
+            "The Opinion You now propose (answers _Carneades_) being another then that I was engag'd to examine, it is not requisite for me to Debate it at present; nor should I have leisure to do it thorowly.",
+            "Wherefore I shall only tell you in General, that though I think this Opinion in some respects more defensible then that of the Vulgar Chymists; yet you may easily enough learn from the past Discourse what may be thought of it: Since many of the Objections made against the Vulgar Doctrine of the Chymists seem, without much alteration, employable against this _Hypothesis_ also.",
+            "For, besides that this Doctrine does as well as the other take it for granted, (what is not easie to be prov'd) that the Fire is the true and Adequate Analyzer of Bodies, and that all the Distinct substances obtainable from a mixt Body by the Fire, were so pre-existent in it, that they were but extricated from each other by the _Analysis_; Besides that this Opinion, too, ascribe Errata: ascribes to the Productions of the Fire an Elementary simplicity, which I have shewn not to belong to them; and besides that this Doctrine is lyable to some of the other Difficulties, wherewith That of the _Tria Prima_ is incumber'd; Besides all this, I say, this quinary number of Elements, (if you pardon the Expression) ought at least to have been restrain'd to the Generality of Animal and Vegetable Bodies, since not only among these there are some Bodies (as I formerly argu'd) which, for ought has yet been made to appear, do consist, either of fewer or more similar substances then precisely Five.",
+            "But in the Mineral Kingdom, there is scarce one Concrete that has been evinc'd to be adequatly divisible into such five Principles or Elements, and neither more nor less, as this Opinion would have every mixt Body to consist of."
+          ]
+        },
+        {
+          "sentences": [
+            "And this very thing (continues _Carneades_) may serve to take away or lessen your Wonder, that just so many Bodies as five should be found upon the Resolution of Concretes.",
+            "For since we find not that the fire can make any such _Analysis_ (into five Elements) of Metals and other Mineral Bodies, whose Texture is more strong and permanent, it remains that the Five Substances under consideration be Obtain'd from Vegetable and Animal Bodies, which (probably by reason of their looser Contexture) are capable of being Distill'd.",
+            "And as to such Bodies, 'tis natural enough, that, whether we suppose that there are, or are not, precisely five Elements, there should ordinarily occurr in the Dissipated parts a five Fold Diversity of Scheme (if I may so speak.) For if the Parts do not remain all fix'd, as in Gold, Calcin'd Talck, &c. nor all ascend, as in the Sublimation of Brimstone, Camphire, &c. but after their Dissipation do associate themselves into new Schemes of Matter; it is very likely, that they will by the Fire be divided into fix'd and Volatile (I mean, in Reference to that degree of heat by which they are destill'd) and those Volatile parts will, for the most part, ascend either in a dry forme, which Chymists are pleas'd to call, if they be Tastless, Flowers; if Sapid, Volatile Salt; or in a Liquid Forme.",
+            "And this Liquor must be either inflamable, and so pass for oyl, or not inflamable, and yet subtile and pungent, which may be call'd Spirit; or else strengthless or insipid, which may be nam'd Phlegme, or Water.",
+            "And as for the fixt part, or _Caput Mortuum_, it will most commonly consist of Corpuscles, partly Soluble in Water, or Sapid, (especially if the Saline parts were not so Volatile, as to fly away before) which make up its fixt salt; and partly insoluble and insipid, which therefore seems to challenge the name of Earth.",
+            "But although upon this ground one might easily enough have foretold, that the differing substances obtain'd from a perfectly mixt Body by the Fire would for the most part be reducible to the five newly mentioned States of Matter; yet it will not presently follow, that these five Distinct substances were simple and primogeneal bodies, so pre-existent in the Concrete that the fire does but take them asunder.",
+            "Besides that it does not appear, that all Mixt Bodies, (witness, Gold, Silver, Mercury, &c.) Nay nor perhaps all Vegetables, which may appear by what we said above of _Camphire_, _Benzoin_, &c. are resoluble by Fire into just such differing Schemes of Matter.",
+            "Nor will the Experiments formerly alledg'd permit us to look upon these separated Substances as Elementary, or uncompounded.",
+            "Neither will it be a sufficient Argument of their being Bodies that deserve the Names which Chymists are pleas'd to give them, that they have an Analogy in point of Consistence, or either Volatility or Fixtness, or else some other obvious Quality, with the suppos'd Principles, whose names are ascrib'd to them.",
+            "For, as I told you above, notwithstanding this Resemblance in some one Quality, there may be such a Disparity in others, as may be more fit to give them Differing Appellations, then the Resemblance is to give them one and the same.",
+            "And indeed it seems but somewhat a gross Way of judging of the Nature of Bodies, to conclude without Scruple, that those must be of the same Nature that agree in some such General Quality, as Fluidity, Dryness, Volatility, and the like: since each of those Qualities, or States of Matter, may Comprehend a great Variety of Bodies, otherwise of a very differing Nature; as we may see in the Calxes of Gold, of Vitriol, and of Venetian Talck, compar'd with common Ashes, which yet are very dry, and fix'd by the vehemence of the Fire, as well as they.",
+            "And as we may likewise gather from what I have formerly Observ'd, touching the Spirit of Box-Wood, which though a Volatile, Sapid, and not inflamable Liquor, as well as the Spirits of Harts-horn, of Blood and others, (and therefore has been hitherto call'd, the Spirit, and esteem'd for one of the Principles of the Wood that affords it;) may yet, as I told You, be subdivided into two Liquors, differing from one another, and one of them at least, from the Generality of other Chymical Spirits."
+          ]
+        },
+        {
+          "sentences": [
+            "But you may your self, if you please, (pursues _Carneades_) accommodate to the _Hypothesis_ you propos'd what other particulars you shall think applicable to it, in the foregoing Discourse.",
+            "For I think it unseasonable for me to meddle now any further with a Controversie, which since it does not now belong to me, Leaves me at Liberty to Take my Own time to Declare my Self about it."
+          ]
+        },
+        {
+          "sentences": [
+            "_Eleutherius_ perceiving that _Carneades_ was somewhat unwilling to spend any more time upon the debate of this Opinion, and having perhaps some thoughts of taking hence a Rise to make him Discourse it more fully another time, thought not fit as then to make any further mention to him of the propos'd opinion, but told him;"
+          ]
+        },
+        {
+          "sentences": [
+            "I presume I need not mind you, _Carneades_, That both the Patrons of the ternary number of Principles, and those that would have five Elements, endeavour to back their experiments with a specious Reason or two; and especially some of those Embracers of the Opinion last nam'd (whom I have convers'd with, and found them Learned men) assigne this Reason of the necessity of five distinct Elements; that otherwise mixt Bodies could not be so compounded and temper'd as to obtain a due consistence and competent Duration.",
+            "For Salt (say they) is the _Basis_ of Solidity; and Permanency in Compound Bodies, without which the other four Elements might indeed be variously and loosly blended together, but would remain incompacted; but that Salt might be dissolv'd into minute Parts, and convey'd to the other Substances to be compacted by it, and with it, there is a Necessity of Water.",
+            "And that the mixture may not be too hard and brittle, a Sulphureous or Oyly Principle must intervene to make the mass more tenacious; to this a Mercurial spirit must be superadded; which by its activity may for a while premeate Transcriber's Note: permeate, and as it were leaven the whole Mass, and thereby promote the more exquisite mixture and incorporation of the Ingredients.",
+            "To all which (lastly) a portion of Earth must be added, which by its drinesse and poracity Errata: porosity may soak up part of that water wherein the Salt was dissolv'd, and eminently concurr with the other ingredients to give the whole body the requisite consistence."
+          ]
+        },
+        {
+          "sentences": [
+            "I perceive (sayes _Carneades_ smiling) that if it be true, as 'twas lately rooted Errata: noted from the Proverb, _That good Wits have bad Memories_, You have that Title, as well as a better, to a place among the good Wits.",
+            "For you have already more then once forgot, that I declar'd to you that I would at this Conference Examine only the Experiments of my Adversaries, not their Speculative Reasons.",
+            "Yet 'tis not (Subjoynes _Carneades_) for fear of medling with the Argument you have propos'd, that I decline the examining it at present.",
+            "For if when we are more at leasure, you shall have a mind that we may Solemnly consider of it together; I am confident we shall scarce find it insoluble.",
+            "And in the mean time we may observe, that such a way of Arguing may, it seems, be speciously accommodated to differing _Hypotheses_.",
+            "For I find that _Beguinus_, and other Assertors of the _Tria Prima_, pretend to make out by such a way, the requisiteness of their Salt, Sulphur and Mercury, to constitute mixt Bodies, without taking notice of any necessity of an Addition of Water and Earth."
+          ]
+        },
+        {
+          "sentences": [
+            "And indeed neither sort of Chymists seem to have duly consider'd how great Variety there is in the Textures and Consistences of Compound Bodie; sand Errata: Bodies; and how little the consistence and Duration of many of them seem to accommodate and be explicable by the propos'd Notion.",
+            "And not to mention those almost incorruptible Substances obtainable by the Fire, which I have prov'd to be somewhat compounded, and which the Chymists will readily grant not to be perfectly mixt Bodies: (Not to mention these, I say) If you will but recall to mind some of those Experiments, whereby I shew'd You that out of common Water only mixt Bodies (and even living ones) of very differing consistences, and resoluble by Fire into as many Principles as other bodies acknowledg'd to be perfectly mixt; if you do this, I say, you will not, I suppose, be averse from beleeving, that Nature by a convenient disposition of the minute parts of a portion of matter may contrive bodies durable enough, and of this, or that, or the other Consistence, without being oblig'd to make use of all, much less of any Determinate quantity of each of the five Elements, or of the three Principles to compound such bodies of.",
+            "And I have (pursues _Carneades_) something wonder'd, Chymists should not consider, that there is scarce any body in Nature so permanent and indissoluble as Glass; which yet themselves teach us may be made of bare Ashes, brought to fusion by the meer Violence of the Fire; so that, since Ashes are granted to consist but of pure Salt and simple Earth, sequestred from all the other Principles or Elements, they must acknowledge, That even Art it self can of two Elements only, or, if you please, one Principle and one Element, compound a Body more durable then almost any in the World.",
+            "Which being undeniable, how will they prove that Nature cannot compound Mixt Bodies, and even durable Ones, under all the five Elements or material Principles."
+          ]
+        },
+        {
+          "sentences": [
+            "But to insist any longer on this Occasional Disquisition, Touching their Opinion that would Establish five Elements, were to remember as little as You did before, that the Debate of this matter is no part of my first undertaking; and consequently, that I have already spent time enough in what I look back upon but as a digression, or at best an Excursion."
+          ]
+        },
+        {
+          "sentences": [
+            "And thus, _Eleutherius_, (sayes _Carneades_) having at length gone through the four Considerations I propos'd to Discourse unto you, I hold it not unfit, for fear my having insisted so long on each of them may have made you forget their _Series_, briefly to repeat them by telling you, that"
+          ]
+        },
+        {
+          "sentences": [
+            "Since, in the first place, it may justly be doubted whether or no the Fire be, as Chymists suppose it, the genuine and Universal Resolver of mixt Bodies;"
+          ]
+        },
+        {
+          "sentences": [
+            "Since we may doubt, in the next place, whether or no all the Distinct Substances that may be obtain'd from a mixt body by the Fire were pre-existent there in the formes in which they were separated from it;"
+          ]
+        },
+        {
+          "sentences": [
+            "Since also, though we should grant the Substances separable from mixt Bodies by the fire to have been their component Ingredients, yet the Number of such substances does not appear the same in all mixt Bodies; some of them being Resoluble into more differing substances than three, and Others not being Resoluble into so many as three."
+          ]
+        },
+        {
+          "sentences": [
+            "And Since, Lastly, those very substances that are thus separated are not for the most part pure and Elementary bodies, but new kinds of mixts;"
+          ]
+        },
+        {
+          "sentences": [
+            "Since, I say, these things are so, I hope you will allow me to inferr, that the Vulgar Experiments (I might perchance have Added, the Arguments too) wont to be Alledg'd by Chymists to prove, that their three Hypostatical Principles do adequately compose all mixt Bodies, are not so demonstrative as to reduce a wary Person to acquiesce in their Doctrine, which, till they Explain and prove it better, will by its perplexing darkness be more apt to puzzle then satisfy considering men, and will to them appear incumbred with no small Difficulties."
+          ]
+        },
+        {
+          "sentences": [
+            "And from what has been hitherto deduc'd (continues _Carneades_) we may Learn, what to Judge of the common Practice of those Chymists, who because they have found that Diverse compound Bodies (for it will not hold in All) can be resolv'd into, or rather can be brought to afford two or three differing Substances more then the Soot and Ashes, whereinto the naked fire commonly divides them in our Chymnies, cry up their own Sect for the Invention of a New Philosophy, some of them, as _Helmont, &c._ styling themselves Philosophers by the Fire; and the most part not only ascribing, but as far as in them lies, engrossing to those of their Sect the Title of PHILOSOPHERS."
+          ]
+        },
         {
           "sentences": [
             "But alas, how narrow is this Philosophy, that reaches but to some of those compound Bodies, which we find but upon, or in the crust or outside of our terrestrial Globe, which is it self but a point in comparison of the vast extended Universe, of whose other and greater parts the Doctrine of the _Tria Prima_ does not give us an Account!",
@@ -1544,18 +2229,9 @@
             "And not to mention that our Authour makes a Body as Homogeneous as any he can produce for Elementary, belong both to Water and Fire, Though it be neither Fluid nor Insipid, like Water; nor light and Volatile, like Fire; he seems to omit in this Anatomy the Element of Earth, save That he intimates, That the salt may pass for that; But since a few lines before, he takes Ashes for Earth, I see not how he will avoid an Inconsistency either betwixt the Parts of his Discourse or betwixt some of them and his Doctrine.",
             "For since There is a manifest Difference betwixt the Saline and the insipid Parts of Ashes, I see not how substances That Disagree in such Notable Qualities can be both said to be Portions of an Element, whose Nature requires that it be Homogeneous, especially in this case where an _Analysis_ by the Fire is suppos'd to have separated it from the admixture of other Elements, which are confess'd by most _Aristotelians_ to be Generally found in common Earth, and to render it impure.",
             "And sure if when we have consider'd for how little a Disparities sake the Peripateticks make these Symbolizing Bodies Aire and Fire to be two Distinct Elements, we shall also consider that the Saline part of Ashes is very strongly Tasted, and easily soluble in Water; whereas the other part of the same Ashes is insipid and indissoluble in the same Liquor: Not to add, that the one substance is Opacous, and the other somewhat Diaphanous, nor that they differ in Divers other Particulars; If we consider those things, I say, we shall hardly think that both these Substances are Elementary Earth; And as to what is sometimes objected, that their Saline Tast is only an Effect of Incineration and Adustion, it has been elsewhere fully reply'd to, when propos'd by _Themistius_, and where it has been prov'd against him, that however insipid Earth may perhaps by Additaments be turn'd into Salt, yet 'tis not like it should be so by the Fire alone: For we see that when we refine Gold and Silver, the violentest Fires We can Employ on them give them not the least Rellish of Saltness.",
-            "And I think _Philoponus_ has rightly observ'd, that the Ashes of some Concretes contain very little salt if any at all; For Refiners suppose that bone-ashes are free from it, and therefore make use of them for Tests and Cuppels, which ought to be Destitute of Salt, lest the Violence of the Fire should bring them to Vitrification; And having purposely and heedfully tasted a Cuppel made of only bone-ashes and fair water, which I had caus'd to be expos'd to a Very Violent Fire, acuated by the Blast of a large pair of Double Bellows, I could not perceive that the force of the Fire had imparted"
+            "And I think _Philoponus_ has rightly observ'd, that the Ashes of some Concretes contain very little salt if any at all; For Refiners suppose that bone-ashes are free from it, and therefore make use of them for Tests and Cuppels, which ought to be Destitute of Salt, lest the Violence of the Fire should bring them to Vitrification; And having purposely and heedfully tasted a Cuppel made of only bone-ashes and fair water, which I had caus'd to be expos'd to a Very Violent Fire, acuated by the Blast of a large pair of Double Bellows, I could not perceive that the force of the Fire had imparted to it the least Saltness, or so much as made it less Insipid."
           ]
-        }
-      ],
-      "sentence_count": 73,
-      "word_count": 4519
-    },
-    {
-      "number": "7",
-      "title": "it the least Saltness, or so much as made it less Insipid.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But (sayes _Carneades_) since neither You nor I love Repetitions, I shall not now make any of what else was urg'd against _Themistius_ but rather invite You to take notice with me that when our Authour, though a Learned Man, and one that pretends skill enough in Chymistry to reforme the whole Art, comes to make good his confident Undertaking, to give us an occular Demonstration of the immediate Presence of the four Elements in the resolution of Green Wood, He is fain to say things that agree very little with one another.",
@@ -1627,18 +2303,139 @@
             "For first, it will not presently follow, That if the Purgative or other vertue of a simple may be easily extracted by Water or Spirit of Wine, it Resides in the Salt or Sulphur of the Concrete; Since unlesse the Body have before been resolved by the Fire, or some Other Powerful Agent, it will, for the most part, afford in the Liquors I have named, rather the finer compounded parts of it self, Than the Elementary ones.",
             "As I noted before, That Water will dissolve not only pure Salts, but Crystals of Tartar, Gumme Arabick, Myrr'h, and Other Compound Bodies.",
             "As also Spirit of Wine will Dissolve not only the pure Sulphur of Concretes, but likewise the whole Substance of divers Resinous Bodies, as Benzoin, the Gummous parts of Jallap, Gumme Lacca, and Other bodies that are counted perfectly Mixt.",
-            "And we see that the"
+            "And we see that the Extracts made either with Water or Spirit of Wine are not of a simple and Elementary Nature, but Masses consisting of the looser Corpuscles, and finer parts of the Concretes whence they are Drawn; since by Distillation they may be Divided into more Elementary substances."
           ]
-        }
-      ],
-      "sentence_count": 42,
-      "word_count": 2468
-    },
-    {
-      "number": "8",
-      "title": "admit it, and are not fill'd up with any grosser substance.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "Next, we may consider That even when there intervenes a Chymical resolution by he Transcriber's Note: the Fire, 'tis seldom in the Saline or Sulphureous principle, as such, that the desir'd Faculty of the Concrete Resides; But, as that Titular Salt or Sulphur is yet a mixt body, though the Saline or Sulphureous Nature be predominant in it.",
+            "For, if in Chymical Resolutions the separated Substances were pure and simple Bodies, and of a perfect Elementary Nature; no one would be indued with more Specifick Vertues, than another; and their qualities would Differ as Little as do those of Water.",
+            "And let me add this upon the bye, That even Eminent Chymists have suffer'd themselves to be reprehended by me for their over great Diligence in purifying some of the things they obtain by Fire from mixt Bodies.",
+            "For though such compleatly purifyed Ingredients of Bodies might perhaps be more satisfactory to our Understanding; yet others are often more useful to our Lives, the efficacy of such Chymical Productions depending most upon what they retain of the Bodies whence they are separated, or gain by the new associations of the Dissipated among themselves; whereas if they were meerly Elementary, their uses would be comparatively very small; and the vertues of Sulphurs, Salts, or Other such Substances of one denomination, would be the very same."
+          ]
+        },
+        {
+          "sentences": [
+            "And by the Way (_Eleutherius_) I am inclin'd upon this ground to Think, That the artificial resolution of compound bodies by Fire does not so much enrich mankind, as it divides them into their supposed Principles; as upon the score of its making new compounds by now Transcriber's Note: new combinations of the dissipated parts of the resolv'd Body.",
+            "For by this means the Number of mixt Bodies is considerably increased.",
+            "And many of those new productions are indow'd with useful qualities, divers of which they owe not to the body from which they were obtein'd, but to Their newly Acquired Texture."
+          ]
+        },
+        {
+          "sentences": [
+            "But thirdly, that which is principally to be Noted is this, that as there are divers Concretes whose Faculties reside in some one or other of those differing Substances that Chymists call their Sulphurs, Salts, and Mercuries, and consequently may be best obtain'd, by analyzing the Concrete whereby the desired Principles may be had sever'd or freed from the rest; So there are other wherein the noblest properties lodge not in the Salt, or Sulphur, or Mercury, but depend immediately upon the form (or if you will) result from the determinate structure of the Whole Concrete; and consequently they that go about to extract the Vertues of such bodies, by exposing them to the Violence of the Fire, do exceedingly mistake, and take the way to Destroy what they would obtain."
+          ]
+        },
+        {
+          "sentences": [
+            "I remmember that _Helmont_ himself somewhere confesses, That as the Fire betters some things and improves their Vertues, so it spoyles others and makes them degenerate.",
+            "And elsewhere he judiciously affirmes, that there may be sometimes greater vertue in a simple, such as Nature has made it, than in any thing that can by the fire be separated from it.",
+            "And lest you should doubt whether he means by the vertues of things those that are Medical; he has in one place27 this ingenuous confession; _Credo_ (sayes he) _simplicia in sua simplicitate esse sufficientia pro sanatione omnium morborum._ Nag.",
+            "Errata: Nay, Barthias, even in a Comment upon _Beguinus_,28 scruples not to make this acknowledgment; _Valde absurdum est_ (sayes he) _ex omnibus rebus extracta facere, salia, quintas essentias; præsertim ex substantiis per se plane vel subtilibus vel homogeneis, quales sunt uniones, Corallia, Moscus, Ambra, &c._ Consonantly whereunto he also tells Us (and Vouches the famous _Platerus_, for having candidly given the same Advertisement to his Auditors,) that some things have greater vertues, and better suited to our humane nature, when unprepar'd, than when they have past the Chymists Fire; as we see, sayes my Author, in Pepper; of which some grains swallowed perform more towards the relief of a Distempered stomack, than a great quantity of the Oyle of the same spice."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 27: Helmont Pharm. & Dispens.",
+            "Nov. p. 458."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 28: Vide Jer. ad Begu.",
+            "Lib. 1.",
+            "Cap. 17."
+          ]
+        },
+        {
+          "sentences": [
+            "It has been (pursues _Carneades_) by our Friend here present observ'd concerning Salt-petre, that none of the substances into which the Fire is wont to divide it, retaines either the Tast, the cooling vertue, or some other of the properties of the Concrete; and that each of those Substances acquires new qualities, not to be found in the Salt-Petre it self.",
+            "The shining property of the tayls of gloworms does survive but so short a time the little animal made conspicuous by it, that inquisitive men have not scrupled publickly to deride _Baptista Porta_ and others; who deluded perhaps with some Chymical surmises have ventur'd to prescribe the distillation of a Water from the tayles of Glowormes, as a sure way to obtain a liquor shining in the Dark.",
+            "To which I shall now add no other example than that afforded us by Amber; which, whilst it remains an intire body, is endow'd with an Electrical faculty of drawing to it self fethers, strawes, and such like Bodies; which I never could observe either in its Salt, its Spirit, its Oyle, or in the Body I remember I once made by the reunion of its divided Elements; none of these having such a Texture as the intire Concrete.",
+            "And however Chymists boldly deduce such and such properties from this or that proportion of their component Principles; yet in Concretes that abound with this or that Ingredient, 'tis not alwayes so much by vertue of its presence, nor its plenty, that the Concrete is qualify'd to perform such and such Effects; as upon the account of the particular texture of that and the other Ingredients, associated after a determinate Manner into one Concrete (though possibly such a proportion of that ingredient may be more convenient than an other for the constituting of such a body.) Thus in a clock the hand is mov'd upon the dyal, the bell is struck, and the other actions belonging to the engine are perform'd, not because the Wheeles are of brass or iron, or part of one metal and part of another, or because the weights are of Lead, but by Vertue of the size, shape, bigness, and co-aptation of the several parts; which would performe the same things though the wheels were of Silver, or Lead, or Wood, and the Weights of Stone or Clay; provided the Fabrick or Contrivance of the engine were the same: though it be not to be deny'd, that Brasse and Steel are more convenient materials to make clock-wheels of than Lead, or Wood.",
+            "And to let you see, _Eleutherius_, that 'tis sometimes at least, upon the Texture of the small parts of a body, and not alwaies upon the presence, or recesse, or increase, or Decrement of any one of its Principle, that it may lose some such Qualities, and acquire some such others as are thought very strongly inherent to the bodies they Reside in.",
+            "Errata: in; I will add to what may from my past discourse be refer'd to this purpose, this Notable Example, from my Own experience; That Lead may without any additament, and only by various applications of the Fire, lose its colour, and acquire sometimes a gray, sometimes a yellowish, sometimes a red, sometimes an _amethihstine_ Transcriber's Note: amethistine colour; and after having past through these, and perhaps divers others, again recover its leaden colour, and be made a bright body.",
+            "That also this Lead, which is so flexible a metal, may be made as brittle as Glasse, and presently be brought to be again flexible and Malleable as before.",
+            "And besides, that the same lead, which I find by _Microscopes_ to be one of the most opacous bodies in the World, may be reduced to a fine transparent glasse; whence yet it may returne to an opacous Nature again; and all this, as I said, without the addition of any extraneous body, and meerly by the manner and Method of exposing it to the Fire."
+          ]
+        },
+        {
+          "sentences": [
+            "But (sayes _Carneades_) after having already put you to so prolix a trouble, it is time for me to relieve you with a promise of putting speedily a period to it; And to make good that promise, I shall from all that I have hitherto discoursed with you, deduce but this one proposition by way of Corollary. _That it may as yet be doubted, whether or no there be any determinate Number of Elements; Or, if you please, whether or no all compound bodies, do consist of the same number of Elementary ingredients or material Principles._"
+          ]
+        },
+        {
+          "sentences": [
+            "This being but an inference from the foregoing Discourse, it will not be requisite to insist at large on the proofs of it; But only to point at the chief of Them, and Referr You for Particulars to what has been already Delivered."
+          ]
+        },
+        {
+          "sentences": [
+            "In the First place then, from what has been so largely discours'd, it may appear, that the Experiments wont to be brought, whether by the common Peripateticks, or by the vulgar Chymists, to demonstrate that all mixt bodies are made up precisely either of the four Elements, or the three Hypostatical Principles, do not evince what they are alledg'd to prove.",
+            "And as for the other common arguments, pretended to be drawn from Reason in favour of _Aristotelian Hypothesis_ (for the Chymists are wont to rely almost altogether upon Experiments) they are Commonly grounded upon such unreasonable or precarious Suppositions, that 'tis altogether as easie and as just for any man to reject them, as for those that take them for granted to assert them, being indeed all of them as indemonstrable as the conclusion to be inferr'd from them; and some of them so manifestly weak and prooflesse; that he must be a very courteous adversary, that can be willing to grant them; and as unskilful a one, that can be compelled to do so."
+          ]
+        },
+        {
+          "sentences": [
+            "In the next place, it may be considered, if what those Patriarchs of the _Spagyrists_, _Paracelsus_ and _Helmont_, do on divers occasions positively deliver, be true; namely that the _Alkahest_ does Resolve all mixt Bodies into other Principles than the fire, it must be decided which of the two resolutions (that made by the _Alkahest_, or that made by the fire) shall determine the number of the Elements, before we can be certain how many there are."
+          ]
+        },
+        {
+          "sentences": [
+            "And in the mean time, we may take notice in the last place, that as the distinct substances whereinto the _Alkahest_ divides bodies, are affirm'd to be differing in nature from those whereunto they are wont to be reduc'd by fire, and to be obtain'd from some bodies more in Number than from some others; since he tells us, he could totally reduce all sorts of Stones into Salt only, whereas of a coal he had two distinct Liquors.29 So, although we should acquiesce in that resolution which is made by fire, we find not that all mixt bodies are thereby divided into the same number of Elements and Principles; some Concretes affordding more of them than others do; Nay and sometimes this or that Body affording a greater number of Differing substances by one way of management, than the same yields by another.",
+            "And they that out of Gold, or Mercury, or Muscovy-glasse, will draw me as many distinct substances as I can separate from Vitriol, or from the juice of Grapes variously orderd, may teach me that which I shall very Thankfully learn.",
+            "Nor does it appear more congruous to that variety that so much conduceth to the perfection of the Universe, that all elemented bodies be compounded of the same number of Elements, then it would be for a language, that all its words should consist of the same number of Letters."
+          ]
+        },
+        {
+          "sentences": [
+            "Footnote 29: _Novi saxum & lapides omnes in merum salem suo saxo aut lapidi & æquiponderantem reducere absque omni prorsus sulphure aut Mercurio._ Helmont. pag. 409."
+          ]
+        },
+        {
+          "sentences": [
+            "THE"
+          ]
+        },
+        {
+          "sentences": [
+            "SCEPTICAL CHYMIST"
+          ]
+        },
+        {
+          "sentences": [
+            "OR,"
+          ]
+        },
+        {
+          "sentences": [
+            "_A Paradoxical Appendix to the Foregoing Treatise._"
+          ]
+        },
+        {
+          "sentences": [
+            "_The Sixth Part._"
+          ]
+        },
+        {
+          "sentences": [
+            "Here _Carneades_ Having Dispach't what he Thought Requisite to oppose against what the Chymists are wont to alledge for Proof of their three Principles, Paus'd awhile, and look'd about him, to discover whether it were Time for him and his Friend to Rejoyne the Rest of the Company.",
+            "But _Eleutherius_ perceiving nothing yet to forbid Them to Prosecute their Discourse a little further, said to his Friend, (who had likewise taken Notice of the same thing) I halfe expected, _Carneades_, that after you had so freely declar'd Your doubting, whether there be any Determinate Number of Elements, You would have proceeded to question whether there be any Elements at all.",
+            "And I confess it will be a Trouble to me if You defeat me of my Expectation; especially since you see the leasure we have allow'd us may probably suffice to examine that Paradox; because you have so largly Deduc'd already many Things pertinent to it, that you need but intimate how you would have them Apply'd, and what you would inferr from them."
+          ]
+        },
+        {
+          "sentences": [
+            "_Carneades_ having in Vain represented that their leasure could be but very short, that he had already prated very long, that he was unprepared to maintain so great and so invidious a Paradox, was at length prevail'd with to tell his Friend; Since, _Eleutherius_, you will have me Discourse _Ex Tempore_ of the Paradox you mention, I am content, (though more perhaps to express my Obedience, then my Opinion) to tell you that (supposing the Truth of _Helmonts_ and _Paracelsus's_ Alkahestical Experiments, if I may so call them) though it may seem extravagant, yet it is not absurd to doubt, whether, for ought has been prov'd, there be a necessity to admit any Elements, or Hypostatical Principles, at all."
+          ]
+        },
+        {
+          "sentences": [
+            "And, as formerly, so now, to avoid the needless trouble of Disputing severally with the _Aristotelians_ and the Chymists, I will address my self to oppose them I have last nam'd, Because their Doctrine about the Elements is more applauded by the Moderns, as pretending highly to be grounded upon Experience.",
+            "And, to deal not only fairly but favourably with them, I will allow them to take in Earth and Water to their other Principles.",
+            "Which I consent to, the rather that my Discourse may the better reach the Tenents of the Peripateticks; who cannot plead for any so probably as for those two Elements; that of fire above the Air being Generally by Judicious Men exploded as an Imaginary thing; And the Air not concurring to compose Mixt Bodies as one of their Elements, but only lodging in their pores, or Rather replenishing, by reason of its Weight and Fluidity, all those Cavities of bodies here below, whether compounded or not, that are big enough to admit it, and are not fill'd up with any grosser substance."
+          ]
+        },
         {
           "sentences": [
             "And, to prevent mistakes, I must advertize You, that I now mean by Elements, as those Chymists that speak plainest do by their Principles, certain Primitive and Simple, or perfectly unmingled bodies; which not being made of any other bodies, or of one another, are the Ingredients of which all those call'd perfectly mixt Bodies are immediately compounded, and into which they are ultimately resolved: now whether there be any one such body to be constantly met with in all, and each, of those that are said to be Elemented bodies, is the thing I now question."
@@ -1711,6 +2508,7 @@
             "Also concerning Lead, not to mention what even _Galen_ notes, that it will increase both in bulk and Weight if it be long kept in Vaults or Sellars, where the Air is gross and thick, as he collects from the smelling of those pieces of Lead that were imploy'd to fasten together the parts of old Statues.",
             "Not to mention this, I say, _Boccacius Certaldus_, as I find him Quoted by a Diligent Writer, has this Passage touching the Growth of Lead. _Fessularum mons_ (sayes he) _in Hetruria, Florentiæ civitati imminens, lapides plumbarios habet; qui si excidantur, brevi temporis spatio, novis incrementis instaurantur; ut_ (annexes my Author) _tradit Boccacius Certaldus, qui id compotissimum Errata: compertissimum esse scribit.",
             "Nihil hoc novi est; sed de eadem Plinius, lib. 34.",
+            "Hist.",
             "Natur. cap. 17. dudum prodidit, Inquiens, mirum in his solis plumbi metallis, quod derelicta fertilius reviviscunt.",
             "In plumbariis secundo Lapide ab Amberga dictis ad Asylum recrementa congesta in cumulos, exposita solibus pluviisque paucis annis, redunt suum metallum cum fenore._ I might Add to these, continues _Carneades_, many things that I have met with concerning the Generation of Gold and Silver.",
             "But, for fear of wanting time, I shall mention but two or three Narratives.",
@@ -2028,18 +2826,9 @@
         },
         {
           "sentences": [
-            "After all is said (sayes _Eleutherius_) I have yet something to Object, that I cannot but think considerable, since _Carneades_ Himself alledg'd it as such; for, (continues _Eleutherius_ smiling) I must make bold to try whether you can as luckily answer your own Arguments, as those of your Antagonists, I mean (pursues he) that part of your Concessions, wherein you cannot but remember that you supply'd your Adversaries with an Example to prove that there may be Elementary Bodies, by taking Notice that Gold may be an Ingredient in a multitude of differing Mixtures, and yet retain its Nature, notwithstanding all that the Chymists by their Fires and Corrosive Waters are able to do"
+            "After all is said (sayes _Eleutherius_) I have yet something to Object, that I cannot but think considerable, since _Carneades_ Himself alledg'd it as such; for, (continues _Eleutherius_ smiling) I must make bold to try whether you can as luckily answer your own Arguments, as those of your Antagonists, I mean (pursues he) that part of your Concessions, wherein you cannot but remember that you supply'd your Adversaries with an Example to prove that there may be Elementary Bodies, by taking Notice that Gold may be an Ingredient in a multitude of differing Mixtures, and yet retain its Nature, notwithstanding all that the Chymists by their Fires and Corrosive Waters are able to do to Destroy it."
           ]
-        }
-      ],
-      "sentence_count": 176,
-      "word_count": 11168
-    },
-    {
-      "number": "9",
-      "title": "Destroy it.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "I sufficiently intimated to you at that time (replies _Carneades_) that I propos'd this Example, chiefly to shew you how Nature may be Conceived to have made Elements, not to prove that she actually has made any; And you know, that _a posse ad esse_ the Inference will not hold.",
@@ -2145,18 +2934,9 @@
         },
         {
           "sentences": [
-            "But though I be therefore inclin'd to think, that _Philoponus_, had he heard you, would scarce have been able in all points to defend the Chymical _Hypothesis_ against the arguments wherewith you have oppos'd it; yet me thinks that however your Objections seem to evince a great part of what they pretend to, yet they evince it not all; and the numerous tryals of those you call the vulgar Chymists, may be allow'd"
+            "But though I be therefore inclin'd to think, that _Philoponus_, had he heard you, would scarce have been able in all points to defend the Chymical _Hypothesis_ against the arguments wherewith you have oppos'd it; yet me thinks that however your Objections seem to evince a great part of what they pretend to, yet they evince it not all; and the numerous tryals of those you call the vulgar Chymists, may be allow'd to prove something too."
           ]
-        }
-      ],
-      "sentence_count": 56,
-      "word_count": 4556
-    },
-    {
-      "number": "10",
-      "title": "prove something too.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Wherefore, if it be granted you that you have made it probable,"
@@ -2184,18 +2964,9 @@
         },
         {
           "sentences": [
-            "First, that divers Mineral Bodies, and therefore probably all the rest, may be resolv'd into a Saline, a Sulphureous, and a Mercurial part; And that almost all Vegetable and Animal Concretes may, if not by the Fire alone, yet, by a skilfull Artist Employing the Fire as his chief Instrument, be divided into five differing Substances, Salt, Spirit, Oyle, Phlegme and Earth; of which the three former by reason of their being so much more Operative than the Two Later, deserve to be Lookt upon as the Three active Principles, and by way of Eminence"
+            "First, that divers Mineral Bodies, and therefore probably all the rest, may be resolv'd into a Saline, a Sulphureous, and a Mercurial part; And that almost all Vegetable and Animal Concretes may, if not by the Fire alone, yet, by a skilfull Artist Employing the Fire as his chief Instrument, be divided into five differing Substances, Salt, Spirit, Oyle, Phlegme and Earth; of which the three former by reason of their being so much more Operative than the Two Later, deserve to be Lookt upon as the Three active Principles, and by way of Eminence to be call'd the three principles of mixt bodies."
           ]
-        }
-      ],
-      "sentence_count": 6,
-      "word_count": 358
-    },
-    {
-      "number": "11",
-      "title": "be call'd the three principles of mixt bodies.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Next, that these Principles, Though they be not perfectly Devoid of all Mixture, yet may without inconvenience be stil'd the Elements of Compounded bodies, and bear the Names of those Substances which they most Resemble, and which are manifestly predominant in them; and that especially for this reason, that none of these Elements is Divisible by the Fire into Four or Five differing substances, like the Concrete whence it was separated."
@@ -2271,21 +3042,7 @@
             "Transcriber's Note: 21. _fugitive_, 231. 17. instead of _all_ lege _a pound_, 237. 6. _Chymist_, 248. 18. _Ashes off_, 251. 23. _Deopilative)_, 259. 6. _it self_, 269. 10.",
             "Greek: ousia analogos, _ibid._ Greek: astrôn stoicheiô, 276. 25. make a parenth. at the words, _by the_, and shut it after the words in the 27. line _at all_, 280. 11. _Corals_, 288. 6. _ascribes_, 294. 22. _porosity_, ibid. 28. _noted_, 296. 1. _Bodies_, 305. 8. _(attended_, 307. 12. dele _to_, 308. 12. _devisers_, 312. 14. _and_, 313. 3. _too_, 314. 24. _fugitivenesse_, 333. 13. _origine_, ibid. 24. _contrivance of_, 339. 1. _Nay, Barthias_, 142.",
             "Transcriber's Note: 342. 3. _in; I will_, 350. 26. _absurd_, 356. 11.",
-            "Transcriber's Note: 21. _Goutieres_, 358. 6. _antea_, 360. 1. _compertissimum_, ibid. 18. _Joachimica_, ibid. _graminis_, ibid. 23. _sua_ Transcriber's Note: this appears"
-          ]
-        }
-      ],
-      "sentence_count": 30,
-      "word_count": 1799
-    },
-    {
-      "number": "12",
-      "title": "be correct on the original page 360], 362. 6. _Dutch account_, 363.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
-            "2. _diggers)_, ibid. 11. and 12. lin. read _damp as the Englishmen also call it_, 366. 25. _a height_, 368. 19. _in use_, 370. 9. _latter; And_, ibid. 24. _Water; I_, 377. 22. _Rest_, ibid. 25. _know)_, 378. 23. after _Aggregate_ insert _or complex_, ibid. 27. dele ), ibid. 28. dele ), 379. 4. before _as_ begin a parenth. which ends lin. 9. at _Gold_, ibid. instead of _Which_, put _This_, ibid. 12. with the word _Texture_ should be connected the next line, _Though_, and this word _Though_ is to have put before it a parenthesis, which is to end at the word _Fluid_ in the 16th. line, 383. 3. _Regulus Martis Stellatus_, 382. 3. _Relations_, ibid. 9. _Chymist_, 386. 29. _confesse by teaching it_, 391. 8. _and yet may_, 392. 1. _an_, ibid. 12. _of_, 393.",
+            "Transcriber's Note: 21. _Goutieres_, 358. 6. _antea_, 360. 1. _compertissimum_, ibid. 18. _Joachimica_, ibid. _graminis_, ibid. 23. _sua_ Transcriber's Note: this appears to be correct on the original , 362. 6. _Dutch account_, 363. 2. _diggers)_, ibid. 11. and 12. lin. read _damp as the Englishmen also call it_, 366. 25. _a height_, 368. 19. _in use_, 370. 9. _latter; And_, ibid. 24. _Water; I_, 377. 22. _Rest_, ibid. 25. _know)_, 378. 23. after _Aggregate_ insert _or complex_, ibid. 27. dele ), ibid. 28. dele ), 379. 4. before _as_ begin a parenth. which ends lin. 9. at _Gold_, ibid. instead of _Which_, put _This_, ibid. 12. with the word _Texture_ should be connected the next line, _Though_, and this word _Though_ is to have put before it a parenthesis, which is to end at the word _Fluid_ in the 16th. line, 383. 3. _Regulus Martis Stellatus_, 382. 3. _Relations_, ibid. 9. _Chymist_, 386. 29. _confesse by teaching it_, 391. 8. _and yet may_, 392. 1. _an_, ibid. 12. _of_, 393.",
             "Transcriber's Note: line 5 _distinct Tasts_, 397. 13. _Talck_, 398. 18. _Earth_, 399. 18. _parts_, 404. 8. _sal-petræ_, 419. 20. after _it_ put in _Sal_."
           ]
         },
@@ -2297,6 +3054,11 @@
         {
           "sentences": [
             "_The Publisher doth advertise the Redaer Transcriber's Note: Reader, that seeing there are divers Experiments related in this Treatise, which the Author is not unwilling to submit to the consideration also of Forraign Philosophers, he believes this piece will be very soon translated into Latin._"
+          ]
+        },
+        {
+          "sentences": [
+            "END."
           ]
         },
         {
@@ -2348,6 +3110,7 @@
         },
         {
           "sentences": [
+            "1.A.",
             "By reading or using any part of this Project Gutenberg™ electronic work, you indicate that you have read, understand, agree to and accept all the terms of this license and intellectual property (trademark/copyright) agreement.",
             "If you do not agree to abide by all the terms of this agreement, you must cease using and return or destroy all copies of Project Gutenberg™ electronic works in your possession.",
             "If you paid a fee for obtaining a copy of or access to a Project Gutenberg™ electronic work and you do not agree to be bound by the terms of this agreement, you may obtain a refund from the person or entity to whom you paid the fee as set forth in paragraph 1.E.8."
@@ -2365,6 +3128,7 @@
         },
         {
           "sentences": [
+            "1.C.",
             "The Project Gutenberg Literary Archive Foundation (“the Foundation” or PGLAF), owns a compilation copyright in the collection of Project Gutenberg™ electronic works.",
             "Nearly all the individual works in the collection are in the public domain in the United States.",
             "If an individual work is unprotected by copyright law in the United States and you are located in the United States, we do not claim a right to prevent you from copying, distributing, performing, displaying or creating derivative works based on the work as long as all references to Project Gutenberg are removed.",
@@ -2374,6 +3138,7 @@
         },
         {
           "sentences": [
+            "1.D.",
             "The copyright laws of the place where you are located also govern what you can do with this work.",
             "Copyright laws in most countries are in a constant state of change.",
             "If you are outside the United States, check the laws of your country in addition to the terms of this agreement before downloading, copying, displaying, performing, distributing or creating derivative works based on this work or any other Project Gutenberg™ work.",
@@ -2382,6 +3147,7 @@
         },
         {
           "sentences": [
+            "1.E.",
             "Unless you have removed all references to Project Gutenberg:"
           ]
         },
@@ -2473,6 +3239,11 @@
             "1.E.9.",
             "If you wish to charge a fee or distribute a Project Gutenberg™ electronic work or group of works on different terms than are set forth in this agreement, you must obtain permission in writing from the Project Gutenberg Literary Archive Foundation, the manager of the Project Gutenberg™ trademark.",
             "Contact the Foundation as set forth in Section below."
+          ]
+        },
+        {
+          "sentences": [
+            "1.F."
           ]
         },
         {
@@ -2626,18 +3397,18 @@
           ]
         }
       ],
-      "sentence_count": 130,
-      "word_count": 3119
+      "sentence_count": 1551,
+      "word_count": 91780
     }
   ],
   "statistics": {
-    "total_chapters": 12,
-    "total_paragraphs": 332,
-    "total_sentences": 1185,
-    "total_words": 72943,
-    "average_sentences_per_chapter": 98.75,
-    "average_paragraphs_per_chapter": 27.666666666666668,
-    "average_sentences_per_paragraph": 3.569277108433735,
-    "average_words_per_sentence": 61.55527426160337
+    "total_chapters": 1,
+    "total_paragraphs": 458,
+    "total_sentences": 1551,
+    "total_words": 91780,
+    "average_sentences_per_chapter": 1551.0,
+    "average_paragraphs_per_chapter": 458.0,
+    "average_sentences_per_paragraph": 3.38646288209607,
+    "average_words_per_sentence": 59.17472598323662
   }
 }

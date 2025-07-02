@@ -256,12 +256,13 @@
         },
         {
           "sentences": [
-            "***START**THE SMALL PRINT!**FOR PUBLIC DOMAIN ETEXTS**START*** Why is this \"Small Print!\" statement here?",
+            "***START**THE SMALL PRINT!**FOR PUBLIC DOMAIN ETEXTS**START*** Why is this \"Small Print!\"",
+            "statement here?",
             "You know: lawyers."
           ]
         }
       ],
-      "sentence_count": 5,
+      "sentence_count": 6,
       "word_count": 67
     },
     {
@@ -272,7 +273,8 @@
         {
           "sentences": [
             "fault.",
-            "So, among other things, this \"Small Print!\" statement disclaims most of our liability to you.",
+            "So, among other things, this \"Small Print!\"",
+            "statement disclaims most of our liability to you.",
             "It also tells you how you can distribute copies of this etext if you want to."
           ]
         },
@@ -282,7 +284,7 @@
           ]
         }
       ],
-      "sentence_count": 4,
+      "sentence_count": 5,
       "word_count": 39
     },
     {
@@ -316,7 +318,8 @@
         },
         {
           "sentences": [
-            "2 Honor the etext refund and replacement provisions of this  \"Small Print!\" statement."
+            "2 Honor the etext refund and replacement provisions of this  \"Small Print!\"",
+            "statement."
           ]
         },
         {
@@ -325,7 +328,7 @@
           ]
         }
       ],
-      "sentence_count": 3,
+      "sentence_count": 4,
       "word_count": 31
     },
     {
@@ -457,11 +460,11 @@
   "statistics": {
     "total_chapters": 18,
     "total_paragraphs": 54,
-    "total_sentences": 67,
+    "total_sentences": 70,
     "total_words": 684,
-    "average_sentences_per_chapter": 3.7222222222222223,
+    "average_sentences_per_chapter": 3.888888888888889,
     "average_paragraphs_per_chapter": 3.0,
-    "average_sentences_per_paragraph": 1.2407407407407407,
-    "average_words_per_sentence": 10.208955223880597
+    "average_sentences_per_paragraph": 1.2962962962962963,
+    "average_words_per_sentence": 9.771428571428572
   }
 }

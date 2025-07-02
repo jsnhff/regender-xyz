@@ -55,6 +55,7 @@
         {
           "sentences": [
             "“Yes, yes,” Mazarin continued, whilst his wonted smile, full of subtlety, lent a strange expression to his pale lips; “yes, these noises prove to me, indeed, that the destiny of favorites is precarious; but ye shall know I am no ordinary favorite.",
+            "No!",
             "The Earl of Essex, ’tis true, wore a splendid ring, set with diamonds, given him by his royal mistress, whilst I—I have nothing but a simple circlet of gold, with a cipher on it and a date; but that ring has been blessed in the chapel of the Palais Royal,* so they will never ruin me, as they long to do, and whilst they shout, ‘Down with Mazarin!’ I, unknown, and unperceived by them, incite them to cry out, ‘Long live the Duke de Beaufort’ one day; another, ‘Long live the Prince de Condé;’ and again, ‘Long live the parliament!’” And at this word the smile on the cardinal’s lips assumed an expression of hatred, of which his mild countenance seemed incapable. “The parliament!",
             "We shall soon see how to dispose,” he continued, “of the parliament!",
             "Both Orléans and Montargis are ours.",
@@ -470,8 +471,8 @@
           ]
         }
       ],
-      "sentence_count": 132,
-      "word_count": 3529
+      "sentence_count": 133,
+      "word_count": 3530
     },
     {
       "number": "II",
@@ -1606,6 +1607,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "Oh no!",
             "There is a congestion of prisoners in the Bastile, who were cooped up in the time of Monsieur de Richelieu; I don’t even know their names.”"
           ]
@@ -1730,6 +1732,7 @@
         {
           "sentences": [
             "“Ah! _mon Dieu!_ my dear Monsieur de Rochefort! do you absolutely think that the Palais Royal is the abode of gayety?",
+            "No.",
             "We have had great annoyances there.",
             "As for me, I play my game squarely, fairly, and above board, as I always do.",
             "Let us come to some conclusion.",
@@ -2150,8 +2153,8 @@
           ]
         }
       ],
-      "sentence_count": 308,
-      "word_count": 4828
+      "sentence_count": 310,
+      "word_count": 4830
     },
     {
       "number": "IV",
@@ -3346,6 +3349,7 @@
           "sentences": [
             "“Crown pieces only—silver pieces!",
             "I suspected it.",
+            "Ah!",
             "Mazarin!",
             "Mazarin! thou hast no confidence in me! so much the worse for thee, for harm may come of it!”"
           ]
@@ -3376,8 +3380,8 @@
           ]
         }
       ],
-      "sentence_count": 117,
-      "word_count": 1668
+      "sentence_count": 118,
+      "word_count": 1669
     },
     {
       "number": "VI",
@@ -3624,6 +3628,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "By no means!” said D’Artagnan."
           ]
         },
@@ -3711,18 +3716,9 @@
         },
         {
           "sentences": [
-            "The boy, the hostess, and all the house had the same regard for D’Artagnan that one would have for Hercules should he return to earth"
+            "The boy, the hostess, and all the house had the same regard for D’Artagnan that one would have for Hercules should he return to earth to repeat his twelve labors."
           ]
-        }
-      ],
-      "sentence_count": 102,
-      "word_count": 1881
-    },
-    {
-      "number": "7",
-      "title": "repeat his twelve labors.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But when he was alone with the hostess he said: “Now, pretty Madeleine, you know the difference between a Swiss and a gentleman.",
@@ -3887,18 +3883,9 @@
         {
           "sentences": [
             "“Monsieur D’Artagnan: You know that I have had a quarrel with a certain gentleman, who has given me an appointment for this evening in the Place Royale.",
-            "As I am of the church, and the affair might injure me if I should share it with any other than a sure friend like you, I write"
+            "As I am of the church, and the affair might injure me if I should share it with any other than a sure friend like you, I write to beg that you will serve me as second."
           ]
-        }
-      ],
-      "sentence_count": 75,
-      "word_count": 1420
-    },
-    {
-      "number": "8",
-      "title": "beg that you will serve me as second.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“You will enter by the Rue Neuve Sainte Catherine; under the second lamp on the right you will find your adversary.",
@@ -4239,8 +4226,8 @@
           ]
         }
       ],
-      "sentence_count": 95,
-      "word_count": 1266
+      "sentence_count": 273,
+      "word_count": 4582
     },
     {
       "number": "VII",
@@ -5054,18 +5041,9 @@
         },
         {
           "sentences": [
-            "They had traveled onward about half a mile when Planchet came close up"
+            "They had traveled onward about half a mile when Planchet came close up to D’Artagnan."
           ]
-        }
-      ],
-      "sentence_count": 64,
-      "word_count": 1175
-    },
-    {
-      "number": "11",
-      "title": "D’Artagnan.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Stop, sir, look yonder,” he whispered; “don’t you see in the darkness something pass by, like shadows?",
@@ -5374,8 +5352,8 @@
           ]
         }
       ],
-      "sentence_count": 75,
-      "word_count": 1253
+      "sentence_count": 139,
+      "word_count": 2430
     },
     {
       "number": "IX",
@@ -6012,6 +5990,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "I am as poor as Job, and were you to search my pockets and my boxes I don’t believe you would find a hundred pistoles.”"
           ]
         },
@@ -6719,8 +6698,8 @@
           ]
         }
       ],
-      "sentence_count": 372,
-      "word_count": 5815
+      "sentence_count": 373,
+      "word_count": 5816
     },
     {
       "number": "X",
@@ -6736,18 +6715,9 @@
           "sentences": [
             "Thanks to what Aramis had told him, D’Artagnan, who knew already that Porthos called himself Du Vallon, was now aware that he styled himself, from his estate, De Bracieux; and that he was, on account of this estate, engaged in a lawsuit with the Bishop of Noyon.",
             "It was, then, in the neighborhood of Noyon that he must seek that estate.",
-            "His itinerary was promptly determined: he would go to Dammartin, from which place two roads diverge, one toward Soissons, the other toward Compiègne; there he would inquire concerning the Bracieux estate and go to the right or"
+            "His itinerary was promptly determined: he would go to Dammartin, from which place two roads diverge, one toward Soissons, the other toward Compiègne; there he would inquire concerning the Bracieux estate and go to the right or to the left according to the information obtained."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 106
-    },
-    {
-      "number": "14",
-      "title": "the left according to the information obtained.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Planchet, who was still a little concerned for his safety after his recent escapade, declared that he would follow D’Artagnan even to the end of the world, either by the road to the right or by that to the left; only he begged his former master to set out in the evening, for greater security to himself.",
@@ -7006,8 +6976,8 @@
           ]
         }
       ],
-      "sentence_count": 73,
-      "word_count": 1877
+      "sentence_count": 77,
+      "word_count": 1991
     },
     {
       "number": "XI",
@@ -7276,6 +7246,7 @@
         {
           "sentences": [
             "“Yes, but understand me; not being of a race of historic fame, like the De Courcys, who were content to be plain sirs, or the Rohans, who didn’t wish to be dukes, all these people, who are all either vicomtes or comtes go before me at church in all the ceremonies, and I can say nothing to them.",
+            "Ah!",
             "If I only were a——”"
           ]
         },
@@ -7763,8 +7734,8 @@
           ]
         }
       ],
-      "sentence_count": 196,
-      "word_count": 2621
+      "sentence_count": 197,
+      "word_count": 2622
     },
     {
       "number": "XII",
@@ -7857,18 +7828,9 @@
         },
         {
           "sentences": [
-            "D’Artagnan smiled; Porthos wanted to lengthen out his names, Mousqueton"
+            "D’Artagnan smiled; Porthos wanted to lengthen out his names, Mousqueton to cut his short."
           ]
-        }
-      ],
-      "sentence_count": 21,
-      "word_count": 318
-    },
-    {
-      "number": "17",
-      "title": "cut his short.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Well, my dear Mouston,” he said, “rest satisfied.",
@@ -8214,8 +8176,8 @@
           ]
         }
       ],
-      "sentence_count": 84,
-      "word_count": 1397
+      "sentence_count": 105,
+      "word_count": 1719
     },
     {
       "number": "XIII",
@@ -9766,7 +9728,8 @@
         },
         {
           "sentences": [
-            "“Return immediately to Paris.—J."
+            "“Return immediately to Paris.—J.",
+            "M——.”"
           ]
         },
         {
@@ -9781,6 +9744,7 @@
         },
         {
           "sentences": [
+            "“P.",
             "S.—Go to the king’s treasurer, at Blois; tell him your name and show him this letter; you will receive two hundred pistoles.”"
           ]
         },
@@ -9807,8 +9771,8 @@
           ]
         }
       ],
-      "sentence_count": 195,
-      "word_count": 3016
+      "sentence_count": 197,
+      "word_count": 3018
     },
     {
       "number": "XVI",
@@ -12291,18 +12255,9 @@
         {
           "sentences": [
             "Athos followed the footman, who led him through a long succession of apartments and paused at length before a closed door.",
-            "Athos made a sign"
+            "Athos made a sign to the Vicomte de Bragelonne to remain where he was."
           ]
-        }
-      ],
-      "sentence_count": 33,
-      "word_count": 601
-    },
-    {
-      "number": "26",
-      "title": "the Vicomte de Bragelonne to remain where he was.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The footman opened the door and announced Monsieur le Comte de la Fère."
@@ -13002,8 +12957,8 @@
           ]
         }
       ],
-      "sentence_count": 194,
-      "word_count": 3329
+      "sentence_count": 227,
+      "word_count": 3940
     },
     {
       "number": "XXI",
@@ -13069,18 +13024,9 @@
         {
           "sentences": [
             "From that lucky moment Scarron led a happy life, spending both income and principal.",
-            "One day, however, an emissary of the cardinal’s gave him"
+            "One day, however, an emissary of the cardinal’s gave him to understand that he was wrong in receiving the coadjutor so often."
           ]
-        }
-      ],
-      "sentence_count": 22,
-      "word_count": 489
-    },
-    {
-      "number": "28",
-      "title": "understand that he was wrong in receiving the coadjutor so often.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“And why?” asked Scarron; “is he not a man of good birth?”"
@@ -13562,6 +13508,7 @@
         {
           "sentences": [
             "“Excuse me, sir,” returned Raoul, blushing still more deeply, “I know no more than I did before.",
+            "Alas!",
             "I am from the country.”"
           ]
         },
@@ -13801,8 +13748,8 @@
           ]
         }
       ],
-      "sentence_count": 187,
-      "word_count": 3041
+      "sentence_count": 210,
+      "word_count": 3543
     },
     {
       "number": "XXII",
@@ -13985,18 +13932,9 @@
         {
           "sentences": [
             "Athos mounted more slowly, after speaking in a low voice to the lackey, who, instead of following them immediately, returned to their rooms.",
-            "Raoul, delighted at the count’s companionship, perceived, or affected"
+            "Raoul, delighted at the count’s companionship, perceived, or affected to perceive nothing of this byplay."
           ]
-        }
-      ],
-      "sentence_count": 47,
-      "word_count": 846
-    },
-    {
-      "number": "30",
-      "title": "perceive nothing of this byplay.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "They set out, passing over the Pont Neuf; they pursued their way along the quay then called L’Abreuvoir Pepin, and went along by the walls of the Grand Châtelet.",
@@ -14285,8 +14223,8 @@
           ]
         }
       ],
-      "sentence_count": 91,
-      "word_count": 1625
+      "sentence_count": 138,
+      "word_count": 2477
     },
     {
       "number": "XXIII",
@@ -15342,18 +15280,9 @@
         {
           "sentences": [
             "On reaching the palace, D’Artagnan sent to his eminence the letter in which he had been ordered to return without delay.",
-            "He was soon ordered"
+            "He was soon ordered to the presence of the cardinal."
           ]
-        }
-      ],
-      "sentence_count": 69,
-      "word_count": 976
-    },
-    {
-      "number": "33",
-      "title": "the presence of the cardinal.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Courage!” he whispered to Porthos, as they proceeded. “Do not be intimidated.",
@@ -15790,8 +15719,8 @@
           ]
         }
       ],
-      "sentence_count": 107,
-      "word_count": 1406
+      "sentence_count": 176,
+      "word_count": 2388
     },
     {
       "number": "XXV",
@@ -18301,18 +18230,9 @@
         {
           "sentences": [
             "Aramis started back and drew his.",
-            "D’Artagnan bent forward, ready either"
+            "D’Artagnan bent forward, ready either to attack or to stand on his defense."
           ]
-        }
-      ],
-      "sentence_count": 47,
-      "word_count": 849
-    },
-    {
-      "number": "38",
-      "title": "attack or to stand on his defense.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Athos at that moment extended his hand with the air of supreme command which characterized him alone, drew out his sword and the scabbard at the same time, broke the blade in the sheath on his knee and threw the pieces to his right.",
@@ -18483,8 +18403,8 @@
           ]
         }
       ],
-      "sentence_count": 49,
-      "word_count": 1021
+      "sentence_count": 96,
+      "word_count": 1878
     },
     {
       "number": "XXIX",
@@ -18530,20 +18450,7 @@
         },
         {
           "sentences": [
-            "As for himself, he dismounted and remained under a beautiful group of chestnuts in flower, amidst which were murmuring a multitude of happy bees, and bade Olivain send the host to him with writing paper and ink,"
-          ]
-        }
-      ],
-      "sentence_count": 10,
-      "word_count": 490
-    },
-    {
-      "number": "40",
-      "title": "be placed on a table which he found there, conveniently ready.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "As for himself, he dismounted and remained under a beautiful group of chestnuts in flower, amidst which were murmuring a multitude of happy bees, and bade Olivain send the host to him with writing paper and ink, to be placed on a table which he found there, conveniently ready.",
             "Olivain obeyed and continued on his way, whilst Raoul remained sitting, with his elbow leaning on the table, from time to time gently shaking the flowers from his head, which fell upon him like snow, and gazing vaguely on the charming landscape spread out before him, dotted over with green fields and groups of trees.",
             "Raoul had been there about ten minutes, during five of which he was lost in reverie, when there appeared within the circle comprised in his rolling gaze a man with a rubicund face, who, with a napkin around his body, another under his arm, and a white cap upon his head, approached him, holding paper, pen and ink in hand."
           ]
@@ -18906,8 +18813,8 @@
           ]
         }
       ],
-      "sentence_count": 115,
-      "word_count": 2893
+      "sentence_count": 125,
+      "word_count": 3395
     },
     {
       "number": "XXX",
@@ -18980,18 +18887,9 @@
         },
         {
           "sentences": [
-            "But as there was nothing positively certain in this report, the young warriors decided to continue their way toward Bethune, free on the road"
+            "But as there was nothing positively certain in this report, the young warriors decided to continue their way toward Bethune, free on the road to diverge to the right and march to Carvin if necessary."
           ]
-        }
-      ],
-      "sentence_count": 33,
-      "word_count": 733
-    },
-    {
-      "number": "42",
-      "title": "diverge to the right and march to Carvin if necessary.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The count’s tutor was well acquainted with the country; he consequently proposed to take a crossroad, which lay between that of Lens and that of Bethune.",
@@ -19212,8 +19110,8 @@
           ]
         }
       ],
-      "sentence_count": 75,
-      "word_count": 1421
+      "sentence_count": 108,
+      "word_count": 2165
     },
     {
       "number": "XXXI",
@@ -20722,18 +20620,9 @@
           "sentences": [
             "Grimaud was reluctant to leave the man alone and yet he perceived the necessity of starting at once to bear these tidings to the Comte de la Fère.",
             "Whilst he thus hesitated the host re-entered the room, followed not only by a surgeon, but by many other persons, whom curiosity had attracted to the spot.",
-            "The surgeon approached the dying man, who seemed"
+            "The surgeon approached the dying man, who seemed to have fainted."
           ]
-        }
-      ],
-      "sentence_count": 56,
-      "word_count": 690
-    },
-    {
-      "number": "46",
-      "title": "have fainted.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“We must first extract the steel from the side,” said he, shaking his head in a significant manner."
@@ -20948,8 +20837,8 @@
           ]
         }
       ],
-      "sentence_count": 57,
-      "word_count": 1015
+      "sentence_count": 113,
+      "word_count": 1708
     },
     {
       "number": "XXXIV",
@@ -20995,18 +20884,9 @@
         {
           "sentences": [
             "Now an enemy is never so near and consequently so threatening, as when he has completely disappeared.",
-            "The prince was, therefore, contrary to his custom, gloomy and anxious, when an officer entered and announced"
+            "The prince was, therefore, contrary to his custom, gloomy and anxious, when an officer entered and announced to Marshal de Grammont that some one wished to see him."
           ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 342
-    },
-    {
-      "number": "48",
-      "title": "Marshal de Grammont that some one wished to see him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The Duc de Grammont received permission from the prince by a glance and went out.",
@@ -21703,8 +21583,8 @@
           ]
         }
       ],
-      "sentence_count": 203,
-      "word_count": 3315
+      "sentence_count": 221,
+      "word_count": 3668
     },
     {
       "number": "XXXV",
@@ -22529,6 +22409,7 @@
         {
           "sentences": [
             "“By a tailor, a coachmaker, a brewer!",
+            "Ah!",
             "I hope, madame, that the cardinal will not enter into negotiations with such men!”"
           ]
         },
@@ -22579,8 +22460,8 @@
           ]
         }
       ],
-      "sentence_count": 103,
-      "word_count": 1717
+      "sentence_count": 104,
+      "word_count": 1718
     },
     {
       "number": "XXXVII",
@@ -24352,6 +24233,7 @@
         {
           "sentences": [
             "“Well, then, you wish to know if I am of Mazarin’s party?",
+            "No.",
             "Pardon my frankness, too, my lord.”"
           ]
         },
@@ -24706,8 +24588,8 @@
           ]
         }
       ],
-      "sentence_count": 175,
-      "word_count": 2721
+      "sentence_count": 176,
+      "word_count": 2722
     },
     {
       "number": "XLII",
@@ -24867,18 +24749,9 @@
         },
         {
           "sentences": [
-            "The queen appeared to be impatiently expecting them, for at the first slight noise she heard in the hall leading to her room she came herself"
+            "The queen appeared to be impatiently expecting them, for at the first slight noise she heard in the hall leading to her room she came herself to the door to receive these courtiers in the corridors of Misfortune."
           ]
-        }
-      ],
-      "sentence_count": 36,
-      "word_count": 776
-    },
-    {
-      "number": "57",
-      "title": "the door to receive these courtiers in the corridors of Misfortune.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Enter.",
@@ -25489,8 +25362,8 @@
           ]
         }
       ],
-      "sentence_count": 177,
-      "word_count": 3107
+      "sentence_count": 213,
+      "word_count": 3895
     },
     {
       "number": "XLIII",
@@ -26375,18 +26248,9 @@
         },
         {
           "sentences": [
-            "Many curious faces had already appeared at the windows and the people attracted to the end of the street began to run, first men, then groups, and then a crowd of people; hearing cries and seeing a chariot they could not understand it; but Friquet sprang from the _entresol_ on"
+            "Many curious faces had already appeared at the windows and the people attracted to the end of the street began to run, first men, then groups, and then a crowd of people; hearing cries and seeing a chariot they could not understand it; but Friquet sprang from the _entresol_ on to the top of the carriage."
           ]
-        }
-      ],
-      "sentence_count": 98,
-      "word_count": 2479
-    },
-    {
-      "number": "60",
-      "title": "the top of the carriage.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“They want to arrest Master Broussel!” he cried; “the guards are in the carriage and the officer is upstairs!”"
@@ -26992,8 +26856,8 @@
           ]
         }
       ],
-      "sentence_count": 172,
-      "word_count": 2947
+      "sentence_count": 270,
+      "word_count": 5432
     },
     {
       "number": "XLV",
@@ -28741,18 +28605,9 @@
         {
           "sentences": [
             "Mazarin wiped his forehead and looked around him.",
-            "He had a great desire"
+            "He had a great desire to go to the window, but he dared not."
           ]
-        }
-      ],
-      "sentence_count": 109,
-      "word_count": 2205
-    },
-    {
-      "number": "64",
-      "title": "go to the window, but he dared not.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“See what is going on, Monsieur D’Artagnan,” said he."
@@ -28856,8 +28711,8 @@
           ]
         }
       ],
-      "sentence_count": 26,
-      "word_count": 358
+      "sentence_count": 135,
+      "word_count": 2572
     },
     {
       "number": "XLVIII",
@@ -29672,18 +29527,9 @@
         {
           "sentences": [
             "At this moment a monstrous battering was heard.",
-            "One of the gates began"
+            "One of the gates began to yield."
           ]
-        }
-      ],
-      "sentence_count": 195,
-      "word_count": 3406
-    },
-    {
-      "number": "66",
-      "title": "yield.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Oh! madame,” cried Mazarin, “you have ruined us all—the king, yourself and me.”"
@@ -29821,18 +29667,9 @@
         },
         {
           "sentences": [
-            "“About a quarter of an hour,” said D’Artagnan, motioning to Porthos not"
+            "“About a quarter of an hour,” said D’Artagnan, motioning to Porthos not to contradict him."
           ]
-        }
-      ],
-      "sentence_count": 32,
-      "word_count": 520
-    },
-    {
-      "number": "67",
-      "title": "contradict him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Mazarin saw the sign and remained convinced that D’Artagnan had seen and heard everything; but he was pleased with his falsehood."
@@ -29845,8 +29682,8 @@
           ]
         }
       ],
-      "sentence_count": 3,
-      "word_count": 74
+      "sentence_count": 230,
+      "word_count": 4005
     },
     {
       "number": "XLIX",
@@ -30256,6 +30093,7 @@
         },
         {
           "sentences": [
+            "“I!",
             "I am always prepared to go, only, as you know, I never do go, and perhaps shall go this time as little as before.”"
           ]
         },
@@ -30370,8 +30208,8 @@
           ]
         }
       ],
-      "sentence_count": 144,
-      "word_count": 2091
+      "sentence_count": 145,
+      "word_count": 2092
     },
     {
       "number": "L",
@@ -30538,18 +30376,10 @@
         },
         {
           "sentences": [
-            "The silence of the oratory was at last disturbed by the slight rustling of silk, and D’Artagnan started when he perceived the tapestry raised by a white hand, which, by its form, its color and its beauty he recognized as that royal hand which had one day been presented to him"
+            "The silence of the oratory was at last disturbed by the slight rustling of silk, and D’Artagnan started when he perceived the tapestry raised by a white hand, which, by its form, its color and its beauty he recognized as that royal hand which had one day been presented to him to kiss.",
+            "The queen entered."
           ]
-        }
-      ],
-      "sentence_count": 39,
-      "word_count": 695
-    },
-    {
-      "number": "70",
-      "title": "kiss. The queen entered.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“It is you, Monsieur d’Artagnan,” she said, fixing a gaze full of melancholy interest on the countenance of the officer, “and I know you well.",
@@ -30960,8 +30790,8 @@
           ]
         }
       ],
-      "sentence_count": 105,
-      "word_count": 1403
+      "sentence_count": 145,
+      "word_count": 2103
     },
     {
       "number": "LI",
@@ -33993,18 +33823,9 @@
         },
         {
           "sentences": [
-            "Mousqueton, recognizing the voice of his master’s friend, got up suddenly, and in doing so let fall some louis which he had appropriated"
+            "Mousqueton, recognizing the voice of his master’s friend, got up suddenly, and in doing so let fall some louis which he had appropriated to himself illegally during the night."
           ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 131
-    },
-    {
-      "number": "75",
-      "title": "himself illegally during the night.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Ho! ho!” exclaimed D’Artagnan, picking up a louis and displaying it; “here’s a louis that smells confoundedly of straw.”"
@@ -34951,8 +34772,8 @@
           ]
         }
       ],
-      "sentence_count": 221,
-      "word_count": 3102
+      "sentence_count": 229,
+      "word_count": 3239
     },
     {
       "number": "LV",
@@ -34966,35 +34787,17 @@
         },
         {
           "sentences": [
-            "And now our readers must leave the _Standard_ to sail peaceably, not toward London, where D’Artagnan and Porthos believed they were going, but to Durham, whither Mordaunt had been ordered to repair by the letter he had received during his sojourn at Boulogne, and accompany us"
+            "And now our readers must leave the _Standard_ to sail peaceably, not toward London, where D’Artagnan and Porthos believed they were going, but to Durham, whither Mordaunt had been ordered to repair by the letter he had received during his sojourn at Boulogne, and accompany us to the royalist camp, on this side of the Tyne, near Newcastle."
           ]
-        }
-      ],
-      "sentence_count": 2,
-      "word_count": 48
-    },
-    {
-      "number": "77",
-      "title": "the royalist camp, on this side of the Tyne, near Newcastle.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "There, placed between two rivers on the borders of Scotland, but still on English soil, the tents of a little army extended.",
             "It was midnight.",
             "Some Highlanders were listlessly keeping watch.",
-            "The moon, which was partially obscured by heavy clouds, now and then lit up the muskets of the sentinels, or silvered the walls, the roofs, and the spires of the town that Charles I. had just surrendered to the parliamentary troops, whilst Oxford and Newark still held out for him in the hopes of coming"
+            "The moon, which was partially obscured by heavy clouds, now and then lit up the muskets of the sentinels, or silvered the walls, the roofs, and the spires of the town that Charles I. had just surrendered to the parliamentary troops, whilst Oxford and Newark still held out for him in the hopes of coming to some arrangement."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 86
-    },
-    {
-      "number": "78",
-      "title": "some arrangement.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "At one of the extremities of the camp, near an immense tent, in which the Scottish officers were holding a kind of council, presided over by Lord Leven, their commander, a man attired as a cavalier lay sleeping on the turf, his right hand extended over his sword."
@@ -35692,18 +35495,9 @@
         },
         {
           "sentences": [
-            "Then, as Lord Leven and the other chieftains recoiled before this unexpected rescue, which seemed to come from Heaven for the prince they already thought was their prisoner, Athos and Aramis dragged the king from the perjured assembly into which he had so imprudently ventured, and throwing themselves on horseback all three returned at full gallop"
+            "Then, as Lord Leven and the other chieftains recoiled before this unexpected rescue, which seemed to come from Heaven for the prince they already thought was their prisoner, Athos and Aramis dragged the king from the perjured assembly into which he had so imprudently ventured, and throwing themselves on horseback all three returned at full gallop to the royal tent."
           ]
-        }
-      ],
-      "sentence_count": 168,
-      "word_count": 2589
-    },
-    {
-      "number": "79",
-      "title": "the royal tent.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "On their road they perceived Lord Winter marching at the head of his regiment.",
@@ -35711,8 +35505,8 @@
           ]
         }
       ],
-      "sentence_count": 2,
-      "word_count": 21
+      "sentence_count": 176,
+      "word_count": 2763
     },
     {
       "number": "LVI",
@@ -37226,6 +37020,7 @@
           "sentences": [
             "“Because all gentlemen are brothers, because you are a gentleman, because the kings of all countries are the first among gentlemen, because the blind populace, ungrateful and brutal, always takes pleasure in pulling down what is above them.",
             "And you, you, D’Artagnan, a man sprung from the ancient nobility of France, bearing an honorable name, carrying a good sword, have helped to give up a king to beersellers, shopkeepers, and wagoners.",
+            "Ah!",
             "D’Artagnan! perhaps you have done your duty as a soldier, but as a gentleman, I say that you are very culpable.”"
           ]
         },
@@ -37522,18 +37317,9 @@
         },
         {
           "sentences": [
-            "“I have this instant left him,” replied Mordaunt, alighting, in order"
+            "“I have this instant left him,” replied Mordaunt, alighting, in order to give his horse to a soldier to hold."
           ]
-        }
-      ],
-      "sentence_count": 145,
-      "word_count": 2432
-    },
-    {
-      "number": "83",
-      "title": "give his horse to a soldier to hold.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Why did you not say so at once, my dear sir! all England is with Cromwell; and since you ask for my prisoners, I bend, sir, to your wishes.",
@@ -37548,18 +37334,9 @@
         },
         {
           "sentences": [
-            "Mordaunt put his foot on the first step of the door and, with his hat in hand, prepared to pass by the two friends, motioning to the four men"
+            "Mordaunt put his foot on the first step of the door and, with his hat in hand, prepared to pass by the two friends, motioning to the four men to follow him."
           ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 89
-    },
-    {
-      "number": "84",
-      "title": "follow him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“But, pardon,” said D’Artagnan, with the most charming smile and putting his hand on the young man’s shoulder, “if the illustrious General Oliver Cromwell has disposed of our prisoners in your favour, he has, of course, made that act of donation in writing.”"
@@ -37592,18 +37369,9 @@
             "“I!” cried D’Artagnan, “I doubt what you say!",
             "God keep me from it, my dear Monsieur Mordaunt!",
             "On the contrary, I take you to be a worthy and accomplished gentleman.",
-            "And then, sir, do you wish me to speak freely"
+            "And then, sir, do you wish me to speak freely to you?” continued D’Artagnan, with his frank expression."
           ]
-        }
-      ],
-      "sentence_count": 11,
-      "word_count": 194
-    },
-    {
-      "number": "85",
-      "title": "you?” continued D’Artagnan, with his frank expression.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Speak out, sir,” said Mordaunt."
@@ -37938,8 +37706,8 @@
           ]
         }
       ],
-      "sentence_count": 93,
-      "word_count": 1562
+      "sentence_count": 255,
+      "word_count": 4298
     },
     {
       "number": "LIX",
@@ -38634,18 +38402,9 @@
         {
           "sentences": [
             "The three friends drew near and discovered a young man stretched on the ground, bathed in a pool of blood.",
-            "It was evident that he had attempted"
+            "It was evident that he had attempted to regain his bed, but had not had sufficient strength to do so."
           ]
-        }
-      ],
-      "sentence_count": 16,
-      "word_count": 184
-    },
-    {
-      "number": "88",
-      "title": "regain his bed, but had not had sufficient strength to do so.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Athos, who imagined that he saw him move, was the first to go up to him."
@@ -38807,18 +38566,9 @@
         {
           "sentences": [
             "They carried the man to his bed and called Grimaud to dress the wound.",
-            "In the service of the four friends Grimaud had had so frequent occasion"
+            "In the service of the four friends Grimaud had had so frequent occasion to make lint and bandages that he had become something of a surgeon."
           ]
-        }
-      ],
-      "sentence_count": 52,
-      "word_count": 682
-    },
-    {
-      "number": "89",
-      "title": "make lint and bandages that he had become something of a surgeon.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "In the meantime the fugitives had returned to the first room, where they took counsel together."
@@ -39102,18 +38852,9 @@
         },
         {
           "sentences": [
-            "And D’Artagnan threw a second glance toward Parry, on whose face such an expression of joy was manifested that Charles stretched out his hand"
+            "And D’Artagnan threw a second glance toward Parry, on whose face such an expression of joy was manifested that Charles stretched out his hand to him, smiling."
           ]
-        }
-      ],
-      "sentence_count": 78,
-      "word_count": 1294
-    },
-    {
-      "number": "90",
-      "title": "him, smiling.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Parry bent over his master’s hand and kissed it respectfully."
@@ -39223,8 +38964,8 @@
           ]
         }
       ],
-      "sentence_count": 24,
-      "word_count": 285
+      "sentence_count": 170,
+      "word_count": 2474
     },
     {
       "number": "LXI",
@@ -41263,6 +41004,7 @@
             "I was free at Newcastle and had there concluded a treaty with both houses.",
             "Instead of performing your part of this contract, as I performed mine, you bought me from the Scotch, cheaply, I know, and that does honor to the economic talent of your government.",
             "But because you have paid the price of a slave, do you imagine that I have ceased to be your king?",
+            "No.",
             "To answer you would be to forget it.",
             "I shall only reply to you when you have satisfied me of your right to question me.",
             "To answer you would be to acknowledge you as my judges, and I only acknowledge you as my executioners.” And in the middle of a deathlike silence, Charles, calm, lofty, and with his head still covered, sat down again in his arm-chair."
@@ -41482,8 +41224,8 @@
           ]
         }
       ],
-      "sentence_count": 155,
-      "word_count": 2771
+      "sentence_count": 156,
+      "word_count": 2772
     },
     {
       "number": "LXIV",
@@ -42132,6 +41874,7 @@
         },
         {
           "sentences": [
+            "“I?",
             "No; how would you have me know?”"
           ]
         },
@@ -42468,8 +42211,8 @@
           ]
         }
       ],
-      "sentence_count": 138,
-      "word_count": 2125
+      "sentence_count": 139,
+      "word_count": 2126
     },
     {
       "number": "LXVI",
@@ -43524,18 +43267,10 @@
         },
         {
           "sentences": [
-            "Cromwell had two or three of these retreats in London, unknown except"
+            "Cromwell had two or three of these retreats in London, unknown except to the most intimate of his friends.",
+            "Mordaunt was among these."
           ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 72
-    },
-    {
-      "number": "99",
-      "title": "the most intimate of his friends. Mordaunt was among these.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“It is you, Mordaunt,” he said. “You are late.”"
@@ -44062,8 +43797,8 @@
           ]
         }
       ],
-      "sentence_count": 137,
-      "word_count": 1665
+      "sentence_count": 143,
+      "word_count": 1748
     },
     {
       "number": "LXIX",
@@ -44493,6 +44228,7 @@
         {
           "sentences": [
             "“Ah, this time you cannot lose ground, my fine friend!” exclaimed D’Artagnan. “Gentlemen, did you ever see a scorpion pinned to a wall?",
+            "No.",
             "Well, then, you shall see it now.”"
           ]
         },
@@ -44581,8 +44317,8 @@
           ]
         }
       ],
-      "sentence_count": 142,
-      "word_count": 2253
+      "sentence_count": 143,
+      "word_count": 2254
     },
     {
       "number": "LXX",
@@ -44627,6 +44363,7 @@
         {
           "sentences": [
             "“There is the port,” he murmured. “That dark point yonder is the Isle of Dogs.",
+            "Good!",
             "I am half an hour in advance of them, an hour, perhaps.",
             "Fool that I was!",
             "I have almost killed myself by my needless haste.",
@@ -45325,8 +45062,8 @@
           ]
         }
       ],
-      "sentence_count": 203,
-      "word_count": 2974
+      "sentence_count": 204,
+      "word_count": 2975
     },
     {
       "number": "LXXI",
@@ -46690,6 +46427,7 @@
         {
           "sentences": [
             "“Zounds!” replied D’Artagnan, “why don’t you give yourself up directly, feet and hands bound, to that wretch?",
+            "Ah!",
             "Comte de la Fère, you wish to perish by his hands!",
             "I, your son, as you call me—I will not let you!”"
           ]
@@ -46873,8 +46611,8 @@
           ]
         }
       ],
-      "sentence_count": 127,
-      "word_count": 2160
+      "sentence_count": 128,
+      "word_count": 2161
     },
     {
       "number": "LXIV",
@@ -48342,18 +48080,9 @@
         },
         {
           "sentences": [
-            "It was then agreed that they were to go first to Monsieur de Bouillon, as his house came first; but first of all Athos begged that he might go"
+            "It was then agreed that they were to go first to Monsieur de Bouillon, as his house came first; but first of all Athos begged that he might go to the Hôtel du Grand Charlemagne, to see Raoul."
           ]
-        }
-      ],
-      "sentence_count": 127,
-      "word_count": 2253
-    },
-    {
-      "number": "108",
-      "title": "the Hôtel du Grand Charlemagne, to see Raoul.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "They re-entered the boat which had brought them to the Louvre and thence proceeded to the Halles; and taking up Grimaud and Blaisois, they went on foot to the Rue Guénégaud."
@@ -48366,8 +48095,8 @@
           ]
         }
       ],
-      "sentence_count": 3,
-      "word_count": 62
+      "sentence_count": 130,
+      "word_count": 2324
     },
     {
       "number": "LXXVII",
@@ -49696,18 +49425,9 @@
         },
         {
           "sentences": [
-            "Athos took the letter, frowning, but an idea that he should find something in this letter about D’Artagnan conquered his unwillingness"
+            "Athos took the letter, frowning, but an idea that he should find something in this letter about D’Artagnan conquered his unwillingness to read it."
           ]
-        }
-      ],
-      "sentence_count": 120,
-      "word_count": 2221
-    },
-    {
-      "number": "111",
-      "title": "read it.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“My lord, I shall send this evening to your eminence in order to reinforce the troop of Monsieur de Comminges, the ten men you demand.",
@@ -49752,8 +49472,8 @@
           ]
         }
       ],
-      "sentence_count": 11,
-      "word_count": 296
+      "sentence_count": 131,
+      "word_count": 2520
     },
     {
       "number": "LXXIX",
@@ -50009,7 +49729,7 @@
         {
           "sentences": [
             "They went into the town and asked for two glasses of liqueur, at the counter—as their friends must have done before them.",
-            "The counter was covered with a plate of pewter; upon this plate was written with the point of a large pin: “Rueil..."
+            "The counter was covered with a plate of pewter; upon this plate was written with the point of a large pin: “Rueil... D..”"
           ]
         },
         {
@@ -50219,7 +49939,7 @@
         }
       ],
       "sentence_count": 137,
-      "word_count": 2343
+      "word_count": 2344
     },
     {
       "number": "LXXX",
@@ -50252,18 +49972,9 @@
             "Was Mazarin to remain the favorite and minister of the queen?",
             "Was he to be carried back by the wind which had blown him there?",
             "Every one hoped so, so that the minister felt that all around him, beneath the homage of the courtiers, lay a fund of hatred, ill disguised by fear and interest.",
-            "He felt ill at ease and at a loss what"
+            "He felt ill at ease and at a loss what to do."
           ]
-        }
-      ],
-      "sentence_count": 13,
-      "word_count": 232
-    },
-    {
-      "number": "114",
-      "title": "do.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Condé himself, whilst fighting for him, lost no opportunity of ridiculing, of humbling him.",
@@ -50273,18 +49984,9 @@
         {
           "sentences": [
             "When the hour appointed for the audience arrived Athos was obliged to stay until the queen, who was waited upon by a new deputation from Paris, had consulted with her minister as to the propriety and manner of receiving them.",
-            "All were fully engrossed with the affairs of the day; Athos could not therefore have chosen a more inauspicious moment"
+            "All were fully engrossed with the affairs of the day; Athos could not therefore have chosen a more inauspicious moment to speak of his friends—poor atoms, lost in that raging whirlwind."
           ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 94
-    },
-    {
-      "number": "115",
-      "title": "speak of his friends—poor atoms, lost in that raging whirlwind.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "But Athos was a man of inflexible determination; he firmly adhered to a purpose once formed, when it seemed to him to spring from conscience and to be prompted by a sense of duty.",
@@ -50574,8 +50276,8 @@
           ]
         }
       ],
-      "sentence_count": 76,
-      "word_count": 1211
+      "sentence_count": 93,
+      "word_count": 1550
     },
     {
       "number": "LXXXI",
@@ -50613,6 +50315,7 @@
           "sentences": [
             "“Gentlemen,” said Mazarin, “I join with you in supplicating the queen to put an end to the miseries of her subjects.",
             "I have done all in my power to ameliorate them and yet the belief of the public, you say, is that they proceed from me, an unhappy foreigner, who has been unable to please the French.",
+            "Alas!",
             "I have never been understood, and no wonder.",
             "I succeeded a man of the most sublime genius that ever upheld the sceptre of France.",
             "The memory of Richelieu annihilates me.",
@@ -50830,8 +50533,8 @@
           ]
         }
       ],
-      "sentence_count": 83,
-      "word_count": 1518
+      "sentence_count": 84,
+      "word_count": 1519
     },
     {
       "number": "LXXXII",
@@ -52216,6 +51919,7 @@
         {
           "sentences": [
             "“If only they close the guardhouse door!",
+            "Good!",
             "They close it.”"
           ]
         },
@@ -52459,6 +52163,7 @@
           "sentences": [
             "“I take them,” said D’Artagnan, “for myself.",
             "If you want another uniform and sword you must play the same trick over again.",
+            "Stop!",
             "I see the other soldier issue from the guardroom and come toward us.”"
           ]
         },
@@ -52827,8 +52532,8 @@
           ]
         }
       ],
-      "sentence_count": 219,
-      "word_count": 2676
+      "sentence_count": 221,
+      "word_count": 2678
     },
     {
       "number": "LXXXV",
@@ -54159,18 +53864,9 @@
         },
         {
           "sentences": [
-            "Mazarin made a grimace which was quite indescribable, and then turned"
+            "Mazarin made a grimace which was quite indescribable, and then turned to D’Artagnan."
           ]
-        }
-      ],
-      "sentence_count": 121,
-      "word_count": 1846
-    },
-    {
-      "number": "123",
-      "title": "D’Artagnan.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“And you, sir?” he said."
@@ -54401,8 +54097,8 @@
           ]
         }
       ],
-      "sentence_count": 53,
-      "word_count": 822
+      "sentence_count": 174,
+      "word_count": 2670
     },
     {
       "number": "LXXXVIII",
@@ -54626,18 +54322,9 @@
         },
         {
           "sentences": [
-            "Whether he spoke seriously or in jest, since it was evident that under existing circumstances D’Artagnan was the only man who could relieve the queen’s uneasiness, Bernouin went without hesitation to announce to her this strange embassy; and as he had foreseen, the queen gave orders"
+            "Whether he spoke seriously or in jest, since it was evident that under existing circumstances D’Artagnan was the only man who could relieve the queen’s uneasiness, Bernouin went without hesitation to announce to her this strange embassy; and as he had foreseen, the queen gave orders to introduce Monsieur d’Artagnan at once."
           ]
-        }
-      ],
-      "sentence_count": 68,
-      "word_count": 1441
-    },
-    {
-      "number": "125",
-      "title": "introduce Monsieur d’Artagnan at once.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "D’Artagnan approached the sovereign with every mark of profound respect, and having fallen on his knees presented to her the cardinal’s letter"
@@ -54804,18 +54491,9 @@
         },
         {
           "sentences": [
-            "Anne of Austria cast her eyes upon the treaty that D’Artagnan presented"
+            "Anne of Austria cast her eyes upon the treaty that D’Artagnan presented to her."
           ]
-        }
-      ],
-      "sentence_count": 57,
-      "word_count": 1395
-    },
-    {
-      "number": "126",
-      "title": "her.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I do not see here,” she said, “anything but general conditions; the interests of the Prince de Conti or of the Ducs de Beaufort, de Bouillon and d’Elbeuf and of the coadjutor, are herein consulted; but with regard to yours?”"
@@ -55190,18 +54868,9 @@
         },
         {
           "sentences": [
-            "On the same day the Treaty of Paris was signed, and it was everywhere announced that the cardinal had shut himself up for three days in order"
+            "On the same day the Treaty of Paris was signed, and it was everywhere announced that the cardinal had shut himself up for three days in order to draw it up with the greatest care."
           ]
-        }
-      ],
-      "sentence_count": 89,
-      "word_count": 1509
-    },
-    {
-      "number": "127",
-      "title": "draw it up with the greatest care.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Here is what each of the parties concerned gained by that treaty:"
@@ -55256,14 +54925,24 @@
           ]
         }
       ],
-      "sentence_count": 17,
-      "word_count": 390
+      "sentence_count": 231,
+      "word_count": 4751
     },
     {
-      "number": "128",
-      "title": "Saint Germain, Athos and Aramis returned to Paris.",
-      "type": "letter",
+      "number": "LXXXIX",
+      "title": "",
+      "type": "chapter",
       "paragraphs": [
+        {
+          "sentences": [
+            "Difficult for Kings to return to the Capitals of their Kingdoms."
+          ]
+        },
+        {
+          "sentences": [
+            "Whilst D’Artagnan and Porthos were engaged in conducting the cardinal to Saint Germain, Athos and Aramis returned to Paris."
+          ]
+        },
         {
           "sentences": [
             "Each had his own particular visit to make."
@@ -55633,18 +55312,9 @@
         },
         {
           "sentences": [
-            "The ranks closed firmly in and a kind of majestic tremor ran from man"
+            "The ranks closed firmly in and a kind of majestic tremor ran from man to man."
           ]
-        }
-      ],
-      "sentence_count": 108,
-      "word_count": 1675
-    },
-    {
-      "number": "129",
-      "title": "man.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "At the Barrière des Sergents the procession was obliged to stop.",
@@ -55947,6 +55617,7 @@
         {
           "sentences": [
             "“So that he told me, that poor Monsieur Maillard, ‘Go find the coadjutor, Friquet, and if you bring him to me you shall be my heir.’ Say, then, Father Bazin—the heir of Monsieur Maillard, the giver of holy water at Saint Eustache!",
+            "Hey!",
             "I shall have nothing to do but to fold my arms!",
             "All the same, I should like to do him that service—what do you say to it?”"
           ]
@@ -56067,8 +55738,8 @@
           ]
         }
       ],
-      "sentence_count": 117,
-      "word_count": 1696
+      "sentence_count": 228,
+      "word_count": 3404
     },
     {
       "number": "XC",
@@ -56259,13 +55930,13 @@
     }
   ],
   "statistics": {
-    "total_chapters": 130,
-    "total_paragraphs": 10082,
-    "total_sentences": 14751,
-    "total_words": 240773,
-    "average_sentences_per_chapter": 113.46923076923076,
-    "average_paragraphs_per_chapter": 77.55384615384615,
-    "average_sentences_per_paragraph": 1.4631025590160682,
-    "average_words_per_sentence": 16.322486611077217
+    "total_chapters": 90,
+    "total_paragraphs": 10083,
+    "total_sentences": 14778,
+    "total_words": 241101,
+    "average_sentences_per_chapter": 164.2,
+    "average_paragraphs_per_chapter": 112.03333333333333,
+    "average_sentences_per_paragraph": 1.4656352276108302,
+    "average_words_per_sentence": 16.31485992691839
   }
 }

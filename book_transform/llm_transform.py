@@ -47,7 +47,7 @@ TRANSFORM_TYPES = {
 }
 
 
-def create_transformation_prompt(text: str, transform_type: str, character_context: Optional[str] = None) -> str:
+def create_transformation_prompt(text: str, transform_type: str, character_context: Optional[str] = None, json_output: bool = True) -> str:
     """Create the transformation prompt for the LLM."""
     
     transform_info = TRANSFORM_TYPES[transform_type]
@@ -69,12 +69,23 @@ IMPORTANT RULES:
 Text to transform:
 {text}
 
-Return your response in the following JSON format:
+"""
+    
+    if json_output:
+        prompt += """Return your response in the following JSON format:
 {{
     "transformed_text": "the complete transformed text",
     "changes_made": ["list of specific changes made"],
     "characters_affected": ["list of character names whose gender was changed"]
-}}"""
+}}
+
+CRITICAL JSON FORMATTING RULES:
+1. All quotes inside the "transformed_text" field MUST be escaped with backslashes (\" not ")
+2. Return ONLY the JSON object - no other text before or after
+3. The JSON must be valid and parseable
+4. Example: "She said \"Hello\" to him" (correct) vs "She said "Hello" to him" (incorrect)"""
+    else:
+        prompt += "Return ONLY the transformed text. Do not include any explanation, JSON formatting, or additional fields - just the transformed text itself."
 
     if character_context:
         prompt = f"""Based on this character analysis:
@@ -105,12 +116,16 @@ def transform_text_with_llm(text: str, transform_type: str,
     """
     client = get_llm_client(provider)
     
-    prompt = create_transformation_prompt(text, transform_type, character_context)
+    # Determine if we should ask for JSON output
+    # Due to JSON parsing issues with Grok, let's use plain text for now
+    json_output = client.get_provider() in ["openai"]
+    
+    prompt = create_transformation_prompt(text, transform_type, character_context, json_output)
     
     messages = [
         {
             "role": "system",
-            "content": "You are a literary transformation assistant that modifies gender representation in text while preserving the original style and meaning."
+            "content": "You are a literary transformation assistant that modifies gender representation in text while preserving the original style and meaning. Always return valid JSON when requested."
         },
         {
             "role": "user",
@@ -125,29 +140,104 @@ def transform_text_with_llm(text: str, transform_type: str,
         "temperature": 0
     }
     
-    # Only add response_format for providers that support it
-    if client.get_provider() in ["openai", "grok"]:
+    # Only add response_format for providers that support it properly
+    if client.get_provider() in ["openai"]:
         kwargs["response_format"] = {"type": "json_object"}
     
     response = client.complete(**kwargs)
     
     # Parse the response
     try:
-        result = json.loads(response.content)
-        
-        # Add provider info
-        result['provider'] = client.get_provider()
-        result['model'] = response.model
-        
-        return result
+        # For providers that support JSON mode, try parsing as JSON
+        if client.get_provider() in ["openai"]:
+            result = json.loads(response.content)
+            
+            # Add provider info
+            result['provider'] = client.get_provider()
+            result['model'] = response.model
+            
+            return result
+        else:
+            # For MLX and others, we get plain text back
+            # Return a simplified result
+            return {
+                'transformed_text': response.content.strip(),
+                'changes_made': [],  # We don't track individual changes in plain text mode
+                'characters_affected': [],  # We don't track affected characters in plain text mode
+                'provider': client.get_provider(),
+                'model': response.model
+            }
     except json.JSONDecodeError as e:
-        # For MLX, try to extract JSON from response
-        if client.get_provider() == 'mlx':
+        # For all providers, try to extract JSON from response
+        # This helps handle cases where the LLM doesn't follow instructions perfectly
+        if True:  # Always try extraction as fallback
             import re
-            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', response.content, re.DOTALL)
+            # Try to find JSON in the response
+            content = response.content.strip()
+            
+            # If the content starts with {, assume it's all JSON
+            if content.startswith('{'):
+                try:
+                    # Clean up the JSON string
+                    json_str = content
+                    # Remove any trailing commas before closing braces/brackets
+                    json_str = re.sub(r',\s*}', '}', json_str)
+                    json_str = re.sub(r',\s*]', ']', json_str)
+                    # Replace smart quotes with regular quotes
+                    json_str = json_str.replace('"', '"').replace('"', '"')
+                    json_str = json_str.replace(''', "'").replace(''', "'")
+                    
+                    # Special handling for the transformed_text field which may contain quotes
+                    # Use a more flexible regex that handles multiline content
+                    parts = re.search(r'"transformed_text"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"changes_made"\s*:\s*(\[[^\]]*\])\s*,\s*"characters_affected"\s*:\s*(\[[^\]]*\])', json_str, re.DOTALL)
+                    if parts:
+                        text_content = parts.group(1)
+                        changes_content = parts.group(2)
+                        chars_content = parts.group(3)
+                        
+                        # Fix common issues in arrays
+                        # Add missing closing quotes
+                        changes_content = re.sub(r'([^\\])"([^",\]]+)(?=,|\])', r'\1"\2"', changes_content)
+                        chars_content = re.sub(r'([^\\])"([^",\]]+)(?=,|\])', r'\1"\2"', chars_content)
+                        
+                        try:
+                            # Build a clean JSON object
+                            result = {
+                                "transformed_text": text_content,
+                                "changes_made": json.loads(changes_content),
+                                "characters_affected": json.loads(chars_content)
+                            }
+                            result['provider'] = client.get_provider()
+                            result['model'] = response.model
+                            return result
+                        except json.JSONDecodeError:
+                            pass
+                    
+                    # Fallback to direct parsing
+                    result = json.loads(json_str)
+                    result['provider'] = client.get_provider()
+                    result['model'] = response.model
+                    return result
+                except (json.JSONDecodeError, AttributeError):
+                    pass
+            
+            # Fallback to regex extraction
+            json_match = re.search(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', content, re.DOTALL)
             if json_match:
                 try:
-                    result = json.loads(json_match.group(0))
+                    # Clean up the JSON string
+                    json_str = json_match.group(0)
+                    # Remove any trailing commas before closing braces/brackets
+                    json_str = re.sub(r',\s*}', '}', json_str)
+                    json_str = re.sub(r',\s*]', ']', json_str)
+                    # Replace smart quotes with regular quotes
+                    json_str = json_str.replace('"', '"').replace('"', '"')
+                    json_str = json_str.replace(''', "'").replace(''', "'")
+                    # Escape quotes inside the text fields
+                    # This is a bit hacky but works for the common case
+                    json_str = re.sub(r'("transformed_text":\s*"[^"]*)"([^"]*"[^"]*")', r'\1\"\2', json_str)
+                    
+                    result = json.loads(json_str)
                     result['provider'] = client.get_provider()
                     result['model'] = response.model
                     return result

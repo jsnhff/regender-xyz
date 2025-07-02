@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 
 from api_client import UnifiedLLMClient
-from .character_analyzer import analyze_book_characters
+# Import moved inside function to avoid circular import
 from .chunking import smart_chunk_sentences, estimate_tokens
 from .chunking.model_configs import calculate_optimal_chunk_size, get_model_config
 
@@ -290,6 +290,7 @@ def transform_book(book_data: Dict[str, Any],
     
     # Step 1: Analyze characters
     try:
+        from book_characters import analyze_book_characters
         characters, character_context = analyze_book_characters(
             book_data, model=model, provider=provider, verbose=verbose
         )

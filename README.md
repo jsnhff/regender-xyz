@@ -12,30 +12,41 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
   - Automatic provider detection based on available API keys
   - Provider-specific model optimization
   - Unified interface for seamless switching
-  - **NEW**: Local model support via MLX on Apple Silicon
+  - Local model support via MLX on Apple Silicon
+  - **NEW**: Grok-3-latest with 131k context window support
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports 100+ book formats (English, French, German, plays, letters, etc.)
   - Smart chapter/section detection with pattern priority system
-  - **NEW**: Paragraph preservation for maintaining original text structure
-  - **NEW**: Intelligent abbreviation handling (Mr., Mrs., Dr., etc.)
+  - Paragraph preservation for maintaining original text structure
+  - **IMPROVED**: Enhanced abbreviation handling (Mr., Mrs., Dr., etc.) with better sentence boundary detection
   - Artifact removal and intelligent sentence splitting
   - 100% success rate on Project Gutenberg collection
 - **Intelligent Token-Based Chunking**: Optimizes API usage for each model
   - Adapts chunk size to model's context window
   - Minimizes API calls while maintaining quality
-  - Special handling for models like grok-3-mini-fast
-- **Character Analysis**: Identify characters, their gender, and mentions in text
+  - **NEW**: Smart chunking strategy for comprehensive book coverage with Grok
+  - Numbered sentence approach for perfect alignment
+- **Smart Character Analysis**: Advanced LLM-based character identification
+  - **NEW**: Pure LLM analysis (regex scanning removed for better accuracy)
+  - **NEW**: Strategic chunk analysis for complete character coverage
+  - Gender detection from pronouns and context
+  - Name variant merging and relationship tracking
+  - Handles 100+ characters per book
 - **Gender Transformation**: Transform text using different gender representations
   - Feminine transformation (male → female)
-  - Masculine transformation (female → male)
-  - Gender-neutral transformation
+  - Character-aware transformations for consistency
+  - **NEW**: Preserves exact sentence and paragraph structure
+  - **NEW**: Handles complex names (Harry → Harriet)
+- **Pre-analyzed Character Support**: Use saved character analysis for faster processing
+  - Analyze once, transform multiple times
+  - Share character data across projects
 - **JSON-based Processing**: Work with pre-parsed books for better control
-- **Verification**: Check for missed transformations
 - **Beautiful CLI**: Colorful interface with progress animations
 
 ## Documentation
 
 - **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
+- **[Character Analysis Module](book_characters/README.md)** - Smart character extraction system
 - **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok APIs
 - **[MLX Setup Guide](docs/MLX_SETUP.md)** - Running local models on Apple Silicon
 - **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the paragraph-aware JSON format
@@ -52,8 +63,8 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
   - MLX local model (Apple Silicon only, set `MLX_MODEL_PATH`)
 - **Supported Models:**
   - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
-  - Grok: grok-beta, grok-3-mini-fast
-  - MLX: Mistral-7B-Instruct (32K context window)
+  - Grok: grok-3-latest (131k context), grok-beta, grok-3-mini-fast
+  - MLX: Mistral-7B-Instruct (32K context), Mistral-Small-24B (requires ~45GB RAM)
 
 ## Installation
 
@@ -132,13 +143,31 @@ Options:
 - `--output`: Output directory for JSON files (default: books/json)
 - `--verify`: Validate the JSON by recreating text
 
-### Gender Transformation
+### Character Analysis
 
-Transform books with automatic character analysis:
+Analyze characters in a book before transformation:
 
 ```bash
-# Transform a single book
+# Analyze characters using Grok (recommended for large books)
+python regender_book_cli.py analyze-characters books/json/book.json \
+  --provider grok \
+  --output books/json/book_characters.json
+```
+
+### Gender Transformation
+
+Transform books with automatic or pre-analyzed characters:
+
+```bash
+# Transform with automatic character analysis
 python regender_book_cli.py transform books/json/book.json --type comprehensive
+
+# Transform using pre-analyzed characters (faster)
+python regender_book_cli.py transform books/json/book.json \
+  --characters books/json/book_characters.json \
+  --type comprehensive \
+  --output books/output/book_transformed.json \
+  --text books/output/book_transformed.txt
 
 # Batch transform multiple books
 python regender_book_cli.py transform books/json/*.json --type comprehensive --batch
@@ -226,6 +255,15 @@ MIT
 
 ## Recent Updates
 
+### v0.8.0 - Enhanced Character Analysis & Sentence Preservation
+- ✅ Pure LLM-based character analysis (removed regex scanning)
+- ✅ Smart chunking strategy for Grok's 131k context window
+- ✅ Fixed sentence boundary detection for abbreviations
+- ✅ Numbered sentence transformation for perfect alignment
+- ✅ Pre-analyzed character support for faster processing
+- ✅ Handles 100+ characters per book (tested on Harry Potter)
+- ✅ Improved name transformations (Harry → Harriet)
+
 ### v0.7.0 - Paragraph Preservation & MLX Support
 - ✅ Added paragraph preservation in JSON structure
 - ✅ Intelligent abbreviation handling (Mr., Mrs., Dr., etc.)
@@ -240,11 +278,6 @@ MIT
 - ✅ Model-specific optimizations (grok-3-mini-fast uses smaller chunks)
 - ✅ Unified API client with automatic provider detection
 - ✅ Consolidated gender_transform modules
-
-### v0.5.0 - Book Parser Overhaul
-- ✅ Modular parser architecture with 100% success rate
-- ✅ Support for 100+ book formats and languages
-- ✅ Pattern registry system with priorities
 
 ## Roadmap
 

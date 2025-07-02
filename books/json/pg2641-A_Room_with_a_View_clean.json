@@ -42,6 +42,7 @@
         {
           "sentences": [
             "“And a Cockney, besides!” said Lucy, who had been further saddened by the Signora’s unexpected accent. “It might be London.” She looked at the two rows of English people who were sitting at the table; at the row of white bottles of water and red bottles of wine that ran between the English people; at the portraits of the late Queen and the late Poet Laureate that hung behind the English people, heavily framed; at the notice of the English church (Rev. Cuthbert Eager, M.",
+            "A.",
             "Oxon.), that was the only other decoration of the wall. “Charlotte, don’t you feel, too, that we might be in London?",
             "I can hardly believe that all kinds of other things are just outside.",
             "I suppose it is one’s being so tired.”"
@@ -367,20 +368,8 @@
         },
         {
           "sentences": [
-            "“I am, as it were,” she concluded, “the chaperon of my young cousin, Lucy, and it would be a serious thing if I put her under an obligation"
-          ]
-        }
-      ],
-      "sentence_count": 123,
-      "word_count": 1841
-    },
-    {
-      "number": "3",
-      "title": "people of whom we know nothing. His manner was somewhat unfortunate.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“I am, as it were,” she concluded, “the chaperon of my young cousin, Lucy, and it would be a serious thing if I put her under an obligation to people of whom we know nothing.",
+            "His manner was somewhat unfortunate.",
             "I hope I acted for the best.”"
           ]
         },
@@ -783,8 +772,8 @@
           ]
         }
       ],
-      "sentence_count": 139,
-      "word_count": 1992
+      "sentence_count": 264,
+      "word_count": 3846
     },
     {
       "number": "II",
@@ -1529,6 +1518,7 @@
         {
           "sentences": [
             "“What are we to do with him?” he asked. “He comes out for his holiday to Italy, and behaves—like that; like the little child who ought to have been playing, and who hurt himself upon the tombstone.",
+            "Eh?",
             "What did you say?”"
           ]
         },
@@ -1553,16 +1543,12 @@
             "By understanding George you may learn to understand yourself.",
             "It will be good for both of you.”"
           ]
-        }
-      ],
-      "sentence_count": 319,
-      "word_count": 4380
-    },
-    {
-      "number": "5",
-      "title": "this extraordinary speech Lucy found no answer.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "To this extraordinary speech Lucy found no answer."
+          ]
+        },
         {
           "sentences": [
             "“I only know what it is that’s wrong with him; not why it is.”"
@@ -1703,8 +1689,8 @@
           ]
         }
       ],
-      "sentence_count": 51,
-      "word_count": 513
+      "sentence_count": 372,
+      "word_count": 4902
     },
     {
       "number": "III",
@@ -1841,18 +1827,9 @@
         {
           "sentences": [
             "The street and the river were dirty yellow, the bridge was dirty grey, and the hills were dirty purple.",
-            "Somewhere in their folds were concealed Miss Lavish and Miss Bartlett, who had chosen this afternoon"
+            "Somewhere in their folds were concealed Miss Lavish and Miss Bartlett, who had chosen this afternoon to visit the Torre del Gallo."
           ]
-        }
-      ],
-      "sentence_count": 57,
-      "word_count": 975
-    },
-    {
-      "number": "7",
-      "title": "visit the Torre del Gallo.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“What about music?” said Mr. Beebe."
@@ -1981,7 +1958,8 @@
         {
           "sentences": [
             "In the midst of her satisfaction she continued to sidle, and at last the cause was disclosed.",
-            "From the chair beneath her she extracted a gun-metal cigarette-case, on which were powdered in turquoise the initials “E."
+            "From the chair beneath her she extracted a gun-metal cigarette-case, on which were powdered in turquoise the initials “E.",
+            "L.”"
           ]
         },
         {
@@ -2231,8 +2209,8 @@
           ]
         }
       ],
-      "sentence_count": 161,
-      "word_count": 2413
+      "sentence_count": 219,
+      "word_count": 3395
     },
     {
       "number": "IV",
@@ -2252,6 +2230,7 @@
             "Conversation was tedious; she wanted something big, and she believed that it would have come to her on the wind-swept platform of an electric tram.",
             "This she might not attempt.",
             "It was unladylike.",
+            "Why?",
             "Why were most big things unladylike?",
             "Charlotte had once explained to her why.",
             "It was not that ladies were inferior to men; it was that they were different.",
@@ -2698,8 +2677,8 @@
           ]
         }
       ],
-      "sentence_count": 162,
-      "word_count": 2066
+      "sentence_count": 163,
+      "word_count": 2067
     },
     {
       "number": "V",
@@ -3445,7 +3424,8 @@
             "What if we popped off to Rome to-morrow—straight to the Vyses’ hotel?",
             "For I do know what I want.",
             "I’m sick of Florence.",
-            "No, you said you’d go to the ends of the earth!"
+            "No, you said you’d go to the ends of the earth!",
+            "Do!"
           ]
         },
         {
@@ -3465,8 +3445,8 @@
           ]
         }
       ],
-      "sentence_count": 278,
-      "word_count": 3868
+      "sentence_count": 279,
+      "word_count": 3869
     },
     {
       "number": "VI",
@@ -3687,18 +3667,9 @@
         },
         {
           "sentences": [
-            "Here the voice of Miss Bartlett was heard saying that a crowd had begun"
+            "Here the voice of Miss Bartlett was heard saying that a crowd had begun to collect."
           ]
-        }
-      ],
-      "sentence_count": 89,
-      "word_count": 1566
-    },
-    {
-      "number": "11",
-      "title": "collect.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Mr. Eager, who suffered from an over-fluent tongue rather than a resolute will, was determined to make himself heard.",
@@ -3716,7 +3687,8 @@
         {
           "sentences": [
             "“Signorina!” echoed Persephone in her glorious contralto.",
-            "She pointed at the other carriage."
+            "She pointed at the other carriage.",
+            "Why?"
           ]
         },
         {
@@ -3882,6 +3854,7 @@
         {
           "sentences": [
             "“Miss Honeychurch listening!” she said rather crossly. “Pouf!",
+            "Wouf!",
             "You naughty girl!",
             "Go away!”"
           ]
@@ -3998,6 +3971,7 @@
         },
         {
           "sentences": [
+            "Good?",
             "Scarcely the adjective for those noble beings!",
             "He showed her his cigar."
           ]
@@ -4099,12 +4073,13 @@
         {
           "sentences": [
             "Before she could speak, almost before she could feel, a voice called, “Lucy!",
+            "Lucy!",
             "Lucy!” The silence of life had been broken by Miss Bartlett who stood brown against the view."
           ]
         }
       ],
-      "sentence_count": 163,
-      "word_count": 2029
+      "sentence_count": 256,
+      "word_count": 3601
     },
     {
       "number": "VII",
@@ -5717,18 +5692,9 @@
         {
           "sentences": [
             "The sketch was in his diary, but it had been made afterwards, when he viewed things artistically.",
-            "At the time he had given surreptitious tugs"
+            "At the time he had given surreptitious tugs to the string himself."
           ]
-        }
-      ],
-      "sentence_count": 277,
-      "word_count": 3758
-    },
-    {
-      "number": "14",
-      "title": "the string himself.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“But the string never broke?”"
@@ -5883,8 +5849,8 @@
           ]
         }
       ],
-      "sentence_count": 61,
-      "word_count": 889
+      "sentence_count": 338,
+      "word_count": 4651
     },
     {
       "number": "IX",
@@ -6355,20 +6321,7 @@
         {
           "sentences": [
             "This futile and unprofitable transaction filled the knight with sadness as he leant on Mrs. Honeychurch’s carriage.",
-            "He had failed in his duties"
-          ]
-        }
-      ],
-      "sentence_count": 159,
-      "word_count": 2052
-    },
-    {
-      "number": "16",
-      "title": "the country-side, and the country-side was laughing at him as well.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "He had failed in his duties to the country-side, and the country-side was laughing at him as well.",
             "He had spent money, and yet Summer Street was spoilt as much as ever.",
             "All he could do now was to find a desirable tenant for “Cissie”—someone really desirable."
           ]
@@ -6697,20 +6650,17 @@
         {
           "sentences": [
             "“Do you know that you’re right?",
+            "I do.",
             "I must be a poetess after all.",
             "When I think of you it’s always as in a room.",
             "How funny!”"
           ]
-        }
-      ],
-      "sentence_count": 123,
-      "word_count": 1362
-    },
-    {
-      "number": "17",
-      "title": "her surprise, he seemed annoyed.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "To her surprise, he seemed annoyed."
+          ]
+        },
         {
           "sentences": [
             "“A drawing-room, pray?",
@@ -6934,8 +6884,8 @@
           ]
         }
       ],
-      "sentence_count": 70,
-      "word_count": 711
+      "sentence_count": 354,
+      "word_count": 4145
     },
     {
       "number": "X",
@@ -7248,6 +7198,7 @@
         {
           "sentences": [
             "“Friends of Cecil’s,” he repeated, “‘and so really dee-sire-rebel.",
+            "Ahem!",
             "Honeychurch, I have just telegraphed to them.’”"
           ]
         },
@@ -7488,8 +7439,8 @@
           ]
         }
       ],
-      "sentence_count": 217,
-      "word_count": 2751
+      "sentence_count": 218,
+      "word_count": 2752
     },
     {
       "number": "XI",
@@ -7627,6 +7578,7 @@
         {
           "sentences": [
             "“Yours affectionately, “L.",
+            "M.",
             "HONEYCHURCH.”"
           ]
         },
@@ -7699,20 +7651,8 @@
         },
         {
           "sentences": [
-            "“Perhaps,” she murmured, thinking of the museum that represented Italy"
-          ]
-        }
-      ],
-      "sentence_count": 94,
-      "word_count": 1479
-    },
-    {
-      "number": "20",
-      "title": "her. “It is just possible. Cecil, mind you marry her next January.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "“Perhaps,” she murmured, thinking of the museum that represented Italy to her. “It is just possible.",
+            "Cecil, mind you marry her next January.",
             "She is one of us already.”"
           ]
         },
@@ -7770,8 +7710,8 @@
           ]
         }
       ],
-      "sentence_count": 22,
-      "word_count": 222
+      "sentence_count": 118,
+      "word_count": 1715
     },
     {
       "number": "XII",
@@ -8158,16 +8098,12 @@
             "“Though, as a matter of fact, coincidences are much rarer than we suppose.",
             "For example, it isn’t purely coincidentally that you are here now, when one comes to reflect.”"
           ]
-        }
-      ],
-      "sentence_count": 137,
-      "word_count": 1340
-    },
-    {
-      "number": "22",
-      "title": "his relief, George began to talk.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "To his relief, George began to talk."
+          ]
+        },
         {
           "sentences": [
             "“It is.",
@@ -8599,8 +8535,8 @@
           ]
         }
       ],
-      "sentence_count": 142,
-      "word_count": 1529
+      "sentence_count": 280,
+      "word_count": 2876
     },
     {
       "number": "XIII",
@@ -8638,6 +8574,8 @@
             "Mrs. Butterworth had wanted to see him, and he did not want to be seen.",
             "He did not want to hear about hydrangeas, why they change their colour at the seaside.",
             "He did not want to join the C.",
+            "O.",
+            "S.",
             "When cross he was always elaborate, and made long, clever answers where “Yes” or “No” would have done.",
             "Lucy soothed him and tinkered at the conversation in a way that promised well for their married peace.",
             "No one is perfect, and surely it is wiser to discover the imperfections before wedlock.",
@@ -8719,6 +8657,7 @@
             "“Not in that way.",
             "At times I could wring her neck.",
             "But not in that way.",
+            "No.",
             "It is the same with Cecil all over.”"
           ]
         },
@@ -9100,6 +9039,11 @@
         },
         {
           "sentences": [
+            "Alas!"
+          ]
+        },
+        {
+          "sentences": [
             "“The truth is, dear, you don’t like Charlotte.”"
           ]
         },
@@ -9189,8 +9133,8 @@
           ]
         }
       ],
-      "sentence_count": 201,
-      "word_count": 2503
+      "sentence_count": 205,
+      "word_count": 2507
     },
     {
       "number": "XIV",
@@ -9383,7 +9327,9 @@
             "I’m done.",
             "I don’t see why—Freddy, don’t poke me.",
             "Miss Honeychurch, your brother’s hurting me.",
+            "Ow!",
             "What about Mr. Floyd’s ten shillings?",
+            "Ow!",
             "No, I don’t see and I never shall see why Miss What’s-her-name shouldn’t pay that bob for the driver.”"
           ]
         },
@@ -9607,8 +9553,8 @@
           ]
         }
       ],
-      "sentence_count": 157,
-      "word_count": 1954
+      "sentence_count": 159,
+      "word_count": 1956
     },
     {
       "number": "XV",
@@ -9632,6 +9578,7 @@
           "sentences": [
             "The garden of Windy Corners was deserted except for a red book, which lay sunning itself upon the gravel path.",
             "From the house came incoherent sounds, as of females preparing for worship. “The men say they won’t go”—“Well, I don’t blame them”—Minnie says, “need she go?”—“Tell her, no nonsense”—“Anne!",
+            "Mary!",
             "Hook me behind!”—“Dearest Lucia, may I trespass upon you for a pin?” For Miss Bartlett had announced that she at all events was one for church."
           ]
         },
@@ -9656,6 +9603,7 @@
         {
           "sentences": [
             "“Lucy!",
+            "Lucy!",
             "What’s that book?",
             "Who’s been taking a book out of the shelf and leaving it about to spoil?”"
           ]
@@ -9951,6 +9899,7 @@
             "All the way home the horses’ hoofs sang a tune to her: “He has not told, he has not told.” Her brain expanded the melody: “He has not told his father—to whom he tells all things.",
             "It was not an exploit.",
             "He did not laugh at me when I had gone.” She raised her hand to her cheek. “He does not love me.",
+            "No.",
             "How terrible if he did!",
             "But he has not told.",
             "He will not tell.”"
@@ -10278,18 +10227,9 @@
             "The ups and downs in his voice were noticeable, but they did not affect her.",
             "She had dwelt amongst melody and movement, and her nerves refused to answer to the clang of his.",
             "Leaving him to be annoyed, she gazed at the black head again.",
-            "She did not want to stroke it, but she saw herself wanting"
+            "She did not want to stroke it, but she saw herself wanting to stroke it; the sensation was curious."
           ]
-        }
-      ],
-      "sentence_count": 262,
-      "word_count": 3496
-    },
-    {
-      "number": "26",
-      "title": "stroke it; the sensation was curious.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“How do you like this view of ours, Mr. Emerson?”"
@@ -10541,8 +10481,8 @@
           ]
         }
       ],
-      "sentence_count": 66,
-      "word_count": 780
+      "sentence_count": 331,
+      "word_count": 4286
     },
     {
       "number": "XVI",
@@ -10696,6 +10636,7 @@
           "sentences": [
             "“Cecil happened to read out the passage aloud to me and to Mr. Emerson; it upset Mr. Emerson and he insulted me again.",
             "Behind Cecil’s back.",
+            "Ugh!",
             "Is it possible that men are such brutes?",
             "Behind Cecil’s back as we were walking up the garden.”"
           ]
@@ -10844,6 +10785,7 @@
           "sentences": [
             "They had gathered round George, who beckoned, she felt, over the rubbish, the sloppy thoughts, the furtive yearnings that were beginning to cumber her soul.",
             "Her anger faded at the sight of him.",
+            "Ah!",
             "The Emersons were fine people in their way.",
             "She had to subdue a rush in her blood before saying:"
           ]
@@ -10852,7 +10794,9 @@
           "sentences": [
             "“Freddy has taken him into the dining-room.",
             "The others are going down the garden.",
+            "Come.",
             "Let us get this over quickly.",
+            "Come.",
             "I want you in the room, of course.”"
           ]
         },
@@ -11080,6 +11024,7 @@
             "In silence the two women watched him.",
             "His last remark, they knew, was nonsense, but was he going after it or not?",
             "Would not he, the cad, the charlatan, attempt a more dramatic finish?",
+            "No.",
             "He was apparently content.",
             "He left them, carefully closing the front door; and when they looked through the hall window, they saw him go up the drive and begin to climb the slopes of withered fern behind the house.",
             "Their tongues were loosed, and they burst into stealthy rejoicings."
@@ -11161,8 +11106,8 @@
           ]
         }
       ],
-      "sentence_count": 231,
-      "word_count": 2622
+      "sentence_count": 236,
+      "word_count": 2627
     },
     {
       "number": "XVII",
@@ -11596,18 +11541,9 @@
             "Though she was hopeless about pictures, and though she dressed so unevenly—oh, that cerise frock yesterday at church!—she must see some beauty in life, or she could not play the piano as she did.",
             "He had a theory that musicians are incredibly complex, and know far less than other artists what they want and what they are; that they puzzle themselves as well as their friends; that their psychology is a modern development, and has not yet been understood.",
             "This theory, had he known it, had possibly just been illustrated by facts.",
-            "Ignorant of the events of yesterday he was only riding over to get some tea, to see his niece, and to observe whether Miss Honeychurch saw anything beautiful in the desire of two old ladies"
+            "Ignorant of the events of yesterday he was only riding over to get some tea, to see his niece, and to observe whether Miss Honeychurch saw anything beautiful in the desire of two old ladies to visit Athens."
           ]
-        }
-      ],
-      "sentence_count": 22,
-      "word_count": 535
-    },
-    {
-      "number": "30",
-      "title": "visit Athens.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "A carriage was drawn up outside Windy Corner, and just as he caught sight of the house it started, bowled up the drive, and stopped abruptly when it reached the main road.",
@@ -12406,6 +12342,7 @@
             "The honours of the day rested with Mr. Beebe.",
             "By his tact and common sense, and by his influence as a clergyman—for a clergyman who was not a fool influenced Mrs. Honeychurch greatly—he bent her to their purpose, “I don’t see why Greece is necessary,” she said; “but as you do, I suppose it is all right.",
             "It must be something I can’t understand.",
+            "Lucy!",
             "Let’s tell her.",
             "Lucy!”"
           ]
@@ -12585,8 +12522,8 @@
           ]
         }
       ],
-      "sentence_count": 352,
-      "word_count": 4532
+      "sentence_count": 375,
+      "word_count": 5071
     },
     {
       "number": "XIX",
@@ -12904,18 +12841,9 @@
         },
         {
           "sentences": [
-            "“It is too far out of town for the young gentleman, and his father’s rheumatism has come on, so he can’t stop on alone, so they are trying"
+            "“It is too far out of town for the young gentleman, and his father’s rheumatism has come on, so he can’t stop on alone, so they are trying to let furnished,” was the answer."
           ]
-        }
-      ],
-      "sentence_count": 114,
-      "word_count": 1685
-    },
-    {
-      "number": "32",
-      "title": "let furnished,” was the answer.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“They have gone, then?”"
@@ -13038,6 +12966,7 @@
           "sentences": [
             "“I taught him,” he quavered, “to trust in love.",
             "I said: ‘When love comes, that is reality.’ I said: ‘Passion does not blind.",
+            "No.",
             "Passion is sanity, and the woman you love, she is the only person you will ever really understand.’” He sighed: “True, everlastingly true, though my day is over, and though there is the result.",
             "Poor boy!",
             "He is so sorry!",
@@ -13712,8 +13641,8 @@
           ]
         }
       ],
-      "sentence_count": 291,
-      "word_count": 3296
+      "sentence_count": 406,
+      "word_count": 4988
     },
     {
       "number": "XX",
@@ -14086,13 +14015,13 @@
     }
   ],
   "statistics": {
-    "total_chapters": 33,
-    "total_paragraphs": 2161,
-    "total_sentences": 5135,
-    "total_words": 66268,
-    "average_sentences_per_chapter": 155.6060606060606,
-    "average_paragraphs_per_chapter": 65.48484848484848,
-    "average_sentences_per_paragraph": 2.3762147154095326,
-    "average_words_per_sentence": 12.905160662122688
+    "total_chapters": 21,
+    "total_paragraphs": 2162,
+    "total_sentences": 5168,
+    "total_words": 66383,
+    "average_sentences_per_chapter": 246.0952380952381,
+    "average_paragraphs_per_chapter": 102.95238095238095,
+    "average_sentences_per_paragraph": 2.3903792784458835,
+    "average_words_per_sentence": 12.845007739938081
   }
 }

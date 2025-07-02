@@ -136,6 +136,8 @@
         {
           "sentences": [
             "“My blood!” ejaculated the vexed coachman, “and not atop of Shooter’s yet!",
+            "Tst!",
+            "Yah!",
             "Get on with you!”"
           ]
         },
@@ -422,8 +424,8 @@
           ]
         }
       ],
-      "sentence_count": 111,
-      "word_count": 2012
+      "sentence_count": 113,
+      "word_count": 2014
     },
     {
       "number": "III",
@@ -2114,6 +2116,7 @@
           "sentences": [
             "“Yes; for a moment.",
             "At first I thought it quite hopeless, but I have unquestionably seen, for a single moment, the face that I once knew so well.",
+            "Hush!",
             "Let us draw further back.",
             "Hush!”"
           ]
@@ -2345,18 +2348,9 @@
         {
           "sentences": [
             "Both Mr. Lorry and Defarge were rather disinclined to this course, and in favour of one of them remaining.",
-            "But, as there were not only carriage and horses to be seen to, but travelling papers; and as time pressed, for the day was drawing to an end, it came at last to their hastily dividing the business that was necessary to be done, and hurrying away"
+            "But, as there were not only carriage and horses to be seen to, but travelling papers; and as time pressed, for the day was drawing to an end, it came at last to their hastily dividing the business that was necessary to be done, and hurrying away to do it."
           ]
-        }
-      ],
-      "sentence_count": 182,
-      "word_count": 3223
-    },
-    {
-      "number": "7",
-      "title": "do it.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "Then, as the darkness closed in, the daughter laid her head down on the hard ground close at the father’s side, and watched him.",
@@ -2479,8 +2473,8 @@
           ]
         }
       ],
-      "sentence_count": 41,
-      "word_count": 903
+      "sentence_count": 224,
+      "word_count": 4130
     },
     {
       "number": "I",
@@ -2937,18 +2931,9 @@
           "sentences": [
             "Mr. Cruncher’s attention was here diverted to the door-keeper, whom he saw making his way to Mr. Lorry, with the note in his hand.",
             "Mr. Lorry sat at a table, among the gentlemen in wigs: not far from a wigged gentleman, the prisoner’s counsel, who had a great bundle of papers before him: and nearly opposite another wigged gentleman with his hands in his pockets, whose whole attention, when Mr. Cruncher looked at him then or afterwards, seemed to be concentrated on the ceiling of the court.",
-            "After some gruff coughing and rubbing of his chin and signing with his hand, Jerry attracted the notice of Mr. Lorry, who had stood up"
+            "After some gruff coughing and rubbing of his chin and signing with his hand, Jerry attracted the notice of Mr. Lorry, who had stood up to look for him, and who quietly nodded and sat down again."
           ]
-        }
-      ],
-      "sentence_count": 60,
-      "word_count": 1070
-    },
-    {
-      "number": "10",
-      "title": "look for him, and who quietly nodded and sat down again.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“What’s _he_ got to do with the case?” asked the man he had spoken with."
@@ -3080,8 +3065,8 @@
           ]
         }
       ],
-      "sentence_count": 46,
-      "word_count": 1301
+      "sentence_count": 106,
+      "word_count": 2383
     },
     {
       "number": "III",
@@ -3153,6 +3138,7 @@
             "Didn’t see what that had to do with it.",
             "Never in a debtors’ prison?--Come, once again.",
             "Never?",
+            "Yes.",
             "How many times?",
             "Two or three times.",
             "Not five or six?",
@@ -3162,6 +3148,7 @@
             "Ever been kicked?",
             "Might have been.",
             "Frequently?",
+            "No.",
             "Ever kicked downstairs?",
             "Decidedly not; once received a kick on the top of a staircase, and fell downstairs of his own accord.",
             "Kicked on that occasion for cheating at dice?",
@@ -3173,13 +3160,19 @@
             "Ever live by play?",
             "Not more than other gentlemen do.",
             "Ever borrow money of the prisoner?",
+            "Yes.",
             "Ever pay him?",
+            "No.",
             "Was not this intimacy with the prisoner, in reality a very slight one, forced upon the prisoner in coaches, inns, and packets?",
+            "No.",
             "Sure he saw the prisoner with these lists?",
             "Certain.",
             "Knew no more about the lists?",
+            "No.",
             "Had not procured them himself, for instance?",
+            "No.",
             "Expect to get anything by this evidence?",
+            "No.",
             "Not in regular government pay and employment, to lay traps?",
             "Oh dear no.",
             "Or to do anything?",
@@ -3907,8 +3900,8 @@
           ]
         }
       ],
-      "sentence_count": 302,
-      "word_count": 4836
+      "sentence_count": 310,
+      "word_count": 4844
     },
     {
       "number": "IV",
@@ -5169,18 +5162,9 @@
         {
           "sentences": [
             "On Sundays, Miss Pross dined at the Doctor’s table, but on other days persisted in taking her meals at unknown periods, either in the lower regions, or in her own room on the second floor--a blue chamber, to which no one but her Ladybird ever gained admittance.",
-            "On this occasion, Miss Pross, responding to Ladybird’s pleasant face and pleasant efforts"
+            "On this occasion, Miss Pross, responding to Ladybird’s pleasant face and pleasant efforts to please her, unbent exceedingly; so the dinner was very pleasant, too."
           ]
-        }
-      ],
-      "sentence_count": 130,
-      "word_count": 3039
-    },
-    {
-      "number": "15",
-      "title": "please her, unbent exceedingly; so the dinner was very pleasant, too.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "It was an oppressive day, and, after dinner, Lucie proposed that the wine should be carried out under the plane-tree, and they should sit there in the air.",
@@ -5237,6 +5221,7 @@
             "Upon a corner stone in an angle of the wall, one prisoner, who seemed to have gone to execution, had cut as his last work, three letters.",
             "They were done with some very poor instrument, and hurriedly, with an unsteady hand.",
             "At first, they were read as D.",
+            "I.",
             "C.; but, on being more carefully examined, the last letter was found to be G.",
             "There was no record or legend of any prisoner with those initials, and many fruitless guesses were made what the name could have been.",
             "At length, it was suggested that the letters were not initials, but the complete word, DIG.",
@@ -5401,8 +5386,8 @@
           ]
         }
       ],
-      "sentence_count": 75,
-      "word_count": 1505
+      "sentence_count": 206,
+      "word_count": 4557
     },
     {
       "number": "VII",
@@ -5424,6 +5409,7 @@
         },
         {
           "sentences": [
+            "Yes.",
             "It took four men, all four ablaze with gorgeous decoration, and the Chief of them unable to exist with fewer than two gold watches in his pocket, emulative of the noble and chaste fashion set by Monseigneur, to conduct the happy chocolate to Monseigneur’s lips.",
             "One lacquey carried the chocolate-pot into the sacred presence; a second, milled and frothed the chocolate with the little instrument he bore for that function; a third, presented the favoured napkin; a fourth (he of the two gold watches), poured the chocolate out.",
             "It was impossible for Monseigneur to dispense with one of these attendants on the chocolate and hold his high place under the admiring Heavens.",
@@ -5616,6 +5602,7 @@
             "“It is extraordinary to me,” said he, “that you people cannot take care of yourselves and your children.",
             "One or the other of you is for ever in the way.",
             "How do I know what injury you have done my horses.",
+            "See!",
             "Give him that.”"
           ]
         },
@@ -5705,8 +5692,8 @@
           ]
         }
       ],
-      "sentence_count": 119,
-      "word_count": 3311
+      "sentence_count": 121,
+      "word_count": 3313
     },
     {
       "number": "VIII",
@@ -5781,18 +5768,9 @@
         },
         {
           "sentences": [
-            "The fellow was brought, cap in hand, and the other fellows closed round"
+            "The fellow was brought, cap in hand, and the other fellows closed round to look and listen, in the manner of the people at the Paris fountain."
           ]
-        }
-      ],
-      "sentence_count": 23,
-      "word_count": 657
-    },
-    {
-      "number": "18",
-      "title": "look and listen, in the manner of the people at the Paris fountain.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I passed you on the road?”"
@@ -5903,6 +5881,7 @@
         {
           "sentences": [
             "“Truly, you did well,” said the Marquis, felicitously sensible that such vermin were not to ruffle him, “to see a thief accompanying my carriage, and not open that great mouth of yours.",
+            "Bah!",
             "Put him aside, Monsieur Gabelle!”"
           ]
         },
@@ -6098,8 +6077,8 @@
           ]
         }
       ],
-      "sentence_count": 92,
-      "word_count": 1168
+      "sentence_count": 116,
+      "word_count": 1840
     },
     {
       "number": "IX",
@@ -6649,6 +6628,7 @@
         {
           "sentences": [
             "“Yes,” repeated the Marquis. “A Doctor with a daughter.",
+            "Yes.",
             "So commences the new philosophy!",
             "You are fatigued.",
             "Good night!”"
@@ -6780,8 +6760,8 @@
           ]
         }
       ],
-      "sentence_count": 209,
-      "word_count": 4059
+      "sentence_count": 210,
+      "word_count": 4060
     },
     {
       "number": "X",
@@ -7276,6 +7256,7 @@
           "sentences": [
             "“Give me your hand.",
             "She will be home directly, and it is better she should not see us together to-night.",
+            "Go!",
             "God bless you!”"
           ]
         },
@@ -7309,8 +7290,8 @@
           ]
         }
       ],
-      "sentence_count": 172,
-      "word_count": 2946
+      "sentence_count": 173,
+      "word_count": 2947
     },
     {
       "number": "XI",
@@ -7668,18 +7649,9 @@
         },
         {
           "sentences": [
-            "“Oh indeed!” said Mr. Lorry, bending down his ear, while his eye strayed"
+            "“Oh indeed!” said Mr. Lorry, bending down his ear, while his eye strayed to the House afar off."
           ]
-        }
-      ],
-      "sentence_count": 25,
-      "word_count": 612
-    },
-    {
-      "number": "23",
-      "title": "the House afar off.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“I am going,” said Mr. Stryver, leaning his arms confidentially on the desk: whereupon, although it was a large double one, there appeared to be not half desk enough for him: “I am going to make an offer of myself in marriage to your agreeable little friend, Miss Manette, Mr. Lorry.”"
@@ -7720,6 +7692,7 @@
         {
           "sentences": [
             "“Oh dear yes!",
+            "Yes.",
             "Oh yes, you’re eligible!” said Mr. Lorry. “If you say eligible, you are eligible.”"
           ]
         },
@@ -7994,8 +7967,8 @@
           ]
         }
       ],
-      "sentence_count": 97,
-      "word_count": 1936
+      "sentence_count": 123,
+      "word_count": 2554
     },
     {
       "number": "XIII",
@@ -8365,6 +8338,8 @@
             "His son obeyed, and the crowd approached; they were bawling and hissing round a dingy hearse and dingy mourning coach, in which mourning coach there was only one mourner, dressed in the dingy trappings that were considered essential to the dignity of the position.",
             "The position appeared by no means to please him, however, with an increasing rabble surrounding the coach, deriding him, making grimaces at him, and incessantly groaning and calling out: “Yah!",
             "Spies!",
+            "Tst!",
+            "Yaha!",
             "Spies!”  with many compliments too numerous and forcible to repeat."
           ]
         },
@@ -8383,6 +8358,8 @@
         {
           "sentences": [
             "“_I_ don’t know,” said the man. “Spies!",
+            "Yaha!",
+            "Tst!",
             "Spies!”"
           ]
         },
@@ -8394,6 +8371,7 @@
         {
           "sentences": [
             "“_I_ don’t know,” returned the man, clapping his hands to his mouth nevertheless, and vociferating in a surprising heat and with the greatest ardour, “Spies!",
+            "Yaha!",
             "Tst, tst!",
             "Spi--ies!”"
           ]
@@ -8411,6 +8389,8 @@
         {
           "sentences": [
             "“Old Bailey spy,” returned his informant. “Yaha!",
+            "Tst!",
+            "Yah!",
             "Old Bailey Spi--i--ies!”"
           ]
         },
@@ -8814,8 +8794,8 @@
           ]
         }
       ],
-      "sentence_count": 189,
-      "word_count": 3865
+      "sentence_count": 196,
+      "word_count": 3872
     },
     {
       "number": "XV",
@@ -9393,6 +9373,7 @@
         {
           "sentences": [
             "“As to you,” said she, “you would shout and shed tears for anything, if it made a show and a noise.",
+            "Say!",
             "Would you not?”"
           ]
         },
@@ -9405,6 +9386,7 @@
         {
           "sentences": [
             "“If you were shown a great heap of dolls, and were set upon them to pluck them to pieces and despoil them for your own advantage, you would pick out the richest and gayest.",
+            "Say!",
             "Would you not?”"
           ]
         },
@@ -9429,8 +9411,8 @@
           ]
         }
       ],
-      "sentence_count": 210,
-      "word_count": 4199
+      "sentence_count": 212,
+      "word_count": 4201
     },
     {
       "number": "XVI",
@@ -9632,6 +9614,7 @@
             "I tell thee it is always advancing.",
             "Look around and consider the lives of all the world that we know, consider the faces of all the world that we know, consider the rage and discontent to which the Jacquerie addresses itself with more and more of certainty every hour.",
             "Can such things last?",
+            "Bah!",
             "I mock you.”"
           ]
         },
@@ -10142,8 +10125,8 @@
           ]
         }
       ],
-      "sentence_count": 216,
-      "word_count": 3842
+      "sentence_count": 217,
+      "word_count": 3843
     },
     {
       "number": "XVII",
@@ -11187,6 +11170,7 @@
             "“I would not keep it,” said Mr. Lorry, shaking his head; for he gained in firmness as he saw the Doctor disquieted. “I would recommend him to sacrifice it.",
             "I only want your authority.",
             "I am sure it does no good.",
+            "Come!",
             "Give me your authority, like a dear good man.",
             "For his daughter’s sake, my dear Manette!”"
           ]
@@ -11220,8 +11204,8 @@
           ]
         }
       ],
-      "sentence_count": 152,
-      "word_count": 2769
+      "sentence_count": 153,
+      "word_count": 2770
     },
     {
       "number": "XX",
@@ -11357,6 +11341,7 @@
         {
           "sentences": [
             "“But I do, and you must take my word for it.",
+            "Well!",
             "If you could endure to have such a worthless fellow, and a fellow of such indifferent reputation, coming and going at odd times, I should ask that I might be permitted to come and go as a privileged person here; that I might be regarded as an useless (and I would add, if it were not for the resemblance I detected between you and me, an unornamental) piece of furniture, tolerated for its old service, and taken no notice of.",
             "I doubt if I should abuse the permission.",
             "It is a hundred to one if I should avail myself of it four times in a year.",
@@ -11499,8 +11484,8 @@
           ]
         }
       ],
-      "sentence_count": 86,
-      "word_count": 1343
+      "sentence_count": 87,
+      "word_count": 1344
     },
     {
       "number": "XXI",
@@ -11926,6 +11911,7 @@
         },
         {
           "sentences": [
+            "“A.",
             "M.!” croaked Jacques Three, as he read greedily."
           ]
         },
@@ -11970,6 +11956,7 @@
         {
           "sentences": [
             "“Let us collect them together, in the middle of the cell.",
+            "So!",
             "Light them, you!”"
           ]
         },
@@ -12020,8 +12007,8 @@
           ]
         }
       ],
-      "sentence_count": 180,
-      "word_count": 4237
+      "sentence_count": 182,
+      "word_count": 4239
     },
     {
       "number": "XXII",
@@ -12174,6 +12161,7 @@
         },
         {
           "sentences": [
+            "No.",
             "They were all by that time choking the Hall of Examination where this old man, ugly and wicked, was, and overflowing into the adjacent open space and streets.",
             "The Defarges, husband and wife, The Vengeance, and Jacques Three, were in the first press, and at no great distance from him in the Hall."
           ]
@@ -12255,8 +12243,8 @@
           ]
         }
       ],
-      "sentence_count": 86,
-      "word_count": 2030
+      "sentence_count": 87,
+      "word_count": 2031
     },
     {
       "number": "XXIII",
@@ -12294,6 +12282,7 @@
           "sentences": [
             "But, this was not the change on the village, and on many a village like it.",
             "For scores of years gone by, Monseigneur had squeezed it and wrung it, and had seldom graced it with his presence except for the pleasures of the chase--now, found in hunting the people; now, found in hunting the beasts, for whose preservation Monseigneur made edifying spaces of barbarous and barren wilderness.",
+            "No.",
             "The change consisted in the appearance of strange faces of low caste, rather than in the disappearance of the high caste, chiselled, and otherwise beautified and beautifying features of Monseigneur."
           ]
         },
@@ -12451,18 +12440,9 @@
         {
           "sentences": [
             "The man slept on, indifferent to showers of hail and intervals of brightness, to sunshine on his face and shadow, to the paltering lumps of dull ice on his body and the diamonds into which the sun changed them, until the sun was low in the west, and the sky was glowing.",
-            "Then, the mender of roads having got his tools together and all things ready"
+            "Then, the mender of roads having got his tools together and all things ready to go down into the village, roused him."
           ]
-        }
-      ],
-      "sentence_count": 59,
-      "word_count": 1293
-    },
-    {
-      "number": "35",
-      "title": "go down into the village, roused him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Good!” said the sleeper, rising on his elbow. “Two leagues beyond the summit of the hill?”"
@@ -12484,18 +12464,9 @@
             "The mender of roads went home, with the dust going on before him according to the set of the wind, and was soon at the fountain, squeezing himself in among the lean kine brought there to drink, and appearing even to whisper to them in his whispering to all the village.",
             "When the village had taken its poor supper, it did not creep to bed, as it usually did, but came out of doors again, and remained there.",
             "A curious contagion of whispering was upon it, and also, when it gathered together at the fountain in the dark, another curious contagion of looking expectantly at the sky in one direction only.",
-            "Monsieur Gabelle, chief functionary of the place, became uneasy; went out on his house-top alone, and looked in that direction too; glanced down from behind his chimneys at the darkening faces by the fountain below, and sent word to the sacristan who kept the keys of the church, that there might be need"
+            "Monsieur Gabelle, chief functionary of the place, became uneasy; went out on his house-top alone, and looked in that direction too; glanced down from behind his chimneys at the darkening faces by the fountain below, and sent word to the sacristan who kept the keys of the church, that there might be need to ring the tocsin by-and-bye."
           ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 183
-    },
-    {
-      "number": "36",
-      "title": "ring the tocsin by-and-bye.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The night deepened.",
@@ -12575,8 +12546,8 @@
           ]
         }
       ],
-      "sentence_count": 38,
-      "word_count": 1132
+      "sentence_count": 106,
+      "word_count": 2622
     },
     {
       "number": "XXIV",
@@ -13008,6 +12979,7 @@
         },
         {
           "sentences": [
+            "Yes.",
             "Like the mariner in the old story, the winds and streams had driven him within the influence of the Loadstone Rock, and it was drawing him to itself, and he must go.",
             "Everything that arose before his mind drifted him on, faster and faster, more and more steadily, to the terrible attraction.",
             "His latent uneasiness had been, that bad aims were being worked out in his own unhappy land by bad instruments, and that he who could not fail to know that he was better than they, was not there, trying to do something to stay bloodshed, and assert the claims of mercy and humanity.",
@@ -13023,6 +12995,7 @@
         },
         {
           "sentences": [
+            "Yes.",
             "The Loadstone Rock was drawing him, and he must sail on, until he struck.",
             "He knew of no rock; he saw hardly any danger.",
             "The intention with which he had done what he had done, even although he had left it incomplete, presented it before him in an aspect that would be gratefully acknowledged in France on his presenting himself to assert it.",
@@ -13136,8 +13109,8 @@
           ]
         }
       ],
-      "sentence_count": 192,
-      "word_count": 4412
+      "sentence_count": 194,
+      "word_count": 4414
     },
     {
       "number": "I",
@@ -14237,18 +14210,9 @@
           "sentences": [
             "That was all the writing.",
             "It was so much, however, to her who received it, that she turned from Defarge to his wife, and kissed one of the hands that knitted.",
-            "It was a passionate, loving, thankful, womanly action, but the hand made no response--dropped cold and heavy, and took"
+            "It was a passionate, loving, thankful, womanly action, but the hand made no response--dropped cold and heavy, and took to its knitting again."
           ]
-        }
-      ],
-      "sentence_count": 50,
-      "word_count": 818
-    },
-    {
-      "number": "41",
-      "title": "its knitting again.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "There was something in its touch that gave Lucie a check.",
@@ -14409,8 +14373,8 @@
           ]
         }
       ],
-      "sentence_count": 51,
-      "word_count": 897
+      "sentence_count": 101,
+      "word_count": 1719
     },
     {
       "number": "IV",
@@ -14860,6 +14824,8 @@
             "He stopped.",
             "There was a heavy lumbering of wheels within hearing.",
             "They both knew too well what it meant.",
+            "One.",
+            "Two.",
             "Three.",
             "Three tumbrils faring away with their dread loads over the hushing snow."
           ]
@@ -14895,8 +14861,8 @@
           ]
         }
       ],
-      "sentence_count": 143,
-      "word_count": 2268
+      "sentence_count": 145,
+      "word_count": 2270
     },
     {
       "number": "VI",
@@ -15046,6 +15012,7 @@
         },
         {
           "sentences": [
+            "Yes.",
             "By birth."
           ]
         },
@@ -15197,8 +15164,8 @@
           ]
         }
       ],
-      "sentence_count": 105,
-      "word_count": 2491
+      "sentence_count": 106,
+      "word_count": 2492
     },
     {
       "number": "VII",
@@ -15434,18 +15401,9 @@
         },
         {
           "sentences": [
-            "The four surrounded him, where he stood with his wife and child clinging"
+            "The four surrounded him, where he stood with his wife and child clinging to him."
           ]
-        }
-      ],
-      "sentence_count": 80,
-      "word_count": 1511
-    },
-    {
-      "number": "46",
-      "title": "him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“Tell me how and why am I again a prisoner?”"
@@ -15565,8 +15523,8 @@
           ]
         }
       ],
-      "sentence_count": 34,
-      "word_count": 333
+      "sentence_count": 114,
+      "word_count": 1846
     },
     {
       "number": "VIII",
@@ -16145,6 +16103,7 @@
         {
           "sentences": [
             "“Though it’s not important,” repeated Carton, in the same mechanical way--“though it’s not important--No, it’s not important.",
+            "No.",
             "Yet I know the face.”"
           ]
         },
@@ -16232,6 +16191,7 @@
         {
           "sentences": [
             "“I mean,” said Mr. Cruncher, “that he warn’t never in it.",
+            "No!",
             "Not he!",
             "I’ll have my head took off, if he was ever in it.”"
           ]
@@ -16357,8 +16317,8 @@
           ]
         }
       ],
-      "sentence_count": 279,
-      "word_count": 4647
+      "sentence_count": 281,
+      "word_count": 4649
     },
     {
       "number": "IX",
@@ -16572,18 +16532,9 @@
         },
         {
           "sentences": [
-            "“And your duties here have drawn to an end, sir?” said Carton, turning"
+            "“And your duties here have drawn to an end, sir?” said Carton, turning to him."
           ]
-        }
-      ],
-      "sentence_count": 78,
-      "word_count": 1599
-    },
-    {
-      "number": "49",
-      "title": "him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "As I was telling you last night when Lucie came in so unexpectedly, I have at length done all that I can do here.",
@@ -16803,18 +16754,9 @@
         },
         {
           "sentences": [
-            "As the grinning little man held out the pipe he was smoking, to explain how he timed the executioner, Carton was so sensible of a rising desire"
+            "As the grinning little man held out the pipe he was smoking, to explain how he timed the executioner, Carton was so sensible of a rising desire to strike the life out of him, that he turned away."
           ]
-        }
-      ],
-      "sentence_count": 74,
-      "word_count": 810
-    },
-    {
-      "number": "50",
-      "title": "strike the life out of him, that he turned away.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“But you are not English,” said the wood-sawyer, “though you wear English dress?”"
@@ -17015,16 +16957,12 @@
             "Suspected and Denounced enemy of the Republic, Aristocrat, one of a family of tyrants, one of a race proscribed, for that they had used their abolished privileges to the infamous oppression of the people.",
             "Charles Evrémonde, called Darnay, in right of such proscription, absolutely Dead in Law."
           ]
-        }
-      ],
-      "sentence_count": 69,
-      "word_count": 1511
-    },
-    {
-      "number": "51",
-      "title": "this effect, in as few or fewer words, the Public Prosecutor.",
-      "type": "letter",
-      "paragraphs": [
+        },
+        {
+          "sentences": [
+            "To this effect, in as few or fewer words, the Public Prosecutor."
+          ]
+        },
         {
           "sentences": [
             "The President asked, was the Accused openly denounced or secretly?"
@@ -17168,8 +17106,8 @@
           ]
         }
       ],
-      "sentence_count": 50,
-      "word_count": 681
+      "sentence_count": 272,
+      "word_count": 4626
     },
     {
       "number": "X",
@@ -17508,18 +17446,9 @@
         },
         {
           "sentences": [
-            "“It was with the greatest difficulty that the boy gathered bodily force"
+            "“It was with the greatest difficulty that the boy gathered bodily force to speak; but, his spirit spoke with a dreadful emphasis."
           ]
-        }
-      ],
-      "sentence_count": 119,
-      "word_count": 2301
-    },
-    {
-      "number": "53",
-      "title": "speak; but, his spirit spoke with a dreadful emphasis.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "“‘We were so robbed by that man who stands there, as all we common dogs are by those superior Beings--taxed by him without mercy, obliged to work for him without pay, obliged to grind our corn at his mill, obliged to feed scores of his tame birds on our wretched crops, and forbidden for our lives to keep a single tame bird of our own, pillaged and plundered to that degree that when we chanced to have a bit of meat, we ate it in fear, with the door barred and the shutters closed, that his people should not see it and take it from us--I say, we were so robbed, and hunted, and were made so poor, that our father told us it was a dreadful thing to bring a child into the world, and that what we should most pray for, was, that our women might be barren and our miserable race die out!’"
@@ -17553,6 +17482,7 @@
             "You know that it is among their Rights to keep us in their grounds all night, quieting the frogs, in order that their noble sleep may not be disturbed.",
             "They kept him out in the unwholesome mists at night, and ordered him back into his harness in the day.",
             "But he was not persuaded.",
+            "No!",
             "Taken out of harness one day at noon, to feed--if he could find food--he sobbed twelve times, once for every stroke of the bell, and died on her bosom.’"
           ]
         },
@@ -17956,8 +17886,8 @@
           ]
         }
       ],
-      "sentence_count": 179,
-      "word_count": 3453
+      "sentence_count": 299,
+      "word_count": 5765
     },
     {
       "number": "XI",
@@ -18019,6 +17949,7 @@
         {
           "sentences": [
             "“My husband.",
+            "No!",
             "A moment!” He was tearing himself apart from her. “We shall not be separated long.",
             "I feel that this will break my heart by-and-bye; but I will do my duty while I can, and when I leave her, God will raise up friends for her, as He did for me.”"
           ]
@@ -18163,6 +18094,7 @@
         {
           "sentences": [
             "“That’s true.",
+            "Well!",
             "It is a forlorn hope at the best, and not much the forlorner for being delayed till dark.",
             "I should like to know how you speed; though, mind!",
             "I expect nothing!",
@@ -18247,8 +18179,8 @@
           ]
         }
       ],
-      "sentence_count": 102,
-      "word_count": 1448
+      "sentence_count": 104,
+      "word_count": 1450
     },
     {
       "number": "XII",
@@ -18300,18 +18232,9 @@
         },
         {
           "sentences": [
-            "As Carton walked in, took his seat and asked (in very indifferent French) for a small measure of wine, Madame Defarge cast a careless glance at him, and then a keener, and then a keener, and then advanced"
+            "As Carton walked in, took his seat and asked (in very indifferent French) for a small measure of wine, Madame Defarge cast a careless glance at him, and then a keener, and then a keener, and then advanced to him herself, and asked him what it was he had ordered."
           ]
-        }
-      ],
-      "sentence_count": 20,
-      "word_count": 405
-    },
-    {
-      "number": "56",
-      "title": "him herself, and asked him what it was he had ordered.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "He repeated what he had already said."
@@ -18818,8 +18741,8 @@
           ]
         }
       ],
-      "sentence_count": 185,
-      "word_count": 2772
+      "sentence_count": 205,
+      "word_count": 3189
     },
     {
       "number": "XIII",
@@ -18890,18 +18813,10 @@
             "To her father himself, he wrote in the same strain; but, he told her father that he expressly confided his wife and child to his care.",
             "And he told him this, very strongly, with the hope of rousing him from any despondency or dangerous retrospect towards which he foresaw he might be tending."
           ]
-        }
-      ],
-      "sentence_count": 29,
-      "word_count": 796
-    },
-    {
-      "number": "58",
-      "title": "Mr. Lorry, he commended them all, and explained his worldly affairs.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
+            "To Mr. Lorry, he commended them all, and explained his worldly affairs.",
             "That done, with many added sentences of grateful friendship and warm attachment, all was done.",
             "He never thought of Carton.",
             "His mind was so full of the others, that he never once thought of him."
@@ -19431,7 +19346,8 @@
         },
         {
           "sentences": [
-            "“And his wife and child."
+            "“And his wife and child.",
+            "Hush!"
           ]
         },
         {
@@ -19716,8 +19632,8 @@
           ]
         }
       ],
-      "sentence_count": 287,
-      "word_count": 3574
+      "sentence_count": 318,
+      "word_count": 4383
     },
     {
       "number": "XIV",
@@ -20082,6 +19998,7 @@
         {
           "sentences": [
             "Mr. Cruncher was so bewildered that he could think of no locality but Temple Bar.",
+            "Alas!",
             "Temple Bar was hundreds of miles away, and Madame Defarge was drawing very near indeed."
           ]
         },
@@ -20119,18 +20036,9 @@
         {
           "sentences": [
             "This exordium, and Miss Pross’s two hands in quite agonised entreaty clasping his, decided Mr. Cruncher.",
-            "With an encouraging nod or two, he immediately went out to alter the arrangements, and left her by herself"
+            "With an encouraging nod or two, he immediately went out to alter the arrangements, and left her by herself to follow as she had proposed."
           ]
-        }
-      ],
-      "sentence_count": 134,
-      "word_count": 2687
-    },
-    {
-      "number": "60",
-      "title": "follow as she had proposed.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "The having originated a precaution which was already in course of execution, was a great relief to Miss Pross.",
@@ -20398,6 +20306,7 @@
         {
           "sentences": [
             "“Blest if she ain’t in a queer condition!” said Mr. Cruncher, more and more disturbed. “Wot can she have been a takin’, to keep her courage up?",
+            "Hark!",
             "There’s the roll of them dreadful carts!",
             "You can hear that, miss?”"
           ]
@@ -20419,8 +20328,8 @@
           ]
         }
       ],
-      "sentence_count": 99,
-      "word_count": 1935
+      "sentence_count": 235,
+      "word_count": 4630
     },
     {
       "number": "XV",
@@ -20568,6 +20477,7 @@
         },
         {
           "sentences": [
+            "Ay!",
             "Louder, Vengeance, much louder, and still she will scarcely hear thee.",
             "Louder yet, Vengeance, with a little oath or so added, and yet it will hardly bring her.",
             "Send other women up and down to seek her, lingering somewhere; and yet, although the messengers have done dread deeds, it is questionable whether of their own wills they will go far enough to find her!"
@@ -20800,6 +20710,7 @@
         },
         {
           "sentences": [
+            "1.A.",
             "By reading or using any part of this Project Gutenberg-tm electronic work, you indicate that you have read, understand, agree to and accept all the terms of this license and intellectual property (trademark/copyright) agreement.",
             "If you do not agree to abide by all the terms of this agreement, you must cease using and return or destroy all copies of Project Gutenberg-tm electronic works in your possession.",
             "If you paid a fee for obtaining a copy of or access to a Project Gutenberg-tm electronic work and you do not agree to be bound by the terms of this agreement, you may obtain a refund from the person or entity to whom you paid the fee as set forth in paragraph 1.E.8."
@@ -20807,7 +20718,7 @@
         },
         {
           "sentences": [
-            "\"Project Gutenberg\" is a registered trademark.",
+            "1.B. \"Project Gutenberg\" is a registered trademark.",
             "It may only be used on or associated in any way with an electronic work by people who agree to be bound by the terms of this agreement.",
             "There are a few things that you can do with most Project Gutenberg-tm electronic works even without complying with the full terms of this agreement.",
             "See paragraph 1.C below.",
@@ -20817,6 +20728,7 @@
         },
         {
           "sentences": [
+            "1.C.",
             "The Project Gutenberg Literary Archive Foundation (\"the Foundation\" or PGLAF), owns a compilation copyright in the collection of Project Gutenberg-tm electronic works.",
             "Nearly all the individual works in the collection are in the public domain in the United States.",
             "If an individual work is unprotected by copyright law in the United States and you are located in the United States, we do not claim a right to prevent you from copying, distributing, performing, displaying or creating derivative works based on the work as long as all references to Project Gutenberg are removed.",
@@ -20826,6 +20738,7 @@
         },
         {
           "sentences": [
+            "1.D.",
             "The copyright laws of the place where you are located also govern what you can do with this work.",
             "Copyright laws in most countries are in a constant state of change.",
             "If you are outside the United States, check the laws of your country in addition to the terms of this agreement before downloading, copying, displaying, performing, distributing or creating derivative works based on this work or any other Project Gutenberg-tm work.",
@@ -20834,6 +20747,7 @@
         },
         {
           "sentences": [
+            "1.E.",
             "Unless you have removed all references to Project Gutenberg:"
           ]
         },
@@ -20925,6 +20839,11 @@
             "1.E.9.",
             "If you wish to charge a fee or distribute a Project Gutenberg-tm electronic work or group of works on different terms than are set forth in this agreement, you must obtain permission in writing from the Project Gutenberg Literary Archive Foundation, the manager of the Project Gutenberg-tm trademark.",
             "Contact the Foundation as set forth in Section below."
+          ]
+        },
+        {
+          "sentences": [
+            "1.F."
           ]
         },
         {
@@ -21078,18 +20997,18 @@
           ]
         }
       ],
-      "sentence_count": 246,
-      "word_count": 5157
+      "sentence_count": 252,
+      "word_count": 5164
     }
   ],
   "statistics": {
-    "total_chapters": 61,
-    "total_paragraphs": 3345,
-    "total_sentences": 7144,
-    "total_words": 138247,
-    "average_sentences_per_chapter": 117.11475409836065,
-    "average_paragraphs_per_chapter": 54.83606557377049,
-    "average_sentences_per_paragraph": 2.135724962630792,
-    "average_words_per_sentence": 19.351483762597983
+    "total_chapters": 45,
+    "total_paragraphs": 3347,
+    "total_sentences": 7199,
+    "total_words": 138431,
+    "average_sentences_per_chapter": 159.9777777777778,
+    "average_paragraphs_per_chapter": 74.37777777777778,
+    "average_sentences_per_paragraph": 2.150881386316104,
+    "average_words_per_sentence": 19.22919849979164
   }
 }

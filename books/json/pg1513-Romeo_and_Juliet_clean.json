@@ -230,6 +230,7 @@
         {
           "sentences": [
             "GREGORY.",
+            "How?",
             "Turn thy back and run?"
           ]
         },
@@ -290,7 +291,8 @@
         },
         {
           "sentences": [
-            "GREGORY."
+            "GREGORY.",
+            "No."
           ]
         },
         {
@@ -479,20 +481,7 @@
             "You men, you beasts, That quench the fire of your pernicious rage With purple fountains issuing from your veins, On pain of torture, from those bloody hands Throw your mistemper’d weapons to the ground And hear the sentence of your moved prince.",
             "Three civil brawls, bred of an airy word, By thee, old Capulet, and Montague, Have thrice disturb’d the quiet of our streets, And made Verona’s ancient citizens Cast by their grave beseeming ornaments, To wield old partisans, in hands as old, Canker’d with peace, to part your canker’d hate.",
             "If ever you disturb our streets again, Your lives shall pay the forfeit of the peace.",
-            "For this time all the rest depart away: You, Capulet, shall go along with me, And Montague, come you this afternoon, To know our farther pleasure in this case,"
-          ]
-        }
-      ],
-      "sentence_count": 131,
-      "word_count": 822
-    },
-    {
-      "number": "4",
-      "title": "old Free-town, our common judgement-place.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "For this time all the rest depart away: You, Capulet, shall go along with me, And Montague, come you this afternoon, To know our farther pleasure in this case, To old Free-town, our common judgement-place.",
             "Once more, on pain of death, all men depart."
           ]
         },
@@ -632,7 +621,8 @@
         },
         {
           "sentences": [
-            "ROMEO."
+            "ROMEO.",
+            "Out."
           ]
         },
         {
@@ -658,6 +648,7 @@
             "ROMEO.",
             "Alas that love, whose view is muffled still, Should, without eyes, see pathways to his will!",
             "Where shall we dine?",
+            "O me!",
             "What fray was here?",
             "Yet tell me not, for I have heard it all.",
             "Here’s much to do with hate, but more with love: Why, then, O brawling love!",
@@ -708,12 +699,14 @@
         {
           "sentences": [
             "BENVOLIO.",
+            "Soft!",
             "I will go along: And if you leave me so, you do me wrong."
           ]
         },
         {
           "sentences": [
             "ROMEO.",
+            "Tut!",
             "I have lost myself; I am not here.",
             "This is not Romeo, he’s some other where."
           ]
@@ -779,20 +772,7 @@
           "sentences": [
             "ROMEO.",
             "She hath, and in that sparing makes huge waste; For beauty starv’d with her severity, Cuts beauty off from all posterity.",
-            "She is too fair, too wise; wisely too fair,"
-          ]
-        }
-      ],
-      "sentence_count": 115,
-      "word_count": 997
-    },
-    {
-      "number": "5",
-      "title": "merit bliss by making me despair.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "She is too fair, too wise; wisely too fair, To merit bliss by making me despair.",
             "She hath forsworn to love, and in that vow Do I live dead, that live to tell it now."
           ]
         },
@@ -816,20 +796,7 @@
         },
         {
           "sentences": [
-            "ROMEO. ’Tis the way"
-          ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 53
-    },
-    {
-      "number": "6",
-      "title": "call hers, exquisite, in question more.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "ROMEO. ’Tis the way To call hers, exquisite, in question more.",
             "These happy masks that kiss fair ladies’ brows, Being black, puts us in mind they hide the fair; He that is strucken blind cannot forget The precious treasure of his eyesight lost.",
             "Show me a mistress that is passing fair, What doth her beauty serve but as a note Where I may read who pass’d that passing fair?",
             "Farewell, thou canst not teach me to forget."
@@ -847,8 +814,8 @@
           ]
         }
       ],
-      "sentence_count": 6,
-      "word_count": 77
+      "sentence_count": 266,
+      "word_count": 1976
     },
     {
       "number": "II",
@@ -1008,7 +975,8 @@
         },
         {
           "sentences": [
-            "SERVANT."
+            "SERVANT.",
+            "Up."
           ]
         },
         {
@@ -1019,18 +987,10 @@
         },
         {
           "sentences": [
-            "SERVANT."
+            "SERVANT.",
+            "To our house."
           ]
-        }
-      ],
-      "sentence_count": 59,
-      "word_count": 626
-    },
-    {
-      "number": "8",
-      "title": "our house.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "ROMEO.",
@@ -1095,8 +1055,8 @@
           ]
         }
       ],
-      "sentence_count": 23,
-      "word_count": 218
+      "sentence_count": 84,
+      "word_count": 848
     },
     {
       "number": "III",
@@ -1175,18 +1135,9 @@
           "sentences": [
             "NURSE.",
             "I’ll lay fourteen of my teeth, And yet, to my teen be it spoken, I have but four, She is not fourteen.",
-            "How long is it now"
+            "How long is it now To Lammas-tide?"
           ]
-        }
-      ],
-      "sentence_count": 31,
-      "word_count": 137
-    },
-    {
-      "number": "10",
-      "title": "Lammas-tide?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "LADY CAPULET.",
@@ -1200,36 +1151,12 @@
             "Susan and she,—God rest all Christian souls!— Were of an age.",
             "Well, Susan is with God; She was too good for me.",
             "But as I said, On Lammas Eve at night shall she be fourteen; That shall she, marry; I remember it well. ’Tis since the earthquake now eleven years; And she was wean’d,—I never shall forget it—, Of all the days of the year, upon that day: For I had then laid wormwood to my dug, Sitting in the sun under the dovehouse wall; My lord and you were then at Mantua: Nay, I do bear a brain.",
-            "But as I said, When it did taste the wormwood on the nipple Of my dug and felt it bitter, pretty fool,"
-          ]
-        }
-      ],
-      "sentence_count": 8,
-      "word_count": 147
-    },
-    {
-      "number": "11",
-      "title": "bid me trudge.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "But as I said, When it did taste the wormwood on the nipple Of my dug and felt it bitter, pretty fool, To see it tetchy, and fall out with the dug!",
+            "Shake, quoth the dovehouse: ’twas no need, I trow, To bid me trudge.",
             "And since that time it is eleven years; For then she could stand alone; nay, by th’rood She could have run and waddled all about; For even the day before she broke her brow, And then my husband,—God be with his soul!",
             "A was a merry man,—took up the child: ‘Yea,’ quoth he, ‘dost thou fall upon thy face?",
-            "Thou wilt fall backward when thou hast more wit; Wilt thou not, Jule?’ and, by my holidame, The pretty wretch left crying, and said ‘Ay’."
-          ]
-        }
-      ],
-      "sentence_count": 3,
-      "word_count": 84
-    },
-    {
-      "number": "12",
-      "title": "see now how a jest shall come about.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Thou wilt fall backward when thou hast more wit; Wilt thou not, Jule?’ and, by my holidame, The pretty wretch left crying, and said ‘Ay’.",
+            "To see now how a jest shall come about.",
             "I warrant, and I should live a thousand years, I never should forget it. ‘Wilt thou not, Jule?’ quoth he; And, pretty fool, it stinted, and said ‘Ay.’"
           ]
         },
@@ -1375,8 +1302,8 @@
           ]
         }
       ],
-      "sentence_count": 54,
-      "word_count": 527
+      "sentence_count": 98,
+      "word_count": 929
     },
     {
       "number": "IV",
@@ -1406,7 +1333,7 @@
       "word_count": 57
     },
     {
-      "number": "14",
+      "number": "7",
       "title": "Nor no without-book prologue, faintly spoke",
       "type": "prologue",
       "paragraphs": [
@@ -1734,18 +1661,10 @@
             "TYBALT.",
             "This by his voice, should be a Montague.",
             "Fetch me my rapier, boy.",
-            "What, dares the slave Come hither, cover’d with an antic face,"
+            "What, dares the slave Come hither, cover’d with an antic face, To fleer and scorn at our solemnity?",
+            "Now by the stock and honour of my kin, To strike him dead I hold it not a sin."
           ]
-        }
-      ],
-      "sentence_count": 60,
-      "word_count": 491
-    },
-    {
-      "number": "16",
-      "title": "strike him dead I hold it not a sin.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "CAPULET.",
@@ -1756,18 +1675,9 @@
         {
           "sentences": [
             "TYBALT.",
-            "Uncle, this is a Montague, our foe; A villain that is hither come in spite,"
+            "Uncle, this is a Montague, our foe; A villain that is hither come in spite, To scorn at our solemnity this night."
           ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 25
-    },
-    {
-      "number": "17",
-      "title": "scorn at our solemnity this night.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "CAPULET.",
@@ -1782,20 +1692,7 @@
         {
           "sentences": [
             "CAPULET.",
-            "Content thee, gentle coz, let him alone, A bears him like a portly gentleman; And, to say truth, Verona brags of him"
-          ]
-        }
-      ],
-      "sentence_count": 5,
-      "word_count": 34
-    },
-    {
-      "number": "18",
-      "title": "be a virtuous and well-govern’d youth.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Content thee, gentle coz, let him alone, A bears him like a portly gentleman; And, to say truth, Verona brags of him To be a virtuous and well-govern’d youth.",
             "I would not for the wealth of all the town Here in my house do him disparagement.",
             "Therefore be patient, take no note of him, It is my will; the which if thou respect, Show a fair presence and put off these frowns, An ill-beseeming semblance for a feast."
           ]
@@ -1852,18 +1749,9 @@
         },
         {
           "sentences": [
-            "ROMEO. _To Juliet._ If I profane with my unworthiest hand This holy shrine, the gentle sin is this, My lips, two blushing pilgrims, ready stand"
+            "ROMEO. _To Juliet._ If I profane with my unworthiest hand This holy shrine, the gentle sin is this, My lips, two blushing pilgrims, ready stand To smooth that rough touch with a tender kiss."
           ]
-        }
-      ],
-      "sentence_count": 29,
-      "word_count": 224
-    },
-    {
-      "number": "19",
-      "title": "smooth that rough touch with a tender kiss.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "JULIET.",
@@ -2066,8 +1954,8 @@
           ]
         }
       ],
-      "sentence_count": 77,
-      "word_count": 430
+      "sentence_count": 177,
+      "word_count": 1253
     },
     {
       "number": "II",
@@ -2083,20 +1971,7 @@
           "sentences": [
             "CHORUS.",
             "Now old desire doth in his deathbed lie, And young affection gapes to be his heir; That fair for which love groan’d for and would die, With tender Juliet match’d, is now not fair.",
-            "Now Romeo is belov’d, and loves again, Alike bewitched by the charm of looks; But to his foe suppos’d he must complain, And she steal love’s sweet bait from fearful hooks: Being held a foe, he may not have access To breathe such vows as lovers use to swear; And she as much in love, her means much less"
-          ]
-        }
-      ],
-      "sentence_count": 4,
-      "word_count": 96
-    },
-    {
-      "number": "21",
-      "title": "meet her new beloved anywhere.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Now Romeo is belov’d, and loves again, Alike bewitched by the charm of looks; But to his foe suppos’d he must complain, And she steal love’s sweet bait from fearful hooks: Being held a foe, he may not have access To breathe such vows as lovers use to swear; And she as much in love, her means much less To meet her new beloved anywhere.",
             "But passion lends them power, time means, to meet, Tempering extremities with extreme sweet."
           ]
         },
@@ -2106,8 +1981,8 @@
           ]
         }
       ],
-      "sentence_count": 2,
-      "word_count": 15
+      "sentence_count": 6,
+      "word_count": 117
     },
     {
       "number": "I",
@@ -2186,20 +2061,7 @@
         {
           "sentences": [
             "BENVOLIO.",
-            "Come, he hath hid himself among these trees"
-          ]
-        }
-      ],
-      "sentence_count": 31,
-      "word_count": 264
-    },
-    {
-      "number": "23",
-      "title": "be consorted with the humorous night.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Come, he hath hid himself among these trees To be consorted with the humorous night.",
             "Blind is his love, and best befits the dark."
           ]
         },
@@ -2218,12 +2080,17 @@
         {
           "sentences": [
             "BENVOLIO.",
-            "Go then; for ’tis in vain"
+            "Go then; for ’tis in vain To seek him here that means not to be found."
+          ]
+        },
+        {
+          "sentences": [
+            "_Exeunt._"
           ]
         }
       ],
-      "sentence_count": 11,
-      "word_count": 87
+      "sentence_count": 43,
+      "word_count": 369
     },
     {
       "number": "II",
@@ -2258,20 +2125,7 @@
             "What of that?",
             "Her eye discourses, I will answer it.",
             "I am too bold, ’tis not to me she speaks.",
-            "Two of the fairest stars in all the heaven, Having some business, do entreat her eyes"
-          ]
-        }
-      ],
-      "sentence_count": 15,
-      "word_count": 144
-    },
-    {
-      "number": "25",
-      "title": "twinkle in their spheres till they return.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Two of the fairest stars in all the heaven, Having some business, do entreat her eyes To twinkle in their spheres till they return.",
             "What if her eyes were there, they in her head?",
             "The brightness of her cheek would shame those stars, As daylight doth a lamp; her eyes in heaven Would through the airy region stream so bright That birds would sing and think it were not night.",
             "See how she leans her cheek upon her hand.",
@@ -2541,20 +2395,7 @@
         {
           "sentences": [
             "JULIET.",
-            "By and by I come—"
-          ]
-        }
-      ],
-      "sentence_count": 114,
-      "word_count": 1152
-    },
-    {
-      "number": "26",
-      "title": "cease thy strife and leave me to my grief.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "By and by I come— To cease thy strife and leave me to my grief.",
             "Tomorrow will I send."
           ]
         },
@@ -2595,21 +2436,9 @@
         {
           "sentences": [
             "JULIET.",
+            "Hist!",
             "Romeo, hist!",
-            "O for a falconer’s voice"
-          ]
-        }
-      ],
-      "sentence_count": 14,
-      "word_count": 57
-    },
-    {
-      "number": "27",
-      "title": "lure this tassel-gentle back again.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "O for a falconer’s voice To lure this tassel-gentle back again.",
             "Bondage is hoarse and may not speak aloud, Else would I tear the cave where Echo lies, And make her airy tongue more hoarse than mine With repetition of my Romeo’s name."
           ]
         },
@@ -2707,8 +2536,8 @@
           ]
         }
       ],
-      "sentence_count": 34,
-      "word_count": 262
+      "sentence_count": 178,
+      "word_count": 1640
     },
     {
       "number": "III",
@@ -2775,6 +2604,7 @@
           "sentences": [
             "ROMEO.",
             "With Rosaline, my ghostly father?",
+            "No.",
             "I have forgot that name, and that name’s woe."
           ]
         },
@@ -2816,20 +2646,7 @@
             "Is Rosaline, that thou didst love so dear, So soon forsaken?",
             "Young men’s love then lies Not truly in their hearts, but in their eyes.",
             "Jesu Maria, what a deal of brine Hath wash’d thy sallow cheeks for Rosaline!",
-            "How much salt water thrown away in waste,"
-          ]
-        }
-      ],
-      "sentence_count": 48,
-      "word_count": 581
-    },
-    {
-      "number": "29",
-      "title": "season love, that of it doth not taste.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "How much salt water thrown away in waste, To season love, that of it doth not taste.",
             "The sun not yet thy sighs from heaven clears, Thy old groans yet ring in mine ancient ears.",
             "Lo here upon thy cheek the stain doth sit Of an old tear that is not wash’d off yet.",
             "If ere thou wast thyself, and these woes thine, Thou and these woes were all for Rosaline, And art thou chang’d?",
@@ -2857,18 +2674,9 @@
         {
           "sentences": [
             "FRIAR LAWRENCE.",
-            "Not in a grave"
+            "Not in a grave To lay one in, another out to have."
           ]
-        }
-      ],
-      "sentence_count": 12,
-      "word_count": 100
-    },
-    {
-      "number": "30",
-      "title": "lay one in, another out to have.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "ROMEO.",
@@ -2880,18 +2688,9 @@
           "sentences": [
             "FRIAR LAWRENCE.",
             "O, she knew well Thy love did read by rote, that could not spell.",
-            "But come young waverer, come go with me, In one respect I’ll thy assistant be; For this alliance may so happy prove,"
+            "But come young waverer, come go with me, In one respect I’ll thy assistant be; For this alliance may so happy prove, To turn your households’ rancour to pure love."
           ]
-        }
-      ],
-      "sentence_count": 6,
-      "word_count": 63
-    },
-    {
-      "number": "31",
-      "title": "turn your households’ rancour to pure love.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "ROMEO.",
@@ -2910,8 +2709,8 @@
           ]
         }
       ],
-      "sentence_count": 5,
-      "word_count": 21
+      "sentence_count": 72,
+      "word_count": 791
     },
     {
       "number": "IV",
@@ -3232,7 +3031,8 @@
         },
         {
           "sentences": [
-            "PETER."
+            "PETER.",
+            "Anon."
           ]
         },
         {
@@ -3530,7 +3330,8 @@
         },
         {
           "sentences": [
-            "PETER."
+            "PETER.",
+            "Anon."
           ]
         },
         {
@@ -3545,8 +3346,8 @@
           ]
         }
       ],
-      "sentence_count": 238,
-      "word_count": 1717
+      "sentence_count": 240,
+      "word_count": 1719
     },
     {
       "number": "V",
@@ -3626,20 +3427,7 @@
         {
           "sentences": [
             "JULIET.",
-            "How art thou out of breath, when thou hast breath"
-          ]
-        }
-      ],
-      "sentence_count": 32,
-      "word_count": 275
-    },
-    {
-      "number": "34",
-      "title": "say to me that thou art out of breath?",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "How art thou out of breath, when thou hast breath To say to me that thou art out of breath?",
             "The excuse that thou dost make in this delay Is longer than the tale thou dost excuse.",
             "Is thy news good or bad?",
             "Answer to that; Say either, and I’ll stay the circumstance.",
@@ -3674,18 +3462,9 @@
             "What a head have I!",
             "It beats as it would fall in twenty pieces.",
             "My back o’ t’other side,—O my back, my back!",
-            "Beshrew your heart for sending me about"
+            "Beshrew your heart for sending me about To catch my death with jauncing up and down."
           ]
-        }
-      ],
-      "sentence_count": 23,
-      "word_count": 181
-    },
-    {
-      "number": "35",
-      "title": "catch my death with jauncing up and down.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "JULIET.",
@@ -3744,6 +3523,7 @@
             "Hie you to church.",
             "I must another way, To fetch a ladder by the which your love Must climb a bird’s nest soon when it is dark.",
             "I am the drudge, and toil in your delight; But you shall bear the burden soon at night.",
+            "Go.",
             "I’ll to dinner; hie you to the cell."
           ]
         },
@@ -3760,8 +3540,8 @@
           ]
         }
       ],
-      "sentence_count": 33,
-      "word_count": 219
+      "sentence_count": 89,
+      "word_count": 695
     },
     {
       "number": "VI",
@@ -3896,6 +3676,7 @@
           "sentences": [
             "MERCUTIO.",
             "Nay, an there were two such, we should have none shortly, for one would kill the other.",
+            "Thou?",
             "Why, thou wilt quarrel with a man that hath a hair more or a hair less in his beard than thou hast.",
             "Thou wilt quarrel with a man for cracking nuts, having no other reason but because thou hast hazel eyes.",
             "What eye but such an eye would spy out such a quarrel?",
@@ -4360,8 +4141,8 @@
           ]
         }
       ],
-      "sentence_count": 206,
-      "word_count": 1687
+      "sentence_count": 207,
+      "word_count": 1688
     },
     {
       "number": "II",
@@ -4465,20 +4246,8 @@
           "sentences": [
             "JULIET.",
             "O, break, my heart.",
-            "Poor bankrout, break at once."
-          ]
-        }
-      ],
-      "sentence_count": 48,
-      "word_count": 478
-    },
-    {
-      "number": "39",
-      "title": "prison, eyes; ne’er look on liberty.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Poor bankrout, break at once.",
+            "To prison, eyes; ne’er look on liberty.",
             "Vile earth to earth resign; end motion here, And thou and Romeo press one heavy bier."
           ]
         },
@@ -4601,20 +4370,8 @@
           "sentences": [
             "NURSE.",
             "Hie to your chamber.",
-            "I’ll find Romeo"
-          ]
-        }
-      ],
-      "sentence_count": 71,
-      "word_count": 626
-    },
-    {
-      "number": "40",
-      "title": "comfort you. I wot well where he is.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I’ll find Romeo To comfort you.",
+            "I wot well where he is.",
             "Hark ye, your Romeo will be here at night.",
             "I’ll to him, he is hid at Lawrence’ cell."
           ]
@@ -4631,8 +4388,8 @@
           ]
         }
       ],
-      "sentence_count": 5,
-      "word_count": 39
+      "sentence_count": 126,
+      "word_count": 1159
     },
     {
       "number": "III",
@@ -4729,18 +4486,9 @@
             "Banished?",
             "O Friar, the damned use that word in hell.",
             "Howling attends it.",
-            "How hast thou the heart, Being a divine, a ghostly confessor, A sin-absolver, and my friend profess’d,"
+            "How hast thou the heart, Being a divine, a ghostly confessor, A sin-absolver, and my friend profess’d, To mangle me with that word banished?"
           ]
-        }
-      ],
-      "sentence_count": 45,
-      "word_count": 393
-    },
-    {
-      "number": "42",
-      "title": "mangle me with that word banished?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "FRIAR LAWRENCE.",
@@ -4756,18 +4504,9 @@
         {
           "sentences": [
             "FRIAR LAWRENCE.",
-            "I’ll give thee armour to keep off that word, Adversity’s sweet milk, philosophy,"
+            "I’ll give thee armour to keep off that word, Adversity’s sweet milk, philosophy, To comfort thee, though thou art banished."
           ]
-        }
-      ],
-      "sentence_count": 6,
-      "word_count": 34
-    },
-    {
-      "number": "43",
-      "title": "comfort thee, though thou art banished.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "ROMEO.",
@@ -4969,20 +4708,8 @@
         {
           "sentences": [
             "NURSE.",
-            "O Lord, I could have stay’d here all the night"
-          ]
-        }
-      ],
-      "sentence_count": 92,
-      "word_count": 854
-    },
-    {
-      "number": "44",
-      "title": "hear good counsel. O, what learning is!",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "O Lord, I could have stay’d here all the night To hear good counsel.",
+            "O, what learning is!",
             "My lord, I’ll tell my lady you will come."
           ]
         },
@@ -5032,8 +4759,8 @@
           ]
         }
       ],
-      "sentence_count": 18,
-      "word_count": 134
+      "sentence_count": 162,
+      "word_count": 1437
     },
     {
       "number": "IV",
@@ -5482,6 +5209,7 @@
         {
           "sentences": [
             "CAPULET.",
+            "Soft.",
             "Take me with you, take me with you, wife.",
             "How, will she none?",
             "Doth she not give us thanks?",
@@ -5654,30 +5382,23 @@
         },
         {
           "sentences": [
-            "JULIET."
+            "JULIET.",
+            "Amen."
           ]
         },
         {
           "sentences": [
-            "NURSE."
+            "NURSE.",
+            "What?"
           ]
         },
         {
           "sentences": [
             "JULIET.",
             "Well, thou hast comforted me marvellous much.",
-            "Go in, and tell my lady I am gone, Having displeas’d my father, to Lawrence’ cell,"
+            "Go in, and tell my lady I am gone, Having displeas’d my father, to Lawrence’ cell, To make confession and to be absolv’d."
           ]
-        }
-      ],
-      "sentence_count": 243,
-      "word_count": 2011
-    },
-    {
-      "number": "47",
-      "title": "make confession and to be absolv’d.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "NURSE.",
@@ -5707,8 +5428,8 @@
           ]
         }
       ],
-      "sentence_count": 12,
-      "word_count": 75
+      "sentence_count": 258,
+      "word_count": 2096
     },
     {
       "number": "I",
@@ -5796,18 +5517,10 @@
         },
         {
           "sentences": [
-            "JULIET."
+            "JULIET.",
+            "To answer that, I should confess to you."
           ]
-        }
-      ],
-      "sentence_count": 28,
-      "word_count": 203
-    },
-    {
-      "number": "49",
-      "title": "answer that, I should confess to you.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "PARIS.",
@@ -5924,18 +5637,9 @@
             "JULIET.",
             "O, bid me leap, rather than marry Paris, From off the battlements of yonder tower, Or walk in thievish ways, or bid me lurk Where serpents are.",
             "Chain me with roaring bears; Or hide me nightly in a charnel-house, O’er-cover’d quite with dead men’s rattling bones, With reeky shanks and yellow chapless skulls.",
-            "Or bid me go into a new-made grave, And hide me with a dead man in his shroud; Things that, to hear them told, have made me tremble, And I will do it without fear or doubt,"
+            "Or bid me go into a new-made grave, And hide me with a dead man in his shroud; Things that, to hear them told, have made me tremble, And I will do it without fear or doubt, To live an unstain’d wife to my sweet love."
           ]
-        }
-      ],
-      "sentence_count": 47,
-      "word_count": 551
-    },
-    {
-      "number": "50",
-      "title": "live an unstain’d wife to my sweet love.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "FRIAR LAWRENCE.",
@@ -5946,20 +5650,7 @@
             "No warmth, no breath shall testify thou livest, The roses in thy lips and cheeks shall fade To paly ashes; thy eyes’ windows fall, Like death when he shuts up the day of life.",
             "Each part depriv’d of supple government, Shall stiff and stark and cold appear like death.",
             "And in this borrow’d likeness of shrunk death Thou shalt continue two and forty hours, And then awake as from a pleasant sleep.",
-            "Now when the bridegroom in the morning comes"
-          ]
-        }
-      ],
-      "sentence_count": 9,
-      "word_count": 151
-    },
-    {
-      "number": "51",
-      "title": "rouse thee from thy bed, there art thou dead.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Now when the bridegroom in the morning comes To rouse thee from thy bed, there art thou dead.",
             "Then as the manner of our country is, In thy best robes, uncover’d, on the bier, Thou shalt be borne to that same ancient vault Where all the kindred of the Capulets lie.",
             "In the meantime, against thou shalt awake, Shall Romeo by my letters know our drift, And hither shall he come, and he and I Will watch thy waking, and that very night Shall Romeo bear thee hence to Mantua.",
             "And this shall free thee from this present shame, If no inconstant toy nor womanish fear Abate thy valour in the acting it."
@@ -5976,18 +5667,9 @@
           "sentences": [
             "FRIAR LAWRENCE.",
             "Hold; get you gone, be strong and prosperous In this resolve.",
-            "I’ll send a friar with speed"
+            "I’ll send a friar with speed To Mantua, with my letters to thy lord."
           ]
-        }
-      ],
-      "sentence_count": 9,
-      "word_count": 125
-    },
-    {
-      "number": "52",
-      "title": "Mantua, with my letters to thy lord.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "JULIET.",
@@ -6001,8 +5683,8 @@
           ]
         }
       ],
-      "sentence_count": 4,
-      "word_count": 14
+      "sentence_count": 98,
+      "word_count": 1079
     },
     {
       "number": "II",
@@ -6099,20 +5781,8 @@
         {
           "sentences": [
             "JULIET.",
-            "Where I have learnt me to repent the sin Of disobedient opposition To you and your behests; and am enjoin’d By holy Lawrence to fall prostrate here,"
-          ]
-        }
-      ],
-      "sentence_count": 29,
-      "word_count": 167
-    },
-    {
-      "number": "54",
-      "title": "beg your pardon. Pardon, I beseech you.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Where I have learnt me to repent the sin Of disobedient opposition To you and your behests; and am enjoin’d By holy Lawrence to fall prostrate here, To beg your pardon.",
+            "Pardon, I beseech you.",
             "Henceforward I am ever rul’d by you."
           ]
         },
@@ -6189,8 +5859,8 @@
           ]
         }
       ],
-      "sentence_count": 33,
-      "word_count": 230
+      "sentence_count": 63,
+      "word_count": 405
     },
     {
       "number": "III",
@@ -6334,6 +6004,7 @@
           "sentences": [
             "CAPULET.",
             "No, not a whit.",
+            "What!",
             "I have watch’d ere now All night for lesser cause, and ne’er been sick."
           ]
         },
@@ -6415,6 +6086,7 @@
         {
           "sentences": [
             "Nurse!",
+            "Wife!",
             "What, ho!",
             "What, Nurse, I say!"
           ]
@@ -6438,8 +6110,8 @@
           ]
         }
       ],
-      "sentence_count": 47,
-      "word_count": 263
+      "sentence_count": 49,
+      "word_count": 265
     },
     {
       "number": "V",
@@ -6475,6 +6147,9 @@
             "Will it not be?",
             "What, dress’d, and in your clothes, and down again?",
             "I must needs wake you.",
+            "Lady!",
+            "Lady!",
+            "Lady!",
             "Alas, alas!",
             "Help, help!",
             "My lady’s dead!",
@@ -6550,6 +6225,7 @@
         {
           "sentences": [
             "CAPULET.",
+            "Ha!",
             "Let me see her.",
             "Out alas!",
             "She’s cold, Her blood is settled and her joints are stiff.",
@@ -6635,20 +6311,7 @@
           "sentences": [
             "CAPULET.",
             "Despis’d, distressed, hated, martyr’d, kill’d.",
-            "Uncomfortable time, why cam’st thou now"
-          ]
-        }
-      ],
-      "sentence_count": 96,
-      "word_count": 512
-    },
-    {
-      "number": "58",
-      "title": "murder, murder our solemnity?",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Uncomfortable time, why cam’st thou now To murder, murder our solemnity?",
             "O child!",
             "O child!",
             "My soul, and not my child, Dead art thou.",
@@ -6677,20 +6340,7 @@
         {
           "sentences": [
             "FRIAR LAWRENCE.",
-            "Sir, go you in, and, madam, go with him, And go, Sir Paris, everyone prepare"
-          ]
-        }
-      ],
-      "sentence_count": 17,
-      "word_count": 252
-    },
-    {
-      "number": "59",
-      "title": "follow this fair corse unto her grave.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "Sir, go you in, and, madam, go with him, And go, Sir Paris, everyone prepare To follow this fair corse unto her grave.",
             "The heavens do lower upon you for some ill; Move them no more by crossing their high will."
           ]
         },
@@ -6760,7 +6410,8 @@
         },
         {
           "sentences": [
-            "FIRST MUSICIAN."
+            "FIRST MUSICIAN.",
+            "No."
           ]
         },
         {
@@ -6883,8 +6534,8 @@
           ]
         }
       ],
-      "sentence_count": 69,
-      "word_count": 395
+      "sentence_count": 187,
+      "word_count": 1177
     },
     {
       "number": "I",
@@ -6978,20 +6629,7 @@
           "sentences": [
             "Well, Juliet, I will lie with thee tonight.",
             "Let’s see for means.",
-            "O mischief thou art swift"
-          ]
-        }
-      ],
-      "sentence_count": 42,
-      "word_count": 302
-    },
-    {
-      "number": "61",
-      "title": "enter in the thoughts of desperate men.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "O mischief thou art swift To enter in the thoughts of desperate men.",
             "I do remember an apothecary,— And hereabouts he dwells,—which late I noted In tatter’d weeds, with overwhelming brows, Culling of simples, meagre were his looks, Sharp misery had worn him to the bones; And in his needy shop a tortoise hung, An alligator stuff’d, and other skins Of ill-shaped fishes; and about his shelves A beggarly account of empty boxes, Green earthen pots, bladders, and musty seeds, Remnants of packthread, and old cakes of roses Were thinly scatter’d, to make up a show.",
             "Noting this penury, to myself I said, And if a man did need a poison now, Whose sale is present death in Mantua, Here lives a caitiff wretch would sell it him.",
             "O, this same thought did but forerun my need, And this same needy man must sell it me.",
@@ -7059,12 +6697,17 @@
             "There is thy gold, worse poison to men’s souls, Doing more murder in this loathsome world Than these poor compounds that thou mayst not sell.",
             "I sell thee poison, thou hast sold me none.",
             "Farewell, buy food, and get thyself in flesh.",
-            "Come, cordial and not poison, go with me"
+            "Come, cordial and not poison, go with me To Juliet’s grave, for there must I use thee."
+          ]
+        },
+        {
+          "sentences": [
+            "_Exeunt._"
           ]
         }
       ],
-      "sentence_count": 32,
-      "word_count": 393
+      "sentence_count": 75,
+      "word_count": 713
     },
     {
       "number": "II",
@@ -7200,20 +6843,7 @@
         {
           "sentences": [
             "The boy gives warning something doth approach.",
-            "What cursed foot wanders this way tonight,"
-          ]
-        }
-      ],
-      "sentence_count": 18,
-      "word_count": 174
-    },
-    {
-      "number": "64",
-      "title": "cross my obsequies and true love’s rite?",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "What cursed foot wanders this way tonight, To cross my obsequies and true love’s rite?",
             "What, with a torch!",
             "Muffle me, night, awhile."
           ]
@@ -7285,18 +6915,10 @@
         {
           "sentences": [
             "PARIS.",
-            "This is that banish’d haughty Montague That murder’d my love’s cousin,—with which grief, It is supposed, the fair creature died,— And here is come to do some villainous shame"
+            "This is that banish’d haughty Montague That murder’d my love’s cousin,—with which grief, It is supposed, the fair creature died,— And here is come to do some villainous shame To the dead bodies.",
+            "I will apprehend him."
           ]
-        }
-      ],
-      "sentence_count": 28,
-      "word_count": 280
-    },
-    {
-      "number": "65",
-      "title": "the dead bodies. I will apprehend him.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "_Advances._"
@@ -7343,6 +6965,7 @@
         },
         {
           "sentences": [
+            "PAGE.",
             "O lord, they fight!",
             "I will go call the watch."
           ]
@@ -7395,20 +7018,7 @@
             "Thou art not conquer’d.",
             "Beauty’s ensign yet Is crimson in thy lips and in thy cheeks, And death’s pale flag is not advanced there.",
             "Tybalt, liest thou there in thy bloody sheet?",
-            "O, what more favour can I do to thee Than with that hand that cut thy youth in twain"
-          ]
-        }
-      ],
-      "sentence_count": 49,
-      "word_count": 387
-    },
-    {
-      "number": "66",
-      "title": "sunder his that was thine enemy?",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "O, what more favour can I do to thee Than with that hand that cut thy youth in twain To sunder his that was thine enemy?",
             "Forgive me, cousin.",
             "Ah, dear Juliet, Why art thou yet so fair?",
             "Shall I believe That unsubstantial death is amorous; And that the lean abhorred monster keeps Thee here in dark to be his paramour?",
@@ -7518,18 +7128,9 @@
           "sentences": [
             "FRIAR LAWRENCE.",
             "Romeo! _Advances._ Alack, alack, what blood is this which stains The stony entrance of this sepulchre?",
-            "What mean these masterless and gory swords"
+            "What mean these masterless and gory swords To lie discolour’d by this place of peace?"
           ]
-        }
-      ],
-      "sentence_count": 50,
-      "word_count": 382
-    },
-    {
-      "number": "67",
-      "title": "lie discolour’d by this place of peace?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "_Enters the monument._"
@@ -7595,18 +7196,11 @@
             "A cup clos’d in my true love’s hand?",
             "Poison, I see, hath been his timeless end.",
             "O churl.",
-            "Drink all, and left no friendly drop"
+            "Drink all, and left no friendly drop To help me after?",
+            "I will kiss thy lips.",
+            "Haply some poison yet doth hang on them, To make me die with a restorative."
           ]
-        }
-      ],
-      "sentence_count": 32,
-      "word_count": 170
-    },
-    {
-      "number": "68",
-      "title": "make me die with a restorative.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "_Kisses him._"
@@ -7653,6 +7247,7 @@
         },
         {
           "sentences": [
+            "PAGE.",
             "This is the place.",
             "There, where the torch doth burn."
           ]
@@ -7788,6 +7383,7 @@
         {
           "sentences": [
             "LADY CAPULET.",
+            "O me!",
             "This sight of death is as a bell That warns my old age to a sepulchre."
           ]
         },
@@ -7799,18 +7395,9 @@
         {
           "sentences": [
             "PRINCE.",
-            "Come, Montague, for thou art early up,"
+            "Come, Montague, for thou art early up, To see thy son and heir more early down."
           ]
-        }
-      ],
-      "sentence_count": 63,
-      "word_count": 406
-    },
-    {
-      "number": "69",
-      "title": "see thy son and heir more early down.",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "MONTAGUE.",
@@ -7829,18 +7416,9 @@
           "sentences": [
             "MONTAGUE.",
             "O thou untaught!",
-            "What manners is in this,"
+            "What manners is in this, To press before thy father to a grave?"
           ]
-        }
-      ],
-      "sentence_count": 9,
-      "word_count": 40
-    },
-    {
-      "number": "70",
-      "title": "press before thy father to a grave?",
-      "type": "letter",
-      "paragraphs": [
+        },
         {
           "sentences": [
             "PRINCE.",
@@ -7892,20 +7470,7 @@
         {
           "sentences": [
             "BALTHASAR.",
-            "I brought my master news of Juliet’s death, And then in post he came from Mantua"
-          ]
-        }
-      ],
-      "sentence_count": 30,
-      "word_count": 471
-    },
-    {
-      "number": "71",
-      "title": "this same place, to this same monument.",
-      "type": "letter",
-      "paragraphs": [
-        {
-          "sentences": [
+            "I brought my master news of Juliet’s death, And then in post he came from Mantua To this same place, to this same monument.",
             "This letter he early bid me give his father, And threaten’d me with death, going in the vault, If I departed not, and left him there."
           ]
         },
@@ -7919,6 +7484,7 @@
         },
         {
           "sentences": [
+            "PAGE.",
             "He came with flowers to strew his lady’s grave, And bid me stand aloof, and so I did.",
             "Anon comes one with light to ope the tomb, And by and by my master drew on him, And then I ran away to call the watch."
           ]
@@ -7972,18 +7538,18 @@
           ]
         }
       ],
-      "sentence_count": 27,
-      "word_count": 316
+      "sentence_count": 313,
+      "word_count": 2711
     }
   ],
   "statistics": {
-    "total_chapters": 71,
-    "total_paragraphs": 1083,
-    "total_sentences": 2996,
-    "total_words": 25215,
-    "average_sentences_per_chapter": 42.19718309859155,
-    "average_paragraphs_per_chapter": 15.253521126760564,
-    "average_sentences_per_paragraph": 2.766389658356417,
-    "average_words_per_sentence": 8.416221628838452
+    "total_chapters": 28,
+    "total_paragraphs": 1061,
+    "total_sentences": 3037,
+    "total_words": 25641,
+    "average_sentences_per_chapter": 108.46428571428571,
+    "average_paragraphs_per_chapter": 37.892857142857146,
+    "average_sentences_per_paragraph": 2.86239396795476,
+    "average_words_per_sentence": 8.442871254527494
   }
 }
