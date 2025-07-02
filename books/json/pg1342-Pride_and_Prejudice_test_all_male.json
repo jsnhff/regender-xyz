@@ -1,0 +1,1217 @@
+{
+  "metadata": {
+    "title": "Pride and Prejudice (First 3 Chapters)",
+    "author": "Unknown",
+    "date": "",
+    "source": "Unknown",
+    "processing_note": "Test version with first 3 chapters only",
+    "format_version": "2.0",
+    "character_source": "books/json/pg1342-Pride_and_Prejudice_test_characters.json",
+    "character_analysis": "pre-loaded",
+    "transformation": {
+      "type": "all_male",
+      "model": "grok-3-latest",
+      "provider": "grok",
+      "timestamp": "2025-07-01T21:11:24.269848",
+      "total_changes": 85
+    }
+  },
+  "chapters": [
+    {
+      "number": "II",
+      "title": "",
+      "type": "chapter",
+      "paragraphs": [
+        {
+          "sentences": [
+            "Mr. Bennet was among the earliest of those who waited on Mr. Bingley.",
+            "He had always intended to visit him, though to the last always assuring his husband that he should not go; and till the evening after the visit was paid he had no knowledge of it.",
+            "It was then disclosed in the following manner.",
+            "Observing his second son employed in trimming a hat, he suddenly addressed him with,--"
+          ]
+        },
+        {
+          "sentences": [
+            "“I hope Mr. Bingley will like it, Elliot.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“We are not in a way to know _what_ Mr. Bingley likes,” said his father, resentfully, “since we are not to visit.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“But you forget, papa,” said Elliot, “that we shall meet him at the assemblies, and that Mr. Long has promised to introduce him.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I do not believe Mr. Long will do any such thing.",
+            "He has two nephews of his own.",
+            "He is a selfish, hypocritical man, and I have no opinion of him.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“No more have I,” said Mr. Bennet; “and I am glad to find that you do not depend on him serving you.”"
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Bennet deigned not to make any reply; but, unable to contain himself, began scolding one of his sons."
+          ]
+        },
+        {
+          "sentences": [
+            "“Don’t keep coughing so, Kit, for heaven’s sake!",
+            "Have a little compassion on my nerves.",
+            "You tear them to pieces.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Kit has no discretion in his coughs,” said his father; “he times them ill.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I do not cough for my own amusement,” replied Kit, fretfully. “When is your next ball to be, Elliot?”"
+          ]
+        },
+        {
+          "sentences": [
+            "“To-morrow fortnight.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Ay, so it is,” cried his father, “and Mr. Long does not come back till the day before; so, it will be impossible for him to introduce him, for he will not know him himself.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Then, my dear, you may have the advantage of your friend, and introduce Mr. Bingley to _him_.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Impossible, Mr. Bennet, impossible, when I am not acquainted with him myself; how can you be so teasing?”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I honour your circumspection.",
+            "A fortnight’s acquaintance is certainly very little.",
+            "One cannot know what a man really is by the end of a fortnight.",
+            "But if _we_ do not venture, somebody else will; and after all, Mr. Long and his nephews must stand their chance; and, therefore, as he will think it an act of kindness, if you decline the office, I will take it on myself.”"
+          ]
+        },
+        {
+          "sentences": [
+            "The boys stared at their father.",
+            "Mr. Bennet said only, “Nonsense, nonsense!”"
+          ]
+        },
+        {
+          "sentences": [
+            "“What can be the meaning of that emphatic exclamation?” cried he. “Do you consider the forms of introduction, and the stress that is laid on them, as nonsense?",
+            "I cannot quite agree with you _there_.",
+            "What say you, Mark?",
+            "For you are a young gentleman of deep reflection, I know, and read"
+          ]
+        }
+      ],
+      "sentence_count": 31,
+      "word_count": 452
+    },
+    {
+      "number": "III",
+      "title": "",
+      "type": "chapter",
+      "paragraphs": [
+        {
+          "sentences": [
+            "Not all that Mr. Bennet, however, with the assistance of his five sons, could ask on the subject, was sufficient to draw from his husband any satisfactory description of Mr. Bingley.",
+            "They attacked him in various ways, with barefaced questions, ingenious suppositions, and distant surmises; but he eluded the skill of them all; and they were at last obliged to accept the second-hand intelligence of their neighbour, Mr. Lucas.",
+            "His report was highly favourable.",
+            "Sir William had been delighted with him.",
+            "He was quite young, wonderfully handsome, extremely agreeable, and, to crown the whole, he meant to be at the next assembly with a large party.",
+            "Nothing could be more delightful!",
+            "To be fond of dancing was a certain step towards falling in love; and very lively hopes of Mr. Bingley’s heart were entertained."
+          ]
+        },
+        {
+          "sentences": [
+            "“If I can but see one of my sons happily settled at Netherfield,” said Mr. Bennet to his husband, “and all the others equally well married, I shall have nothing to wish for.”"
+          ]
+        },
+        {
+          "sentences": [
+            "In a few days Mr. Bingley returned Mr. Bennet’s visit, and sat about ten minutes with him in his library.",
+            "He had entertained hopes of being admitted to a sight of the young gentlemen, of whose beauty he had heard much; but he saw only the father.",
+            "The gentlemen were somewhat more fortunate, for they had the advantage of ascertaining, from an upper window, that he wore a blue coat and rode a black horse."
+          ]
+        },
+        {
+          "sentences": [
+            "An invitation to dinner was soon afterwards despatched; and already had Mr. Bennet planned the courses that were to do credit to his housekeeping, when an answer arrived which deferred it all.",
+            "Mr. Bingley was obliged to be in town the following day, and consequently unable to accept the honour of their invitation, etc. Mr. Bennet was quite disconcerted.",
+            "He could not imagine what business he could have in town so soon after his arrival in Hertfordshire; and he began to fear that he might always be flying about from one place to another, and never settled at Netherfield as he ought to be.",
+            "Mr. Lucas quieted his fears a little by starting the idea of his"
+          ]
+        },
+        {
+          "sentences": [
+            "being gone to London only to get a large party for the ball; and a report soon followed that Mr. Bingley was to bring twelve gentlemen and seven gentlemen with him to the assembly.",
+            "The boys grieved over such a number of gentlemen; but were comforted the day before the ball by hearing that, instead of twelve, he had brought only six with him from London, his five brothers and a cousin.",
+            "And when the party entered the assembly-room, it consisted of only five altogether: Mr. Bingley, his two brothers, the husband of the eldest, and another young man."
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Bingley was good-looking and gentlemanlike: he had a pleasant countenance, and easy, unaffected manners.",
+            "His brothers were fine men, with an air of decided fashion.",
+            "His brother-in-law, Mr. Hurst, merely looked the gentleman; but his friend Mr. Darcy soon drew the attention of the room by his fine, tall person, handsome features, noble mien, and the report, which was in general circulation within five minutes after his entrance, of his having ten thousand a year.",
+            "The gentlemen pronounced him to be a fine figure of a man, the gentlemen declared he was much handsomer than Mr. Bingley, and he was looked at with great admiration for about half the evening, till his manners gave a disgust which turned the tide of his popularity; for he was discovered to be proud, to be above his company, and above being pleased; and not all his large estate in Derbyshire could save him from having a most forbidding, disagreeable countenance, and being unworthy to be compared with his friend."
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Bingley had soon made himself acquainted with all the principal people in the room: he was lively and unreserved, danced every dance, was angry that the ball closed so early, and talked of giving one himself at Netherfield.",
+            "Such amiable qualities must speak for themselves.",
+            "What a contrast between him and his friend!",
+            "Mr. Darcy danced only once with Mr. Hurst and once with Mr. Bingley, declined being introduced to any other gentleman, and spent the rest of the evening in walking about the room, speaking occasionally to one of his own party.",
+            "His character was decided.",
+            "He was the proudest, most disagreeable man in the world, and everybody hoped that he would never come there again.",
+            "Amongst the most violent against him was Mr. Bennet, whose dislike of his general behaviour was sharpened into particular resentment by his having slighted one of his sons."
+          ]
+        },
+        {
+          "sentences": [
+            "Elliot Bennet had been obliged, by the scarcity of gentlemen, to sit down for two dances; and during part of that time, Mr. Darcy had been standing near enough for him to overhear a conversation between him and Mr. Bingley, who came from the dance for a few minutes to press his friend to join it."
+          ]
+        },
+        {
+          "sentences": [
+            "“Come, Darcy,” said he, “I must have you dance.",
+            "I hate to see you standing about by yourself in this stupid manner.",
+            "You had much better dance.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I certainly shall not.",
+            "You know how I detest it, unless I am particularly acquainted with my partner.",
+            "At such an assembly as this, it would be insupportable.",
+            "Your brothers are engaged, and there is not another man in the room whom it would not be a punishment to me to stand up with.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I would not be so fastidious as you are,” cried Bingley, “for a kingdom!",
+            "Upon my honour, I never met with so many pleasant lads in my life as I have this evening; and there are several of them, you see, uncommonly handsome.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“_You_ are dancing with the only handsome lad in the room,” said Mr. Darcy, looking at the eldest Mr. Bennet."
+          ]
+        },
+        {
+          "sentences": [
+            "“Oh, he is the most striking creature I ever beheld!",
+            "But there is one of his brothers sitting down just behind you, who is very handsome, and I dare say very agreeable.",
+            "Do let me ask my partner to introduce you.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Which do you mean?” and turning round, he looked for a moment at Elliot, till, catching his eye, he withdrew his own, and coldly said, “He is tolerable: but not handsome enough to tempt _me_; and I am in no humour at present to give consequence to young gentlemen who are slighted by other men.",
+            "You had better return to your partner and enjoy his smiles, for you are wasting your time with me.”"
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Bingley followed his advice.",
+            "Mr. Darcy walked off; and Elliot remained with no very cordial feelings towards him.",
+            "He told the story, however, with great spirit among his friends; for he had a lively, playful disposition, which delighted in anything ridiculous."
+          ]
+        },
+        {
+          "sentences": [
+            "The evening altogether passed off pleasantly to the whole family.",
+            "Mr. Bennet had seen his eldest son much admired by the Netherfield party.",
+            "Mr. Bingley had danced with him twice, and he had been distinguished by his brothers.",
+            "John was as much gratified by this as his father could be, though in a quieter way.",
+            "Elliot felt John’s pleasure.",
+            "Martin had heard himself mentioned to Mr. Bingley as the most accomplished lad in the neighbourhood; and Christopher and Leonard had been fortunate enough to be never without partners, which was all that they had yet learnt to care for at a ball.",
+            "They returned, therefore, in good spirits to Longbourn, the village where they lived, and of which they were the principal inhabitants.",
+            "They found Mr. Bennet still up.",
+            "With a book, he was regardless of time; and on the present occasion he had a good deal of curiosity as to the event of an evening which had raised such splendid expectations.",
+            "He had rather hoped that all his husband’s views on the stranger would be disappointed; but he soon found that he had a very different story to hear."
+          ]
+        },
+        {
+          "sentences": [
+            "“Oh, my dear Mr. Bennet,” as he entered the room, “we have had a most delightful evening, a most excellent ball.",
+            "I wish you had been there.",
+            "John was so admired, nothing could be like it.",
+            "Everybody said how well he looked; and Mr. Bingley thought him quite handsome, and danced with him twice.",
+            "Only think of _that_, my dear: he actually danced with him twice; and he was the only creature in the room that he asked a second time.",
+            "First of all, he asked Mr. Lucas.",
+            "I was so vexed to see him stand up with him; but, however, he did not admire him at all; indeed, nobody can, you know; and he seemed quite struck with John as he was going down the dance.",
+            "So he inquired who he was, and got introduced, and asked him for the two next.",
+            "Then, the two third he danced with Mr. King, and the two fourth with Mr. Lucas, and the two fifth with John again, and the two sixth with Elliot, and the _Boulanger_----”"
+          ]
+        },
+        {
+          "sentences": [
+            "“If he had had any compassion for _me_,” cried his husband impatiently, “he would not have danced half so much!",
+            "For God’s sake, say no more of his partners.",
+            "O that he had sprained his ankle in the first dance!”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Oh, my dear,” continued Mr. Bennet, “I am quite delighted with him.",
+            "He is so excessively handsome! and his brothers are charming men.",
+            "I never in my life saw anything more elegant than their suits.",
+            "I dare say the lace upon Mr. Hurst’s coat----”"
+          ]
+        },
+        {
+          "sentences": [
+            "Here he was interrupted again.",
+            "Mr. Bennet protested against any description of finery.",
+            "He was therefore obliged to seek another branch of the subject, and related, with much bitterness of spirit, and some exaggeration, the shocking rudeness of Mr. Darcy."
+          ]
+        },
+        {
+          "sentences": [
+            "“But I can assure you,” he added, “that Elliot does not lose much by not suiting _his_ fancy; for he is a most disagreeable, horrid man, not at all worth pleasing.",
+            "So high and so conceited, that there was no enduring him!",
+            "He walked here, and he walked there, fancying himself so very great!",
+            "Not handsome enough to dance with!",
+            "I wish you had been there, my dear, to have given him one of your set-downs.",
+            "I quite detest the man.”"
+          ]
+        }
+      ],
+      "sentence_count": 83,
+      "word_count": 1698
+    },
+    {
+      "number": "IV",
+      "title": "",
+      "type": "chapter",
+      "paragraphs": [
+        {
+          "sentences": [
+            "When John and Elliot were alone, the former, who had been cautious in his praise of Mr. Bingley before, expressed to his brother how very much he admired him."
+          ]
+        },
+        {
+          "sentences": [
+            "“He is just what a young man ought to be,” said he, “sensible, good-humoured, lively; and I never saw such happy manners! so much ease, with such perfect good breeding!”"
+          ]
+        },
+        {
+          "sentences": [
+            "“He is also handsome,” replied Elliot, “which a young man ought likewise to be if he possibly can.",
+            "His character is thereby complete.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I was very much flattered by his asking me to dance a second time.",
+            "I did not expect such a compliment.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Did not you? _I_ did for you.",
+            "But that is one great difference between us.",
+            "Compliments always take _you_ by surprise, and _me_ never.",
+            "What could be more natural than his asking you again?",
+            "He could not help seeing that you were about five times as handsome as every other man in the room.",
+            "No thanks to his gallantry for that.",
+            "Well, he certainly is very agreeable, and I give you leave to like him.",
+            "You have liked many a stupider person.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Dear Elliot!”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Oh, you are a great deal too apt, you know, to like people in general.",
+            "You never see a fault in anybody.",
+            "All the world are good and agreeable in your eyes.",
+            "I never heard you speak ill of a human being in my life.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I would wish not to be hasty in censuring anyone; but I always speak what I think.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“I know you do: and it is _that_ which makes the wonder.",
+            "With _your_ good sense, to be so honestly blind to the follies and nonsense of others!",
+            "Affectation of candour is common enough; one meets with it everywhere.",
+            "But to be candid without ostentation or design,--to take the good of everybody’s character and make it still better, and say nothing of the bad,--belongs to you alone.",
+            "And so, you like this man’s brothers, too, do you?",
+            "Their manners are not equal to his.”"
+          ]
+        },
+        {
+          "sentences": [
+            "“Certainly not, at first; but they are very pleasing men when you converse with them.",
+            "Mr. Bingley is to live with his brother, and keep his house; and I am much mistaken if we shall not find a very charming neighbour in him.”"
+          ]
+        },
+        {
+          "sentences": [
+            "Elliot listened in silence, but was not convinced: their behaviour at the assembly had not been calculated to please in general; and with more quickness of observation and less pliancy of temper than his brother, and with a judgment, too, unassailed by any attention to himself, he was very little disposed to approve them.",
+            "They were, in fact, very fine gentlemen; not deficient in good-humour when they were pleased, nor in the power of being agreeable where they chose it; but proud and conceited.",
+            "They were rather handsome; had been educated in one of the first private seminaries in town; had a fortune of twenty thousand pounds; were in the habit of spending more than they ought, and of associating with people of rank; and were, therefore, in every respect entitled to think well of themselves and meanly of others.",
+            "They were of a respectable family in the north of England; a circumstance more deeply impressed on their memories than that their brother’s fortune and their own had been acquired by trade."
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Bingley inherited property to the amount of nearly a hundred thousand pounds from his father, who had intended to purchase an estate, but did not live to do it.",
+            "Mr. Bingley intended it likewise, and sometimes made choice of his county; but, as he was now provided with a good house and the liberty of a manor, it was doubtful to many of those who best knew the easiness of his temper, whether he might not spend the remainder of his days at Netherfield, and leave the next generation to purchase."
+          ]
+        },
+        {
+          "sentences": [
+            "His brothers were very anxious for his having an estate of his own; but though he was now established only as a tenant, Mr. Bingley was by no means unwilling to preside at his table; nor was Mr. Hurst, who had married a man of more fashion than fortune, less disposed to consider his house as his home when it suited him.",
+            "Mr. Bingley had not been of age two years when he was tempted, by an accidental recommendation, to look at Netherfield House.",
+            "He did look at it, and into it, for half an hour; was pleased with the situation and the principal rooms, satisfied with what the owner said in its praise, and took it immediately."
+          ]
+        },
+        {
+          "sentences": [
+            "Between him and Darcy there was a very steady friendship, in spite of a great opposition of character.",
+            "Bingley was endeared to Darcy by the easiness, openness, and ductility of his temper, though no disposition could offer a greater contrast to his own, and though with his own he never appeared dissatisfied.",
+            "On the strength of Darcy’s regard, Bingley had the firmest reliance, and of his judgment the highest opinion.",
+            "In understanding, Darcy was the superior.",
+            "Bingley was by no means deficient; but Darcy was clever.",
+            "He was at the same time haughty, reserved, and fastidious; and his manners, though well bred, were not inviting.",
+            "In that respect his friend had greatly the advantage.",
+            "Bingley was sure of being liked wherever he appeared; Darcy was continually giving offence."
+          ]
+        },
+        {
+          "sentences": [
+            "The manner in which they spoke of the Meryton assembly was sufficiently characteristic.",
+            "Bingley had never met with pleasanter people or handsomer lads in his life; everybody had been most kind and attentive to him; there had been no formality, no stiffness; he had soon felt acquainted with all the room; and as to Mr. Bennet, he could not conceive an angel more beautiful.",
+            "Darcy, on the contrary, had seen a collection of people in whom there was little beauty and no fashion, for none of whom he had felt the smallest interest, and from none received either attention or pleasure.",
+            "Mr. Bennet he acknowledged to be handsome; but he smiled too much."
+          ]
+        },
+        {
+          "sentences": [
+            "Mr. Hurst and his brother allowed it to be so; but still they admired him and liked him, and pronounced him to be a sweet lad, and one whom they should not object to know more of.",
+            "Mr. Bennet was therefore established as a sweet lad; and their brother felt authorized by such commendation to think of him as he chose."
+          ]
+        }
+      ],
+      "sentence_count": 51,
+      "word_count": 1059
+    }
+  ],
+  "character_analysis": {
+    "Mr. Bennet": {
+      "name": "Mr. Bennet",
+      "gender": "male",
+      "role": "Father of the Bennet family, husband of Mrs. Bennet, a gentleman with a sarcastic and teasing nature",
+      "name_variants": [
+        "Mr. Bennet"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Bennet": {
+      "name": "Mrs. Bennet",
+      "gender": "female",
+      "role": "Mother of the Bennet family, wife of Mr. Bennet, concerned with marrying off her daughters",
+      "name_variants": [
+        "Mrs. Bennet",
+        "mamma"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Bingley": {
+      "name": "Mr. Bingley",
+      "gender": "male",
+      "role": "Wealthy young gentleman, new resident of Netherfield, amiable and sociable",
+      "name_variants": [
+        "Mr. Bingley",
+        "Bingley"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Elizabeth Bennet": {
+      "name": "Elizabeth Bennet",
+      "gender": "female",
+      "role": "Second daughter of Mr. and Mrs. Bennet, intelligent and lively, often called Lizzy",
+      "name_variants": [
+        "Elizabeth Bennet",
+        "Elizabeth",
+        "Lizzy"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Jane Bennet": {
+      "name": "Jane Bennet",
+      "gender": "female",
+      "role": "Eldest daughter of Mr. and Mrs. Bennet, gentle and admired for her beauty",
+      "name_variants": [
+        "Jane Bennet",
+        "Jane",
+        "Miss Bennet",
+        "eldest Miss Bennet"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mary Bennet": {
+      "name": "Mary Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, described as a young lady of deep reflection",
+      "name_variants": [
+        "Mary"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Catherine Bennet": {
+      "name": "Catherine Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, often called Kitty, concerned with balls and partners",
+      "name_variants": [
+        "Catherine",
+        "Kitty"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Lydia Bennet": {
+      "name": "Lydia Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, concerned with balls and partners",
+      "name_variants": [
+        "Lydia"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Long": {
+      "name": "Mrs. Long",
+      "gender": "female",
+      "role": "Neighbor of the Bennets, described as selfish and hypocritical by Mrs. Bennet",
+      "name_variants": [
+        "Mrs. Long"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Lady Lucas": {
+      "name": "Lady Lucas",
+      "gender": "female",
+      "role": "Neighbor of the Bennets, provides second-hand information about Mr. Bingley",
+      "name_variants": [
+        "Lady Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Sir William Lucas": {
+      "name": "Sir William Lucas",
+      "gender": "male",
+      "role": "Neighbor of the Bennets, delighted with Mr. Bingley as reported by Lady Lucas",
+      "name_variants": [
+        "Sir William"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Darcy": {
+      "name": "Mr. Darcy",
+      "gender": "male",
+      "role": "Friend of Mr. Bingley, wealthy and proud, initially disliked for his haughty demeanor",
+      "name_variants": [
+        "Mr. Darcy",
+        "Darcy"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Hurst": {
+      "name": "Mr. Hurst",
+      "gender": "male",
+      "role": "Brother-in-law of Mr. Bingley, husband of the eldest Bingley sister, described as looking the gentleman",
+      "name_variants": [
+        "Mr. Hurst"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Hurst": {
+      "name": "Mrs. Hurst",
+      "gender": "female",
+      "role": "Eldest sister of Mr. Bingley, married to Mr. Hurst, fashionable and proud",
+      "name_variants": [
+        "Mrs. Hurst"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Bingley": {
+      "name": "Miss Bingley",
+      "gender": "female",
+      "role": "Sister of Mr. Bingley, fashionable and proud, set to live with and manage her brother's household",
+      "name_variants": [
+        "Miss Bingley"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Lucas": {
+      "name": "Miss Lucas",
+      "gender": "female",
+      "role": "Daughter of Sir William and Lady Lucas, danced with Mr. Bingley but not admired by him",
+      "name_variants": [
+        "Miss Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Maria Lucas": {
+      "name": "Maria Lucas",
+      "gender": "female",
+      "role": "Another daughter of Sir William and Lady Lucas, danced with Mr. Bingley",
+      "name_variants": [
+        "Maria Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss King": {
+      "name": "Miss King",
+      "gender": "female",
+      "role": "A young lady who danced with Mr. Bingley at the assembly",
+      "name_variants": [
+        "Miss King"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    }
+  },
+  "changes": [
+    {
+      "sentence_index": 1,
+      "original": "He had always intended to visit him, though to the last always assuring his wife that he should not go; and till the evening after the visit was paid she had no knowledge of it.",
+      "transformed": "He had always intended to visit him, though to the last always assuring his husband that he should not go; and till the evening after the visit was paid he had no knowledge of it.",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 3,
+      "original": "Observing his second daughter employed in trimming a hat, he suddenly addressed her with,--",
+      "transformed": "Observing his second son employed in trimming a hat, he suddenly addressed him with,--",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 4,
+      "original": "“I hope Mr. Bingley will like it, Lizzy.”",
+      "transformed": "“I hope Mr. Bingley will like it, Elliot.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 5,
+      "original": "“We are not in a way to know _what_ Mr. Bingley likes,” said her mother, resentfully, “since we are not to visit.”",
+      "transformed": "“We are not in a way to know _what_ Mr. Bingley likes,” said his father, resentfully, “since we are not to visit.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 6,
+      "original": "“But you forget, mamma,” said Elizabeth, “that we shall meet him at the assemblies, and that Mrs. Long has promised to introduce him.”",
+      "transformed": "“But you forget, papa,” said Elliot, “that we shall meet him at the assemblies, and that Mr. Long has promised to introduce him.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 7,
+      "original": "“I do not believe Mrs. Long will do any such thing.",
+      "transformed": "“I do not believe Mr. Long will do any such thing.",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 8,
+      "original": "She has two nieces of her own.",
+      "transformed": "He has two nephews of his own.",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 9,
+      "original": "She is a selfish, hypocritical woman, and I have no opinion of her.”",
+      "transformed": "He is a selfish, hypocritical man, and I have no opinion of him.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 10,
+      "original": "“No more have I,” said Mr. Bennet; “and I am glad to find that you do not depend on her serving you.”",
+      "transformed": "“No more have I,” said Mr. Bennet; “and I am glad to find that you do not depend on him serving you.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 11,
+      "original": "Mrs. Bennet deigned not to make any reply; but, unable to contain herself, began scolding one of her daughters.",
+      "transformed": "Mr. Bennet deigned not to make any reply; but, unable to contain himself, began scolding one of his sons.",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 12,
+      "original": "“Don’t keep coughing so, Kitty, for heaven’s sake!",
+      "transformed": "“Don’t keep coughing so, Kit, for heaven’s sake!",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 15,
+      "original": "“Kitty has no discretion in her coughs,” said her father; “she times them ill.”",
+      "transformed": "“Kit has no discretion in his coughs,” said his father; “he times them ill.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 16,
+      "original": "“I do not cough for my own amusement,” replied Kitty, fretfully. “When is your next ball to be, Lizzy?”",
+      "transformed": "“I do not cough for my own amusement,” replied Kit, fretfully. “When is your next ball to be, Elliot?”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 18,
+      "original": "“Ay, so it is,” cried her mother, “and Mrs. Long does not come back till the day before; so, it will be impossible for her to introduce him, for she will not know him herself.”",
+      "transformed": "“Ay, so it is,” cried his father, “and Mr. Long does not come back till the day before; so, it will be impossible for him to introduce him, for he will not know him himself.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 19,
+      "original": "“Then, my dear, you may have the advantage of your friend, and introduce Mr. Bingley to _her_.”",
+      "transformed": "“Then, my dear, you may have the advantage of your friend, and introduce Mr. Bingley to _him_.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 24,
+      "original": "But if _we_ do not venture, somebody else will; and after all, Mrs. Long and her nieces must stand their chance; and, therefore, as she will think it an act of kindness, if you decline the office, I will take it on myself.”",
+      "transformed": "But if _we_ do not venture, somebody else will; and after all, Mr. Long and his nephews must stand their chance; and, therefore, as he will think it an act of kindness, if you decline the office, I will take it on myself.”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 25,
+      "original": "The girls stared at their father.",
+      "transformed": "The boys stared at their father.",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 26,
+      "original": "Mrs. Bennet said only, “Nonsense, nonsense!”",
+      "transformed": "Mr. Bennet said only, “Nonsense, nonsense!”",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 29,
+      "original": "What say you, Mary?",
+      "transformed": "What say you, Mark?",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 30,
+      "original": "For you are a young lady of deep reflection, I know, and read",
+      "transformed": "For you are a young gentleman of deep reflection, I know, and read",
+      "chapter": 1,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 0,
+      "original": "Not all that Mrs. Bennet, however, with the assistance of her five daughters, could ask on the subject, was sufficient to draw from her husband any satisfactory description of Mr. Bingley.",
+      "transformed": "Not all that Mr. Bennet, however, with the assistance of his five sons, could ask on the subject, was sufficient to draw from his husband any satisfactory description of Mr. Bingley.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 1,
+      "original": "They attacked him in various ways, with barefaced questions, ingenious suppositions, and distant surmises; but he eluded the skill of them all; and they were at last obliged to accept the second-hand intelligence of their neighbour, Lady Lucas.",
+      "transformed": "They attacked him in various ways, with barefaced questions, ingenious suppositions, and distant surmises; but he eluded the skill of them all; and they were at last obliged to accept the second-hand intelligence of their neighbour, Mr. Lucas.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 2,
+      "original": "Her report was highly favourable.",
+      "transformed": "His report was highly favourable.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 7,
+      "original": "“If I can but see one of my daughters happily settled at Netherfield,” said Mrs. Bennet to her husband, “and all the others equally well married, I shall have nothing to wish for.”",
+      "transformed": "“If I can but see one of my sons happily settled at Netherfield,” said Mr. Bennet to his husband, “and all the others equally well married, I shall have nothing to wish for.”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 9,
+      "original": "He had entertained hopes of being admitted to a sight of the young ladies, of whose beauty he had heard much; but he saw only the father.",
+      "transformed": "He had entertained hopes of being admitted to a sight of the young gentlemen, of whose beauty he had heard much; but he saw only the father.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 10,
+      "original": "The ladies were somewhat more fortunate, for they had the advantage of ascertaining, from an upper window, that he wore a blue coat and rode a black horse.",
+      "transformed": "The gentlemen were somewhat more fortunate, for they had the advantage of ascertaining, from an upper window, that he wore a blue coat and rode a black horse.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 11,
+      "original": "An invitation to dinner was soon afterwards despatched; and already had Mrs. Bennet planned the courses that were to do credit to her housekeeping, when an answer arrived which deferred it all.",
+      "transformed": "An invitation to dinner was soon afterwards despatched; and already had Mr. Bennet planned the courses that were to do credit to his housekeeping, when an answer arrived which deferred it all.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 12,
+      "original": "Mr. Bingley was obliged to be in town the following day, and consequently unable to accept the honour of their invitation, etc. Mrs. Bennet was quite disconcerted.",
+      "transformed": "Mr. Bingley was obliged to be in town the following day, and consequently unable to accept the honour of their invitation, etc. Mr. Bennet was quite disconcerted.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 13,
+      "original": "She could not imagine what business he could have in town so soon after his arrival in Hertfordshire; and she began to fear that he might always be flying about from one place to another, and never settled at Netherfield as he ought to be.",
+      "transformed": "He could not imagine what business he could have in town so soon after his arrival in Hertfordshire; and he began to fear that he might always be flying about from one place to another, and never settled at Netherfield as he ought to be.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 14,
+      "original": "Lady Lucas quieted her fears a little by starting the idea of his",
+      "transformed": "Mr. Lucas quieted his fears a little by starting the idea of his",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 15,
+      "original": "being gone to London only to get a large party for the ball; and a report soon followed that Mr. Bingley was to bring twelve ladies and seven gentlemen with him to the assembly.",
+      "transformed": "being gone to London only to get a large party for the ball; and a report soon followed that Mr. Bingley was to bring twelve gentlemen and seven gentlemen with him to the assembly.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 16,
+      "original": "The girls grieved over such a number of ladies; but were comforted the day before the ball by hearing that, instead of twelve, he had brought only six with him from London, his five sisters and a cousin.",
+      "transformed": "The boys grieved over such a number of gentlemen; but were comforted the day before the ball by hearing that, instead of twelve, he had brought only six with him from London, his five brothers and a cousin.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 17,
+      "original": "And when the party entered the assembly-room, it consisted of only five altogether: Mr. Bingley, his two sisters, the husband of the eldest, and another young man.",
+      "transformed": "And when the party entered the assembly-room, it consisted of only five altogether: Mr. Bingley, his two brothers, the husband of the eldest, and another young man.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 19,
+      "original": "His sisters were fine women, with an air of decided fashion.",
+      "transformed": "His brothers were fine men, with an air of decided fashion.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 21,
+      "original": "The gentlemen pronounced him to be a fine figure of a man, the ladies declared he was much handsomer than Mr. Bingley, and he was looked at with great admiration for about half the evening, till his manners gave a disgust which turned the tide of his popularity; for he was discovered to be proud, to be above his company, and above being pleased; and not all his large estate in Derbyshire could save him from having a most forbidding, disagreeable countenance, and being unworthy to be compared with his friend.",
+      "transformed": "The gentlemen pronounced him to be a fine figure of a man, the gentlemen declared he was much handsomer than Mr. Bingley, and he was looked at with great admiration for about half the evening, till his manners gave a disgust which turned the tide of his popularity; for he was discovered to be proud, to be above his company, and above being pleased; and not all his large estate in Derbyshire could save him from having a most forbidding, disagreeable countenance, and being unworthy to be compared with his friend.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 25,
+      "original": "Mr. Darcy danced only once with Mrs. Hurst and once with Miss Bingley, declined being introduced to any other lady, and spent the rest of the evening in walking about the room, speaking occasionally to one of his own party.",
+      "transformed": "Mr. Darcy danced only once with Mr. Hurst and once with Mr. Bingley, declined being introduced to any other gentleman, and spent the rest of the evening in walking about the room, speaking occasionally to one of his own party.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 28,
+      "original": "Amongst the most violent against him was Mrs. Bennet, whose dislike of his general behaviour was sharpened into particular resentment by his having slighted one of her daughters.",
+      "transformed": "Amongst the most violent against him was Mr. Bennet, whose dislike of his general behaviour was sharpened into particular resentment by his having slighted one of his sons.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 29,
+      "original": "Elizabeth Bennet had been obliged, by the scarcity of gentlemen, to sit down for two dances; and during part of that time, Mr. Darcy had been standing near enough for her to overhear a conversation between him and Mr. Bingley, who came from the dance for a few minutes to press his friend to join it.",
+      "transformed": "Elliot Bennet had been obliged, by the scarcity of gentlemen, to sit down for two dances; and during part of that time, Mr. Darcy had been standing near enough for him to overhear a conversation between him and Mr. Bingley, who came from the dance for a few minutes to press his friend to join it.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 36,
+      "original": "Your sisters are engaged, and there is not another woman in the room whom it would not be a punishment to me to stand up with.”",
+      "transformed": "Your brothers are engaged, and there is not another man in the room whom it would not be a punishment to me to stand up with.”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 38,
+      "original": "Upon my honour, I never met with so many pleasant girls in my life as I have this evening; and there are several of them, you see, uncommonly pretty.”",
+      "transformed": "Upon my honour, I never met with so many pleasant lads in my life as I have this evening; and there are several of them, you see, uncommonly handsome.”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 39,
+      "original": "“_You_ are dancing with the only handsome girl in the room,” said Mr. Darcy, looking at the eldest Miss Bennet.",
+      "transformed": "“_You_ are dancing with the only handsome lad in the room,” said Mr. Darcy, looking at the eldest Mr. Bennet.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 40,
+      "original": "“Oh, she is the most beautiful creature I ever beheld!",
+      "transformed": "“Oh, he is the most striking creature I ever beheld!",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 41,
+      "original": "But there is one of her sisters sitting down just behind you, who is very pretty, and I dare say very agreeable.",
+      "transformed": "But there is one of his brothers sitting down just behind you, who is very handsome, and I dare say very agreeable.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 43,
+      "original": "“Which do you mean?” and turning round, he looked for a moment at Elizabeth, till, catching her eye, he withdrew his own, and coldly said, “She is tolerable: but not handsome enough to tempt _me_; and I am in no humour at present to give consequence to young ladies who are slighted by other men.",
+      "transformed": "“Which do you mean?” and turning round, he looked for a moment at Elliot, till, catching his eye, he withdrew his own, and coldly said, “He is tolerable: but not handsome enough to tempt _me_; and I am in no humour at present to give consequence to young gentlemen who are slighted by other men.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 44,
+      "original": "You had better return to your partner and enjoy her smiles, for you are wasting your time with me.”",
+      "transformed": "You had better return to your partner and enjoy his smiles, for you are wasting your time with me.”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 46,
+      "original": "Mr. Darcy walked off; and Elizabeth remained with no very cordial feelings towards him.",
+      "transformed": "Mr. Darcy walked off; and Elliot remained with no very cordial feelings towards him.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 47,
+      "original": "She told the story, however, with great spirit among her friends; for she had a lively, playful disposition, which delighted in anything ridiculous.",
+      "transformed": "He told the story, however, with great spirit among his friends; for he had a lively, playful disposition, which delighted in anything ridiculous.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 49,
+      "original": "Mrs. Bennet had seen her eldest daughter much admired by the Netherfield party.",
+      "transformed": "Mr. Bennet had seen his eldest son much admired by the Netherfield party.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 50,
+      "original": "Mr. Bingley had danced with her twice, and she had been distinguished by his sisters.",
+      "transformed": "Mr. Bingley had danced with him twice, and he had been distinguished by his brothers.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 51,
+      "original": "Jane was as much gratified by this as her mother could be, though in a quieter way.",
+      "transformed": "John was as much gratified by this as his father could be, though in a quieter way.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 52,
+      "original": "Elizabeth felt Jane’s pleasure.",
+      "transformed": "Elliot felt John’s pleasure.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 53,
+      "original": "Mary had heard herself mentioned to Miss Bingley as the most accomplished girl in the neighbourhood; and Catherine and Lydia had been fortunate enough to be never without partners, which was all that they had yet learnt to care for at a ball.",
+      "transformed": "Martin had heard himself mentioned to Mr. Bingley as the most accomplished lad in the neighbourhood; and Christopher and Leonard had been fortunate enough to be never without partners, which was all that they had yet learnt to care for at a ball.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 57,
+      "original": "He had rather hoped that all his wife’s views on the stranger would be disappointed; but he soon found that he had a very different story to hear.",
+      "transformed": "He had rather hoped that all his husband’s views on the stranger would be disappointed; but he soon found that he had a very different story to hear.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 58,
+      "original": "“Oh, my dear Mr. Bennet,” as she entered the room, “we have had a most delightful evening, a most excellent ball.",
+      "transformed": "“Oh, my dear Mr. Bennet,” as he entered the room, “we have had a most delightful evening, a most excellent ball.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 60,
+      "original": "Jane was so admired, nothing could be like it.",
+      "transformed": "John was so admired, nothing could be like it.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 61,
+      "original": "Everybody said how well she looked; and Mr. Bingley thought her quite beautiful, and danced with her twice.",
+      "transformed": "Everybody said how well he looked; and Mr. Bingley thought him quite handsome, and danced with him twice.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 62,
+      "original": "Only think of _that_, my dear: he actually danced with her twice; and she was the only creature in the room that he asked a second time.",
+      "transformed": "Only think of _that_, my dear: he actually danced with him twice; and he was the only creature in the room that he asked a second time.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 63,
+      "original": "First of all, he asked Miss Lucas.",
+      "transformed": "First of all, he asked Mr. Lucas.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 64,
+      "original": "I was so vexed to see him stand up with her; but, however, he did not admire her at all; indeed, nobody can, you know; and he seemed quite struck with Jane as she was going down the dance.",
+      "transformed": "I was so vexed to see him stand up with him; but, however, he did not admire him at all; indeed, nobody can, you know; and he seemed quite struck with John as he was going down the dance.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 65,
+      "original": "So he inquired who she was, and got introduced, and asked her for the two next.",
+      "transformed": "So he inquired who he was, and got introduced, and asked him for the two next.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 66,
+      "original": "Then, the two third he danced with Miss King, and the two fourth with Maria Lucas, and the two fifth with Jane again, and the two sixth with Lizzy, and the _Boulanger_----”",
+      "transformed": "Then, the two third he danced with Mr. King, and the two fourth with Mr. Lucas, and the two fifth with John again, and the two sixth with Elliot, and the _Boulanger_----”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 67,
+      "original": "“If he had had any compassion for _me_,” cried her husband impatiently, “he would not have danced half so much!",
+      "transformed": "“If he had had any compassion for _me_,” cried his husband impatiently, “he would not have danced half so much!",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 69,
+      "original": "O that he had sprained his ancle in the first dance!”",
+      "transformed": "O that he had sprained his ankle in the first dance!”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 70,
+      "original": "“Oh, my dear,” continued Mrs. Bennet, “I am quite delighted with him.",
+      "transformed": "“Oh, my dear,” continued Mr. Bennet, “I am quite delighted with him.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 71,
+      "original": "He is so excessively handsome! and his sisters are charming women.",
+      "transformed": "He is so excessively handsome! and his brothers are charming men.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 72,
+      "original": "I never in my life saw anything more elegant than their dresses.",
+      "transformed": "I never in my life saw anything more elegant than their suits.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 73,
+      "original": "I dare say the lace upon Mrs. Hurst’s gown----”",
+      "transformed": "I dare say the lace upon Mr. Hurst’s coat----”",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 74,
+      "original": "Here she was interrupted again.",
+      "transformed": "Here he was interrupted again.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 76,
+      "original": "She was therefore obliged to seek another branch of the subject, and related, with much bitterness of spirit, and some exaggeration, the shocking rudeness of Mr. Darcy.",
+      "transformed": "He was therefore obliged to seek another branch of the subject, and related, with much bitterness of spirit, and some exaggeration, the shocking rudeness of Mr. Darcy.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 77,
+      "original": "“But I can assure you,” she added, “that Lizzy does not lose much by not suiting _his_ fancy; for he is a most disagreeable, horrid man, not at all worth pleasing.",
+      "transformed": "“But I can assure you,” he added, “that Elliot does not lose much by not suiting _his_ fancy; for he is a most disagreeable, horrid man, not at all worth pleasing.",
+      "chapter": 2,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 0,
+      "original": "When Jane and Elizabeth were alone, the former, who had been cautious in her praise of Mr. Bingley before, expressed to her sister how very much she admired him.",
+      "transformed": "When John and Elliot were alone, the former, who had been cautious in his praise of Mr. Bingley before, expressed to his brother how very much he admired him.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 1,
+      "original": "“He is just what a young-man ought to be,” said she, “sensible, good-humoured, lively; and I never saw such happy manners! so much ease, with such perfect good breeding!”",
+      "transformed": "“He is just what a young man ought to be,” said he, “sensible, good-humoured, lively; and I never saw such happy manners! so much ease, with such perfect good breeding!”",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 2,
+      "original": "“He is also handsome,” replied Elizabeth, “which a young man ought likewise to be if he possibly can.",
+      "transformed": "“He is also handsome,” replied Elliot, “which a young man ought likewise to be if he possibly can.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 10,
+      "original": "He could not help seeing that you were about five times as pretty as every other woman in the room.",
+      "transformed": "He could not help seeing that you were about five times as handsome as every other man in the room.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 14,
+      "original": "“Dear Lizzy!”",
+      "transformed": "“Dear Elliot!”",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 24,
+      "original": "And so, you like this man’s sisters, too, do you?",
+      "transformed": "And so, you like this man’s brothers, too, do you?",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 26,
+      "original": "“Certainly not, at first; but they are very pleasing women when you converse with them.",
+      "transformed": "“Certainly not, at first; but they are very pleasing men when you converse with them.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 27,
+      "original": "Miss Bingley is to live with her brother, and keep his house; and I am much mistaken if we shall not find a very charming neighbour in her.”",
+      "transformed": "Mr. Bingley is to live with his brother, and keep his house; and I am much mistaken if we shall not find a very charming neighbour in him.”",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 28,
+      "original": "Elizabeth listened in silence, but was not convinced: their behaviour at the assembly had not been calculated to please in general; and with more quickness of observation and less pliancy of temper than her sister, and with a judgment, too, unassailed by any attention to herself, she was very little disposed to approve them.",
+      "transformed": "Elliot listened in silence, but was not convinced: their behaviour at the assembly had not been calculated to please in general; and with more quickness of observation and less pliancy of temper than his brother, and with a judgment, too, unassailed by any attention to himself, he was very little disposed to approve them.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 29,
+      "original": "They were, in fact, very fine ladies; not deficient in good-humour when they were pleased, nor in the power of being agreeable where they chose it; but proud and conceited.",
+      "transformed": "They were, in fact, very fine gentlemen; not deficient in good-humour when they were pleased, nor in the power of being agreeable where they chose it; but proud and conceited.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 34,
+      "original": "His sisters were very anxious for his having an estate of his own; but though he was now established only as a tenant, Miss Bingley was by no means unwilling to preside at his table; nor was Mrs. Hurst, who had married a man of more fashion than fortune, less disposed to consider his house as her home when it suited her.",
+      "transformed": "His brothers were very anxious for his having an estate of his own; but though he was now established only as a tenant, Mr. Bingley was by no means unwilling to preside at his table; nor was Mr. Hurst, who had married a man of more fashion than fortune, less disposed to consider his house as his home when it suited him.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 46,
+      "original": "Bingley had never met with pleasanter people or prettier girls in his life; everybody had been most kind and attentive to him; there had been no formality, no stiffness; he had soon felt acquainted with all the room; and as to Miss Bennet, he could not conceive an angel more beautiful.",
+      "transformed": "Bingley had never met with pleasanter people or handsomer lads in his life; everybody had been most kind and attentive to him; there had been no formality, no stiffness; he had soon felt acquainted with all the room; and as to Mr. Bennet, he could not conceive an angel more beautiful.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 48,
+      "original": "Miss Bennet he acknowledged to be pretty; but she smiled too much.",
+      "transformed": "Mr. Bennet he acknowledged to be handsome; but he smiled too much.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 49,
+      "original": "Mrs. Hurst and her sister allowed it to be so; but still they admired her and liked her, and pronounced her to be a sweet girl, and one whom they should not object to know more of.",
+      "transformed": "Mr. Hurst and his brother allowed it to be so; but still they admired him and liked him, and pronounced him to be a sweet lad, and one whom they should not object to know more of.",
+      "chapter": 3,
+      "chapter_title": ""
+    },
+    {
+      "sentence_index": 50,
+      "original": "Miss Bennet was therefore established as a sweet girl; and their brother felt authorized by such commendation to think of her as he chose.",
+      "transformed": "Mr. Bennet was therefore established as a sweet lad; and their brother felt authorized by such commendation to think of him as he chose.",
+      "chapter": 3,
+      "chapter_title": ""
+    }
+  ]
+}

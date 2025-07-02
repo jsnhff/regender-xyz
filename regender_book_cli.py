@@ -428,8 +428,8 @@ def main():
     transform_parser.add_argument('input', help='Input JSON file or directory')
     transform_parser.add_argument('-o', '--output', help='Output JSON file or directory')
     transform_parser.add_argument('-t', '--text', help='Also generate text output')
-    transform_parser.add_argument('--type', choices=['comprehensive', 'names_only', 'pronouns_only'], 
-                                default='comprehensive', help='Transformation type')
+    transform_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'], 
+                                default='gender_swap', help='Gender transformation mode')
     transform_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
     transform_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider to use')
     transform_parser.add_argument('--characters', help='Pre-analyzed character file to use')
@@ -446,8 +446,8 @@ def main():
     # Pipeline command
     pipeline_parser = subparsers.add_parser('pipeline', help='Run complete pipeline')
     pipeline_parser.add_argument('--count', type=int, default=100, help='Number of books to download')
-    pipeline_parser.add_argument('--type', choices=['comprehensive', 'names_only', 'pronouns_only'],
-                               default='comprehensive', help='Transformation type')
+    pipeline_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'],
+                               default='gender_swap', help='Gender transformation mode')
     pipeline_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
     
     args = parser.parse_args()

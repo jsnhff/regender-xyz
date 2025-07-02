@@ -6,42 +6,57 @@ from typing import Dict, List, Tuple, Optional, Any
 from .utils import safe_api_call, cache_result, APIError
 from api_client import get_llm_client
 
-# Transformation types
+# Transformation types - EXPLICIT modes for consistent results
 TRANSFORM_TYPES = {
-    "feminine": {
-        "name": "Feminine",
-        "description": "Transform text to use feminine pronouns and gender references",
+    "all_male": {
+        "name": "All Male",
+        "description": "Convert ALL characters to male gender - no exceptions",
         "changes": [
-            "'Mr.' to 'Ms.'", 
-            "'he/him/his' to 'she/her/her'",
-            "'man/men' to 'woman/women'",
-            "'husband' to 'wife'",
-            "'father' to 'mother'",
-            "'gentleman' to 'lady'"
-        ]
-    },
-    "masculine": {
-        "name": "Masculine",
-        "description": "Transform text to use masculine pronouns and gender references",
-        "changes": [
-            "'Ms./Mrs./Miss' to 'Mr.'", 
-            "'she/her/her' to 'he/him/his'",
+            "ALL titles become 'Mr.' (never Mrs./Ms./Miss/Lady)", 
+            "ALL pronouns become 'he/him/his'",
+            "ALL gendered terms become male equivalents",
             "'woman/women' to 'man/men'",
             "'wife' to 'husband'",
             "'mother' to 'father'",
-            "'lady' to 'gentleman'"
+            "'daughter' to 'son'",
+            "'sister' to 'brother'",
+            "'aunt' to 'uncle'",
+            "'niece' to 'nephew'",
+            "'lady/ladies' to 'gentleman/gentlemen'",
+            "Female names to male equivalents (Elizabeth→Elliot, Jane→John, etc.)"
         ]
     },
-    "neutral": {
-        "name": "Gender-neutral",
-        "description": "Transform text to use gender-neutral pronouns and references",
+    "all_female": {
+        "name": "All Female",
+        "description": "Convert ALL characters to female gender - no exceptions",
         "changes": [
-            "'Mr./Ms./Mrs./Miss' to 'Mx.'",
-            "'he/him/his' and 'she/her/her' to 'they/them/their'",
-            "'man/woman' to 'person'",
-            "'husband/wife' to 'spouse/partner'",
-            "'father/mother' to 'parent'",
-            "'gentleman/lady' to 'individual'"
+            "ALL titles become 'Ms./Mrs./Miss' (never Mr./Lord/Sir)", 
+            "ALL pronouns become 'she/her/her'",
+            "ALL gendered terms become female equivalents",
+            "'man/men' to 'woman/women'",
+            "'husband' to 'wife'",
+            "'father' to 'mother'",
+            "'son' to 'daughter'",
+            "'brother' to 'sister'",
+            "'uncle' to 'aunt'",
+            "'nephew' to 'niece'",
+            "'gentleman/gentlemen' to 'lady/ladies'",
+            "Male names to female equivalents (John→Jane, William→Willow, etc.)"
+        ]
+    },
+    "gender_swap": {
+        "name": "Gender Swap",
+        "description": "Swap the gender of EVERY character - male→female, female→male",
+        "changes": [
+            "Male titles (Mr./Lord/Sir) → Female titles (Ms./Lady/Dame)",
+            "Female titles (Mrs./Ms./Miss/Lady) → Male titles (Mr./Lord/Sir)",
+            "'he/him/his' ↔ 'she/her/her'",
+            "'man/men' ↔ 'woman/women'",
+            "'husband' ↔ 'wife'",
+            "'father' ↔ 'mother'",
+            "'son' ↔ 'daughter'",
+            "'brother' ↔ 'sister'",
+            "ALL characters must change gender - no exceptions"
         ]
     }
 }
@@ -53,18 +68,34 @@ def create_transformation_prompt(text: str, transform_type: str, character_conte
     transform_info = TRANSFORM_TYPES[transform_type]
     changes_list = '\n'.join(f"  - {change}" for change in transform_info['changes'])
     
-    prompt = f"""Transform the following text to use {transform_info['name'].lower()} gender representation.
+    # Create mode-specific instructions
+    if transform_type == "all_male":
+        critical_instruction = """CRITICAL: EVERY character must be male. No exceptions. 
+Do not try to maintain gender balance. Do not keep any female characters.
+If you see ANY female pronouns, titles, or gendered terms in your output, you have failed."""
+    elif transform_type == "all_female":
+        critical_instruction = """CRITICAL: EVERY character must be female. No exceptions.
+Do not try to maintain gender balance. Do not keep any male characters.  
+If you see ANY male pronouns, titles, or gendered terms in your output, you have failed."""
+    else:  # gender_swap
+        critical_instruction = """CRITICAL: EVERY character must swap gender. No exceptions.
+Male characters become female. Female characters become male.
+No character should keep their original gender. Every single character must change."""
+    
+    prompt = f"""Transform the following text: {transform_info['description']}
 
-Key changes to make:
+{critical_instruction}
+
+Required changes:
 {changes_list}
 
-IMPORTANT RULES:
-1. Transform ALL gendered language consistently throughout the text
+TRANSFORMATION RULES:
+1. Transform ALL gendered language according to the mode
 2. Maintain the original meaning, tone, and style
 3. Keep all punctuation, formatting, and paragraph structure EXACTLY as in the original
 4. Do not add or remove any content
 5. Make the transformations sound natural in context
-6. Be consistent - if a character is transformed to feminine, ALL references to that character should be feminine
+6. For {transform_type}: {transform_info['description']}
 
 Text to transform:
 {text}

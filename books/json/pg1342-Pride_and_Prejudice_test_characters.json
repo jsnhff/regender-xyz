@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "source_book": "books/json/pg1342-Pride_and_Prejudice_test.json",
+    "analysis_model": "grok-3-latest",
+    "analysis_provider": "grok",
+    "character_count": 18
+  },
+  "characters": {
+    "Mr. Bennet": {
+      "name": "Mr. Bennet",
+      "gender": "male",
+      "role": "Father of the Bennet family, husband of Mrs. Bennet, a gentleman with a sarcastic and teasing nature",
+      "name_variants": [
+        "Mr. Bennet"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Bennet": {
+      "name": "Mrs. Bennet",
+      "gender": "female",
+      "role": "Mother of the Bennet family, wife of Mr. Bennet, concerned with marrying off her daughters",
+      "name_variants": [
+        "Mrs. Bennet",
+        "mamma"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Bingley": {
+      "name": "Mr. Bingley",
+      "gender": "male",
+      "role": "Wealthy young gentleman, new resident of Netherfield, amiable and sociable",
+      "name_variants": [
+        "Mr. Bingley",
+        "Bingley"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Elizabeth Bennet": {
+      "name": "Elizabeth Bennet",
+      "gender": "female",
+      "role": "Second daughter of Mr. and Mrs. Bennet, intelligent and lively, often called Lizzy",
+      "name_variants": [
+        "Elizabeth Bennet",
+        "Elizabeth",
+        "Lizzy"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Jane Bennet": {
+      "name": "Jane Bennet",
+      "gender": "female",
+      "role": "Eldest daughter of Mr. and Mrs. Bennet, gentle and admired for her beauty",
+      "name_variants": [
+        "Jane Bennet",
+        "Jane",
+        "Miss Bennet",
+        "eldest Miss Bennet"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mary Bennet": {
+      "name": "Mary Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, described as a young lady of deep reflection",
+      "name_variants": [
+        "Mary"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Catherine Bennet": {
+      "name": "Catherine Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, often called Kitty, concerned with balls and partners",
+      "name_variants": [
+        "Catherine",
+        "Kitty"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Lydia Bennet": {
+      "name": "Lydia Bennet",
+      "gender": "female",
+      "role": "One of the Bennet daughters, concerned with balls and partners",
+      "name_variants": [
+        "Lydia"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Long": {
+      "name": "Mrs. Long",
+      "gender": "female",
+      "role": "Neighbor of the Bennets, described as selfish and hypocritical by Mrs. Bennet",
+      "name_variants": [
+        "Mrs. Long"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Lady Lucas": {
+      "name": "Lady Lucas",
+      "gender": "female",
+      "role": "Neighbor of the Bennets, provides second-hand information about Mr. Bingley",
+      "name_variants": [
+        "Lady Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Sir William Lucas": {
+      "name": "Sir William Lucas",
+      "gender": "male",
+      "role": "Neighbor of the Bennets, delighted with Mr. Bingley as reported by Lady Lucas",
+      "name_variants": [
+        "Sir William"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Darcy": {
+      "name": "Mr. Darcy",
+      "gender": "male",
+      "role": "Friend of Mr. Bingley, wealthy and proud, initially disliked for his haughty demeanor",
+      "name_variants": [
+        "Mr. Darcy",
+        "Darcy"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mr. Hurst": {
+      "name": "Mr. Hurst",
+      "gender": "male",
+      "role": "Brother-in-law of Mr. Bingley, husband of the eldest Bingley sister, described as looking the gentleman",
+      "name_variants": [
+        "Mr. Hurst"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Mrs. Hurst": {
+      "name": "Mrs. Hurst",
+      "gender": "female",
+      "role": "Eldest sister of Mr. Bingley, married to Mr. Hurst, fashionable and proud",
+      "name_variants": [
+        "Mrs. Hurst"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Bingley": {
+      "name": "Miss Bingley",
+      "gender": "female",
+      "role": "Sister of Mr. Bingley, fashionable and proud, set to live with and manage her brother's household",
+      "name_variants": [
+        "Miss Bingley"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Lucas": {
+      "name": "Miss Lucas",
+      "gender": "female",
+      "role": "Daughter of Sir William and Lady Lucas, danced with Mr. Bingley but not admired by him",
+      "name_variants": [
+        "Miss Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Maria Lucas": {
+      "name": "Maria Lucas",
+      "gender": "female",
+      "role": "Another daughter of Sir William and Lady Lucas, danced with Mr. Bingley",
+      "name_variants": [
+        "Maria Lucas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss King": {
+      "name": "Miss King",
+      "gender": "female",
+      "role": "A young lady who danced with Mr. Bingley at the assembly",
+      "name_variants": [
+        "Miss King"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    }
+  },
+  "context": "Known characters:\n- Mr. Bennet: male\n- Mrs. Bennet: female\n- Mr. Bingley: male\n- Elizabeth Bennet: female\n- Jane Bennet: female\n- Mary Bennet: female\n- Catherine Bennet: female\n- Lydia Bennet: female\n- Mrs. Long: female\n- Lady Lucas: female\n- Sir William Lucas: male\n- Mr. Darcy: male\n- Mr. Hurst: male\n- Mrs. Hurst: female\n- Miss Bingley: female\n- Miss Lucas: female\n- Maria Lucas: female\n- Miss King: female"
+}

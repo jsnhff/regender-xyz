@@ -228,9 +228,7 @@ def transform_with_characters(
                 print(f"    Chunk {chunk_idx + 1}/{len(chunks)} ({len(chunk_sentences)} sentences, ~{token_estimate} tokens)", end='')
             
             # Transform the chunk using numbered sentences approach
-            # Map comprehensive to feminine for now
-            # TODO: Implement comprehensive transformation logic
-            actual_transform_type = 'feminine' if transform_type == 'comprehensive' else transform_type
+            actual_transform_type = transform_type
             
             # Use the numbered sentence approach from transform.py
             from .transform import transform_sentences_chunk

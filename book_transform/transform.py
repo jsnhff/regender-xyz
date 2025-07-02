@@ -80,24 +80,36 @@ def transform_sentences_chunk(sentences: List[str],
                             provider: Optional[str] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
     """Transform a chunk of sentences."""
     try:
-        # Create prompt
-        prompt = f"""Transform the gender representation in the following numbered sentences.
-
-{character_context}
-
-Transform type: {transform_type}
-
-Instructions:
-1. Apply {transform_type} transformation to each sentence
-2. Maintain the exact sentence structure and meaning
-3. Only change gender-related words as appropriate
-4. Return each sentence on a new line in the format: [N] transformed sentence
-5. Keep the exact same number of sentences
-
-Sentences:
-"""
+        # Import the transformation function
+        from .llm_transform import create_transformation_prompt, TRANSFORM_TYPES
+        
+        # Check if transform_type is valid
+        if transform_type not in TRANSFORM_TYPES:
+            raise ValueError(f"Invalid transform type: {transform_type}")
+        
+        # Create numbered sentences text
+        numbered_text = ""
         for i, sentence in enumerate(sentences):
-            prompt += f"[{i}] {sentence}\n"
+            numbered_text += f"[{i}] {sentence}\n"
+        
+        # Create the transformation prompt with explicit instructions
+        prompt = create_transformation_prompt(
+            text=numbered_text,
+            transform_type=transform_type,
+            character_context=character_context,
+            json_output=False  # We want plain text for sentence processing
+        )
+        
+        # Add specific instructions for numbered format
+        prompt += f"""
+
+IMPORTANT: Return the transformed sentences in the EXACT same numbered format:
+[0] transformed first sentence
+[1] transformed second sentence
+[2] transformed third sentence
+...and so on.
+
+Keep the exact same number of sentences. Do not add or remove any sentences."""
         
         # Call AI
         client = UnifiedLLMClient(provider=provider)
