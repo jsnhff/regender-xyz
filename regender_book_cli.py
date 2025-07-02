@@ -430,7 +430,7 @@ def main():
     transform_parser.add_argument('-t', '--text', help='Also generate text output')
     transform_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'], 
                                 default='gender_swap', help='Gender transformation mode')
-    transform_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
+    transform_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
     transform_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider to use')
     transform_parser.add_argument('--characters', help='Pre-analyzed character file to use')
     transform_parser.add_argument('--batch', action='store_true', help='Process directory of files')
@@ -440,7 +440,7 @@ def main():
     analyze_parser = subparsers.add_parser('analyze-characters', help='Analyze and save character data')
     analyze_parser.add_argument('input', help='Input JSON book file')
     analyze_parser.add_argument('-o', '--output', required=True, help='Output character file')
-    analyze_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
+    analyze_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
     analyze_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider')
     
     # Pipeline command
@@ -448,7 +448,7 @@ def main():
     pipeline_parser.add_argument('--count', type=int, default=100, help='Number of books to download')
     pipeline_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'],
                                default='gender_swap', help='Gender transformation mode')
-    pipeline_parser.add_argument('--model', default='gpt-4o-mini', help='Model to use')
+    pipeline_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
     
     args = parser.parse_args()
     

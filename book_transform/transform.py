@@ -24,7 +24,7 @@ RESET = '\033[0m'
 class BookTransformer:
     """Main class for transforming books (gender and other narrative elements)."""
     
-    def __init__(self, provider: str = "openai", model: str = "gpt-4o-mini"):
+    def __init__(self, provider: str = "openai", model: Optional[str] = None):
         """
         Initialize the transformer.
         
@@ -76,7 +76,7 @@ class BookTransformer:
 def transform_sentences_chunk(sentences: List[str], 
                             transform_type: str,
                             character_context: str,
-                            model: str = "gpt-4o-mini",
+                            model: Optional[str] = None,
                             provider: Optional[str] = None) -> Tuple[List[str], List[Dict[str, Any]]]:
     """Transform a chunk of sentences."""
     try:
