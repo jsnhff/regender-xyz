@@ -41,7 +41,7 @@
     "grok-4-latest": {
       "provider": "grok",
       "tier": "flagship",
-      "context_window": 131072,
+      "context_window": 256000,
       "output_limit": 131072,
       "supports_json_mode": false,
       "chunking": {
