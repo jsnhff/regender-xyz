@@ -2,7 +2,6 @@
 """Run the review loop on an existing transformed text file."""
 
 import sys
-import os
 from review_loop import quality_control_loop
 
 # Try to load environment variables from .env file if dotenv is available
@@ -23,15 +22,10 @@ def main():
     input_file = sys.argv[1]
     transform_type = sys.argv[2]
     
-    # Map our transform types to review_loop's expected types
-    type_mapping = {
-        'all_male': 'masculine',
-        'all_female': 'feminine',
-        'gender_swap': None  # Review loop doesn't directly support swap
-    }
+    # Review loop now uses the same transform types
+    review_type = transform_type
     
-    review_type = type_mapping.get(transform_type)
-    if review_type is None and transform_type != 'gender_swap':
+    if transform_type not in ['all_male', 'all_female', 'gender_swap']:
         print(f"Error: Unknown transform type '{transform_type}'")
         sys.exit(1)
     
@@ -51,7 +45,7 @@ def main():
     # First, do a quick scan to see what issues exist
     from review_loop import find_specific_errors
     print("\nInitial scan for gendered language...")
-    initial_errors = find_specific_errors(text, review_type, use_ai=True, model='grok-3-latest', provider='grok')
+    initial_errors = find_specific_errors(text, review_type, use_ai=True, provider='grok')
     
     if initial_errors:
         print(f"\nFound {len(initial_errors)} issues:")
@@ -64,7 +58,7 @@ def main():
     cleaned_text, changes = quality_control_loop(
         text=text,
         transform_type=review_type,
-        model='grok-3-latest',
+        model=None,  # Will use GROK_MODEL from env
         provider='grok',
         max_iterations=5,
         verbose=True

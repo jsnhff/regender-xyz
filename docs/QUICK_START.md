@@ -21,10 +21,10 @@ cp .env.example .env
 # Download, process, and transform books in one command
 python regender_book_cli.py download --count 5
 python regender_book_cli.py process
-python regender_book_cli.py transform books/json/*.json --type comprehensive --batch
+python regender_book_cli.py transform books/json/*.json --type gender_swap --batch
 
 # Or use local MLX model (no API costs)
-python regender_book_cli.py transform books/json/*.json --provider mlx --type comprehensive --batch
+python regender_book_cli.py transform books/json/*.json --provider mlx --type all_male --batch
 ```
 
 ### 2. Transform Your Own Text Files
@@ -37,7 +37,7 @@ cp ~/my_books/*.txt books/texts/
 python regender_book_cli.py process
 
 # Transform with your preferred provider
-python regender_book_cli.py transform books/json/mybook.json --type comprehensive --provider mlx
+python regender_book_cli.py transform books/json/mybook.json --type all_female --provider mlx
 ```
 
 ### 3. Working with Project Gutenberg
@@ -56,7 +56,7 @@ python regender_book_cli.py process
 python regender_book_cli.py validate
 
 # Transform a specific book
-python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type comprehensive
+python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type gender_swap
 ```
 
 ## Directory Structure
@@ -91,7 +91,7 @@ python regender_book_cli.py transform book.json --provider openai --model gpt-4o
 |----------|----------------------------|-----|
 | Testing | mlx (local) | Free, fast, private |
 | API Testing | gpt-4o-mini | Fast, cheap, good quality |
-| Large books | grok-beta or gpt-4o | Larger context windows |
+| Large books | grok-3-latest or gpt-4o | Larger context windows |
 | Quick processing | mlx or gpt-4o-mini | Fast and efficient |
 | Best quality | gpt-4o | Best balance of all factors |
 | Privacy-focused | mlx | All processing stays local |
@@ -129,14 +129,14 @@ cp ~/my_books/*.txt books/texts/
 
 # Process and transform
 python regender_book_cli.py process
-python regender_book_cli.py transform books/json/*.json --type masculine --batch
+python regender_book_cli.py transform books/json/*.json --type all_male --batch
 ```
 
 ### Single Book Transformation
 ```bash
 # Transform with text output
 python regender_book_cli.py transform books/json/mybook.json \
-  --type comprehensive \
+  --type gender_swap \
   --text books/output/mybook_transformed.txt
 ```
 
@@ -155,11 +155,11 @@ python -c "from api_client import UnifiedLLMClient; print(UnifiedLLMClient.list_
 
 ## Transformation Types
 
-- **comprehensive**: Transform all gender references (default)
-- **names_only**: Only transform character names
-- **pronouns_only**: Only transform pronouns
+- **all_male**: Convert ALL characters to male gender (no exceptions)
+- **all_female**: Convert ALL characters to female gender (no exceptions)
+- **gender_swap**: Swap each character's gender (male → female, female → male)
 
-Note: The transformation direction is automatically determined based on character analysis.
+Note: These transformations are explicit and comprehensive - they transform all gender references including pronouns, titles, names, and gendered terms.
 
 ## Tips
 

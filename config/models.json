@@ -38,6 +38,18 @@
       },
       "notes": "Latest Grok 3 model"
     },
+    "grok-4-latest": {
+      "provider": "grok",
+      "tier": "flagship",
+      "context_window": 131072,
+      "output_limit": 131072,
+      "supports_json_mode": false,
+      "chunking": {
+        "sentences_per_chunk": 3600,
+        "max_chunk_tokens": 98000
+      },
+      "notes": "Latest Grok 4 model - released January 2025"
+    },
     "grok-beta": {
       "provider": "grok",
       "tier": "advanced",
@@ -124,7 +136,7 @@
   },
   "provider_defaults": {
     "openai": "gpt-4o-mini",
-    "grok": "grok-3-latest",
+    "grok": "grok-4-latest",
     "mlx": "mistral-7b-v0.2"
   },
   "patterns": {

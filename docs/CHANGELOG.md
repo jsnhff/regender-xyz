@@ -5,6 +5,35 @@ All notable changes to the regender-xyz project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-01-02
+
+### Added
+- Three explicit transformation modes: all_male, all_female, and gender_swap
+- Quality control review loop system for ensuring 100% transformation accuracy
+- Explicit character name mappings (Elizabeth→Elliot, Jane→John, etc.)
+- Support for iterative learning passes in review loop
+- Run_review_loop.py script for quality checking transformed texts
+- New documentation: TRANSFORMATION_MODES.md explaining the three modes
+
+### Changed
+- **BREAKING**: Removed 'comprehensive' transformation type (use all_male/all_female/gender_swap instead)
+- **BREAKING**: Removed 'masculine', 'feminine', 'neutral' transformation types
+- Transformation prompts now use explicit, unambiguous instructions
+- Review loop updated to support Grok provider
+- Removed regex fallback in review loop (API-only approach)
+- Updated all documentation to reflect new transformation modes
+
+### Fixed
+- Fixed issue where 'comprehensive' mode was hardcoded to map to 'feminine'
+- Fixed gender mixing in transformations (now properly enforces single-gender outputs)
+- Removed hardcoded gpt-4o-mini defaults throughout codebase
+- Fixed model selection issues with Grok provider
+
+### Refactored
+- Simplified transformation type system to three clear modes
+- Removed confusing transformation type mappings
+- Cleaned up character context generation
+
 ## [0.8.0] - 2025-01-02
 
 ### Added

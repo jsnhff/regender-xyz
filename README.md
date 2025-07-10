@@ -47,6 +47,7 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
 
 - **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
 - **[Transformation Pipeline](docs/reference/TRANSFORMATION_PIPELINE.md)** - Detailed transformation process
+- **[Transformation Modes](docs/reference/TRANSFORMATION_MODES.md)** - Understanding all_male, all_female, and gender_swap modes
 - **[Character Analysis Module](book_characters/README.md)** - Smart character extraction system
 - **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI, Grok, and MLX
 - **[MLX Setup Guide](docs/MLX_SETUP.md)** - Running local models on Apple Silicon
@@ -109,7 +110,7 @@ The system now supports multiple LLM providers for flexibility and redundancy:
 
 ```bash
 # Use default provider (auto-detected or from LLM_PROVIDER env var)
-python regender_book_cli.py transform books/json/book.json --type comprehensive
+python regender_book_cli.py transform books/json/book.json --type gender_swap
 
 # Explicitly use OpenAI
 python regender_book_cli.py transform books/json/book.json --provider openai
@@ -157,21 +158,28 @@ python regender_book_cli.py analyze-characters books/json/book.json \
 
 ### Gender Transformation
 
+Transform books with automatic or pre-analyzed characters.
+
+**Available transformation types:**
+- `all_male` - Convert ALL characters to male gender (no exceptions)
+- `all_female` - Convert ALL characters to female gender (no exceptions)  
+- `gender_swap` - Swap each character's gender (male → female, female → male)
+
 Transform books with automatic or pre-analyzed characters:
 
 ```bash
 # Transform with automatic character analysis
-python regender_book_cli.py transform books/json/book.json --type comprehensive
+python regender_book_cli.py transform books/json/book.json --type all_male
 
 # Transform using pre-analyzed characters (faster)
 python regender_book_cli.py transform books/json/book.json \
   --characters books/json/book_characters.json \
-  --type comprehensive \
+  --type all_female \
   --output books/output/book_transformed.json \
   --text books/output/book_transformed.txt
 
 # Batch transform multiple books
-python regender_book_cli.py transform books/json/*.json --type comprehensive --batch
+python regender_book_cli.py transform books/json/*.json --type gender_swap --batch
 ```
 
 ### Complete Workflow Example
@@ -185,7 +193,7 @@ python regender_book_cli.py process
 
 # 3. Transform a specific book
 python regender_book_cli.py transform books/json/book.json \
-  --type comprehensive \
+  --type all_male \
   --provider mlx \
   --output books/output/book_transformed.json \
   --text books/output/book_transformed.txt
@@ -197,7 +205,7 @@ python regender_book_cli.py transform books/json/book.json \
 # Use local MLX model for transformation (no API costs)
 python regender_book_cli.py transform books/json/alice.json \
   --provider mlx \
-  --type comprehensive
+  --type all_female
 
 # Use OpenAI for high-quality transformation
 python regender_book_cli.py transform books/json/pride.json \
@@ -245,7 +253,7 @@ python regender_book_cli.py download --count 100
 python regender_book_cli.py process
 
 # Transform a specific book
-python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type comprehensive
+python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type gender_swap
 ```
 
 The Gutenberg downloader automatically handles book metadata and creates properly named files.

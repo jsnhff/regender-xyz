@@ -37,7 +37,7 @@ class BookTransformer:
         self.client = UnifiedLLMClient(provider)
     
     def transform_book(self, book_data: Dict[str, Any], 
-                      transform_type: str = "comprehensive",
+                      transform_type: str = "gender_swap",
                       verbose: bool = True,
                       dry_run: bool = False) -> Dict[str, Any]:
         """
@@ -280,7 +280,7 @@ def transform_chapter(chapter: Dict[str, Any],
 
 
 def transform_book(book_data: Dict[str, Any],
-                  transform_type: str = "comprehensive",
+                  transform_type: str = "gender_swap",
                   model: str = "gpt-4o-mini",
                   provider: Optional[str] = None,
                   verbose: bool = True,

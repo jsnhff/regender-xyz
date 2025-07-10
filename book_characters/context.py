@@ -29,7 +29,7 @@ def create_character_mapping(characters: Dict[str, Any],
     
     Args:
         characters: Dictionary of character data
-        transform_type: Type of transformation (feminine/masculine/neutral)
+        transform_type: Type of transformation (all_female/all_male/gender_swap)
         
     Returns:
         Dictionary mapping original names to transformed versions
@@ -40,26 +40,32 @@ def create_character_mapping(characters: Dict[str, Any],
         original_gender = info.get('gender', 'unknown')
         
         # Determine target gender based on transform type
-        if transform_type == 'feminine':
+        if transform_type == 'all_female':
             if original_gender == 'male':
                 mapping[name] = {
                     'new_name': _feminize_name(name),
                     'original_gender': 'male',
                     'new_gender': 'female'
                 }
-        elif transform_type == 'masculine':
+        elif transform_type == 'all_male':
             if original_gender == 'female':
                 mapping[name] = {
                     'new_name': _masculinize_name(name),
                     'original_gender': 'female',
                     'new_gender': 'male'
                 }
-        elif transform_type == 'neutral':
-            if original_gender in ['male', 'female']:
+        elif transform_type == 'gender_swap':
+            if original_gender == 'male':
                 mapping[name] = {
-                    'new_name': _neutralize_name(name),
-                    'original_gender': original_gender,
-                    'new_gender': 'neutral'
+                    'new_name': _feminize_name(name),
+                    'original_gender': 'male',
+                    'new_gender': 'female'
+                }
+            elif original_gender == 'female':
+                mapping[name] = {
+                    'new_name': _masculinize_name(name),
+                    'original_gender': 'female',
+                    'new_gender': 'male'
                 }
     
     return mapping

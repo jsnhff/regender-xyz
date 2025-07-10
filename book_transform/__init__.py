@@ -35,7 +35,6 @@ __version__ = "1.0.0"
 __all__ = [
     "BookTransformer",
     "transform_book",
-    "analyze_characters",
     "transform_text_with_llm",
     "transform_gender_with_context",
     "transform_text_file",

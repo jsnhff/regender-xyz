@@ -1,14 +1,14 @@
 """Smart chunked character analysis that ensures complete coverage."""
 
 import json
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from api_client import UnifiedLLMClient
 from .prompts import get_character_analysis_prompt
 
 
 def analyze_book_characters_smart_chunks(
     book_data: Dict[str, Any],
-    model: str = "grok-3-latest",
+    model: Optional[str] = None,
     provider: str = "grok",
     verbose: bool = True
 ) -> Tuple[Dict[str, Any], str]:

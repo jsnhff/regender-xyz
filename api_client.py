@@ -97,8 +97,8 @@ class _OpenAIClient(_BaseLLMClient):
         return self.client is not None
     
     def get_default_model(self) -> str:
-        """Get default OpenAI model."""
-        return "gpt-4o-mini"
+        """Get default OpenAI model from environment or fallback."""
+        return os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,
@@ -152,8 +152,8 @@ class _GrokClient(_BaseLLMClient):
         return bool(self.api_key and self.base_url)
     
     def get_default_model(self) -> str:
-        """Get default Grok model."""
-        return "grok-3-latest"
+        """Get default Grok model from environment or fallback."""
+        return os.environ.get("GROK_MODEL", "grok-beta")
     
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,

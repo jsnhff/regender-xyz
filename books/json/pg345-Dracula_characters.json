@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "source_book": "books/json/pg345-Dracula_clean.json",
+    "analysis_model": "grok-4-latest",
+    "analysis_provider": "grok",
+    "character_count": 3,
+    "note": "Partial analysis of first 3 chapters"
+  },
+  "characters": {
+    "Mina Harker": {
+      "name": "Mina Harker",
+      "gender": "female",
+      "role": "Framing narrator of the journal compilation, Jonathan Harker's fianc\u00e9e to whom he intends to share recipes and travel stories"
+    },
+    "Jonathan Harker": {
+      "name": "Jonathan Harker",
+      "gender": "male",
+      "role": "Solicitor traveling to Transylvania on business to meet Count Dracula, narrator of the journal"
+    },
+    "Count Dracula": {
+      "name": "Count Dracula",
+      "gender": "male",
+      "role": "Nobleman residing in Transylvania, Jonathan Harker's host and business associate, author of the welcoming letter"
+    }
+  },
+  "context": "Known characters:\n- Mina Harker: female\n- Jonathan Harker: male\n- Count Dracula: male"
+}

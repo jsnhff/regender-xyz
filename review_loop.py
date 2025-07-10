@@ -29,7 +29,7 @@ def scan_for_gendered_language(text: str, transform_type: str) -> Dict[str, Any]
             'titles': title_matches
         }
     
-    elif transform_type == "feminine":
+    elif transform_type == "all_female":
         he_matches = re.findall(r'\b(he|He)\b', text)
         him_matches = re.findall(r'\b(him|Him)\b', text)
         his_matches = re.findall(r'\b(his|His)\b', text)
@@ -45,7 +45,7 @@ def scan_for_gendered_language(text: str, transform_type: str) -> Dict[str, Any]
             'titles': mr_matches
         }
     
-    elif transform_type == "masculine":
+    elif transform_type == "all_male":
         she_matches = re.findall(r'\b(she|She)\b', text)
         her_matches = re.findall(r'\b(her|Her)\b', text)
         female_titles = re.findall(r'\b(Mrs\.|Ms\.|Miss)\s+', text)
@@ -72,10 +72,10 @@ def ai_comprehensive_scan(text: str, transform_type: str, model: str = "gpt-4o-m
     if transform_type == "neutral":
         target_description = "gender-neutral language (they/them/their, Mx., neutral terms)"
         examples = "he→they, she→they, his→their, Mr./Mrs.→Mx., king→monarch, uncle→parent's sibling"
-    elif transform_type == "feminine":
+    elif transform_type == "all_female":
         target_description = "feminine language (she/her/her, Ms., feminine terms)"
         examples = "he→she, him→her, his→her, Mr.→Ms., king→queen, uncle→aunt"
-    elif transform_type == "masculine":
+    elif transform_type == "all_male":
         target_description = "masculine language (he/him/his, Mr., masculine terms)"
         examples = "she→he, her→him, her→his, Mrs./Ms.→Mr., queen→king, aunt→uncle"
     
@@ -178,14 +178,14 @@ def regex_fallback_scan(text: str, transform_type: str) -> List[Dict[str, str]]:
             (r'\b(Mrs\.)\s*', 'Mx. '),
             (r'\b(Ms\.)\s*', 'Mx. ')
         ]
-    elif transform_type == "feminine":
+    elif transform_type == "all_female":
         patterns = [
             (r'\b(he|He)\b', 'she'),
             (r'\b(him|Him)\b', 'her'),
             (r'\b(his|His)\b', 'her'),
             (r'\b(Mr\.)\s*', 'Ms. ')
         ]
-    elif transform_type == "masculine":
+    elif transform_type == "all_male":
         patterns = [
             (r'\b(she|She)\b', 'he'),
             (r'\b(her|Her)\b', 'him'),  # Simplified - AI handles possessive vs object
@@ -275,13 +275,13 @@ def apply_learning_pass(text: str, transform_type: str, errors: List[Dict[str, s
 - Any him/her as object pronoun → them  
 - Any his/her as possessive → their
 - Any Mr./Mrs./Ms./Miss title → Mx."""
-    elif transform_type == "feminine":
+    elif transform_type == "all_female":
         rules = """GENERALIZED RULES (not just exact matches):
 - Any form of he referring to a person → she
 - Any him as object pronoun → her
 - Any his as possessive → her  
 - Any Mr. title → Ms."""
-    elif transform_type == "masculine":
+    elif transform_type == "all_male":
         rules = """GENERALIZED RULES (not just exact matches):
 - Any form of she referring to a person → he
 - Any her as object pronoun → him
