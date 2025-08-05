@@ -283,9 +283,8 @@ class UnifiedBookTransformer:
         val_start = time.time()
         
         # Get original text for comparison
-        from book_parser import recreate_text_from_json
-        original_text = recreate_text_from_json(book_data)
-        final_text = transformed_book.get('qc_text', recreate_text_from_json(transformed_book))
+        original_text = self._recreate_text_from_data(book_data)
+        final_text = transformed_book.get('qc_text', self._recreate_text_from_data(transformed_book))
         
         validation_report = validate_transformation(
             original_text,

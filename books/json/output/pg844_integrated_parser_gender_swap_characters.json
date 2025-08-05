@@ -85,8 +85,7 @@
       "role": "A fictional invalid friend invented by Algernon to escape social obligations",
       "name_variants": [
         "Bunbury",
-        "Mr. Bunbury",
-        "poor Bunbury"
+        "Mr. Bunbury"
       ],
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
@@ -101,10 +100,33 @@
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
     },
+    "Thomas Cardew": {
+      "name": "Thomas Cardew",
+      "gender": "male",
+      "role": "The late gentleman who adopted Jack and made him guardian to Cecily, found Jack in a handbag",
+      "name_variants": [
+        "Thomas Cardew",
+        "Mr. Thomas Cardew",
+        "Mr. James or Thomas Cardew"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Prism": {
+      "name": "Miss Prism",
+      "gender": "female",
+      "role": "Cecily's governess, responsible for her education, a woman with a past as a novelist",
+      "name_variants": [
+        "Miss Prism",
+        "Lætitia"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
     "Lady Harbury": {
       "name": "Lady Harbury",
       "gender": "female",
-      "role": "A woman visited by Lady Bracknell, recently widowed and noted for looking younger after her husband's death",
+      "role": "A woman visited by Lady Bracknell, noted for looking younger after her husband's death",
       "name_variants": [
         "Lady Harbury",
         "dear Lady Harbury"
@@ -155,36 +177,10 @@
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
     },
-    "Thomas Cardew": {
-      "name": "Thomas Cardew",
-      "gender": "male",
-      "role": "A deceased gentleman who adopted Jack and made him guardian to Cecily",
-      "name_variants": [
-        "Thomas Cardew",
-        "Mr. Thomas Cardew",
-        "Old Mr. Thomas Cardew",
-        "Mr. James or Thomas Cardew",
-        "the late Mr. Thomas Cardew"
-      ],
-      "appears_in_section": false,
-      "first_seen_in": "Complete Book"
-    },
-    "Miss Prism": {
-      "name": "Miss Prism",
-      "gender": "female",
-      "role": "Cecily's governess, responsible for her education, known for her strict demeanor and past as a novelist",
-      "name_variants": [
-        "Miss Prism",
-        "Lætitia",
-        "Egeria"
-      ],
-      "appears_in_section": true,
-      "first_seen_in": "Complete Book"
-    },
     "Canon Chasuble": {
       "name": "Canon Chasuble",
       "gender": "male",
-      "role": "A rector who interacts with Miss Prism and Cecily, known for his metaphorical speech and religious duties",
+      "role": "A rector who visits the Manor House, interacts with Miss Prism and Cecily, known as Dr. Chasuble",
       "name_variants": [
         "Canon Chasuble",
         "Dr. Chasuble",
