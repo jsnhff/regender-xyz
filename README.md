@@ -14,9 +14,6 @@ Transform any book with a single command:
 # Transform a book with automatic quality control
 python regender_book_cli.py regender book.txt --type all_female
 
-# High quality mode with extensive validation
-python regender_book_cli.py regender book.txt --quality high
-
 # Test without using API credits
 python regender_book_cli.py regender book.txt --dry-run
 ```
@@ -126,9 +123,6 @@ python regender_book_cli.py regender book.txt --type all_female
 # Specify provider
 python regender_book_cli.py regender book.txt --provider anthropic
 
-# High quality mode
-python regender_book_cli.py regender book.txt --quality high
-
 # Test without API usage
 python regender_book_cli.py regender book.txt --dry-run
 ```
@@ -208,11 +202,6 @@ for book in books/texts/*.txt; do
 done
 ```
 
-### Quality Levels
-
-- `fast` - No quality control, quickest results
-- `standard` - One QC iteration (default)
-- `high` - Three QC iterations, best quality
 
 ## License
 

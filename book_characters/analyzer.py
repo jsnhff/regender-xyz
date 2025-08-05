@@ -51,11 +51,18 @@ def analyze_characters(text: str, model: Optional[str] = None, provider: Optiona
     # Always request JSON output for consistency
     kwargs["response_format"] = {"type": "json_object"}
     
+    print(f"Calling LLM with provider: {provider}, model: {model}")
+    
     # Call the LLM
     response = client.complete(**kwargs)
     
     # Extract characters from response
     try:
+        # Make sure response has content attribute
+        if not hasattr(response, 'content'):
+            print(f"Warning: Response object missing 'content' attribute. Response type: {type(response)}")
+            return {'characters': {}}
+            
         content = response.content.strip()
         
         # Try to parse as JSON
@@ -65,7 +72,11 @@ def analyze_characters(text: str, model: Optional[str] = None, provider: Optiona
             # If not valid JSON, try to extract JSON from the response
             analysis = extract_json_from_response(content)
         
-        # Ensure we have the expected structure
+        # Ensure we have the expected structure and it's a dictionary
+        if not isinstance(analysis, dict):
+            print(f"Warning: Analysis result is not a dictionary, got {type(analysis)}")
+            analysis = {'characters': {}}
+        
         if 'characters' not in analysis:
             analysis = {'characters': {}}
             
@@ -74,6 +85,9 @@ def analyze_characters(text: str, model: Optional[str] = None, provider: Optiona
         
     except Exception as e:
         print(f"Error parsing LLM response: {e}")
+        print(f"Response type: {type(response) if 'response' in locals() else 'N/A'}")
+        if 'content' in locals():
+            print(f"Content preview: {content[:200] if len(content) > 200 else content}")
         return {'characters': {}}
 
 
@@ -82,15 +96,33 @@ def extract_json_from_response(content: str) -> Dict[str, Any]:
     # Look for JSON structure in the response
     import re
     
-    # Try to find JSON object
-    json_match = re.search(r'\{.*\}', content, re.DOTALL)
-    if json_match:
-        try:
-            return json.loads(json_match.group())
-        except json.JSONDecodeError:
-            pass
+    # Try to find JSON object - look for the outermost braces
+    # First, try to find a JSON object that starts with {"characters"
+    json_patterns = [
+        r'\{"characters"[^}]*\}(?:\s*\})*',  # Match nested JSON starting with {"characters"
+        r'\{[^{}]*"characters"[^{}]*\{[^}]*\}[^}]*\}',  # Match JSON with nested characters object
+        r'\{.*\}',  # Fallback to any JSON object
+    ]
+    
+    for pattern in json_patterns:
+        json_matches = re.finditer(pattern, content, re.DOTALL)
+        for match in json_matches:
+            try:
+                json_str = match.group()
+                # Balance braces if needed
+                open_braces = json_str.count('{')
+                close_braces = json_str.count('}')
+                if open_braces > close_braces:
+                    json_str += '}' * (open_braces - close_braces)
+                
+                result = json.loads(json_str)
+                if isinstance(result, dict):
+                    return result
+            except json.JSONDecodeError:
+                continue
     
     # If no valid JSON found, return empty structure
+    print(f"Warning: Could not extract valid JSON from response")
     return {'characters': {}}
 
 
@@ -213,6 +245,8 @@ def analyze_book_characters(book_data: Dict[str, Any],
     except Exception as e:
         if verbose:
             print(f"Error during character analysis: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Return empty results on error
         return {}, "No characters identified"

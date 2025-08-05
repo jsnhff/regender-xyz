@@ -41,19 +41,19 @@ class UnifiedBookTransformer:
     def transform_book_with_qc(self, 
                               book_data: Dict[str, Any],
                               transform_type: str = "gender_swap",
-                              quality_level: str = "high",
                               verbose: bool = True,
                               output_path: Optional[str] = None,
                               dry_run: bool = False) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Transform a book with integrated quality control.
+        Always uses maximum quality (3 QC iterations).
         
         Args:
             book_data: Parsed JSON book data
             transform_type: Type of transformation (all_male, all_female, gender_swap)
-            quality_level: Quality level (fast, standard, high)
             verbose: Print progress information
             output_path: Optional path to save both JSON and text output
+            dry_run: If True, only process first chapter
             
         Returns:
             Tuple of (transformed_book_data, transformation_report)
@@ -63,7 +63,6 @@ class UnifiedBookTransformer:
         report = {
             'start_time': datetime.now().isoformat(),
             'transform_type': transform_type,
-            'quality_level': quality_level,
             'stages': {}
         }
         
@@ -73,7 +72,6 @@ class UnifiedBookTransformer:
             print(f"{CYAN}{'='*60}{RESET}")
             print(f"📖 Book: {book_data.get('title', 'Unknown')}")
             print(f"🔄 Transform: {transform_type}")
-            print(f"🎯 Quality: {quality_level}")
             print()
         
         # Stage 1: Character Analysis (MANDATORY)
@@ -109,16 +107,8 @@ class UnifiedBookTransformer:
                 'time_taken': time.time() - character_start
             }
             
-            if quality_level == "high":
-                # In high quality mode, character analysis is mandatory
-                raise RuntimeError(f"Character analysis failed (required for {quality_level} quality): {e}")
-            else:
-                # Fallback for lower quality levels
-                if verbose:
-                    print(f"  ⚠️  Character analysis failed: {e}")
-                    print("  Continuing with limited context...")
-                characters = {}
-                character_context = ""
+            # Character analysis is always mandatory
+            raise RuntimeError(f"Character analysis failed: {e}")
         
         # Stage 2: Initial Transformation
         if verbose:
@@ -168,8 +158,8 @@ class UnifiedBookTransformer:
         else:
             transformed_book['chapters'] = transformed_chapters
         
-        # Stage 3: Quality Control (if not 'fast' mode and not dry run)
-        if quality_level != "fast" and not dry_run:
+        # Stage 3: Quality Control (always run unless dry run)
+        if not dry_run:
             if verbose:
                 print(f"\n{BOLD}Stage 3: Quality Control{RESET}")
             
@@ -180,14 +170,13 @@ class UnifiedBookTransformer:
             from book_parser import recreate_text_from_json
             transformed_text = recreate_text_from_json(transformed_book)
             
-            # Run quality control
-            iterations = 3 if quality_level == "high" else 1
+            # Run quality control (always 3 iterations)
             cleaned_text, qc_changes = quality_control_loop(
                 transformed_text,
                 transform_type,
                 model=self.model,
                 provider=self.provider,
-                max_iterations=iterations,
+                max_iterations=3,
                 verbose=verbose
             )
             
@@ -202,7 +191,7 @@ class UnifiedBookTransformer:
             report['stages']['quality_control'] = {
                 'success': True,
                 'issues_fixed': qc_changes_total,
-                'iterations': iterations,
+                'iterations': 3,
                 'time_taken': time.time() - qc_start
             }
         
@@ -286,7 +275,6 @@ class UnifiedBookTransformer:
 
 def transform_book_unified(book_data: Dict[str, Any],
                          transform_type: str = "gender_swap",
-                         quality_level: str = "standard",
                          model: Optional[str] = None,
                          provider: Optional[str] = None,
                          output_path: Optional[str] = None,
@@ -301,7 +289,6 @@ def transform_book_unified(book_data: Dict[str, Any],
     return transformer.transform_book_with_qc(
         book_data=book_data,
         transform_type=transform_type,
-        quality_level=quality_level,
         verbose=verbose,
         output_path=output_path,
         dry_run=dry_run

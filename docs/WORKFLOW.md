@@ -61,18 +61,6 @@ python regender_book_cli.py regender book.txt --type gender_swap
 - Female characters → Male (she→he, Ms.→Mr., Jane→John)
 - Maintains consistency throughout the book
 
-### Quality Levels
-
-```bash
-# Fast mode (no quality control)
-python regender_book_cli.py regender book.txt --quality fast
-
-# Standard mode (1 QC iteration) - DEFAULT
-python regender_book_cli.py regender book.txt --quality standard
-
-# High quality (3 QC iterations, mandatory character analysis)
-python regender_book_cli.py regender book.txt --quality high
-```
 
 ## The Unified Pipeline
 
@@ -87,7 +75,7 @@ The `regender` command automatically handles:
 - Extracts all characters from the book
 - Identifies character genders from context
 - Builds character mapping for consistent transformation
-- In high quality mode, fails if character analysis fails
+- Fails if character analysis cannot be completed
 
 ### 3. Transformation
 - Processes book chapter by chapter
@@ -97,7 +85,7 @@ The `regender` command automatically handles:
 ### 4. Quality Control
 - Scans for missed transformations
 - Uses AI to identify and fix errors
-- Runs multiple iterations based on quality level
+- Always runs 3 iterations for maximum accuracy
 
 ### 5. Validation
 - Calculates quality score (0-100)
@@ -170,41 +158,22 @@ python regender_book_cli.py process books/texts/
 
 # Then transform with unified pipeline
 for json in books/json/*.json; do
-    python regender_book_cli.py regender "$json" --quality high
+    python regender_book_cli.py regender "$json"
 done
 ```
 
-## Quality Level Details
-
-### Fast Mode
-- No quality control
-- Character analysis if possible (not mandatory)
-- Fastest processing
-- Use for drafts or testing
-
-### Standard Mode (Default)
-- Character analysis required
-- 1 iteration of quality control
-- Good balance of speed and quality
-- Recommended for most uses
-
-### High Mode
-- Mandatory character analysis (fails if not possible)
-- 3 iterations of quality control
-- Highest quality output
-- Use for final/published versions
 
 ## Troubleshooting
 
 ### Character Analysis Fails
-- In `fast` or `standard` mode: Continues with limited context
-- In `high` mode: Transformation stops (character analysis is mandatory)
+- Transformation stops (character analysis is mandatory)
 - Solution: Check if book has clear character names and dialogue
+- Solution: Try a different model or provider
 
 ### Low Quality Score
-- Run with `--quality high` for more iterations
 - Check transformation type matches book content
 - Some books may have ambiguous gender references
+- Consider using a more capable model
 
 ### Rate Limits
 - The unified pipeline handles rate limits automatically

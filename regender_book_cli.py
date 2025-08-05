@@ -503,7 +503,6 @@ def handle_regender_command(args):
         transformed_book, report = transform_book_unified(
             book_data=book_data,
             transform_type=args.type,
-            quality_level=args.quality,
             model=args.model,
             provider=args.provider,
             output_path=output_path,
@@ -648,8 +647,6 @@ For more help on specific commands:
     regender_parser.add_argument('-o', '--output', help='Output path (without extension)')
     regender_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'],
                                default='gender_swap', help='Gender transformation mode')
-    regender_parser.add_argument('--quality', choices=['fast', 'standard', 'high'],
-                               default='standard', help='Quality level')
     regender_parser.add_argument('--model', help='Model to use')
     regender_parser.add_argument('--provider', choices=['openai', 'anthropic', 'claude', 'grok'], help='LLM provider')
     regender_parser.add_argument('--dry-run', action='store_true', help='Test without using API credits (processes first chapter only)')

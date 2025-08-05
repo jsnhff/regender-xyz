@@ -169,8 +169,8 @@ class ModelConfigLoader:
         
         # Provider defaults
         if provider:
-            defaults = self._config_data.get("provider_defaults", {}).get(provider, {})
-            default_model = defaults.get("model")
+            provider_defaults = self._config_data.get("provider_defaults", {})
+            default_model = provider_defaults.get(provider)
             if default_model and default_model in self._models:
                 return self._models[default_model]
         
