@@ -46,21 +46,40 @@ def print_banner():
 # Gutenberg Download Functions
 # =============================================================================
 
-def download_books(count=100, output_dir="books/texts"):
-    """Download top books from Project Gutenberg."""
-    print(f"\n📚 Downloading top {count} books from Project Gutenberg...")
-    print("=" * 70)
-    
+def download_books(book_id=None, count=100, output_dir="books/texts"):
+    """Download books from Project Gutenberg."""
     downloader = GutenbergDownloader(output_dir=output_dir)
-    stats = downloader.download_top_books(limit=count)
     
-    print("\n" + "=" * 70)
-    print("✅ Download Complete!")
-    print(f"📊 Downloaded: {stats['successful']} books")
-    print(f"❌ Failed: {stats['failed']} books")
-    print(f"💾 Total size: {stats['total_size']}")
-    
-    return stats
+    if book_id:
+        # Download specific book
+        print(f"\n📚 Downloading book ID {book_id} from Project Gutenberg...")
+        print("=" * 70)
+        
+        try:
+            success = downloader.download_book(int(book_id))
+            if success:
+                print(f"\n✅ Successfully downloaded book ID {book_id}")
+                return {'successful': 1, 'failed': 0}
+            else:
+                print(f"\n❌ Failed to download book ID {book_id}")
+                return {'successful': 0, 'failed': 1}
+        except Exception as e:
+            print(f"\n❌ Error downloading book ID {book_id}: {e}")
+            return {'successful': 0, 'failed': 1}
+    else:
+        # Download top books
+        print(f"\n📚 Downloading top {count} books from Project Gutenberg...")
+        print("=" * 70)
+        
+        stats = downloader.download_top_books(limit=count)
+        
+        print("\n" + "=" * 70)
+        print("✅ Download Complete!")
+        print(f"📊 Downloaded: {stats['successful']} books")
+        print(f"❌ Failed: {stats['failed']} books")
+        print(f"💾 Total size: {stats['total_size']}")
+        
+        return stats
 
 
 def list_books(texts_dir="books/texts"):
@@ -94,15 +113,54 @@ def list_books(texts_dir="books/texts"):
 # Book Processing Functions
 # =============================================================================
 
-def process_books(input_dir="books/texts", output_dir="books/json"):
-    """Process all downloaded books to JSON format."""
-    print("\n🔄 Processing books to JSON format...")
-    print("=" * 70)
+def process_books(input_path=None, output_path=None):
+    """Process books to JSON format (single file or directory)."""
+    # Default paths
+    if not input_path:
+        input_path = "books/texts"
+    if not output_path:
+        output_path = "books/json" if Path(input_path).is_dir() else None
     
-    stats = process_all_books(
-        input_dir=input_dir,
-        output_dir=output_dir
-    )
+    input_p = Path(input_path)
+    
+    if input_p.is_file():
+        # Process single file
+        print(f"\n🔄 Processing single book to JSON format...")
+        print("=" * 70)
+        
+        # Determine output file
+        if output_path:
+            output_file = Path(output_path)
+        else:
+            # Create output filename in same directory
+            output_file = input_p.with_suffix('').parent / f"{input_p.stem}_clean.json"
+        
+        # Create output directory if needed
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Process the file
+        parser = BookParser()
+        try:
+            book_data = parser.parse_file(str(input_p))
+            save_book_json(book_data, str(output_file))
+            
+            print(f"✓ Successfully processed: {input_p.name}")
+            print(f"  Output: {output_file}")
+            print(f"  Chapters: {len(book_data.get('chapters', []))}")
+            print(f"  Sentences: {book_data.get('statistics', {}).get('total_sentences', 0)}")
+            
+        except Exception as e:
+            print(f"❌ Failed to process {input_p.name}: {e}")
+            
+    else:
+        # Process directory
+        print("\n🔄 Processing books to JSON format...")
+        print("=" * 70)
+        
+        stats = process_all_books(
+            input_dir=str(input_path),
+            output_dir=str(output_path) if output_path else "books/json"
+        )
     
     print("\n" + "=" * 70)
     print("✅ Processing Complete!")
@@ -439,6 +497,9 @@ def handle_regender_command(args):
     
     # Run unified transformation
     try:
+        if args.dry_run:
+            print(f"\n{YELLOW}🔬 DRY RUN MODE - Processing first chapter only{RESET}")
+        
         transformed_book, report = transform_book_unified(
             book_data=book_data,
             transform_type=args.type,
@@ -446,7 +507,8 @@ def handle_regender_command(args):
             model=args.model,
             provider=args.provider,
             output_path=output_path,
-            verbose=True
+            verbose=True,
+            dry_run=args.dry_run
         )
         
         # Show summary
@@ -472,6 +534,11 @@ def handle_regender_command(args):
 
 def pipeline(count=100, transform_type="comprehensive", model="gpt-4o-mini"):
     """Run the complete pipeline: download, process, and transform."""
+    print(f"\n{YELLOW}{BOLD}⚠️  WARNING: The 'pipeline' command is deprecated!{RESET}")
+    print(f"{YELLOW}Please use the 'regender' command instead for better results.{RESET}")
+    print(f"{YELLOW}Example: python {sys.argv[0]} regender book.txt --type {transform_type}{RESET}")
+    print("\nContinuing with deprecated pipeline...\n")
+    
     print("\n🚀 Running complete book processing pipeline...")
     print("=" * 70)
     
@@ -506,14 +573,34 @@ def pipeline(count=100, transform_type="comprehensive", model="gpt-4o-mini"):
 def main():
     parser = argparse.ArgumentParser(
         description="Book processing and gender transformation CLI",
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Quick transform a single book
+  %(prog)s regender book.txt --type all_female
+  
+  # Download specific books from Project Gutenberg
+  %(prog)s download --count 5
+  
+  # Process text files to JSON
+  %(prog)s process --input texts/ --output json/
+  
+  # Transform with high quality
+  %(prog)s regender book.json --quality high --provider anthropic
+  
+  # List available books
+  %(prog)s list
+
+For more help on specific commands:
+  %(prog)s <command> --help
+""")
     
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
     # Download command
     download_parser = subparsers.add_parser('download', help='Download books from Project Gutenberg')
-    download_parser.add_argument('--count', type=int, default=100, help='Number of books to download')
+    download_parser.add_argument('book_id', nargs='?', help='Specific book ID to download (e.g., 1342 for Pride and Prejudice)')
+    download_parser.add_argument('--count', type=int, default=100, help='Number of top books to download (if no book_id specified)')
     download_parser.add_argument('--output', default='books/texts', help='Output directory')
     
     # List command
@@ -522,8 +609,8 @@ def main():
     
     # Process command
     process_parser = subparsers.add_parser('process', help='Convert books to JSON format')
-    process_parser.add_argument('--input', default='books/texts', help='Input directory')
-    process_parser.add_argument('--output', default='books/json', help='Output directory')
+    process_parser.add_argument('input', nargs='?', help='Input file or directory (default: books/texts)')
+    process_parser.add_argument('-o', '--output', help='Output file or directory')
     
     # Validate command
     validate_parser = subparsers.add_parser('validate', help='Validate JSON against source texts')
@@ -565,9 +652,10 @@ def main():
                                default='standard', help='Quality level')
     regender_parser.add_argument('--model', help='Model to use')
     regender_parser.add_argument('--provider', choices=['openai', 'anthropic', 'claude', 'grok'], help='LLM provider')
+    regender_parser.add_argument('--dry-run', action='store_true', help='Test without using API credits (processes first chapter only)')
     
-    # Pipeline command
-    pipeline_parser = subparsers.add_parser('pipeline', help='Run complete pipeline')
+    # Pipeline command (DEPRECATED - use 'regender' instead)
+    pipeline_parser = subparsers.add_parser('pipeline', help='[DEPRECATED] Use regender command instead')
     pipeline_parser.add_argument('--count', type=int, default=100, help='Number of books to download')
     pipeline_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'],
                                default='gender_swap', help='Gender transformation mode')
@@ -582,7 +670,7 @@ def main():
     
     # Execute commands
     if args.command == 'download':
-        download_books(args.count, args.output)
+        download_books(args.book_id, args.count, args.output)
     
     elif args.command == 'list':
         list_books(args.dir)

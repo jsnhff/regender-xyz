@@ -136,25 +136,48 @@ Unified interface for AI providers.
 CHAPTER I
 The Beginning
 
-Alice was very tired...
+Alice was very tired. She had been sitting by her sister for a long time.
+
+The White Rabbit appeared suddenly...
 ```
 
-### Parsed JSON
+### Parsed JSON Structure
 ```json
 {
   "metadata": {
     "title": "Alice in Wonderland",
+    "author": "Lewis Carroll",
+    "date": "1865",
+    "source": "Project Gutenberg",
+    "processing_note": "Parsed with modular book parser",
     "format_version": "2.0"
   },
   "chapters": [{
     "number": "I",
     "title": "The Beginning",
-    "paragraphs": [{
-      "sentences": [
-        "Alice was very tired..."
-      ]
-    }]
-  }]
+    "type": "chapter",
+    "paragraphs": [
+      {
+        "sentences": [
+          "Alice was very tired.",
+          "She had been sitting by her sister for a long time."
+        ]
+      },
+      {
+        "sentences": [
+          "The White Rabbit appeared suddenly..."
+        ]
+      }
+    ],
+    "sentence_count": 3,
+    "word_count": 25
+  }],
+  "statistics": {
+    "total_chapters": 12,
+    "total_paragraphs": 450,
+    "total_sentences": 2300,
+    "total_words": 27500
+  }
 }
 ```
 

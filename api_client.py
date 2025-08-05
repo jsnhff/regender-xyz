@@ -362,7 +362,32 @@ class UnifiedLLMClient:
         
         self.client = self.providers[self.provider]
         if not self.client.is_available():
-            raise APIError(f"Provider {self.provider} is not properly configured.")
+            # Check which providers are available
+            available = self.list_available_providers()
+            
+            error_msg = f"Provider {self.provider} is not properly configured.\n\n"
+            error_msg += "To fix this:\n"
+            
+            if self.provider == "openai":
+                error_msg += "1. Copy .env.example to .env\n"
+                error_msg += "2. Add your OpenAI API key: OPENAI_API_KEY=your-key-here\n"
+                error_msg += "3. Get a key from: https://platform.openai.com/api-keys\n"
+            elif self.provider == "anthropic":
+                error_msg += "1. Copy .env.example to .env\n"
+                error_msg += "2. Add your Anthropic API key: ANTHROPIC_API_KEY=your-key-here\n"
+                error_msg += "3. Get a key from: https://console.anthropic.com/settings/keys\n"
+            elif self.provider == "grok":
+                error_msg += "1. Copy .env.example to .env\n"
+                error_msg += "2. Add your Grok API key: GROK_API_KEY=your-key-here\n"
+                error_msg += "3. Get a key from: https://console.x.ai/\n"
+            
+            if available:
+                error_msg += f"\nAlternatively, use one of these configured providers: {', '.join(available)}\n"
+                error_msg += f"Example: --provider {available[0]}"
+            else:
+                error_msg += "\nNo providers are currently configured. See .env.example for setup instructions."
+                
+            raise APIError(error_msg)
     
     def complete(self, messages: List[Dict[str, str]], 
                 model: Optional[str] = None,

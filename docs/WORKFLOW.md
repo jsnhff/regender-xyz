@@ -1,8 +1,8 @@
-# Unified Workflow Documentation
+# Workflow Guide
 
 ## Overview
 
-The regender-xyz system has been refactored to provide a unified, streamlined workflow for transforming gender representation in books. The new `regender` command handles the entire pipeline automatically, including character analysis, transformation, and quality control.
+The regender-xyz system provides a streamlined workflow for transforming gender representation in books. The `regender` command handles the entire pipeline automatically, including character analysis, transformation, and quality control.
 
 ## Quick Start
 
@@ -23,16 +23,43 @@ python regender_book_cli.py regender input.txt -o output/my_book_transformed
 
 ### Transformation Types
 
+#### all_male
+Convert ALL characters to male gender with no exceptions.
+
 ```bash
-# All female (default: gender_swap)
-python regender_book_cli.py regender book.txt --type all_female
-
-# All male
 python regender_book_cli.py regender book.txt --type all_male
+```
 
-# Gender swap (swaps all genders)
+**What happens:**
+- ALL titles become 'Mr.' (never Mrs./Ms./Miss/Lady)
+- ALL pronouns become 'he/him/his'
+- Female names → male equivalents (Elizabeth→Elliot, Jane→John)
+- Gendered terms (queen→king, mother→father)
+
+#### all_female
+Convert ALL characters to female gender with no exceptions.
+
+```bash
+python regender_book_cli.py regender book.txt --type all_female
+```
+
+**What happens:**
+- ALL titles become 'Ms.' (never Mr.)
+- ALL pronouns become 'she/her/hers'
+- Male names → female equivalents (John→Jane, William→Willow)
+- Gendered terms (king→queen, father→mother)
+
+#### gender_swap
+Swap each character's gender to its opposite.
+
+```bash
 python regender_book_cli.py regender book.txt --type gender_swap
 ```
+
+**What happens:**
+- Male characters → Female (he→she, Mr.→Ms., John→Jane)
+- Female characters → Male (she→he, Ms.→Mr., Jane→John)
+- Maintains consistency throughout the book
 
 ### Quality Levels
 

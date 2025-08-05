@@ -43,7 +43,8 @@ class UnifiedBookTransformer:
                               transform_type: str = "gender_swap",
                               quality_level: str = "high",
                               verbose: bool = True,
-                              output_path: Optional[str] = None) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+                              output_path: Optional[str] = None,
+                              dry_run: bool = False) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Transform a book with integrated quality control.
         
@@ -127,9 +128,15 @@ class UnifiedBookTransformer:
         transformed_chapters = []
         all_changes = []
         
-        for idx, chapter in enumerate(book_data['chapters']):
+        # In dry run mode, only process first chapter
+        chapters_to_process = book_data['chapters'][:1] if dry_run else book_data['chapters']
+        
+        for idx, chapter in enumerate(chapters_to_process):
             if verbose:
-                print(f"  Chapter {idx + 1}/{len(book_data['chapters'])}", end='', flush=True)
+                if dry_run:
+                    print(f"  Chapter {idx + 1}/{len(chapters_to_process)} (DRY RUN - first chapter only)", end='', flush=True)
+                else:
+                    print(f"  Chapter {idx + 1}/{len(chapters_to_process)}", end='', flush=True)
             
             transformed_chapter, chapter_changes = transform_chapter(
                 chapter,
@@ -155,10 +162,14 @@ class UnifiedBookTransformer:
         
         # Create initial transformed book
         transformed_book = book_data.copy()
-        transformed_book['chapters'] = transformed_chapters
+        if dry_run:
+            # In dry run, append untransformed chapters
+            transformed_book['chapters'] = transformed_chapters + book_data['chapters'][1:]
+        else:
+            transformed_book['chapters'] = transformed_chapters
         
-        # Stage 3: Quality Control (if not 'fast' mode)
-        if quality_level != "fast":
+        # Stage 3: Quality Control (if not 'fast' mode and not dry run)
+        if quality_level != "fast" and not dry_run:
             if verbose:
                 print(f"\n{BOLD}Stage 3: Quality Control{RESET}")
             
@@ -279,7 +290,8 @@ def transform_book_unified(book_data: Dict[str, Any],
                          model: Optional[str] = None,
                          provider: Optional[str] = None,
                          output_path: Optional[str] = None,
-                         verbose: bool = True) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+                         verbose: bool = True,
+                         dry_run: bool = False) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Convenience function for unified book transformation.
     
@@ -291,5 +303,6 @@ def transform_book_unified(book_data: Dict[str, Any],
         transform_type=transform_type,
         quality_level=quality_level,
         verbose=verbose,
-        output_path=output_path
+        output_path=output_path,
+        dry_run=dry_run
     )

@@ -9,16 +9,11 @@ Welcome to regender-xyz! This tool transforms gender representation in books usi
 
 That's it! The system handles everything automatically.
 
-## Essential Guides
+## Documentation Guides
 
-- **[Unified Workflow](UNIFIED_WORKFLOW.md)** - Complete guide to the `regender` command
-- **[Architecture & Pipeline](ARCHITECTURE.md)** - System design and complete flow
-- **[JSON Structure](JSON_STRUCTURE.md)** - Understanding the book JSON format
-
-## Reference Docs
-
-- **[Transformation Modes](reference/TRANSFORMATION_MODES.md)** - Understanding all_male, all_female, and gender_swap
-- **[Multi-Provider Guide](reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI, Anthropic, or Grok
+- **[Workflow Guide](WORKFLOW.md)** - How to use the system, transformation types, quality levels
+- **[Architecture](ARCHITECTURE.md)** - System design, components, and data structures
+- **[Providers Guide](PROVIDERS.md)** - Using OpenAI, Anthropic/Claude, or Grok
 
 ## Key Commands
 
