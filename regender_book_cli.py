@@ -219,6 +219,18 @@ def transform_single_book(input_file: str, output_file: Optional[str] = None,
                          model: str = "gpt-4o-mini", provider: Optional[str] = None, 
                          character_file: Optional[str] = None, quiet: bool = False):
     """Transform a single JSON book."""
+    # Check for model/provider mismatch
+    if model != "gpt-4o-mini" and not provider:
+        detected_provider = detect_provider_from_model(model)
+        if detected_provider:
+            print(f"{RED}❌ Model '{model}' requires provider '{detected_provider}'{RESET}")
+            print(f"{YELLOW}Please add: --provider {detected_provider}{RESET}")
+            sys.exit(1)
+        else:
+            print(f"{RED}❌ Cannot determine provider for model '{model}'{RESET}")
+            print(f"{YELLOW}Please specify a provider with: --provider [openai|anthropic|grok]{RESET}")
+            sys.exit(1)
+    
     if not quiet:
         print(f"\n{CYAN}📖 Processing: {input_file}{RESET}")
         print("=" * 60)
@@ -317,6 +329,18 @@ def analyze_characters_command(input_file: str, output_file: str,
                               model: str = "gpt-4o-mini", provider: Optional[str] = None,
                               rate_limited: bool = False, tokens_per_minute: int = 16000):
     """Analyze and save character data from a book."""
+    # Check for model/provider mismatch
+    if model != "gpt-4o-mini" and not provider:
+        detected_provider = detect_provider_from_model(model)
+        if detected_provider:
+            print(f"{RED}❌ Model '{model}' requires provider '{detected_provider}'{RESET}")
+            print(f"{YELLOW}Please add: --provider {detected_provider}{RESET}")
+            sys.exit(1)
+        else:
+            print(f"{RED}❌ Cannot determine provider for model '{model}'{RESET}")
+            print(f"{YELLOW}Please specify a provider with: --provider [openai|anthropic|grok]{RESET}")
+            sys.exit(1)
+    
     print(f"\n{CYAN}📖 Analyzing characters in: {input_file}{RESET}")
     
     # Load book
@@ -373,6 +397,18 @@ def batch_transform(input_dir: str = "books/json", output_dir: str = "books/outp
                    transform_type: str = "comprehensive", model: str = "gpt-4o-mini",
                    provider: Optional[str] = None, limit: Optional[int] = None):
     """Transform multiple JSON books."""
+    # Check for model/provider mismatch
+    if model != "gpt-4o-mini" and not provider:
+        detected_provider = detect_provider_from_model(model)
+        if detected_provider:
+            print(f"{RED}❌ Model '{model}' requires provider '{detected_provider}'{RESET}")
+            print(f"{YELLOW}Please add: --provider {detected_provider}{RESET}")
+            return
+        else:
+            print(f"{RED}❌ Cannot determine provider for model '{model}'{RESET}")
+            print(f"{YELLOW}Please specify a provider with: --provider [openai|anthropic|grok]{RESET}")
+            return
+    
     input_path = Path(input_dir)
     output_path = Path(output_dir)
     output_path.mkdir(exist_ok=True)
@@ -440,10 +476,37 @@ def batch_transform(input_dir: str = "books/json", output_dir: str = "books/outp
 # Unified Regender Command (NEW)
 # =============================================================================
 
+def detect_provider_from_model(model_name: str) -> Optional[str]:
+    """Detect provider from model name."""
+    if not model_name:
+        return None
+    
+    model_lower = model_name.lower()
+    if 'gpt' in model_lower:
+        return 'openai'
+    elif 'claude' in model_lower:
+        return 'anthropic'
+    elif 'grok' in model_lower:
+        return 'grok'
+    return None
+
+
 def handle_regender_command(args):
     """Handle the unified regender command that does everything."""
     from book_transform import transform_book_unified
     from book_parser import BookParser, save_book_json, load_book_json
+    
+    # Check for model/provider mismatch
+    if args.model and not args.provider:
+        detected_provider = detect_provider_from_model(args.model)
+        if detected_provider:
+            print(f"{RED}❌ Model '{args.model}' requires provider '{detected_provider}'{RESET}")
+            print(f"{YELLOW}Please add: --provider {detected_provider}{RESET}")
+            return
+        else:
+            print(f"{RED}❌ Cannot determine provider for model '{args.model}'{RESET}")
+            print(f"{YELLOW}Please specify a provider with: --provider [openai|anthropic|grok]{RESET}")
+            return
     
     input_path = Path(args.input)
     if not input_path.exists():

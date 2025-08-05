@@ -78,6 +78,14 @@ PLAY_PATTERNS = [
     
     # Scene patterns without location
     Pattern(
+        regex=r'^SCENE\s*$',  # Just "SCENE" without number (like in The Importance of Being Earnest)
+        pattern_type=PatternType.SCENE,
+        number_type=NumberType.NONE,
+        capture_groups={},
+        priority=125,  # Higher priority for exact match
+        description="SCENE (no number)"
+    ),
+    Pattern(
         regex=r'^SCENE\s+(' + ROMAN + r')\.?\s*$',
         pattern_type=PatternType.SCENE,
         number_type=NumberType.ROMAN,

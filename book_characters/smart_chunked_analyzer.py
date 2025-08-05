@@ -2,6 +2,7 @@
 
 import json
 from typing import Dict, Any, List, Tuple, Optional
+from datetime import datetime
 from api_client import UnifiedLLMClient
 from .prompts import get_character_analysis_prompt
 
@@ -22,7 +23,8 @@ def analyze_book_characters_smart_chunks(
     4. Overlap zones to catch characters that appear at boundaries
     """
     if verbose:
-        print("Analyzing characters with smart chunking strategy...")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] Analyzing characters with smart chunking strategy...")
     
     # Extract chapters
     chapters = book_data.get('chapters', [])
@@ -116,8 +118,9 @@ def analyze_book_characters_smart_chunks(
         all_characters = merge_characters_smart(all_characters, chunk_chars, chunk_config['name'])
         
         if verbose:
-            print(f"    Found {len(chunk_chars)} characters in this section")
-            print(f"    Total unique characters so far: {len(all_characters)}")
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] Found {len(chunk_chars)} characters in this section")
+            print(f"[{timestamp}] Total unique characters so far: {len(all_characters)}")
     
     # Create character context
     from .context import create_character_context

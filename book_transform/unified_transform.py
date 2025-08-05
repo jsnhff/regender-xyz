@@ -46,7 +46,7 @@ class UnifiedBookTransformer:
                               dry_run: bool = False) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Transform a book with integrated quality control.
-        Always uses maximum quality (3 QC iterations).
+        Uses 1 QC iteration by default for faster processing.
         
         Args:
             book_data: Parsed JSON book data
@@ -108,7 +108,12 @@ class UnifiedBookTransformer:
                 # Save characters to a file immediately
                 if output_path:
                     char_dir = os.path.dirname(output_path)
-                    char_filename = os.path.basename(output_path).replace('.json', '_characters.json')
+                    base_filename = os.path.basename(output_path)
+                    # Ensure we handle both cases: with and without .json extension
+                    if base_filename.endswith('.json'):
+                        char_filename = base_filename.replace('.json', '_characters.json')
+                    else:
+                        char_filename = base_filename + '_characters.json'
                     char_path = os.path.join(char_dir, char_filename)
                     
                     metadata = {
@@ -148,10 +153,11 @@ class UnifiedBookTransformer:
         
         for idx, chapter in enumerate(chapters_to_process):
             if verbose:
+                timestamp = datetime.now().strftime("%H:%M:%S")
                 if dry_run:
-                    print(f"  Chapter {idx + 1}/{len(chapters_to_process)} (DRY RUN - first chapter only)", end='', flush=True)
+                    print(f"[{timestamp}] Chapter {idx + 1}/{len(chapters_to_process)} (DRY RUN - first chapter only)", end='', flush=True)
                 else:
-                    print(f"  Chapter {idx + 1}/{len(chapters_to_process)}", end='', flush=True)
+                    print(f"[{timestamp}] Chapter {idx + 1}/{len(chapters_to_process)}", end='', flush=True)
             
             transformed_chapter, chapter_changes = transform_chapter(
                 chapter,
@@ -195,13 +201,13 @@ class UnifiedBookTransformer:
             from book_parser import recreate_text_from_json
             transformed_text = recreate_text_from_json(transformed_book)
             
-            # Run quality control (always 3 iterations)
+            # Run quality control (1 iteration by default for speed)
             cleaned_text, qc_changes = quality_control_loop(
                 transformed_text,
                 transform_type,
                 model=self.model,
                 provider=self.provider,
-                max_iterations=3,
+                max_iterations=1,
                 verbose=verbose
             )
             
@@ -216,7 +222,7 @@ class UnifiedBookTransformer:
             report['stages']['quality_control'] = {
                 'success': True,
                 'issues_fixed': qc_changes_total,
-                'iterations': 3,
+                'iterations': 1,
                 'time_taken': time.time() - qc_start
             }
         

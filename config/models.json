@@ -38,78 +38,6 @@
       },
       "notes": "Claude Opus 4 - Latest flagship model with enhanced capabilities"
     },
-    "claude-3-5-sonnet-20241022": {
-      "provider": "anthropic",
-      "tier": "flagship",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Claude 3.5 Sonnet (Oct 2024) - Previous flagship"
-    },
-    "claude-3-5-sonnet-latest": {
-      "provider": "anthropic",
-      "tier": "flagship",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Alias for the latest Claude 3.5 Sonnet"
-    },
-    "claude-3-opus-20240229": {
-      "provider": "anthropic",
-      "tier": "flagship",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Claude 3 Opus - Powerful reasoning capabilities"
-    },
-    "claude-3-opus-latest": {
-      "provider": "anthropic",
-      "tier": "flagship",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Alias for the latest Claude 3 Opus"
-    },
-    "claude-3-sonnet-20240229": {
-      "provider": "anthropic",
-      "tier": "standard",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Claude 3 Sonnet - Balanced speed and intelligence"
-    },
-    "claude-3-haiku-20240307": {
-      "provider": "anthropic",
-      "tier": "standard",
-      "context_window": 200000,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 4000,
-        "max_chunk_tokens": 150000
-      },
-      "notes": "Claude 3 Haiku - Fast and cost-effective"
-    },
     "grok-3-latest": {
       "provider": "grok",
       "tier": "flagship",
@@ -139,17 +67,20 @@
       },
       "notes": "Latest Grok 4 model - released January 2025"
     },
-    "grok-beta": {
+    "grok-3-fast": {
       "provider": "grok",
       "tier": "advanced",
       "context_window": 131072,
       "output_limit": 131072,
       "supports_json_mode": false,
       "chunking": {
-        "sentences_per_chunk": 3600,
-        "max_chunk_tokens": 98000
+        "sentences_per_chunk": 500,
+        "max_chunk_tokens": 30000
       },
-      "notes": "Combined prompt + output limited to 131k tokens"
+      "rate_limits": {
+        "requests_per_minute": 600
+      },
+      "notes": "Fast Grok 3 model with higher rate limits"
     },
     "grok-3-mini-fast": {
       "provider": "grok",

@@ -1,0 +1,225 @@
+{
+  "characters": {
+    "Algernon Moncrieff": {
+      "name": "Algernon Moncrieff",
+      "gender": "male",
+      "role": "Bachelor living in a flat in Half-Moon Street, inventive with fictional excuses like Bunbury, nephew of Lady Bracknell, cousin of Gwendolen",
+      "name_variants": [
+        "Algernon Moncrieff",
+        "Algernon",
+        "Algy",
+        "dear Algy"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Lane": {
+      "name": "Lane",
+      "gender": "male",
+      "role": "Manservant and butler to Algernon",
+      "name_variants": [
+        "Lane"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "John Worthing": {
+      "name": "John Worthing",
+      "gender": "male",
+      "role": "Guardian to Cecily Cardew, pretends to be Ernest in town and Jack in the country, in love with Gwendolen",
+      "name_variants": [
+        "John Worthing",
+        "Jack Worthing",
+        "Mr. Ernest Worthing",
+        "Ernest Worthing",
+        "Jack",
+        "Ernest",
+        "Mr. Worthing",
+        "Uncle Jack",
+        "dear Uncle Jack"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Lady Bracknell": {
+      "name": "Lady Bracknell",
+      "gender": "female",
+      "role": "Aunt to Algernon, mother to Gwendolen, authoritative and socially conscious aristocrat",
+      "name_variants": [
+        "Lady Bracknell",
+        "Aunt Augusta",
+        "mamma"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Gwendolen Fairfax": {
+      "name": "Gwendolen Fairfax",
+      "gender": "female",
+      "role": "Daughter of Lady Bracknell, cousin to Algernon, in love with Jack under the name Ernest",
+      "name_variants": [
+        "Gwendolen Fairfax",
+        "Gwendolen",
+        "Miss Fairfax"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Cecily Cardew": {
+      "name": "Cecily Cardew",
+      "gender": "female",
+      "role": "Ward of Jack Worthing, granddaughter of Thomas Cardew, lives in the country under Miss Prism's care",
+      "name_variants": [
+        "Cecily Cardew",
+        "Miss Cecily Cardew",
+        "Cecily",
+        "little Cecily"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Lord Shoreman": {
+      "name": "Lord Shoreman",
+      "gender": "male",
+      "role": "Guest who dined with Algernon and others",
+      "name_variants": [
+        "Lord Shoreman"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Thomas Cardew": {
+      "name": "Thomas Cardew",
+      "gender": "male",
+      "role": "Deceased gentleman who adopted Jack and was guardian to his granddaughter Cecily",
+      "name_variants": [
+        "Thomas Cardew",
+        "Old Mr. Thomas Cardew",
+        "Mr. Thomas Cardew",
+        "the late Mr. Thomas Cardew",
+        "Mr. James",
+        "Mr. James or Thomas"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Laetitia Prism": {
+      "name": "Laetitia Prism",
+      "gender": "female",
+      "role": "Governess to Cecily, former novelist, educator in the country house",
+      "name_variants": [
+        "Laetitia Prism",
+        "Miss Prism",
+        "Laetitia"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Bunbury": {
+      "name": "Bunbury",
+      "gender": "male",
+      "role": "Fictional invalid friend invented by Algernon as an excuse for absences",
+      "name_variants": [
+        "Bunbury",
+        "Mr. Bunbury",
+        "poor Bunbury",
+        "poor friend Bunbury"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Mary Farquhar": {
+      "name": "Mary Farquhar",
+      "gender": "female",
+      "role": "Woman known for flirting with her own husband at dinner parties",
+      "name_variants": [
+        "Mary Farquhar"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Lady Harbury": {
+      "name": "Lady Harbury",
+      "gender": "female",
+      "role": "Widow who appears younger after her husband's death, visited by Lady Bracknell",
+      "name_variants": [
+        "Lady Harbury",
+        "dear Lady Harbury"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Lord Bracknell": {
+      "name": "Lord Bracknell",
+      "gender": "male",
+      "role": "Husband of Lady Bracknell, father of Gwendolen, suffers from poor health",
+      "name_variants": [
+        "Lord Bracknell",
+        "your uncle",
+        "poor uncle"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Gerald": {
+      "name": "Gerald",
+      "gender": "male",
+      "role": "Brother of Gwendolen, known for proposing to women for practice",
+      "name_variants": [
+        "Gerald",
+        "my brother Gerald"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Lady Bloxham": {
+      "name": "Lady Bloxham",
+      "gender": "female",
+      "role": "Elderly tenant of Jack's town house in Belgrave Square",
+      "name_variants": [
+        "Lady Bloxham"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Duchess of Bolton": {
+      "name": "Duchess of Bolton",
+      "gender": "female",
+      "role": "Aristocrat who maintains a list of eligible young men in collaboration with Lady Bracknell",
+      "name_variants": [
+        "Duchess of Bolton",
+        "dear Duchess of Bolton"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Canon Chasuble": {
+      "name": "Canon Chasuble",
+      "gender": "male",
+      "role": "Local clergyman and rector, visits the manor house",
+      "name_variants": [
+        "Canon Chasuble",
+        "Dr. Chasuble",
+        "the Rector"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
+    "Moulton": {
+      "name": "Moulton",
+      "gender": "unknown",
+      "role": "Servant, likely a gardener responsible for tasks like watering flowers",
+      "name_variants": [
+        "Moulton"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    }
+  },
+  "metadata": {
+    "book_title": "The Importance of Being Earnest",
+    "total_characters": 18,
+    "provider": "grok",
+    "model": null
+  }
+}

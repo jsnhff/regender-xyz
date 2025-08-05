@@ -85,7 +85,7 @@ The `regender` command automatically handles:
 ### 4. Quality Control
 - Scans for missed transformations
 - Uses AI to identify and fix errors
-- Always runs 3 iterations for maximum accuracy
+- Runs 1 iteration by default (faster processing)
 
 ### 5. Validation
 - Calculates quality score (0-100)

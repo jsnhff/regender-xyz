@@ -2,6 +2,7 @@
 
 import json
 from typing import Dict, Any, Optional, List, Tuple
+from datetime import datetime
 from api_client import UnifiedLLMClient
 from book_transform.utils import safe_api_call, cache_result, APIError
 from .prompts import get_character_analysis_prompt
@@ -162,14 +163,16 @@ def analyze_book_characters(book_data: Dict[str, Any],
         Tuple of (character_dict, character_context_string)
     """
     if verbose:
-        print("Analyzing characters using LLM...")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] Analyzing characters using LLM...")
     
     try:
         # Analyze in one pass or with smart sampling
         full_text = get_full_text_from_json(book_data)
         
         if verbose:
-            print(f"  Book length: {len(full_text)} characters")
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] Book length: {len(full_text)} characters")
         
         # For very long books, we might need to chunk even for API providers
         # Check context window limits

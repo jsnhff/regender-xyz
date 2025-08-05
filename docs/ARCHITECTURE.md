@@ -30,14 +30,14 @@ Text File → Parse to JSON → Analyze Characters → Transform Gender → Outp
 └────────┬────────┘                        └────────┬────────┘
          │                                          │
          ▼                                          │
-┌─────────────────────────┐                        │
-│   1. PARSING STAGE      │                        │
-├─────────────────────────┤                        │
-│ book_parser/            │                        │
-│ • 100+ formats support  │                        │
-│ • Pattern detection     │                        │
-│ • Paragraph preservation│                        │
-└────────┬────────────────┘                        │
+┌─────────────────────────┐                         │
+│   1. PARSING STAGE      │                         │
+├─────────────────────────┤                         │
+│ book_parser/            │                         │
+│ • 100+ formats support  │                         │
+│ • Pattern detection     │                         │
+│ • Paragraph preservation│                         │
+└────────┬────────────────┘                         │
          │                                          │
          └──────────────────┬───────────────────────┘
                             │
@@ -46,10 +46,10 @@ Text File → Parse to JSON → Analyze Characters → Transform Gender → Outp
 │           2. CHARACTER ANALYSIS                   │
 ├───────────────────────────────────────────────────┤
 │ book_characters/                                  │
-│ • Flagship-quality prompts only                  │
-│ • Identifies all characters & genders            │
-│ • Smart chunking for large books                 │
-│ • Rate limiting for APIs                         │
+│ • Flagship-quality prompts only                   │
+│ • Identifies all characters & genders             │
+│ • Smart chunking for large books                  │
+│ • Rate limiting for APIs                          │
 └─────────────────────┬─────────────────────────────┘
                       │
                       ▼
@@ -57,28 +57,28 @@ Text File → Parse to JSON → Analyze Characters → Transform Gender → Outp
 │           3. TRANSFORMATION                       │
 ├───────────────────────────────────────────────────┤
 │ book_transform/                                   │
-│ • Applies gender changes                         │
-│ • Uses character context                         │
-│ • Preserves narrative structure                  │
+│ • Applies gender changes                          │
+│ • Uses character context                          │
+│ • Preserves narrative structure                   │
 └─────────────────────┬─────────────────────────────┘
                       │
                       ▼
 ┌───────────────────────────────────────────────────┐
 │           4. QUALITY CONTROL                      │
 ├───────────────────────────────────────────────────┤
-│ book_transform/quality_control.py                │
-│ • Scans for missed transformations               │
-│ • Iterative corrections                          │
-│ • Validation scoring                             │
+│ book_transform/quality_control.py                 │
+│ • Scans for missed transformations                │
+│ • Iterative corrections                           │
+│ • Validation scoring                              │
 └─────────────────────┬─────────────────────────────┘
                       │
                       ▼
 ┌───────────────────────────────────────────────────┐
 │           5. OUTPUT GENERATION                    │
 ├───────────────────────────────────────────────────┤
-│ • Saves transformed JSON                         │
-│ • Recreates readable text                        │
-│ • Generates transformation report                │
+│ • Saves transformed JSON                          │
+│ • Recreates readable text                         │
+│ • Generates transformation report                 │
 └───────────────────────────────────────────────────┘
 ```
 

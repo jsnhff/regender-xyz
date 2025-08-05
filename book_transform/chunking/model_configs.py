@@ -37,15 +37,21 @@ MODEL_CONFIGS = {
     },
     "grok-3-latest": {
         "context_window": 131072,  # Large context window
-        "output_limit": 8192,
-        "sentences_per_chunk": 50,  # Increased for efficiency
-        "max_chunk_tokens": 4000
+        "output_limit": 131072,
+        "sentences_per_chunk": 3600,  # Much larger chunks for efficiency
+        "max_chunk_tokens": 98000
+    },
+    "grok-3-fast": {
+        "context_window": 131072,
+        "output_limit": 131072,
+        "sentences_per_chunk": 500,  # Moderate chunks for faster processing
+        "max_chunk_tokens": 30000
     },
     "grok-4-latest": {
-        "context_window": 131072,  # Same as grok-3
-        "output_limit": 8192,
-        "sentences_per_chunk": 50,
-        "max_chunk_tokens": 4000
+        "context_window": 256000,  # Grok-4 has 256k context
+        "output_limit": 131072,
+        "sentences_per_chunk": 3600,  # Much larger chunks for efficiency
+        "max_chunk_tokens": 98000
     },
     
     # Local models (MLX)

@@ -6,6 +6,7 @@ Integrated from the standalone review_loop.py for unified transformation pipelin
 import json
 import re
 from typing import List, Dict, Tuple, Any, Optional
+from datetime import datetime
 from api_client import UnifiedLLMClient
 
 
@@ -175,7 +176,8 @@ def quality_control_loop(text: str, transform_type: str, model: Optional[str] = 
     
     for iteration in range(max_iterations):
         if verbose:
-            print(f"\nQuality Control Iteration {iteration + 1}/{max_iterations}")
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"\n[{timestamp}] Quality Control Iteration {iteration + 1}/{max_iterations}")
         
         # Find errors
         errors = find_specific_errors(current_text, transform_type, use_ai=True, provider=provider)

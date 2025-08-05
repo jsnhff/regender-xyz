@@ -1,0 +1,291 @@
+{
+  "characters": {
+    "Lady Bracknell": {
+      "name": "Lady Bracknell",
+      "gender": "female",
+      "role": "Gwendolen's mother, authoritative figure interviewing Jack for marriage approval, Algernon's aunt",
+      "name_variants": [
+        "Aunt Augusta",
+        "Mamma",
+        "aunt",
+        "her mother",
+        "mamma"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Jack Worthing": {
+      "name": "Jack Worthing",
+      "gender": "male",
+      "role": "Protagonist, suitor to Gwendolen, guardian to Cecily, invents a fictional brother named Ernest, lives a double life as Jack in the country and Ernest in town",
+      "name_variants": [
+        "Algernon",
+        "Algernon Moncrieff",
+        "Algy",
+        "Dear Mr. Worthing",
+        "Ernest",
+        "Ernest John",
+        "Ernest Worthing",
+        "General",
+        "General Moncrieff",
+        "Jack",
+        "John",
+        "John Worthing",
+        "Moncrieff",
+        "Mr. Algernon Moncrieff",
+        "Mr. Ernest Worthing",
+        "Mr. John Worthing",
+        "Mr. Moncrieff",
+        "Mr. Worthing",
+        "Poor Ernest",
+        "Uncle Jack",
+        "brother",
+        "brother Ernest",
+        "my brother",
+        "my wicked cousin Ernest",
+        "poor brother Ernest",
+        "that unfortunate young man his brother",
+        "the General",
+        "the profligate Ernest",
+        "your brother Ernest"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Thomas Cardew": {
+      "name": "Mr. Thomas Cardew",
+      "gender": "male",
+      "role": "Deceased gentleman who found and adopted Jack as a baby in a hand-bag",
+      "name_variants": [
+        "Mr. Thomas Cardew",
+        "Mr. James Cardew",
+        "the charitable gentleman",
+        "the late Mr. Thomas Cardew"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Algernon": {
+      "name": "Algernon",
+      "gender": "male",
+      "role": "Jack's friend, Lady Bracknell's nephew, Gwendolen's cousin, pretends to be Ernest Worthing to meet Cecily, invents fictional friend Bunbury",
+      "name_variants": [
+        "Algy",
+        "cousin Cecily (addressing her but part of his dialogue)"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Gwendolen Fairfax": {
+      "name": "Gwendolen Fairfax",
+      "gender": "female",
+      "role": "embraces Cecily, feels deceived, questions Jack about his name being John and about brother Ernest",
+      "name_variants": [
+        "Gwendolen",
+        "Miss Fairfax"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Lane": {
+      "name": "Lane",
+      "gender": "male",
+      "role": "Algernon's manservant/butler",
+      "name_variants": [
+        "Lane"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Cecily Cardew": {
+      "name": "Cecily Cardew",
+      "gender": "female",
+      "role": "Young woman engaging in banter with Algernon, offers him food and a flower, enters the house with him",
+      "name_variants": [
+        "Cecily",
+        "Cousin Cecily",
+        "Miss Cardew",
+        "little cousin Cecily",
+        "my cousin Cecily"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Laetitia Prism": {
+      "name": "Laetitia Prism",
+      "gender": "female",
+      "role": "Governess advising Dr. Chasuble on marriage, comments on Jack's return and Ernest's death, returns with Dr. Chasuble",
+      "name_variants": [
+        "Laetitia",
+        "Miss Prism",
+        "Prism",
+        "dear Miss Prism"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Canon Chasuble": {
+      "name": "Canon Chasuble",
+      "gender": "male",
+      "role": "Rector discussing marriage with Miss Prism, offers condolences to Jack about Ernest, inquires about burial and sermon",
+      "name_variants": [
+        "Canon",
+        "Chasuble",
+        "Dr. Chasuble",
+        "Frederick",
+        "dear Doctor",
+        "dear Dr. Chasuble",
+        "the Rector"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Merriman": {
+      "name": "Merriman",
+      "gender": "male",
+      "role": "Butler at the country estate, serves tea and announces visitors",
+      "name_variants": [],
+      "appears_in_section": true,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Bunbury": {
+      "name": "Bunbury",
+      "gender": "male",
+      "role": "Fictional invalid friend invented by Algernon to escape social obligations",
+      "name_variants": [
+        "Bunbury",
+        "poor Bunbury",
+        "your friend Bunbury"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Moulton": {
+      "name": "Moulton",
+      "gender": "unknown",
+      "role": "Servant, likely a gardener responsible for utilitarian tasks like watering flowers",
+      "name_variants": [
+        "Moulton"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Beginning (Introduction)"
+    },
+    "Manager of the Grand Hotel": {
+      "name": "Manager of the Grand Hotel",
+      "gender": "unknown",
+      "role": "Hotel manager who sent a telegram to Jack about Ernest's death",
+      "name_variants": [
+        "the manager of the Grand Hotel"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Early-Middle Transition"
+    },
+    "Lord Bracknell": {
+      "name": "Lord Bracknell",
+      "gender": "male",
+      "role": "Lady Bracknell's husband, Algernon's uncle, mentioned as being uninterested in social excesses",
+      "name_variants": [
+        "papa"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Middle (Main Plot)"
+    },
+    "Lady Lancing": {
+      "name": "Lady Lancing",
+      "gender": "female",
+      "role": "Young woman mentioned in anecdote about a French maid changing her appearance",
+      "name_variants": [
+        "young Lady Lancing"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Mrs. Moncrieff": {
+      "name": "Mrs. Moncrieff",
+      "gender": "female",
+      "role": "Lady Bracknell's poor sister, mother of Jack and Algernon",
+      "name_variants": [
+        "Mrs. Moncrieff",
+        "my poor sister"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Mallam": {
+      "name": "Mallam",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Mallam"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Maxbohm": {
+      "name": "Maxbohm",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Maxbohm"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Magley": {
+      "name": "Magley",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Magley"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Markby": {
+      "name": "Markby",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Markby"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Migsby": {
+      "name": "Migsby",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Migsby"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Mobbs": {
+      "name": "Mobbs",
+      "gender": "unknown",
+      "role": "General mentioned in Army Lists",
+      "name_variants": [
+        "Mobbs"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    },
+    "Professor Michael S. Hart": {
+      "name": "Professor Michael S. Hart",
+      "gender": "male",
+      "role": "Originator of Project Gutenberg, mentioned in the ebook's end notes",
+      "name_variants": [
+        "Professor Michael S. Hart"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "End (Resolution)"
+    }
+  },
+  "metadata": {
+    "book_title": "The Importance of Being Earnest",
+    "total_characters": 23,
+    "provider": "grok",
+    "model": null
+  }
+}

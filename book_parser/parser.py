@@ -8,6 +8,7 @@ import re
 from .patterns import PatternRegistry, PatternType
 from .detectors import SectionDetector
 from .detectors.section_detector import DetectedSection
+from .detectors.play_detector import PlayFormatDetector
 
 
 class BookParser:
@@ -24,6 +25,7 @@ class BookParser:
     def __init__(self):
         self.pattern_registry = PatternRegistry()
         self.section_detector = SectionDetector(self.pattern_registry)
+        self.play_detector = PlayFormatDetector()
         
         # Common abbreviations that don't end sentences
         self.abbreviations = {
@@ -54,12 +56,21 @@ class BookParser:
         # Extract metadata
         metadata = self._extract_metadata(lines[:100])  # Check first 100 lines
         
-        # Detect sections
-        sections = self.section_detector.detect_sections(
-            lines,
-            detect_frontmatter=options.get('detect_frontmatter', True),
-            min_section_lines=options.get('min_section_lines', 5)
-        )
+        # First, try special play format detection
+        play_sections = self.play_detector.detect_importance_of_being_earnest_format(lines)
+        
+        if play_sections:
+            # Use the special play sections
+            sections = play_sections
+            metadata['genre'] = 'play'
+            metadata['format_note'] = 'Special play format (acts listed at beginning)'
+        else:
+            # Use standard section detection
+            sections = self.section_detector.detect_sections(
+                lines,
+                detect_frontmatter=options.get('detect_frontmatter', True),
+                min_section_lines=options.get('min_section_lines', 5)
+            )
         
         # Convert sections to chapters format
         chapters = self._sections_to_chapters(sections, lines)
@@ -218,24 +229,79 @@ class BookParser:
         if not text:
             return []
         
-        # First, normalize line breaks within paragraphs (unwrap soft line breaks)
-        # Replace single newlines with spaces, but preserve double newlines
-        text = re.sub(r'(?<!\n)\n(?!\n)', ' ', text)
+        # Check if this looks like play dialogue
+        lines = text.split('\n')
+        has_dialogue = any(self.play_detector.is_play_dialogue_line(line) for line in lines[:100])
         
-        # Now split on actual paragraph breaks (2+ newlines)
-        paragraph_splits = re.split(r'\n\s*\n+', text)
-        
-        paragraphs = []
-        for para_text in paragraph_splits:
-            para_text = para_text.strip()
-            if para_text:  # Skip empty paragraphs
-                sentences = self._split_sentences(para_text)
-                if sentences:  # Only add paragraphs that have sentences
-                    paragraphs.append({
-                        "sentences": sentences
-                    })
-        
-        return paragraphs
+        if has_dialogue:
+            # Handle play format specially
+            paragraphs = []
+            current_paragraph = []
+            current_speaker = None
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Check for character name
+                if self.play_detector.is_play_dialogue_line(line):
+                    # Save previous paragraph if exists
+                    if current_paragraph:
+                        paragraphs.append({"sentences": current_paragraph})
+                        current_paragraph = []
+                    current_speaker = line
+                    continue
+                
+                # Skip stage directions and act markers
+                if line.startswith('[') and line.endswith(']'):
+                    if current_paragraph:
+                        paragraphs.append({"sentences": current_paragraph})
+                        current_paragraph = []
+                    paragraphs.append({"sentences": [line]})
+                    continue
+                
+                if line in ['SCENE', 'ACT DROP']:
+                    continue
+                
+                # Add dialogue with speaker
+                if current_speaker:
+                    sentences = self._split_sentences(line)
+                    if sentences:
+                        # Add speaker to first sentence
+                        sentences[0] = f"{current_speaker} {sentences[0]}"
+                        current_paragraph.extend(sentences)
+                else:
+                    # Regular narrative
+                    sentences = self._split_sentences(line)
+                    if sentences:
+                        current_paragraph.extend(sentences)
+            
+            # Don't forget the last paragraph
+            if current_paragraph:
+                paragraphs.append({"sentences": current_paragraph})
+            
+            return paragraphs
+        else:
+            # Standard paragraph splitting
+            # First, normalize line breaks within paragraphs (unwrap soft line breaks)
+            # Replace single newlines with spaces, but preserve double newlines
+            text = re.sub(r'(?<!\n)\n(?!\n)', ' ', text)
+            
+            # Now split on actual paragraph breaks (2+ newlines)
+            paragraph_splits = re.split(r'\n\s*\n+', text)
+            
+            paragraphs = []
+            for para_text in paragraph_splits:
+                para_text = para_text.strip()
+                if para_text:  # Skip empty paragraphs
+                    sentences = self._split_sentences(para_text)
+                    if sentences:  # Only add paragraphs that have sentences
+                        paragraphs.append({
+                            "sentences": sentences
+                        })
+            
+            return paragraphs
     
     def _split_sentences(self, text: str) -> List[str]:
         """Split text into sentences with proper handling of abbreviations"""

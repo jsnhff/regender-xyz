@@ -186,10 +186,12 @@ def transform_chapter(chapter: Dict[str, Any],
         sentences_per_chunk = calculate_optimal_chunk_size(sentences, model)
         if verbose:
             config = get_model_config(model)
-            print(f"    Using chunk size: {sentences_per_chunk} sentences (model: {model})")
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] Using chunk size: {sentences_per_chunk} sentences (model: {model})")
     
     if verbose:
-        print(f"  Processing {chapter['title']} ({total_sentences} sentences)...")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] Processing {chapter['title']} ({total_sentences} sentences)...")
     
     transformed_sentences = []
     all_changes = []
@@ -204,24 +206,35 @@ def transform_chapter(chapter: Dict[str, Any],
     )
     
     if verbose:
-        print(f"    Smart chunking: {len(chunks)} chunks for {total_sentences} sentences")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] Smart chunking: {len(chunks)} chunks for {total_sentences} sentences")
     
     # Process smart chunks
     sentence_index = 0
     for chunk_idx, chunk in enumerate(chunks):
         if verbose:
             chunk_tokens = sum(estimate_tokens(s) for s in chunk)
-            print(f"    Chunk {chunk_idx + 1}/{len(chunks)} ({len(chunk)} sentences, ~{chunk_tokens} tokens)", end='', flush=True)
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] Chunk {chunk_idx + 1}/{len(chunks)} ({len(chunk)} sentences, ~{chunk_tokens} tokens)", end='', flush=True)
         
         # Transform the chunk
-        transformed_chunk, changes = transform_sentences_chunk(
-            chunk, transform_type, character_context, model, provider
-        )
+        try:
+            start_time = datetime.now()
+            transformed_chunk, changes = transform_sentences_chunk(
+                chunk, transform_type, character_context, model, provider
+            )
+            elapsed = (datetime.now() - start_time).total_seconds()
+            if verbose:
+                print(f" ✓ ({elapsed:.1f}s)")
+        except Exception as e:
+            if verbose:
+                print(f" ❌ Error: {e}")
+            raise
         
         # Adjust change indices to be chapter-relative
         for change in changes:
             change['sentence_index'] += sentence_index
-            change['chapter'] = chapter['number']
+            change['chapter'] = chapter.get('number', chapter.get('title', 'Unknown'))
         
         transformed_sentences.extend(transformed_chunk)
         all_changes.extend(changes)

@@ -36,9 +36,6 @@ python regender_book_cli.py download --count 10
 # Process to JSON
 python regender_book_cli.py process
 
-# Transform with MLX (local)
-python regender_book_cli.py transform books/json/book.json --provider mlx
-
 # Transform with API
 python regender_book_cli.py transform books/json/book.json --provider grok
 ```

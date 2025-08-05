@@ -445,13 +445,13 @@ SUPPORTED_PROVIDERS = {
     },
     "anthropic": {
         "name": "Anthropic/Claude",
-        "models": ["claude-opus-4-20250514", "claude-3-5-sonnet-latest", "claude-3-opus-latest", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"],
+        "models": ["claude-opus-4-20250514"],
         "env_key": "ANTHROPIC_API_KEY",
         "default_model": "claude-opus-4-20250514"
     },
     "grok": {
         "name": "xAI/Grok",
-        "models": ["grok-4-latest", "grok-3-latest", "grok-beta"],
+        "models": ["grok-4-latest", "grok-3-latest", "grok-3-fast", "grok-3-mini-fast"],
         "env_key": "GROK_API_KEY",
         "default_model": "grok-4-latest"
     }
