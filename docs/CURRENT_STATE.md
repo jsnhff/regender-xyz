@@ -4,7 +4,7 @@
 
 ## Overview
 
-Regender-XYZ is a sophisticated command-line tool for analyzing and transforming gender representation in literature using multiple Large Language Model (LLM) providers. The system has evolved to include character analysis, quality control loops, and support for rate-limited APIs.
+Regender-XYZ is a sophisticated command-line tool for analyzing and transforming gender representation in literature using multiple Large Language Model (LLM) providers (OpenAI and Grok). The system has evolved to include character analysis, quality control loops, and support for rate-limited APIs.
 
 ## Core Architecture
 
@@ -30,7 +30,7 @@ A newer addition that provides post-processing quality control:
 
 ```
 regender-xyz/
-├── api_client.py              # Unified LLM interface
+├── api_client.py              # Unified LLM interface (OpenAI/Grok)
 ├── book_parser/               # Text to JSON conversion
 │   ├── __init__.py           # Main parser interface
 │   ├── patterns/             # Format detection
@@ -69,9 +69,6 @@ regender-xyz/
 - **grok-beta**: 131k context
 - **grok-3-mini-fast**: 131k context
 
-#### MLX (Local)
-- **mistral-7b-v0.2**: 32k context
-- **mistral-small**: 131k context (requires 45GB RAM)
 
 ## Current Workflows
 
@@ -190,7 +187,7 @@ Transformed Text →
 ```bash
 OPENAI_API_KEY=your-key
 GROK_API_KEY=your-key
-LLM_PROVIDER=openai|grok|mlx
+LLM_PROVIDER=openai|grok
 GROK_MODEL=grok-4-latest  # For quality control
 ```
 

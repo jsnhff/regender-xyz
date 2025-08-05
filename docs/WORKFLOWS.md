@@ -113,9 +113,6 @@ python regender_book_cli.py transform books/json/pg1342.json --type all_female
 export LLM_PROVIDER=grok
 python regender_book_cli.py transform books/json/pg345-Dracula.json --type gender_swap
 
-# Use local MLX model
-export LLM_PROVIDER=mlx
-python regender_book_cli.py transform books/json/pg1342.json --type all_male
 ```
 
 ## 7. Validation Workflow

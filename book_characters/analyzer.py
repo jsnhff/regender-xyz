@@ -5,7 +5,6 @@ from typing import Dict, Any, Optional, List, Tuple
 from api_client import UnifiedLLMClient
 from book_transform.utils import safe_api_call, cache_result, APIError
 from .prompts import get_character_analysis_prompt
-from .mlx_chunked_analyzer import analyze_book_characters_chunked
 from .smart_chunked_analyzer import analyze_book_characters_smart_chunks
 
 
@@ -143,29 +142,7 @@ def analyze_book_characters(book_data: Dict[str, Any],
         print("Analyzing characters using LLM...")
     
     try:
-        # For MLX with large models, use chunked processing
-        if provider == 'mlx' and model == 'mistral-small':
-            # Check model config for memory settings
-            from book_transform.model_config_loader import get_verified_model_config
-            config = get_verified_model_config(model, provider)
-            
-            if config and config.mlx_memory_config:
-                # Use chunked processing for large MLX models
-                if verbose:
-                    print("  Using chunked processing for large model...")
-                
-                characters, character_context = analyze_book_characters_chunked(
-                    book_data=book_data,
-                    model=model,
-                    provider=provider,
-                    chunk_size=config.mlx_memory_config.get('max_chars_per_chunk', 50000),
-                    overlap=config.mlx_memory_config.get('overlap_chars', 2000),
-                    verbose=verbose
-                )
-                
-                return characters, character_context
-        
-        # For other providers or smaller models, analyze in one pass or with smart sampling
+        # Analyze in one pass or with smart sampling
         full_text = get_full_text_from_json(book_data)
         
         if verbose:

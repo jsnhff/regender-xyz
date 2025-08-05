@@ -78,77 +78,11 @@
         "max_chunk_tokens": 98000
       },
       "notes": "Combined prompt + output limited to 131k tokens"
-    },
-    "mistral-7b-v0.1": {
-      "provider": ["mlx", "api"],
-      "tier": "basic",
-      "context_window": 8192,
-      "output_limit": 8192,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 225,
-        "max_chunk_tokens": 6000
-      }
-    },
-    "mistral-7b-v0.2": {
-      "provider": ["mlx", "api"],
-      "tier": "basic",
-      "context_window": 32768,
-      "output_limit": 8192,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 900,
-        "max_chunk_tokens": 24000
-      }
-    },
-    "mistral-small": {
-      "provider": ["mlx", "api"],
-      "tier": "standard",
-      "context_window": 131072,
-      "output_limit": 4096,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 3600,
-        "max_chunk_tokens": 98000
-      },
-      "mlx_memory_config": {
-        "max_chars_per_chunk": 50000,
-        "overlap_chars": 2000,
-        "memory_warning": "Requires ~45GB RAM for 24B model"
-      },
-      "version_specific": {
-        "2501": {
-          "context_window": 32768,
-          "chunking": {
-            "sentences_per_chunk": 900,
-            "max_chunk_tokens": 24000
-          }
-        }
-      }
-    },
-    "mistral-medium": {
-      "provider": ["mlx", "api"],
-      "tier": "advanced",
-      "context_window": 32768,
-      "output_limit": null,
-      "supports_json_mode": false,
-      "chunking": {
-        "sentences_per_chunk": 900,
-        "max_chunk_tokens": 24000
-      },
-      "notes": "Output limit not documented"
     }
   },
   "provider_defaults": {
     "openai": "gpt-4o-mini",
-    "grok": "grok-4-latest",
-    "mlx": "mistral-7b-v0.2"
-  },
-  "patterns": {
-    "mistral-7b-v0.1": ["mistral.*7b.*v0\\.1"],
-    "mistral-7b-v0.2": ["mistral.*7b.*v0\\.[2-3]"],
-    "mistral-small": ["mistral.*small.*24b", "mistral.*24b.*small", "mistral-small-3\\.[1-2]"],
-    "mistral-medium": ["mistral.*medium"]
+    "grok": "grok-4-latest"
   },
   "tiers": {
     "basic": {

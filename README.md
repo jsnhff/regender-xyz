@@ -4,16 +4,15 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
+This tool uses AI (OpenAI or Grok) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
 
 ## Features
 
-- **Multi-Provider LLM Support**: Choose between OpenAI, Grok, and local MLX models
+- **Multi-Provider LLM Support**: Choose between OpenAI and Grok
   - Automatic provider detection based on available API keys
   - Provider-specific model optimization
   - Unified interface for seamless switching
-  - Local model support via MLX on Apple Silicon
-  - **NEW**: Grok-3-latest with 131k context window support
+  - **NEW**: Grok-4-latest with 256k context window support
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports 100+ book formats (English, French, German, plays, letters, etc.)
   - Smart chapter/section detection with pattern priority system
@@ -49,8 +48,7 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
 - **[Transformation Pipeline](docs/reference/TRANSFORMATION_PIPELINE.md)** - Detailed transformation process
 - **[Transformation Modes](docs/reference/TRANSFORMATION_MODES.md)** - Understanding all_male, all_female, and gender_swap modes
 - **[Character Analysis Module](book_characters/README.md)** - Smart character extraction system
-- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI, Grok, and MLX
-- **[MLX Setup Guide](docs/MLX_SETUP.md)** - Running local models on Apple Silicon
+- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok
 - **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the paragraph-aware JSON format
 - **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser
 - **[Development Docs](docs/development/)** - Parser development and improvements
@@ -62,11 +60,9 @@ This tool uses AI (OpenAI, Grok, or local MLX models) to identify characters in 
 - At least one LLM provider:
   - OpenAI API key (set as `OPENAI_API_KEY`)
   - Grok API key (set as `GROK_API_KEY`)
-  - MLX local model (Apple Silicon only, set `MLX_MODEL_PATH`)
 - **Supported Models:**
-  - OpenAI: GPT-4, GPT-4o, GPT-4o-mini
-  - Grok: grok-3-latest (131k context), grok-beta, grok-3-mini-fast
-  - MLX: Mistral-7B-Instruct (32K context), Mistral-Small-24B (requires ~45GB RAM)
+  - OpenAI: GPT-4o, GPT-4o-mini
+  - Grok: grok-4-latest (256k context), grok-3-latest (131k context), grok-beta, grok-3-mini-fast
 
 ## Installation
 
@@ -117,9 +113,6 @@ python regender_book_cli.py transform books/json/book.json --provider openai
 
 # Explicitly use Grok
 python regender_book_cli.py transform books/json/book.json --provider grok
-
-# Use local MLX model (no API costs)
-python regender_book_cli.py transform books/json/book.json --provider mlx
 ```
 
 ## Usage
@@ -194,7 +187,7 @@ python regender_book_cli.py process
 # 3. Transform a specific book
 python regender_book_cli.py transform books/json/book.json \
   --type all_male \
-  --provider mlx \
+  --provider grok \
   --output books/output/book_transformed.json \
   --text books/output/book_transformed.txt
 ```
@@ -202,9 +195,9 @@ python regender_book_cli.py transform books/json/book.json \
 ## Examples
 
 ```bash
-# Use local MLX model for transformation (no API costs)
+# Use Grok for transformation (large context window)
 python regender_book_cli.py transform books/json/alice.json \
-  --provider mlx \
+  --provider grok \
   --type all_female
 
 # Use OpenAI for high-quality transformation
@@ -233,7 +226,7 @@ regender-xyz/
 ├── gutenberg/          # Project Gutenberg downloader
 ├── book_transform/     # AI book transformation system
 │   └── chunking/       # Smart token-based chunking
-├── api_client.py       # Unified LLM client (OpenAI/Grok/MLX)
+├── api_client.py       # Unified LLM client (OpenAI/Grok)
 ├── regender_book_cli.py # Main CLI interface
 └── docs/               # Documentation
 ```
@@ -273,10 +266,9 @@ MIT
 - ✅ Handles 100+ characters per book (tested on Harry Potter)
 - ✅ Improved name transformations (Harry → Harriet)
 
-### v0.7.0 - Paragraph Preservation & MLX Support
+### v0.7.0 - Paragraph Preservation
 - ✅ Added paragraph preservation in JSON structure
 - ✅ Intelligent abbreviation handling (Mr., Mrs., Dr., etc.)
-- ✅ Full MLX local model support for offline processing
 - ✅ Improved error handling for character analysis
 - ✅ Cleaned up codebase - removed obsolete CLI files
 - ✅ Consolidated utilities into appropriate modules

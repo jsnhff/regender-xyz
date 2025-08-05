@@ -309,8 +309,6 @@ def transform_book(book_data: Dict[str, Any],
     except Exception as e:
         if verbose:
             print(f"Warning: Character analysis failed: {e}")
-            if provider == 'mlx':
-                print("Note: MLX models may have difficulty with complex JSON generation.")
             print("Proceeding without character context")
         characters = {}
         character_context = ""
