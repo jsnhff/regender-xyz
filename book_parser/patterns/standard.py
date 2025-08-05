@@ -173,6 +173,70 @@ ENGLISH_PATTERNS = [
         description="1."
     ),
     
+    # Bracketed chapter numbers (like in Ulysses)
+    Pattern(
+        regex=r'^\[\s*(\d+)\s*\]\s*$',
+        pattern_type=PatternType.CHAPTER,
+        number_type=NumberType.ARABIC,
+        capture_groups={1: 'number'},
+        priority=60,
+        description="[ 1 ]"
+    ),
+    Pattern(
+        regex=r'^\[\s*(' + ROMAN + r')\s*\]\s*$',
+        pattern_type=PatternType.CHAPTER,
+        number_type=NumberType.ROMAN,
+        capture_groups={1: 'number'},
+        priority=60,
+        description="[ I ]"
+    ),
+    
+    # Bare Roman numerals (like in Metamorphosis)
+    Pattern(
+        regex=r'^(' + ROMAN + r')\s*$',
+        pattern_type=PatternType.CHAPTER,
+        number_type=NumberType.ROMAN,
+        capture_groups={1: 'number'},
+        priority=30,
+        description="I (bare)"
+    ),
+    
+    # Grouped sections (like in Ulysses)
+    Pattern(
+        regex=r'^—\s*(' + ROMAN + r')\s*—\s*$',
+        pattern_type=PatternType.PART,
+        number_type=NumberType.ROMAN,
+        capture_groups={1: 'number'},
+        priority=80,
+        description="— I —"
+    ),
+    
+    # Book patterns (higher level than parts)
+    Pattern(
+        regex=r'^BOOK\s+(' + ROMAN + r')(?:\s*[:\-—]\s*(.+))?\s*$',
+        pattern_type=PatternType.PART,
+        number_type=NumberType.ROMAN,
+        capture_groups={1: 'number', 2: 'title'},
+        priority=105,
+        description="BOOK I: Title"
+    ),
+    Pattern(
+        regex=r'^Book\s+(' + ROMAN + r')(?:\s*[:\-—]\s*(.+))?\s*$',
+        pattern_type=PatternType.PART,
+        number_type=NumberType.ROMAN,
+        capture_groups={1: 'number', 2: 'title'},
+        priority=105,
+        description="Book I: Title"
+    ),
+    Pattern(
+        regex=r'^BOOK\s+(' + NUMBER_WORDS_UPPER + r')(?:\s*[:\-—]\s*(.+))?\s*$',
+        pattern_type=PatternType.PART,
+        number_type=NumberType.WORD,
+        capture_groups={1: 'number', 2: 'title'},
+        priority=105,
+        description="BOOK ONE: Title"
+    ),
+    
     # Part patterns
     Pattern(
         regex=r'^Part\s+(' + ROMAN + r')\.?\s*$',

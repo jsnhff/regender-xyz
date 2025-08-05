@@ -44,6 +44,7 @@ class SectionDetector:
         self.toc_patterns = [
             re.compile(r'^\s*CONTENTS?\s*$', re.IGNORECASE),
             re.compile(r'^\s*TABLE\s+OF\s+CONTENTS?\s*$', re.IGNORECASE),
+            # Also detect implicit TOC - multiple chapter references in sequence
         ]
         
         # End of book patterns
@@ -109,10 +110,24 @@ class SectionDetector:
                     content_lines=lines[:frontmatter_end]
                 ))
         
+        # Check for implicit TOC at beginning
+        toc_start, toc_end = self._detect_implicit_toc(lines[:500])
+        if toc_start is not None:
+            sections.append(DetectedSection(
+                pattern_type=PatternType.TOC,
+                start_line=toc_start,
+                end_line=toc_end,
+                content_lines=lines[toc_start:toc_end]
+            ))
+        
         # Process lines
         for i, line in enumerate(lines):
             # Skip if we're still in frontmatter
             if sections and sections[-1].pattern_type == PatternType.FRONTMATTER and i < sections[-1].end_line:
+                continue
+            
+            # Skip if we're in detected TOC
+            if toc_start is not None and toc_start <= i < toc_end:
                 continue
             
             # Check for special sections
@@ -207,6 +222,32 @@ class SectionDetector:
     
     def _find_first_content_section(self, lines: List[str]) -> int:
         """Find where actual content begins"""
+        # First check if we have an implicit TOC (many chapter headings close together)
+        chapter_lines = []
+        for i in range(min(200, len(lines))):
+            match_result = self.pattern_registry.match_line(lines[i])
+            if match_result:
+                pattern, _, _ = match_result
+                if pattern.pattern_type == PatternType.CHAPTER:
+                    chapter_lines.append(i)
+        
+        # If we found many chapters close together, it's likely a TOC
+        if len(chapter_lines) > 5:
+            # Check density - if chapters are within 2 lines of each other on average
+            avg_gap = sum(chapter_lines[i+1] - chapter_lines[i] for i in range(len(chapter_lines)-1)) / (len(chapter_lines)-1)
+            if avg_gap < 3:
+                # This looks like a TOC, find where it ends
+                toc_end = self._find_toc_end(lines, chapter_lines[0])
+                # Look for first real chapter after TOC
+                for i in range(toc_end, len(lines)):
+                    match_result = self.pattern_registry.match_line(lines[i])
+                    if match_result:
+                        pattern, _, _ = match_result
+                        if pattern.pattern_type in [PatternType.CHAPTER, PatternType.ACT, 
+                                                  PatternType.PART, PatternType.LIVRE]:
+                            return i
+        
+        # Standard search
         for i, line in enumerate(lines):
             # Check if this is a content section
             match_result = self.pattern_registry.match_line(line)
@@ -235,27 +276,102 @@ class SectionDetector:
     
     def _find_toc_end(self, lines: List[str], start_idx: int) -> int:
         """Find where TOC ends"""
-        # Simple heuristic: TOC ends when we find a chapter or empty lines followed by chapter
+        # Look for patterns that indicate we're still in TOC
+        toc_line_patterns = [
+            # Page numbers at end of line
+            re.compile(r'\d+\s*$'),
+            # Dotted leaders
+            re.compile(r'\.{3,}'),
+            # Chapter references in TOC format
+            re.compile(r'Chapter\s+[IVXLCDM]+\s*[-—–]\s*', re.IGNORECASE),
+            re.compile(r'Chapter\s+\d+\s*[-—–]\s*', re.IGNORECASE),
+            # Multi-line with brace
+            re.compile(r'[}\s]*\([IVXLCDM]+\)'),
+        ]
+        
         empty_count = 0
-        for i in range(start_idx, len(lines)):
+        toc_line_count = 0
+        
+        for i in range(start_idx, min(start_idx + 200, len(lines))):
             line = lines[i].strip()
             
             if not line:
                 empty_count += 1
-                if empty_count > 3:  # Multiple empty lines might signal end
+                if empty_count > 5:  # Multiple empty lines likely signal end
                     return i
+                continue
             else:
                 empty_count = 0
                 
-                # Check if this is a chapter start
+                # Check if this line looks like a TOC entry
+                is_toc_line = any(pattern.search(line) for pattern in toc_line_patterns)
+                if is_toc_line:
+                    toc_line_count += 1
+                    continue
+                
+                # Check if this is an actual chapter start (not a TOC reference)
                 match_result = self.pattern_registry.match_line(line)
                 if match_result:
                     pattern, _, _ = match_result
                     if pattern.pattern_type in [PatternType.CHAPTER, PatternType.PART, 
                                               PatternType.ACT, PatternType.PROLOGUE]:
-                        return i
+                        # Check if the next few lines look like actual content, not more TOC
+                        if self._looks_like_content_start(lines, i):
+                            return i
+        
+        # If we found many TOC-like lines, extend the search
+        if toc_line_count > 10:
+            return min(start_idx + 200, len(lines))
         
         return min(start_idx + 50, len(lines))  # Default: max 50 lines for TOC
+    
+    def _looks_like_content_start(self, lines: List[str], start_idx: int) -> bool:
+        """Check if this looks like actual chapter content vs TOC"""
+        # Look at next 10 lines
+        for i in range(start_idx + 1, min(start_idx + 10, len(lines))):
+            line = lines[i].strip()
+            if not line:
+                continue
+            # If we see typical content patterns, it's likely real content
+            if len(line) > 50:  # Normal prose lines
+                return True
+            # If we see more chapter headings, likely still TOC
+            if self.pattern_registry.match_line(line):
+                return False
+        return True
+    
+    def _detect_implicit_toc(self, lines: List[str]) -> Tuple[Optional[int], Optional[int]]:
+        """Detect implicit TOC from chapter density"""
+        chapter_lines = []
+        for i, line in enumerate(lines):
+            match_result = self.pattern_registry.match_line(line)
+            if match_result:
+                pattern, _, _ = match_result
+                if pattern.pattern_type == PatternType.CHAPTER:
+                    chapter_lines.append(i)
+        
+        # Need at least 5 chapters to consider it a TOC
+        if len(chapter_lines) < 5:
+            return None, None
+        
+        # Check if chapters are densely packed (avg < 3 lines apart)
+        gaps = [chapter_lines[i+1] - chapter_lines[i] for i in range(len(chapter_lines)-1)]
+        avg_gap = sum(gaps) / len(gaps)
+        
+        if avg_gap < 3:
+            # This looks like a TOC
+            toc_start = chapter_lines[0]
+            # Find where the dense chapters end
+            for i in range(len(gaps)):
+                if gaps[i] > 10:  # Big gap means TOC likely ended
+                    toc_end = chapter_lines[i+1]
+                    break
+            else:
+                toc_end = chapter_lines[-1] + 5
+            
+            return toc_start, min(toc_end, len(lines))
+        
+        return None, None
     
     def _is_end_of_book(self, line: str) -> bool:
         """Check if line indicates end of book"""

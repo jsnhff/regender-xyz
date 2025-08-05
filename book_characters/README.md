@@ -18,6 +18,7 @@ book_characters/
 ├── analyzer.py               # Main character analysis with LLM
 ├── prompts.py               # Character analysis prompt templates
 ├── smart_chunked_analyzer.py # Smart chunking for comprehensive coverage
+├── rate_limited_analyzer.py  # Rate-limited analysis for API constraints
 ├── mlx_chunked_analyzer.py   # Chunked processing for local MLX models
 ├── api_chunked_analyzer.py   # Chunked processing for API providers
 ├── context.py                # Character context creation for transformations
@@ -50,7 +51,18 @@ For large context models like Grok-3-latest (131k tokens):
 - Includes overlap zones to catch boundary characters
 - Ensures comprehensive character coverage
 
-### 3. Adaptive Prompt System
+### 3. Rate-Limited Analysis
+
+For APIs with strict rate limits (e.g., Grok-4-latest with 16k tokens/minute):
+
+**Intelligent Rate Limiting** (rate_limited_analyzer.py)
+- Tracks token usage in real-time
+- Automatically pauses when approaching limits
+- Resumes processing after rate window resets
+- Optimizes chunk sizes to maximize throughput
+- Provides progress tracking and token usage stats
+
+### 4. Adaptive Prompt System
 
 The module automatically adjusts prompts based on model capabilities:
 
@@ -89,6 +101,28 @@ characters, context = analyze_book_characters(
 # Results
 print(f"Found {len(characters)} characters")
 print(context)
+```
+
+### Rate-Limited Analysis for Large Books
+
+```python
+from book_characters import analyze_book_with_rate_limits
+
+# Analyze with rate limiting (essential for grok-4-latest)
+characters = analyze_book_with_rate_limits(
+    book_file="books/json/large_book.json",
+    output_file="books/json/large_book_characters.json",
+    model="grok-4-latest",
+    provider="grok",
+    tokens_per_minute=16000,  # Grok's limit
+    verbose=True
+)
+
+# The analyzer will:
+# - Track token usage per chunk
+# - Pause when approaching the limit
+# - Resume automatically after rate window resets
+# - Save results with analysis history
 ```
 
 ### Using Pre-analyzed Characters
@@ -137,6 +171,14 @@ python regender_book_cli.py analyze-characters book.json \
     --output characters.json \
     --provider grok \
     --model grok-3-latest
+
+# For large books with rate limits (auto-enabled for grok-4-latest)
+python regender_book_cli.py analyze-characters large_book.json \
+    --output characters.json \
+    --provider grok \
+    --model grok-4-latest \
+    --rate-limited \
+    --tokens-per-minute 16000
 
 # Transform using pre-analyzed characters (much faster)
 python regender_book_cli.py transform book.json \

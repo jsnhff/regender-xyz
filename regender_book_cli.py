@@ -256,35 +256,56 @@ def transform_single_book(input_file: str, output_file: Optional[str] = None,
 
 
 def analyze_characters_command(input_file: str, output_file: str, 
-                              model: str = "gpt-4o-mini", provider: Optional[str] = None):
+                              model: str = "gpt-4o-mini", provider: Optional[str] = None,
+                              rate_limited: bool = False, tokens_per_minute: int = 16000):
     """Analyze and save character data from a book."""
     print(f"\n{CYAN}📖 Analyzing characters in: {input_file}{RESET}")
     
     # Load book
     book_data = load_json_book(input_file)
     
+    # Auto-enable rate limiting for grok-4-latest
+    if model == "grok-4-latest" or (provider == "grok" and "4" in str(model)):
+        if not rate_limited:
+            print(f"{YELLOW}⚠️  Auto-enabling rate limiting for {model} (16k tokens/minute){RESET}")
+            rate_limited = True
+    
     # Analyze characters
-    from book_characters import analyze_book_characters
-    characters, context = analyze_book_characters(
-        book_data,
-        model=model,
-        provider=provider,
-        verbose=True
-    )
-    
-    # Save character data
-    character_data = {
-        'metadata': {
-            'source_book': input_file,
-            'analysis_model': model,
-            'analysis_provider': provider,
-            'character_count': len(characters)
-        },
-        'characters': characters,
-        'context': context
-    }
-    
-    save_json_book(character_data, output_file)
+    if rate_limited:
+        from book_characters import analyze_book_with_rate_limits
+        print(f"{CYAN}🔧 Using rate-limited analysis ({tokens_per_minute:,} tokens/minute){RESET}")
+        characters = analyze_book_with_rate_limits(
+            input_file,
+            output_file,
+            model=model,
+            provider=provider,
+            tokens_per_minute=tokens_per_minute,
+            verbose=True
+        )
+        # Results are already saved by analyze_book_with_rate_limits
+        print(f"\n{GREEN}✅ Character analysis complete!{RESET}")
+    else:
+        from book_characters import analyze_book_characters
+        characters, context = analyze_book_characters(
+            book_data,
+            model=model,
+            provider=provider,
+            verbose=True
+        )
+        
+        # Save character data
+        character_data = {
+            'metadata': {
+                'source_book': input_file,
+                'analysis_model': model,
+                'analysis_provider': provider,
+                'character_count': len(characters)
+            },
+            'characters': characters,
+            'context': context
+        }
+        
+        save_json_book(character_data, output_file)
     
     print(f"\n{GREEN}✓ Saved {len(characters)} characters to: {output_file}{RESET}")
     return characters
@@ -441,6 +462,10 @@ def main():
     analyze_parser.add_argument('-o', '--output', required=True, help='Output character file')
     analyze_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
     analyze_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider')
+    analyze_parser.add_argument('--rate-limited', action='store_true', 
+                               help='Use rate-limited analysis (auto-enabled for grok-4-latest)')
+    analyze_parser.add_argument('--tokens-per-minute', type=int, default=16000,
+                               help='Token rate limit per minute (default: 16000)')
     
     # Pipeline command
     pipeline_parser = subparsers.add_parser('pipeline', help='Run complete pipeline')
@@ -484,7 +509,10 @@ def main():
             transform_single_book(args.input, output_file, args.text, args.type, args.model, args.provider, args.characters)
     
     elif args.command == 'analyze-characters':
-        analyze_characters_command(args.input, args.output, args.model, args.provider)
+        analyze_characters_command(
+            args.input, args.output, args.model, args.provider,
+            rate_limited=args.rate_limited, tokens_per_minute=args.tokens_per_minute
+        )
     
     elif args.command == 'pipeline':
         pipeline(args.count, args.type, args.model)

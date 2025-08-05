@@ -48,6 +48,11 @@
         "sentences_per_chunk": 3600,
         "max_chunk_tokens": 98000
       },
+      "rate_limits": {
+        "tokens_per_minute": 16000,
+        "requests_per_minute": null,
+        "note": "Rate limit is per team, not per key"
+      },
       "notes": "Latest Grok 4 model - released January 2025"
     },
     "grok-beta": {
