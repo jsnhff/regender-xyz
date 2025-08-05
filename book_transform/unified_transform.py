@@ -240,13 +240,15 @@ class UnifiedBookTransformer:
         else:
             transformed_book['chapters'] = transformed_chapters
         
+        # Initialize qc_changes_total for all paths
+        qc_changes_total = 0
+        
         # Stage 3: Quality Control (always run unless dry run)
         if not dry_run:
             if verbose:
                 print(f"\n{BOLD}Stage 3: Quality Control{RESET}")
             
             qc_start = time.time()
-            qc_changes_total = 0
             
             # Convert to text for QC
             transformed_text = self._recreate_text_from_data(transformed_book)
@@ -276,33 +278,41 @@ class UnifiedBookTransformer:
                 'time_taken': time.time() - qc_start
             }
         
-        # Stage 4: Validation
-        if verbose:
-            print(f"\n{BOLD}Stage 4: Validation{RESET}")
-        
-        val_start = time.time()
-        
-        # Get original text for comparison
-        original_text = self._recreate_text_from_data(book_data)
-        final_text = transformed_book.get('qc_text', self._recreate_text_from_data(transformed_book))
-        
-        validation_report = validate_transformation(
-            original_text,
-            final_text,
-            transform_type,
-            characters
-        )
-        
-        report['stages']['validation'] = {
-            'success': True,
-            'quality_score': validation_report['quality_score'],
-            'remaining_issues': validation_report['total_issues'],
-            'time_taken': time.time() - val_start
-        }
-        
-        if verbose:
-            print(f"  Quality Score: {validation_report['quality_score']}/100")
-            print(f"  Remaining Issues: {validation_report['total_issues']}")
+        # Stage 4: Validation (skip in dry run since we only transformed first chapter)
+        if not dry_run:
+            if verbose:
+                print(f"\n{BOLD}Stage 4: Validation{RESET}")
+            
+            val_start = time.time()
+            
+            # Get original text for comparison
+            original_text = self._recreate_text_from_data(book_data)
+            final_text = transformed_book.get('qc_text', self._recreate_text_from_data(transformed_book))
+            
+            validation_report = validate_transformation(
+                original_text,
+                final_text,
+                transform_type,
+                characters
+            )
+            
+            report['stages']['validation'] = {
+                'success': True,
+                'quality_score': validation_report['quality_score'],
+                'remaining_issues': validation_report['total_issues'],
+                'time_taken': time.time() - val_start
+            }
+            
+            if verbose:
+                print(f"  Quality Score: {validation_report['quality_score']}/100")
+                print(f"  Remaining Issues: {validation_report['total_issues']}")
+        else:
+            # In dry run, create a dummy validation report
+            validation_report = {
+                'quality_score': 'N/A (dry run)',
+                'total_issues': 0,
+                'message': 'Validation skipped in dry run mode'
+            }
         
         # Add metadata to transformed book
         transformed_book['transformation'] = {
@@ -310,8 +320,8 @@ class UnifiedBookTransformer:
             'model': self.model,
             'provider': self.provider,
             'timestamp': datetime.now().isoformat(),
-            'quality_level': quality_level,
-            'total_changes': len(all_changes) + qc_changes_total if quality_level != "fast" else len(all_changes),
+            'quality_level': 'standard',  # Using 1 QC iteration by default
+            'total_changes': len(all_changes) + qc_changes_total,
             'character_analysis': characters,
             'validation': validation_report
         }
@@ -330,8 +340,14 @@ class UnifiedBookTransformer:
             
             # Save text
             text_path = output_path.with_suffix('.txt')
+            # Get the final text - either from QC or from the transformed book
+            if not dry_run and 'qc_text' in transformed_book:
+                text_to_save = transformed_book['qc_text']
+            else:
+                text_to_save = self._recreate_text_from_data(transformed_book)
+            
             with open(text_path, 'w', encoding='utf-8') as f:
-                f.write(final_text)
+                f.write(text_to_save)
             
             if verbose:
                 print(f"  ✓ JSON saved to: {json_path}")

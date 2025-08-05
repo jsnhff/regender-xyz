@@ -3,7 +3,7 @@
     "Algernon Moncrieff": {
       "name": "Algernon Moncrieff",
       "gender": "male",
-      "role": "A young bachelor living in a flat in Half-Moon Street, known for his wit and playful demeanor",
+      "role": "A young bachelor, owner of the flat in Half-Moon Street, witty and cynical",
       "name_variants": [
         "Algernon",
         "Algy"
@@ -14,7 +14,7 @@
     "Lane": {
       "name": "Lane",
       "gender": "male",
-      "role": "Algernon's manservant, responsible for household tasks and serving tea",
+      "role": "Algernon's manservant, arranges tea and assists in the household",
       "name_variants": [
         "Lane"
       ],
@@ -24,7 +24,7 @@
     "Lady Bracknell": {
       "name": "Lady Bracknell",
       "gender": "female",
-      "role": "Algernon's aunt and Gwendolen's mother, a formidable and opinionated aristocrat",
+      "role": "Algernon's aunt, Gwendolen's mother, a formidable and traditional aristocrat",
       "name_variants": [
         "Lady Bracknell",
         "Aunt Augusta"
@@ -35,7 +35,7 @@
     "Lord Shoreman": {
       "name": "Lord Shoreman",
       "gender": "male",
-      "role": "A guest who dined with Algernon on Thursday night, mentioned in passing",
+      "role": "A guest who dined with Algernon on Thursday night",
       "name_variants": [
         "Lord Shoreman"
       ],
@@ -45,7 +45,7 @@
     "Ernest Worthing": {
       "name": "Ernest Worthing",
       "gender": "male",
-      "role": "Jack's alter ego in town, a fictional younger brother invented by Jack to escape to London; also the name Jack is known by in town",
+      "role": "A young man, known as Ernest in town and Jack in the country, in love with Gwendolen, guardian to Cecily",
       "name_variants": [
         "Ernest",
         "Jack",
@@ -53,13 +53,13 @@
         "Mr. Worthing",
         "Uncle Jack"
       ],
-      "appears_in_section": true,
+      "appears_in_section": false,
       "first_seen_in": "Complete Book"
     },
     "Gwendolen Fairfax": {
       "name": "Gwendolen Fairfax",
       "gender": "female",
-      "role": "Lady Bracknell's daughter and Algernon's cousin, the object of Jack's affection",
+      "role": "Lady Bracknell's daughter, Algernon's cousin, love interest of Jack",
       "name_variants": [
         "Gwendolen",
         "Miss Fairfax"
@@ -70,7 +70,7 @@
     "Cecily Cardew": {
       "name": "Cecily Cardew",
       "gender": "female",
-      "role": "Jack's ward, a young girl living in the country under Jack's guardianship, described as pretty and eighteen",
+      "role": "Jack's ward, granddaughter of Thomas Cardew, lives in the country under Jack's guardianship",
       "name_variants": [
         "Cecily",
         "Miss Cecily Cardew",
@@ -85,7 +85,8 @@
       "role": "A fictional invalid friend invented by Algernon to escape social obligations",
       "name_variants": [
         "Bunbury",
-        "Mr. Bunbury"
+        "Mr. Bunbury",
+        "poor Bunbury"
       ],
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
@@ -100,33 +101,10 @@
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
     },
-    "Thomas Cardew": {
-      "name": "Thomas Cardew",
-      "gender": "male",
-      "role": "The late gentleman who adopted Jack and made him guardian to Cecily, found Jack in a handbag",
-      "name_variants": [
-        "Thomas Cardew",
-        "Mr. Thomas Cardew",
-        "Mr. James or Thomas Cardew"
-      ],
-      "appears_in_section": false,
-      "first_seen_in": "Complete Book"
-    },
-    "Miss Prism": {
-      "name": "Miss Prism",
-      "gender": "female",
-      "role": "Cecily's governess, responsible for her education, a woman with a past as a novelist",
-      "name_variants": [
-        "Miss Prism",
-        "Lætitia"
-      ],
-      "appears_in_section": true,
-      "first_seen_in": "Complete Book"
-    },
     "Lady Harbury": {
       "name": "Lady Harbury",
       "gender": "female",
-      "role": "A woman visited by Lady Bracknell, noted for looking younger after her husband's death",
+      "role": "An acquaintance of Lady Bracknell, recently widowed and changed in appearance",
       "name_variants": [
         "Lady Harbury",
         "dear Lady Harbury"
@@ -147,7 +125,7 @@
     "Lord Bracknell": {
       "name": "Lord Bracknell",
       "gender": "male",
-      "role": "Lady Bracknell's husband and Gwendolen's father, mentioned as having health issues",
+      "role": "Lady Bracknell's husband, Gwendolen's father, mentioned as having health issues",
       "name_variants": [
         "Lord Bracknell",
         "your uncle",
@@ -159,7 +137,7 @@
     "Duchess of Bolton": {
       "name": "Duchess of Bolton",
       "gender": "female",
-      "role": "A peeress who collaborates with Lady Bracknell on a list of eligible young men",
+      "role": "An aristocrat who collaborates with Lady Bracknell on a list of eligible young men",
       "name_variants": [
         "Duchess of Bolton",
         "dear Duchess of Bolton"
@@ -177,10 +155,36 @@
       "appears_in_section": false,
       "first_seen_in": "Complete Book"
     },
+    "Thomas Cardew": {
+      "name": "Thomas Cardew",
+      "gender": "male",
+      "role": "A deceased gentleman who adopted Jack and made him guardian to Cecily",
+      "name_variants": [
+        "Thomas Cardew",
+        "Mr. Thomas Cardew",
+        "Old Mr. Thomas Cardew",
+        "Mr. James or Thomas Cardew",
+        "late Mr. Thomas Cardew"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
+    },
+    "Miss Prism": {
+      "name": "Miss Prism",
+      "gender": "female",
+      "role": "Cecily's governess, a strict and intellectual woman with a past as a novelist",
+      "name_variants": [
+        "Miss Prism",
+        "Lætitia",
+        "Egeria"
+      ],
+      "appears_in_section": true,
+      "first_seen_in": "Complete Book"
+    },
     "Canon Chasuble": {
       "name": "Canon Chasuble",
       "gender": "male",
-      "role": "A rector who visits the Manor House, interacts with Miss Prism and Cecily, known as Dr. Chasuble",
+      "role": "A rector, known as Dr. Chasuble, who interacts with Miss Prism and Cecily",
       "name_variants": [
         "Canon Chasuble",
         "Dr. Chasuble",
@@ -188,11 +192,21 @@
       ],
       "appears_in_section": true,
       "first_seen_in": "Complete Book"
+    },
+    "Moulton": {
+      "name": "Moulton",
+      "gender": "unknown",
+      "role": "A presumed gardener or household staff member at the Manor House, mentioned by Miss Prism",
+      "name_variants": [
+        "Moulton"
+      ],
+      "appears_in_section": false,
+      "first_seen_in": "Complete Book"
     }
   },
   "metadata": {
     "book_title": "The Importance of Being Earnest",
-    "total_characters": 17,
+    "total_characters": 18,
     "provider": "grok",
     "model": "grok-3-fast"
   }
