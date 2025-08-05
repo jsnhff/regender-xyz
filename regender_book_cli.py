@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 
 # Import book processing modules
-from gutenberg import GutenbergDownloader
+from book_downloader import GutenbergDownloader
 from book_parser import BookParser, BookValidator, process_all_books, recreate_text_from_json, save_book_json, load_book_json
 from book_transform import transform_book
 
@@ -379,6 +379,94 @@ def batch_transform(input_dir: str = "books/json", output_dir: str = "books/outp
 
 
 # =============================================================================
+# Unified Regender Command (NEW)
+# =============================================================================
+
+def handle_regender_command(args):
+    """Handle the unified regender command that does everything."""
+    from book_transform import transform_book_unified
+    from book_parser import BookParser, save_book_json, load_book_json
+    
+    input_path = Path(args.input)
+    if not input_path.exists():
+        print(f"{RED}❌ Input file not found: {input_path}{RESET}")
+        return
+    
+    print(f"\n{CYAN}{'='*60}{RESET}")
+    print(f"{CYAN}{BOLD}Unified Regender Transformation{RESET}")
+    print(f"{CYAN}{'='*60}{RESET}")
+    
+    # Determine if input is text or JSON
+    if input_path.suffix == '.txt':
+        # Need to parse text to JSON first
+        print(f"\n{BOLD}Step 1: Parsing text to JSON{RESET}")
+        parser = BookParser()
+        book_data = parser.parse_file(str(input_path))
+        
+        if not book_data:
+            print(f"{RED}❌ Failed to parse text file{RESET}")
+            return
+            
+        print(f"  ✓ Successfully parsed: {book_data.get('title', 'Unknown')}")
+        
+    elif input_path.suffix == '.json':
+        # Load existing JSON
+        print(f"\n{BOLD}Loading JSON file{RESET}")
+        book_data = load_book_json(str(input_path))
+        
+        if not book_data:
+            print(f"{RED}❌ Failed to load JSON file{RESET}")
+            return
+            
+        print(f"  ✓ Loaded: {book_data.get('title', 'Unknown')}")
+    else:
+        print(f"{RED}❌ Input must be .txt or .json file{RESET}")
+        return
+    
+    # Determine output path
+    if args.output:
+        output_path = args.output
+    else:
+        # Auto-generate output path
+        output_dir = input_path.parent / 'output'
+        output_dir.mkdir(exist_ok=True)
+        base_name = input_path.stem.replace('_clean', '').replace('_transformed', '')
+        output_path = str(output_dir / f"{base_name}_{args.type}")
+    
+    print(f"\n{BOLD}Output will be saved to:{RESET}")
+    print(f"  📄 JSON: {output_path}.json")
+    print(f"  📝 Text: {output_path}.txt")
+    
+    # Run unified transformation
+    try:
+        transformed_book, report = transform_book_unified(
+            book_data=book_data,
+            transform_type=args.type,
+            quality_level=args.quality,
+            model=args.model,
+            provider=args.provider,
+            output_path=output_path,
+            verbose=True
+        )
+        
+        # Show summary
+        print(f"\n{GREEN}{'='*60}{RESET}")
+        print(f"{GREEN}{BOLD}Transformation Summary{RESET}")
+        print(f"{GREEN}{'='*60}{RESET}")
+        print(f"📊 Quality Score: {report['stages']['validation']['quality_score']}/100")
+        print(f"✏️  Total Changes: {transformed_book['transformation']['total_changes']}")
+        print(f"⏱️  Total Time: {report['total_time']:.1f}s")
+        print(f"\n✅ Files saved to:")
+        print(f"   {output_path}.json")
+        print(f"   {output_path}.txt")
+        
+    except Exception as e:
+        print(f"\n{RED}❌ Transformation failed: {e}{RESET}")
+        import traceback
+        traceback.print_exc()
+
+
+# =============================================================================
 # Pipeline Functions
 # =============================================================================
 
@@ -451,7 +539,7 @@ def main():
     transform_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'], 
                                 default='gender_swap', help='Gender transformation mode')
     transform_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
-    transform_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider to use')
+    transform_parser.add_argument('--provider', choices=['openai', 'anthropic', 'claude', 'grok'], help='LLM provider to use')
     transform_parser.add_argument('--characters', help='Pre-analyzed character file to use')
     transform_parser.add_argument('--batch', action='store_true', help='Process directory of files')
     transform_parser.add_argument('--limit', type=int, help='Limit number of files in batch mode')
@@ -461,11 +549,22 @@ def main():
     analyze_parser.add_argument('input', help='Input JSON book file')
     analyze_parser.add_argument('-o', '--output', required=True, help='Output character file')
     analyze_parser.add_argument('--model', help='Model to use (defaults to provider\'s default)')
-    analyze_parser.add_argument('--provider', choices=['openai', 'grok', 'mlx'], help='LLM provider')
+    analyze_parser.add_argument('--provider', choices=['openai', 'anthropic', 'claude', 'grok'], help='LLM provider')
     analyze_parser.add_argument('--rate-limited', action='store_true', 
                                help='Use rate-limited analysis (auto-enabled for grok-4-latest)')
     analyze_parser.add_argument('--tokens-per-minute', type=int, default=16000,
                                help='Token rate limit per minute (default: 16000)')
+    
+    # Unified regender command (NEW - RECOMMENDED)
+    regender_parser = subparsers.add_parser('regender', help='Complete transformation with quality control')
+    regender_parser.add_argument('input', help='Input text file or JSON file')
+    regender_parser.add_argument('-o', '--output', help='Output path (without extension)')
+    regender_parser.add_argument('--type', choices=['all_male', 'all_female', 'gender_swap'],
+                               default='gender_swap', help='Gender transformation mode')
+    regender_parser.add_argument('--quality', choices=['fast', 'standard', 'high'],
+                               default='standard', help='Quality level')
+    regender_parser.add_argument('--model', help='Model to use')
+    regender_parser.add_argument('--provider', choices=['openai', 'anthropic', 'claude', 'grok'], help='LLM provider')
     
     # Pipeline command
     pipeline_parser = subparsers.add_parser('pipeline', help='Run complete pipeline')
@@ -513,6 +612,10 @@ def main():
             args.input, args.output, args.model, args.provider,
             rate_limited=args.rate_limited, tokens_per_minute=args.tokens_per_minute
         )
+    
+    elif args.command == 'regender':
+        # New unified command
+        handle_regender_command(args)
     
     elif args.command == 'pipeline':
         pipeline(args.count, args.type, args.model)

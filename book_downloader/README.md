@@ -1,6 +1,6 @@
-# Gutenberg Utilities
+# Book Downloader
 
-Utilities for downloading books from Project Gutenberg.
+Utilities for downloading books from online sources (currently Project Gutenberg).
 
 ## Overview
 
@@ -13,9 +13,9 @@ This package provides functionality for downloading books from Project Gutenberg
 ## Structure
 
 ```
-gutenberg/
+book_downloader/
 ├── __init__.py        # Package initialization
-└── download.py        # Download books from Project Gutenberg
+└── download.py        # Download books from online sources
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ python regender_book_cli.py download --count 50 --output book_texts
 ### Python API
 
 ```python
-from gutenberg import GutenbergDownloader
+from book_downloader import GutenbergDownloader
 
 # Create downloader
 downloader = GutenbergDownloader(output_dir="book_texts")
@@ -89,7 +89,7 @@ This package is designed to work with the `book_parser` package for processing d
 
 ```python
 # Download books
-from gutenberg import GutenbergDownloader
+from book_downloader import GutenbergDownloader
 downloader = GutenbergDownloader()
 downloader.download_top_books(100)
 

@@ -41,19 +41,15 @@ def analyze_characters(text: str, model: Optional[str] = None, provider: Optiona
         {"role": "user", "content": user_prompt}
     ]
     
-    # Build kwargs based on model capabilities
+    # Build kwargs - always use high-quality settings
     kwargs = {
         "messages": messages,
         "model": model,
         "temperature": 0.0
     }
     
-    # Get model config for response format support
-    from book_transform.model_config_loader import get_verified_model_config
-    config = get_verified_model_config(model, provider)
-    
-    if config and config.supports_json_mode:
-        kwargs["response_format"] = {"type": "json_object"}
+    # Always request JSON output for consistency
+    kwargs["response_format"] = {"type": "json_object"}
     
     # Call the LLM
     response = client.complete(**kwargs)
@@ -107,15 +103,10 @@ def get_full_text_from_json(book_data: Dict[str, Any]) -> str:
         if chapter.get('title'):
             full_text.append(f"\nCHAPTER: {chapter['title']}\n")
         
-        # Handle both old (flat sentences) and new (paragraphs) structures
-        if 'paragraphs' in chapter:
-            # New structure with paragraphs
-            for paragraph in chapter['paragraphs']:
-                para_text = ' '.join(paragraph.get('sentences', []))
-                full_text.append(para_text)
-        elif 'sentences' in chapter:
-            # Old structure with flat sentences
-            full_text.extend(chapter['sentences'])
+        # Process paragraphs
+        for paragraph in chapter['paragraphs']:
+            para_text = ' '.join(paragraph.get('sentences', []))
+            full_text.append(para_text)
     
     return '\n'.join(full_text)
 

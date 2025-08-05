@@ -10,16 +10,17 @@ The character analysis phase is crucial for accurate gender transformation. By i
 - Preserve narrative coherence
 - Avoid transforming non-character references
 
+**Important**: This module now uses only flagship-quality prompts for ALL models. We prioritize accuracy over cost because errors in character identification cascade through the entire book transformation and waste significant human proofreading time.
+
 ## Module Structure
 
 ```
 book_characters/
 ├── __init__.py               # Module exports
 ├── analyzer.py               # Main character analysis with LLM
-├── prompts.py               # Character analysis prompt templates
+├── prompts.py               # Flagship-quality character analysis prompts
 ├── smart_chunked_analyzer.py # Smart chunking for comprehensive coverage
 ├── rate_limited_analyzer.py  # Rate-limited analysis for API constraints
-├── mlx_chunked_analyzer.py   # Chunked processing for local MLX models
 ├── api_chunked_analyzer.py   # Chunked processing for API providers
 ├── context.py                # Character context creation for transformations
 ├── loader.py                 # Load pre-analyzed character data
@@ -28,17 +29,18 @@ book_characters/
 
 ## Key Features
 
-### 1. Pure LLM-Based Character Detection
+### 1. Flagship-Quality Character Detection
 
-The module uses advanced language models exclusively for character identification:
+The module uses only the highest quality prompting approach for character identification:
 
 **Character Analysis** (analyzer.py)
-- Uses LLM to identify all characters in the text
-- No regex patterns - relies entirely on LLM understanding
+- Uses flagship-quality prompts for ALL models (no tier system)
+- Comprehensive character extraction with zero tolerance for errors
 - Extracts gender from pronouns, titles, and context
 - Identifies character roles and relationships
 - Handles name variations and aliases
 - Supports 100+ characters per book
+- Family members are ALWAYS kept as separate characters
 
 ### 2. Smart Chunking Strategy
 
@@ -61,15 +63,6 @@ For APIs with strict rate limits (e.g., Grok-4-latest with 16k tokens/minute):
 - Resumes processing after rate window resets
 - Optimizes chunk sizes to maximize throughput
 - Provides progress tracking and token usage stats
-
-### 4. Adaptive Prompt System
-
-The module automatically adjusts prompts based on model capabilities:
-
-- **Basic Models** (e.g., Mistral-7B): Simple character list with gender
-- **Standard Models** (e.g., GPT-4): Anti-merging rules to prevent family member confusion
-- **Advanced Models** (e.g., Grok): Comprehensive analysis with all characters
-- **Flagship Models** (e.g., GPT-4o): Complex analysis with position tracking
 
 ### 4. Character Context Generation
 
@@ -166,11 +159,11 @@ save_character_analysis(
 The module integrates seamlessly with the main CLI:
 
 ```bash
-# Analyze characters in a book (recommended: use Grok for best results)
+# Analyze characters in a book (uses flagship-quality prompts)
 python regender_book_cli.py analyze-characters book.json \
     --output characters.json \
     --provider grok \
-    --model grok-3-latest
+    --model grok-4-latest
 
 # For large books with rate limits (auto-enabled for grok-4-latest)
 python regender_book_cli.py analyze-characters large_book.json \
@@ -222,11 +215,12 @@ The smart chunking strategy ensures complete book coverage:
 
 ## Best Practices
 
-1. **Use Grok for Character Analysis**: Best results with 131k context window
+1. **Use Top-Tier Models**: Always use GPT-4o, Grok-4-latest, or similar flagship models
 2. **Save Character Data**: Analyze once, use multiple times
 3. **Verify Character Count**: 100+ characters indicates comprehensive analysis
 4. **Use Pre-analyzed Characters**: Faster transformation, consistent results
 5. **Check Gender Distribution**: Ensure reasonable male/female balance
+6. **Quality Over Cost**: The extra cost of flagship models is insignificant compared to human proofreading time
 
 ## Technical Details
 

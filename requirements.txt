@@ -1,5 +1,6 @@
 # Core dependencies
 openai>=1.0.0
+anthropic>=0.18.0
 
 # For Grok API support
 requests>=2.31.0

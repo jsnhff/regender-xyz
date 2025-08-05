@@ -4,14 +4,37 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI (OpenAI or Grok) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
+This tool uses AI (OpenAI, Anthropic/Claude, or Grok) to identify characters in text and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles 100+ text formats including standard chapters, international languages, plays, and more with intelligent token-based chunking for optimal API usage.
+
+## ✨ NEW: Unified Workflow
+
+Transform any book with a single command:
+
+```bash
+# Transform a book with automatic quality control
+python regender_book_cli.py regender book.txt --type all_female
+
+# High quality mode with extensive validation
+python regender_book_cli.py regender book.txt --quality high
+```
+
+The new `regender` command handles everything automatically:
+1. 📖 Parses text to structured JSON
+2. 🔍 Analyzes all characters (mandatory)
+3. 🔄 Transforms gender with context
+4. ✅ Runs quality control iterations
+5. 📊 Validates and scores output
+6. 💾 Saves both JSON and text formats
+
+See [Unified Workflow Guide](docs/UNIFIED_WORKFLOW.md) for details.
 
 ## Features
 
-- **Multi-Provider LLM Support**: Choose between OpenAI and Grok
+- **Multi-Provider LLM Support**: Choose between OpenAI, Anthropic/Claude, and Grok
   - Automatic provider detection based on available API keys
   - Provider-specific model optimization
   - Unified interface for seamless switching
+  - **NEW**: Support for Claude Opus 4, Claude 3.5 Sonnet, and Claude 3 Opus
   - **NEW**: Grok-4-latest with 256k context window support
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports 100+ book formats (English, French, German, plays, letters, etc.)
@@ -44,25 +67,32 @@ This tool uses AI (OpenAI or Grok) to identify characters in text and transform 
 
 ## Documentation
 
-- **[Complete Flow Diagram](docs/reference/COMPLETE_FLOW_DIAGRAM.md)** - Visual overview of the entire system
-- **[Transformation Pipeline](docs/reference/TRANSFORMATION_PIPELINE.md)** - Detailed transformation process
-- **[Transformation Modes](docs/reference/TRANSFORMATION_MODES.md)** - Understanding all_male, all_female, and gender_swap modes
+### Quick Start
+For new users, start with the **[Documentation Index](docs/README.md)** which provides a simple overview and quick commands.
+
+### Essential Guides
+- **[Unified Workflow Guide](docs/UNIFIED_WORKFLOW.md)** - Complete guide to the `regender` command
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - How the system works internally
+- **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the book JSON format
+
+### Reference Documentation
+- **[Transformation Modes](docs/reference/TRANSFORMATION_MODES.md)** - Understanding all_male, all_female, and gender_swap
+- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI, Anthropic, and Grok
+
+### Module Documentation
 - **[Character Analysis Module](book_characters/README.md)** - Smart character extraction system
-- **[Multi-Provider Guide](docs/reference/MULTI_PROVIDER_GUIDE.md)** - Using OpenAI and Grok
-- **[JSON Structure Guide](docs/JSON_STRUCTURE.md)** - Understanding the paragraph-aware JSON format
-- **[Parser Architecture](docs/development/CLEAN_PARSER_ARCHITECTURE.md)** - Details on the modular parser
-- **[Development Docs](docs/development/)** - Parser development and improvements
-- **[Maintenance Docs](docs/maintenance/)** - System maintenance guides
 
 ## Requirements
 
 - Python 3.9+
 - At least one LLM provider:
   - OpenAI API key (set as `OPENAI_API_KEY`)
+  - Anthropic API key (set as `ANTHROPIC_API_KEY`)
   - Grok API key (set as `GROK_API_KEY`)
 - **Supported Models:**
-  - OpenAI: GPT-4o, GPT-4o-mini
-  - Grok: grok-4-latest (256k context), grok-3-latest (131k context), grok-beta, grok-3-mini-fast
+  - OpenAI: GPT-4o, GPT-4o-mini, GPT-4 Turbo
+  - Anthropic: Claude Opus 4, Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku
+  - Grok: grok-4-latest (256k context), grok-3-latest (131k context), grok-beta
 
 ## Installation
 
@@ -74,14 +104,15 @@ cd regender-xyz
 # Install dependencies
 pip install -r requirements.txt
 # Or manually:
-pip install openai requests beautifulsoup4 python-dotenv
+pip install openai anthropic requests beautifulsoup4 python-dotenv
 
-# Set up API keys (choose one or both)
+# Set up API keys (choose one or more)
 export OPENAI_API_KEY='your-openai-api-key'
+export ANTHROPIC_API_KEY='your-anthropic-api-key'
 export GROK_API_KEY='your-grok-api-key'
 
 # Optional: specify default provider
-export LLM_PROVIDER='openai'  # or 'grok'
+export DEFAULT_PROVIDER='openai'  # or 'anthropic' or 'grok'
 ```
 
 ## Multi-Provider LLM Support
@@ -105,11 +136,14 @@ The system now supports multiple LLM providers for flexibility and redundancy:
 ### Using Different Providers
 
 ```bash
-# Use default provider (auto-detected or from LLM_PROVIDER env var)
+# Use default provider (auto-detected or from DEFAULT_PROVIDER env var)
 python regender_book_cli.py transform books/json/book.json --type gender_swap
 
 # Explicitly use OpenAI
 python regender_book_cli.py transform books/json/book.json --provider openai
+
+# Explicitly use Anthropic/Claude
+python regender_book_cli.py transform books/json/book.json --provider anthropic
 
 # Explicitly use Grok
 python regender_book_cli.py transform books/json/book.json --provider grok
@@ -223,7 +257,7 @@ regender-xyz/
 │   ├── patterns/       # Format detection patterns
 │   ├── detectors/      # Smart section detection
 │   └── utils/          # Validation and batch processing
-├── gutenberg/          # Project Gutenberg downloader
+├── book_downloader/    # Book downloader (Project Gutenberg)
 ├── book_transform/     # AI book transformation system
 │   └── chunking/       # Smart token-based chunking
 ├── api_client.py       # Unified LLM client (OpenAI/Grok)
@@ -238,18 +272,20 @@ The parser has been tested on 100 Project Gutenberg books with 100% success rate
 - 28 edge cases handled with specialized patterns
 - Supports multiple languages and formats
 
-### Quick Start with Gutenberg Books
+### Quick Start with Project Gutenberg
 
 ```bash
-# Download and process top 100 books
-python regender_book_cli.py download --count 100
-python regender_book_cli.py process
+# Download books from Project Gutenberg
+python regender_book_cli.py download --count 10
 
-# Transform a specific book
-python regender_book_cli.py transform books/json/Pride_and_Prejudice.json --type gender_swap
+# Transform with the unified command
+python regender_book_cli.py regender books/texts/pg1342-Pride_and_Prejudice.txt --type all_female
+
+# Or transform multiple books
+for book in books/texts/*.txt; do
+    python regender_book_cli.py regender "$book" --type gender_swap
+done
 ```
-
-The Gutenberg downloader automatically handles book metadata and creates properly named files.
 
 ## License
 

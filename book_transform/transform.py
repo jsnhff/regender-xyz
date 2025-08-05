@@ -170,20 +170,14 @@ def transform_chapter(chapter: Dict[str, Any],
                      sentences_per_chunk: Optional[int] = None,
                      verbose: bool = True) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Transform a single chapter with model-aware chunking."""
-    # Handle both old (flat sentences) and new (paragraphs) structures
-    if 'paragraphs' in chapter:
-        # New structure - extract all sentences with paragraph tracking
-        sentences = []
-        sentence_to_paragraph = []  # Track which paragraph each sentence belongs to
-        
-        for para_idx, paragraph in enumerate(chapter['paragraphs']):
-            for sent in paragraph.get('sentences', []):
-                sentences.append(sent)
-                sentence_to_paragraph.append(para_idx)
-    else:
-        # Old structure - flat sentences
-        sentences = chapter.get('sentences', [])
-        sentence_to_paragraph = [0] * len(sentences)
+    # Extract all sentences with paragraph tracking
+    sentences = []
+    sentence_to_paragraph = []  # Track which paragraph each sentence belongs to
+    
+    for para_idx, paragraph in enumerate(chapter['paragraphs']):
+        for sent in paragraph.get('sentences', []):
+            sentences.append(sent)
+            sentence_to_paragraph.append(para_idx)
     
     total_sentences = len(sentences)
     
@@ -239,37 +233,32 @@ def transform_chapter(chapter: Dict[str, Any],
     # Create transformed chapter
     transformed_chapter = chapter.copy()
     
-    # Reconstruct paragraph structure if present
-    if 'paragraphs' in chapter:
-        # Rebuild paragraphs with transformed sentences
-        transformed_paragraphs = []
-        current_para_idx = -1
-        current_sentences = []
+    # Rebuild paragraphs with transformed sentences
+    transformed_paragraphs = []
+    current_para_idx = -1
+    current_sentences = []
+    
+    for sent_idx, sent in enumerate(transformed_sentences):
+        para_idx = sentence_to_paragraph[sent_idx]
         
-        for sent_idx, sent in enumerate(transformed_sentences):
-            para_idx = sentence_to_paragraph[sent_idx]
-            
-            # If we've moved to a new paragraph, save the current one
-            if para_idx != current_para_idx and current_para_idx >= 0:
-                transformed_paragraphs.append({
-                    'sentences': current_sentences
-                })
-                current_sentences = []
-            
-            # Add to current paragraph
-            current_para_idx = para_idx
-            current_sentences.append(sent)
-        
-        # Don't forget the last paragraph
-        if current_para_idx >= 0:
+        # If we've moved to a new paragraph, save the current one
+        if para_idx != current_para_idx and current_para_idx >= 0:
             transformed_paragraphs.append({
                 'sentences': current_sentences
             })
+            current_sentences = []
         
-        transformed_chapter['paragraphs'] = transformed_paragraphs
-    else:
-        # Old structure - just use flat sentences
-        transformed_chapter['sentences'] = transformed_sentences
+        # Add to current paragraph
+        current_para_idx = para_idx
+        current_sentences.append(sent)
+    
+    # Don't forget the last paragraph
+    if current_para_idx >= 0:
+        transformed_paragraphs.append({
+            'sentences': current_sentences
+        })
+    
+    transformed_chapter['paragraphs'] = transformed_paragraphs
     
     transformed_chapter['transformation_stats'] = {
         'total_changes': len(all_changes),

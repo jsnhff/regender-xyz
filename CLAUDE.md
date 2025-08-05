@@ -4,16 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Regender-XYZ is a command-line tool for analyzing and transforming gender representation in literature using multiple LLM providers (OpenAI, Grok). It processes Project Gutenberg books into structured JSON format and can apply gender transformations.
+Regender-XYZ is a command-line tool for analyzing and transforming gender representation in literature using multiple LLM providers (OpenAI, Anthropic/Claude, Grok). It processes Project Gutenberg books into structured JSON format and can apply gender transformations.
 
 ## Common Commands
 
 ### Environment Setup
 ```bash
-# Set up API keys (required)
+# Set up API keys (required - at least one)
 export OPENAI_API_KEY='your-key'
+export ANTHROPIC_API_KEY='your-key'
 export GROK_API_KEY='your-key'
-export LLM_PROVIDER='openai'  # or 'grok'
+export DEFAULT_PROVIDER='openai'  # or 'anthropic' or 'grok'
 
 # Install dependencies
 pip install -r requirements.txt
@@ -70,13 +71,14 @@ python tests/test_end_to_end.py
    - `validation/` - Transformation quality checks
 
 3. **book_characters/** - Character analysis system
-   - Uses LLMs to identify characters and their genders
+   - Uses flagship-quality prompts exclusively for accuracy
+   - Identifies characters and their genders with zero tolerance for errors
    - Supports rate-limited analysis for large books
 
 4. **api_client.py** - Unified LLM interface
    - Auto-detects provider from environment
    - Handles rate limiting and retries
-   - Supports OpenAI and Grok models
+   - Supports OpenAI, Anthropic/Claude, and Grok models
 
 ### Data Flow
 

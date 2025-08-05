@@ -8,6 +8,8 @@ including gender swapping and other narrative modifications.
 from .transform import BookTransformer, transform_book
 # Character analysis moved to book_characters module
 from .llm_transform import transform_text_with_llm, transform_gender_with_context, TRANSFORM_TYPES
+from .quality_control import quality_control_loop, validate_transformation
+from .unified_transform import UnifiedBookTransformer, transform_book_unified
 
 # Simple file transformation wrapper
 def transform_text_file(file_path: str, transform_type: str, output_path: str = None, model: str = "gpt-4o-mini", **kwargs):
@@ -28,8 +30,6 @@ def transform_text_file(file_path: str, transform_type: str, output_path: str = 
     
     return transformed_text
 
-# Compatibility alias
-GenderTransformer = BookTransformer
 
 __version__ = "1.0.0"
 __all__ = [
@@ -38,5 +38,9 @@ __all__ = [
     "transform_text_with_llm",
     "transform_gender_with_context",
     "transform_text_file",
-    "TRANSFORM_TYPES"
+    "TRANSFORM_TYPES",
+    "quality_control_loop",
+    "validate_transformation",
+    "UnifiedBookTransformer",
+    "transform_book_unified"
 ]

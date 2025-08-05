@@ -111,22 +111,13 @@ def recreate_text_from_json(json_file: str, output_file: Optional[str] = None,
             parts.append(chapter_heading)
             parts.append("")  # blank line after heading
         
-        # Handle both old (flat sentences) and new (paragraphs) structures
-        if 'paragraphs' in chapter:
-            # New structure with paragraphs
-            paragraph_texts = []
-            for paragraph in chapter['paragraphs']:
-                para_text = ' '.join(paragraph.get('sentences', []))
-                if para_text:  # Only add non-empty paragraphs
-                    paragraph_texts.append(para_text)
-            chapter_text = '\n\n'.join(paragraph_texts)
-        elif 'sentences' in chapter:
-            # Old structure with flat sentences
-            chapter_text = ' '.join(chapter['sentences'])
-            # Restore paragraph breaks where we have \n\n in sentences
-            chapter_text = chapter_text.replace('\\n\\n', '\n\n')
-        else:
-            chapter_text = ""
+        # Process paragraphs
+        paragraph_texts = []
+        for paragraph in chapter['paragraphs']:
+            para_text = ' '.join(paragraph.get('sentences', []))
+            if para_text:  # Only add non-empty paragraphs
+                paragraph_texts.append(para_text)
+        chapter_text = '\n\n'.join(paragraph_texts)
         
         if chapter_text:
             parts.append(chapter_text)
@@ -202,21 +193,12 @@ def format_book_text(book_data: dict, include_metadata: bool = True) -> str:
             parts.append(chapter_heading)
             parts.append("")  # blank line after heading
         
-        # Handle both old (flat sentences) and new (paragraphs) structures
-        if 'paragraphs' in chapter:
-            # New structure with paragraphs
-            paragraph_texts = []
-            for paragraph in chapter['paragraphs']:
-                para_text = ' '.join(paragraph.get('sentences', []))
-                paragraph_texts.append(para_text)
-            chapter_text = '\n\n'.join(paragraph_texts)
-        elif 'sentences' in chapter:
-            # Old structure with flat sentences
-            chapter_text = ' '.join(chapter['sentences'])
-            # Restore paragraph breaks
-            chapter_text = chapter_text.replace('\\n\\n', '\n\n')
-        else:
-            chapter_text = ""
+        # Process paragraphs
+        paragraph_texts = []
+        for paragraph in chapter['paragraphs']:
+            para_text = ' '.join(paragraph.get('sentences', []))
+            paragraph_texts.append(para_text)
+        chapter_text = '\n\n'.join(paragraph_texts)
         
         parts.append(chapter_text)
         parts.append("")  # blank line between chapters

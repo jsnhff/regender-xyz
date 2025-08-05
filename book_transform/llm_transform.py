@@ -281,7 +281,7 @@ def transform_text_with_llm(text: str, transform_type: str,
 def transform_gender_with_context(text: str, transform_type: str, character_context: str, 
                                 model: Optional[str] = None) -> Tuple[str, List[str]]:
     """
-    Compatibility wrapper for the original gender_transform interface.
+    Transform gender in the provided text.
     
     Args:
         text: Text to transform

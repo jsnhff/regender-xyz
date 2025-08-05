@@ -47,36 +47,13 @@ def recreate_text_from_json(json_path: str, output_path: str = None) -> str:
             text_parts.append(''.join(chapter_header))
             text_parts.append('')  # Empty line after chapter header
         
-        # Check if we have new paragraph structure or old flat sentence structure
-        if 'paragraphs' in chapter:
-            # New structure with paragraphs
-            for paragraph in chapter['paragraphs']:
-                # Join sentences in paragraph
-                para_text = ' '.join(paragraph.get('sentences', []))
-                if para_text:  # Only add non-empty paragraphs
-                    text_parts.append(para_text)
-                    text_parts.append('')  # Empty line between paragraphs
-        else:
-            # Old structure - flat sentence list
-            # We'll add a simple heuristic: break after sentences ending with closing quotes
-            # or when we detect a topic shift
-            if 'sentences' in chapter:
-                current_para = []
-                for i, sentence in enumerate(chapter['sentences']):
-                    current_para.append(sentence)
-                    
-                    # Simple heuristic for paragraph breaks
-                    if (sentence.rstrip().endswith('"') or 
-                        (i > 0 and i < len(chapter['sentences']) - 1 and 
-                         len(current_para) > 3)):
-                        text_parts.append(' '.join(current_para))
-                        text_parts.append('')  # Empty line for paragraph break
-                        current_para = []
-                
-                # Add any remaining sentences
-                if current_para:
-                    text_parts.append(' '.join(current_para))
-                    text_parts.append('')
+        # Process paragraphs
+        for paragraph in chapter['paragraphs']:
+            # Join sentences in paragraph
+            para_text = ' '.join(paragraph.get('sentences', []))
+            if para_text:  # Only add non-empty paragraphs
+                text_parts.append(para_text)
+                text_parts.append('')  # Empty line between paragraphs
         
         # Extra line between chapters
         text_parts.append('')

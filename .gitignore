@@ -38,12 +38,6 @@ parsed_books/
 # Keep: parser_test_results.json
 # Keep: conversion_report.json
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
 # OS
 .DS_Store
 Thumbs.db

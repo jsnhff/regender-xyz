@@ -79,43 +79,20 @@ Comprehensive statistics are calculated including:
 - Total and average counts for chapters, paragraphs, sentences, and words
 - Useful for analyzing book structure and planning transformations
 
-## Backward Compatibility
-
-The system maintains backward compatibility with the old flat structure:
-
-```json
-{
-  "chapters": [
-    {
-      "sentences": ["sentence1", "sentence2", "sentence3"]
-    }
-  ]
-}
-```
-
-All transformation and recreation functions detect and handle both structures automatically.
-
 ## Example Usage
 
 ### Reading Sentences
 ```python
-# New structure
 for chapter in book_data['chapters']:
     for paragraph in chapter['paragraphs']:
         for sentence in paragraph['sentences']:
             print(sentence)
-
-# Old structure (still supported)
-for chapter in book_data['chapters']:
-    for sentence in chapter['sentences']:
-        print(sentence)
 ```
 
 ### Recreating Text
 ```python
 from book_parser import recreate_text_from_json
 
-# Works with both old and new structures
 recreate_text_from_json('book.json', 'output.txt')
 ```
 
@@ -125,7 +102,7 @@ recreate_text_from_json('book.json', 'output.txt')
 2. **Better Context**: Transformations can consider paragraph boundaries
 3. **Accurate Recreation**: Text can be recreated with proper formatting
 4. **Flexibility**: Easy to work with at paragraph or sentence level
-5. **Future-Proof**: Structure can be extended without breaking compatibility
+5. **Extensible**: Structure can be enhanced as needed
 
 ## Migration
 

@@ -1,249 +1,244 @@
-# Regender-XYZ Architecture
+# System Architecture & Pipeline
 
 ## Overview
 
-Regender-XYZ is a modular system for analyzing and transforming gender representation in literature. The architecture supports multiple LLM providers, advanced book parsing, and flexible transformation pipelines.
+Regender-XYZ transforms gender representation in literature using AI. The system follows a clear pipeline:
+
+```
+Text File → Parse to JSON → Analyze Characters → Transform Gender → Output Files
+```
+
+## Complete Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        regender_book_cli.py                         │
+│                    (Unified CLI Entry Point)                        │
+└───────────────────────────┬─────────────────────────────────────────┘
+                            │
+        ┌───────────────────┴───────────────────┐
+        │         'regender' command            │
+        │    (Complete automated pipeline)      │
+        └───────────────────┬───────────────────┘
+                            │
+    ┌───────────────────────┴───────────────────────┐
+    │                                               │
+    ▼                                               ▼
+┌─────────────────┐                        ┌─────────────────┐
+│  Text Input     │                        │  JSON Input     │
+│  (.txt file)    │                        │  (.json file)   │
+└────────┬────────┘                        └────────┬────────┘
+         │                                          │
+         ▼                                          │
+┌─────────────────────────┐                        │
+│   1. PARSING STAGE      │                        │
+├─────────────────────────┤                        │
+│ book_parser/            │                        │
+│ • 100+ formats support  │                        │
+│ • Pattern detection     │                        │
+│ • Paragraph preservation│                        │
+└────────┬────────────────┘                        │
+         │                                          │
+         └──────────────────┬───────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────┐
+│           2. CHARACTER ANALYSIS                   │
+├───────────────────────────────────────────────────┤
+│ book_characters/                                  │
+│ • Flagship-quality prompts only                  │
+│ • Identifies all characters & genders            │
+│ • Smart chunking for large books                 │
+│ • Rate limiting for APIs                         │
+└─────────────────────┬─────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────┐
+│           3. TRANSFORMATION                       │
+├───────────────────────────────────────────────────┤
+│ book_transform/                                   │
+│ • Applies gender changes                         │
+│ • Uses character context                         │
+│ • Preserves narrative structure                  │
+└─────────────────────┬─────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────┐
+│           4. QUALITY CONTROL                      │
+├───────────────────────────────────────────────────┤
+│ book_transform/quality_control.py                │
+│ • Scans for missed transformations               │
+│ • Iterative corrections                          │
+│ • Validation scoring                             │
+└─────────────────────┬─────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────┐
+│           5. OUTPUT GENERATION                    │
+├───────────────────────────────────────────────────┤
+│ • Saves transformed JSON                         │
+│ • Recreates readable text                        │
+│ • Generates transformation report                │
+└───────────────────────────────────────────────────┘
+```
 
 ## Core Components
 
-### 1. Book Parser Module (`book_parser/`)
-A modular parser achieving 100% success rate on Project Gutenberg texts.
+### 1. Book Parser (`book_parser/`)
+Converts any text format to structured JSON.
 
 ```
 book_parser/
-├── parser.py              # Main API: BookParser class
-├── patterns/
-│   ├── base.py           # Base pattern definitions
-│   ├── registry.py       # Pattern management system
-│   ├── standard.py       # English patterns (CHAPTER, Part, etc.)
-│   ├── international.py  # French, German patterns
-│   └── plays.py         # Drama patterns (ACT, SCENE)
-└── detectors/
-    └── section_detector.py # Smart section detection
+├── parser.py              # Main BookParser class
+├── patterns/             # Format detection
+│   ├── standard.py      # English (CHAPTER, Part)
+│   ├── international.py # French, German
+│   └── plays.py        # Drama (ACT, SCENE)
+└── detectors/           # Smart section detection
 ```
+
+**Capabilities:**
+- 100% success rate on Project Gutenberg
+- Handles 100+ text formats
+- Preserves paragraph structure
+- Smart abbreviation handling
+
+### 2. Character Analysis (`book_characters/`)
+Identifies all characters using flagship AI models.
 
 **Key Features:**
-- Pattern-based chapter detection with priority system
-- Support for 100+ book formats
-- International language support
-- Smart fallback strategies
+- Pure LLM analysis (no regex)
+- Flagship prompts for accuracy
+- Smart chunking for large books
+- Rate limiting support
 
-### 2. LLM Integration (`api_client.py`)
-Unified interface for multiple LLM providers with automatic .env loading.
+### 3. Transformation Engine (`book_transform/`)
+Applies gender transformations using character context.
+
+**Components:**
+- `transform.py` - Main orchestration
+- `unified_transform.py` - Complete pipeline
+- `quality_control.py` - Post-transform validation
+- `chunking/` - Token-aware text splitting
+
+### 4. LLM Integration (`api_client.py`)
+Unified interface for AI providers.
 
 **Supported Providers:**
-- OpenAI (GPT-4, GPT-4o, GPT-4o-mini)
-- Grok (grok-beta, grok-3-mini-fast)
-- MLX (local models on Apple Silicon - Mistral-7B)
+- **OpenAI**: GPT-4o, GPT-4o-mini
+- **Anthropic**: Claude Opus 4, Claude 3.5 Sonnet
+- **Grok**: Grok-4-latest (256k), Grok-3-latest (131k)
 
-**Key Classes:**
-- `_BaseLLMClient` - Abstract base for providers (internal)
-- `_OpenAIClient` - OpenAI implementation (internal)
-- `_GrokClient` - Grok implementation (internal)
-- `_MLXClient` - MLX local model implementation (internal)
-- `UnifiedLLMClient` - Auto-detecting wrapper (public API)
+## Data Structures
 
-**Features:**
-- Automatic .env file loading
-- Provider auto-detection
-- Unified API across providers
-- Graceful error handling
+### Input Text
+```
+CHAPTER I
+The Beginning
 
-### 3. Transformation Pipeline (`book_transform/`)
-
-#### Character Analysis (`book_transform/character_analyzer.py`)
-- Identifies characters and their genders
-- Tracks character mentions and relationships
-- Provides context for accurate transformations
-- Handles MLX JSON parsing limitations gracefully
-
-#### Gender Transformation (`book_transform/transform.py`)
-- Multi-provider implementation supporting OpenAI, Grok, and MLX
-- Handles three transformation types:
-  - comprehensive (default)
-  - names_only
-  - pronouns_only
-- Provider selection via parameter or environment
-- Paragraph-aware processing
-
-#### Smart Chunking (`book_transform/chunking/`)
-- Chapter-by-chapter transformation
-- Intelligent token-based chunking
-- Model-aware optimization
-- Progress tracking and error recovery
-- Optimized for large books with minimal API calls
-
-### 4. CLI Interface (`regender_book_cli.py`)
-
-Unified command-line interface for all book processing operations:
-
-```bash
-# Download books from Project Gutenberg
-regender_book_cli.py download --count 10
-
-# Process text files to JSON
-regender_book_cli.py process --input books/texts --output books/json
-
-# Transform books
-regender_book_cli.py transform books/json/book.json --type comprehensive --provider mlx
-
-# List available books
-regender_book_cli.py list
-
-# Validate JSON files
-regender_book_cli.py validate
+Alice was very tired...
 ```
 
-### 5. Utilities
-
-#### Book Transform Utils (`book_transform/utils.py`)
-- API error handling
-- Caching system
-- Safe API call decorators
-
-#### Chunking Utilities (`book_transform/chunking/`)
-- Token estimation algorithms
-- Smart sentence chunking
-- Model-specific optimization
-- Model configurations
-
-#### Gutenberg Downloader (`gutenberg/`)
-- Book downloading from Project Gutenberg
-- Metadata extraction
-- Automatic file naming
-
-## Data Flow
-
+### Parsed JSON
+```json
+{
+  "metadata": {
+    "title": "Alice in Wonderland",
+    "format_version": "2.0"
+  },
+  "chapters": [{
+    "number": "I",
+    "title": "The Beginning",
+    "paragraphs": [{
+      "sentences": [
+        "Alice was very tired..."
+      ]
+    }]
+  }]
+}
 ```
-1. Input Stage
-   ├── Raw text file (.txt)
-   └── Pre-processed JSON
 
-2. Parsing Stage (book_parser/)
-   ├── Pattern matching
-   ├── Section detection
-   └── JSON generation
+### Character Analysis
+```json
+{
+  "characters": {
+    "Alice": {
+      "name": "Alice",
+      "gender": "female",
+      "role": "protagonist"
+    }
+  }
+}
+```
 
-3. Analysis Stage
-   ├── Character identification
-   └── Gender detection
-
-4. Transformation Stage
-   ├── Provider selection (OpenAI/Grok)
-   ├── Chunk processing
-   └── Validation
-
-5. Output Stage
-   ├── Transformed JSON
-   ├── Recreated text
-   └── Validation report
+### Transformed Output
+```json
+{
+  "chapters": [{
+    "paragraphs": [{
+      "sentences": [
+        "Alan was very tired..."
+      ]
+    }]
+  }],
+  "transformation": {
+    "type": "all_male",
+    "changes": ["Alice → Alan"]
+  }
+}
 ```
 
 ## Directory Structure
 
 ```
 regender-xyz/
-├── book_parser/          # Modular parser (100% success rate)
-│   ├── patterns/        # Pattern definitions
-│   └── detectors/       # Detection logic
-├── gutenberg_utils/     # Gutenberg-specific tools
-│   ├── download_gutenberg_books.py
-│   ├── process_all_gutenberg.py
-│   └── common.py
-├── docs/               # Documentation
-│   ├── development/    # Development guides
-│   ├── maintenance/    # Maintenance docs
-│   └── reference/      # API references
-├── tests/              # Test suite
-├── books/              # All book files
-│   ├── texts/         # Downloaded text files
-│   ├── json/          # Processed JSON files
-│   └── output/        # Transformed books
-├── logs/               # Processing logs
-├── .cache/             # API response cache
-│
-# Core modules
-├── api_client.py       # Multi-provider LLM support (OpenAI/Grok/MLX)
-├── book_to_json.py     # Book parsing wrapper
-├── book_transform/     # Transformation system
-│   ├── transform.py   # Main transformation logic
-│   ├── character_analyzer.py
-│   ├── llm_transform.py
-│   ├── utils.py      # Transform utilities
-│   └── chunking/     # Smart chunking system
-│
-# CLI tool
-└── regender_book_cli.py  # Unified CLI interface
+├── api_client.py          # LLM provider interface
+├── regender_book_cli.py   # CLI entry point
+├── book_parser/           # Text parsing module
+├── book_characters/       # Character analysis
+├── book_transform/        # Transformation engine
+├── book_downloader/       # Gutenberg downloads
+├── config/
+│   └── models.json       # Model configurations
+├── books/
+│   ├── texts/           # Input text files
+│   ├── json/            # Parsed JSON files
+│   └── output/          # Transformed output
+└── docs/                # Documentation
 ```
 
-## Configuration
+## Key Design Decisions
 
-### Environment Variables
-```bash
-# LLM Provider Configuration
-OPENAI_API_KEY=sk-...
-GROK_API_KEY=xai-...
-MLX_MODEL_PATH=/path/to/mlx/model  # For local MLX models
-LLM_PROVIDER=openai  # or grok or mlx
-
-# Optional Settings
-REGENDER_DISABLE_CACHE=1
-REGENDER_DEBUG=1
-```
-
-### Provider Selection Logic
-1. Explicit parameter (`--provider`)
-2. Environment variable (`LLM_PROVIDER`)
-3. Auto-detection (first available)
+1. **Flagship Models Only** - Character analysis uses only top-tier models to minimize errors
+2. **Mandatory Character Analysis** - Ensures consistency across transformations
+3. **Unified Pipeline** - Single command handles entire workflow
+4. **Provider Abstraction** - Easy switching between AI providers
+5. **Smart Chunking** - Optimizes for each model's context window
 
 ## Performance Characteristics
 
-### Book Parser
-- **Success Rate**: 100% on Gutenberg collection
-- **Formats**: 100+ supported patterns
-- **Speed**: ~1-2 seconds per book
+- **Parsing**: ~1-2 seconds per book
+- **Character Analysis**: ~2-5 minutes (depends on book size)
+- **Transformation**: ~5-10 minutes per book
+- **Quality Control**: ~1-3 minutes per iteration
 
-### LLM Processing
-- **Chunk Size**: Model-adaptive (30-100 sentences)
-  - grok-3-mini-fast: 30 sentences/chunk
-  - gpt-4o-mini: 75 sentences/chunk
-  - grok-beta: 100 sentences/chunk
-- **Token Awareness**: Estimates actual token usage
-- **Caching**: 24-hour response cache
-- **Concurrency**: Chapter-level parallelism possible
+## Configuration
+
+Environment variables in `.env`:
+```bash
+# API Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GROK_API_KEY=xai-...
+
+# Settings
+DEFAULT_PROVIDER=anthropic
+DEFAULT_QUALITY_LEVEL=standard
+```
 
 ## Error Handling
 
-### Graceful Degradation
-- Provider fallback on API errors
-- Chapter-level recovery
-- Validation warnings vs errors
-
-### Logging
-- Structured logs in `logs/`
-- API response caching in `.cache/`
-- Progress tracking for long operations
-
-## Security Considerations
-
-- API keys via environment variables only
-- No credentials in code or logs
-- `.env` files excluded from git
-- Secure credential storage recommended
-
-## Future Enhancements
-
-### Planned Features
-- Additional LLM providers (Claude, Gemini)
-- Streaming API support
-- Real-time transformation preview
-- Web interface
-- Enhanced MLX model support
-
-### Extension Points
-- Custom pattern definitions
-- Provider plugins (add new LLM providers)
-- Model configurations (add new models)
-- Transformation rules engine
-- Output format plugins
-- Token counting improvements
+- **Graceful Degradation**: Continues processing other chapters if one fails
+- **Automatic Retries**: Failed API calls retry with backoff
+- **Rate Limit Management**: Automatic pausing for rate-limited APIs
+- **Validation**: Each stage validates its output
