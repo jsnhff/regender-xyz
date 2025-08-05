@@ -37,6 +37,57 @@ class UnifiedBookTransformer:
         self.provider = provider
         self.model = model
         self.client = UnifiedLLMClient(provider)
+    
+    def _recreate_text_from_data(self, book_data: Dict[str, Any]) -> str:
+        """Recreate text from book data dictionary (not from file)."""
+        import re
+        
+        text_parts = []
+        
+        # Add metadata header if available
+        metadata = book_data.get('metadata', {})
+        if metadata.get('title') and metadata.get('title') != 'Unknown':
+            text_parts.append(f"Title: {metadata.get('title')}")
+        if metadata.get('author') and metadata.get('author') != 'Unknown':
+            text_parts.append(f"Author: {metadata.get('author')}")
+        if text_parts:
+            text_parts.append('')  # Empty line after metadata
+        
+        # Process chapters
+        for chapter in book_data.get('chapters', []):
+            # Add chapter header
+            chapter_header = []
+            if chapter.get('number'):
+                chapter_header.append(f"Chapter {chapter['number']}")
+            if chapter.get('title'):
+                if chapter_header:
+                    chapter_header.append(f": {chapter['title']}")
+                else:
+                    chapter_header.append(chapter['title'])
+            
+            if chapter_header:
+                text_parts.append(''.join(chapter_header))
+                text_parts.append('')  # Empty line after chapter header
+            
+            # Process paragraphs
+            for paragraph in chapter.get('paragraphs', []):
+                # Join sentences in paragraph
+                para_text = ' '.join(paragraph.get('sentences', []))
+                if para_text:  # Only add non-empty paragraphs
+                    text_parts.append(para_text)
+                    text_parts.append('')  # Empty line between paragraphs
+            
+            # Extra line between chapters
+            text_parts.append('')
+        
+        # Join all parts
+        recreated_text = '\n'.join(text_parts)
+        
+        # Clean up excessive empty lines
+        recreated_text = re.sub(r'\n{3,}', '\n\n', recreated_text)
+        recreated_text = recreated_text.strip()
+        
+        return recreated_text
         
     def transform_book_with_qc(self, 
                               book_data: Dict[str, Any],
@@ -198,8 +249,7 @@ class UnifiedBookTransformer:
             qc_changes_total = 0
             
             # Convert to text for QC
-            from book_parser import recreate_text_from_json
-            transformed_text = recreate_text_from_json(transformed_book)
+            transformed_text = self._recreate_text_from_data(transformed_book)
             
             # Run quality control (1 iteration by default for speed)
             cleaned_text, qc_changes = quality_control_loop(
