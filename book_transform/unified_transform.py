@@ -99,6 +99,31 @@ class UnifiedBookTransformer:
             
             if verbose:
                 print(f"  ✓ Found {len(characters)} characters")
+            
+            # Save character analysis immediately
+            try:
+                import os
+                from book_characters.exporter import save_character_analysis
+                
+                # Save characters to a file immediately
+                if output_path:
+                    char_dir = os.path.dirname(output_path)
+                    char_filename = os.path.basename(output_path).replace('.json', '_characters.json')
+                    char_path = os.path.join(char_dir, char_filename)
+                    
+                    metadata = {
+                        "book_title": book_data.get('metadata', {}).get('title', 'Unknown'),
+                        "total_characters": len(characters),
+                        "provider": self.provider,
+                        "model": self.model
+                    }
+                    
+                    save_character_analysis(characters, char_path, metadata)
+                    if verbose:
+                        print(f"  💾 Character analysis saved to: {char_path}")
+            except Exception as save_error:
+                if verbose:
+                    print(f"  ⚠️  Warning: Could not save character analysis: {save_error}")
                 
         except Exception as e:
             report['stages']['character_analysis'] = {
