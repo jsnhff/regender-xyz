@@ -78,8 +78,9 @@ class GutenbergParser:
             actual_end = self._find_actual_end(lines)
             content_lines = lines[actual_start:actual_end]
         
-        # Clean content
+        # Clean content and skip TOC
         content_lines = self._clean_lines(content_lines)
+        content_lines = self._skip_toc(content_lines)
         content = '\n'.join(content_lines)
         
         # If no title found, try to extract from content
@@ -332,6 +333,99 @@ class GutenbergParser:
                 return line_stripped.rstrip('.,;:')
         
         return None
+    
+    def _skip_toc(self, lines: List[str]) -> List[str]:
+        """
+        Skip table of contents and illustrations list.
+        
+        Detects and skips:
+        - Table of Contents section
+        - Illustrations list
+        - Other front matter lists
+        
+        Returns lines starting from actual content.
+        """
+        toc_start = None
+        toc_end = None
+        illustrations_start = None
+        illustrations_end = None
+        
+        # Find TOC and illustrations sections
+        for i, line in enumerate(lines[:1000]):  # Only check first 1000 lines
+            line_upper = line.strip().upper()
+            
+            # Detect TOC start
+            if line_upper in ['CONTENTS', 'CONTENTS.', 'TABLE OF CONTENTS', 'CONTENTS:']:
+                toc_start = i
+                # Find where TOC ends (usually at next major section or chapter)
+                for j in range(i + 1, min(i + 500, len(lines))):
+                    check_line = lines[j].strip().upper()
+                    # TOC ends when we hit illustrations, chapter, or long text
+                    if (check_line.startswith('ILLUSTRATION') or 
+                        check_line.startswith('CHAPTER ') or
+                        check_line.startswith('PART ') or
+                        check_line.startswith('BOOK ') or
+                        check_line.startswith('ACT ') or
+                        len(lines[j].strip()) > 100):  # Long line = probably content
+                        toc_end = j
+                        break
+                if not toc_end:
+                    toc_end = min(i + 200, len(lines))  # Default max TOC length
+            
+            # Detect illustrations list
+            elif line_upper in ['ILLUSTRATIONS', 'ILLUSTRATIONS.', 'LIST OF ILLUSTRATIONS']:
+                illustrations_start = i
+                # Find where illustrations list ends
+                for j in range(i + 1, min(i + 300, len(lines))):
+                    check_line = lines[j].strip().upper()
+                    # List ends at chapter or substantial text
+                    if (check_line.startswith('CHAPTER ') or
+                        check_line.startswith('PART ') or
+                        check_line.startswith('BOOK ') or
+                        check_line.startswith('ACT ') or
+                        # Check for actual content (paragraph-like text)
+                        (len(lines[j]) > 100 and not lines[j].strip().startswith(' '))):
+                        illustrations_end = j
+                        break
+                if not illustrations_end:
+                    illustrations_end = min(i + 200, len(lines))
+        
+        # Determine where to start
+        skip_until = 0
+        
+        if toc_start is not None and toc_end is not None:
+            skip_until = max(skip_until, toc_end)
+        
+        if illustrations_start is not None and illustrations_end is not None:
+            skip_until = max(skip_until, illustrations_end)
+        
+        # If we're skipping content, find the first real chapter after
+        if skip_until > 0:
+            for i in range(skip_until, min(skip_until + 100, len(lines))):
+                line_stripped = lines[i].strip()
+                # Look for chapter start
+                if (line_stripped.upper().startswith('CHAPTER ') or
+                    line_stripped.upper().startswith('PART ') or
+                    line_stripped.upper().startswith('BOOK ') or
+                    line_stripped.upper().startswith('ACT ') or
+                    line_stripped.upper().startswith('PROLOGUE')):
+                    # Keep title and author info if it's before the skip
+                    result = []
+                    # Preserve title/author at beginning if present
+                    for j in range(min(20, skip_until)):
+                        if lines[j].strip() and not any(
+                            lines[j].strip().upper().startswith(x) 
+                            for x in ['CONTENTS', 'ILLUSTRATION', 'CHAPTER']
+                        ):
+                            result.append(lines[j])
+                        if len(result) >= 5:  # Max 5 lines of title/author
+                            break
+                    # Add the actual content
+                    result.extend(lines[i:])
+                    return result
+        
+        # No TOC found or already at content
+        return lines
     
     def _clean_lines(self, lines: List[str]) -> List[str]:
         """

@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "title": "Moby Multiple Language Lists of Common Words",
+    "author": "Grady Ward",
+    "format": "standard",
+    "format_confidence": 50,
+    "original_metadata": {
+      "title": "Moby Multiple Language Lists of Common Words",
+      "author": "Grady Ward",
+      "language": "English",
+      "release_date": null,
+      "ebook_number": null
+    },
+    "raw_text_length": 22166,
+    "cleaned_text_length": 2793
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Chapter 1",
+      "paragraphs": [
+        {
+          "sentences": [
+            "Produced by Mike Pullen"
+          ]
+        },
+        {
+          "sentences": [
+            "**** PLEASE SEE AT THE BOTTOM OF THIS PAGE INSTRUCTIONS FOR DOWNLOADING THIS FILE****"
+          ]
+        },
+        {
+          "sentences": [
+            "MOBY (tm) LANGUAGE II DOCUMENTATION NOTES"
+          ]
+        },
+        {
+          "sentences": [
+            "This documentation, the software and/or database are:"
+          ]
+        },
+        {
+          "sentences": [
+            "Public Domain material by grant from the author, January, 2001."
+          ]
+        },
+        {
+          "sentences": [
+            "HISTORICAL NOTE:"
+          ]
+        },
+        {
+          "sentences": [
+            "The Ward word lists were some of the largest public domain word lists in the world, at the time they were added to the Project Gutenberg collection in 2007.",
+            "These word lists do not contain 8-bit accented characters or Unicode, as would be found in a more recent Project Gutenberg eBook.",
+            "Instead, the lists include phonetic spelling, utilizing backslashes and other characters to indicate where accents would normally occur.",
+            "There is no detailed guide on how these extra characters were used, and therefore it is likely infeasible to map from the word lists back to a correct representation of the word (i.e., to map from a word list entry with slashes or other characters, back to the actual non-English word with accents or other non-ASCII characters)."
+          ]
+        },
+        {
+          "sentences": [
+            "These lists may still be useful, but they are no longer the state-of-the-art in word lists.",
+            "In the time since the lists were created, it has become much easier for anyone with interests to make their own lists of unique words from the Project Gutenberg collection or other sources."
+          ]
+        },
+        {
+          "sentences": [
+            "Moby (tm) Language II for MSDOS operating systems is compressed and distributed as a single zip file.",
+            "After decompression the language files included with this product is in ordinary ASCII format with CRLF (ASCII 13/10) delimiters."
+          ]
+        },
+        {
+          "sentences": [
+            "MOBY Language II CONTENTS"
+          ]
+        },
+        {
+          "sentences": [
+            "Read Me First File (aaREADME.txt) French Language list (french.txt) German Language list (german.txt) Italian Language list (italian.txt) Japanese Language list (japanese.txt) Spanish Language list (spanish.txt)"
+          ]
+        },
+        {
+          "sentences": [
+            "Quick Start"
+          ]
+        },
+        {
+          "sentences": [
+            "1) Insure you have at least 3Mb of free disk space to hold the contents of this zip file."
+          ]
+        },
+        {
+          "sentences": [
+            "2) Create a destination directory to hold the files listed above."
+          ]
+        },
+        {
+          "sentences": [
+            "3) On the PG Catalog page click on the selection \"More Files\".",
+            "You will see a \"files.zip\" folder in the list.",
+            "Move this zipped folder to your computer.",
+            "On your computer open \"files.zip\", double click on its \"files\" subdirectory and copy the contents into the destination directory on your computer."
+          ]
+        },
+        {
+          "sentences": [
+            "Word lists in five of the world's great languages:"
+          ]
+        },
+        {
+          "sentences": [
+            "FRENCH number of words 138257 size in bytes 1524757 GERMAN number of words 159809 size in bytes 2055986 ITALIAN number of words 60453 size in bytes 561981 JAPANESE number of words 115523 size in bytes 934783 SPANISH number of words 86059 size in bytes 850523"
+          ]
+        },
+        {
+          "sentences": [
+            "Total number of words 560101 size in bytes 5928030"
+          ]
+        },
+        {
+          "sentences": [
+            "Once decompressed, the vocabulary files may be viewed and used just as any TEXT-type file might."
+          ]
+        }
+      ],
+      "metadata": {}
+    }
+  ],
+  "source_file": "books/texts/pg3206-Mo.txt"
+}

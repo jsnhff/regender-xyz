@@ -15,21 +15,18 @@ import json
 class Paragraph:
     """Represents a paragraph in a book."""
     sentences: List[str]
-    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
-            "sentences": self.sentences,
-            "metadata": self.metadata
+            "sentences": self.sentences
         }
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Paragraph':
         """Create from dictionary representation."""
         return cls(
-            sentences=data.get("sentences", []),
-            metadata=data.get("metadata", {})
+            sentences=data.get("sentences", [])
         )
     
     def get_text(self) -> str:

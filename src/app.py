@@ -15,6 +15,7 @@ from src.container import ServiceContainer
 from src.plugins.base import PluginManager
 from src.models.book import Book
 from src.models.transformation import TransformType
+from src.parsers.book_converter import BookConverter
 
 
 class Application:
@@ -289,6 +290,196 @@ class Application:
                 f.write(transformed_book.get_text())
         
         self.logger.info(f"Saved output to {output_path}")
+    
+    async def parse_book(self,
+                        file_path: str,
+                        output_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Parse a book to canonical JSON format without transformation.
+        
+        Args:
+            file_path: Path to input file
+            output_path: Optional output path
+            
+        Returns:
+            Parsing results
+        """
+        self.logger.info(f"Parsing book: {file_path}")
+        
+        try:
+            # Parse the book using the integrated parser
+            from src.parsers.parser import IntegratedParser
+            parser = IntegratedParser()
+            
+            # Read the file
+            input_path = Path(file_path)
+            with open(input_path, 'r', encoding='utf-8', errors='ignore') as f:
+                text = f.read()
+            
+            # Parse to ParsedBook format
+            parsed_book = parser.parse(text)
+            
+            # Convert to canonical Book format with sentences
+            converter = BookConverter()
+            book = converter.convert(parsed_book)
+            book.source_file = str(input_path)
+            
+            self.logger.info(f"Parsed book: {book.title}")
+            
+            # Calculate statistics
+            total_paragraphs = sum(len(ch.paragraphs) for ch in book.chapters)
+            total_sentences = sum(
+                len(p.sentences) 
+                for ch in book.chapters 
+                for p in ch.paragraphs
+            )
+            
+            # Save output if requested
+            if output_path:
+                output_path = Path(output_path)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Save as JSON
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    json.dump(book.to_dict(), f, indent=2, ensure_ascii=False)
+                
+                self.logger.info(f"Saved canonical JSON to {output_path}")
+            
+            return {
+                'success': True,
+                'book_title': book.title,
+                'author': book.author,
+                'chapters': len(book.chapters),
+                'paragraphs': total_paragraphs,
+                'sentences': total_sentences,
+                'output_path': str(output_path) if output_path else None
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse book: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def parse_book_sync(self,
+                       file_path: str,
+                       output_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Synchronous wrapper for book parsing.
+        
+        Args:
+            file_path: Path to input file
+            output_path: Optional output path
+            
+        Returns:
+            Parsing results
+        """
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(
+                self.parse_book(file_path, output_path)
+            )
+        finally:
+            loop.close()
+    
+    async def analyze_characters(self,
+                                file_path: str,
+                                output_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Analyze characters in a book and save to separate character file.
+        
+        Args:
+            file_path: Path to input file (text or JSON)
+            output_path: Optional output path for character analysis JSON
+            
+        Returns:
+            Character analysis results
+        """
+        self.logger.info(f"Analyzing characters in: {file_path}")
+        
+        try:
+            input_path = Path(file_path)
+            
+            # Load the book (from JSON if available, otherwise parse)
+            if input_path.suffix == '.json':
+                # Load from JSON
+                with open(input_path, 'r', encoding='utf-8') as f:
+                    book_data = json.load(f)
+                from src.models.book import Book
+                book = Book.from_dict(book_data)
+                self.logger.info(f"Loaded book from JSON: {book.title}")
+            else:
+                # Parse from text
+                parser = self.get_service('parser')
+                book = await parser.process_async(file_path)
+                self.logger.info(f"Parsed book: {book.title}")
+            
+            # Analyze characters
+            character_service = self.get_service('character')
+            characters = await character_service.process_async(book)
+            self.logger.info(f"Found {len(characters.characters)} characters")
+            
+            # Save output if requested
+            if output_path:
+                output_path = Path(output_path)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Save just the character analysis
+                character_data = characters.to_dict()
+                character_data['book_metadata'] = {
+                    'title': book.title,
+                    'author': book.author,
+                    'source_file': str(input_path)
+                }
+                
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    json.dump(character_data, f, indent=2, ensure_ascii=False)
+                
+                self.logger.info(f"Saved character analysis to {output_path}")
+            
+            # Get character statistics
+            stats = characters.get_statistics()
+            
+            return {
+                'success': True,
+                'book_title': book.title,
+                'total_characters': stats['total'],
+                'by_gender': stats['by_gender'],
+                'by_importance': stats['by_importance'],
+                'main_characters': stats['main_characters'],
+                'output_path': str(output_path) if output_path else None
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Failed to analyze characters: {e}")
+            return {
+                'success': False,
+                'error': str(e)
+            }
+    
+    def analyze_characters_sync(self,
+                               file_path: str,
+                               output_path: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Synchronous wrapper for character analysis.
+        
+        Args:
+            file_path: Path to input file
+            output_path: Optional output path
+            
+        Returns:
+            Character analysis results
+        """
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(
+                self.analyze_characters(file_path, output_path)
+            )
+        finally:
+            loop.close()
     
     def process_book_sync(self,
                          file_path: str,

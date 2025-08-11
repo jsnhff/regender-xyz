@@ -77,18 +77,40 @@ class UnifiedProvider(LLMProvider, Plugin):
             from .legacy_client import UnifiedLLMClient
             
             # Get provider from config or environment
+            # Handle ${VAR} syntax if present in config
+            provider_from_config = config.get('provider')
+            if provider_from_config and provider_from_config.startswith('${'):
+                # Extract env var name
+                env_var = provider_from_config[2:-1]  # Remove ${ and }
+                provider_from_config = os.getenv(env_var)
+            
             self.provider_name = (
-                config.get('provider') or 
+                provider_from_config or 
                 os.getenv('DEFAULT_PROVIDER') or
                 'openai'
             )
             
-            self.model = config.get('model')
+            # Get model from config or environment
+            model_from_config = config.get('model')
+            if model_from_config and model_from_config.startswith('${'):
+                # Extract env var name
+                env_var = model_from_config[2:-1]  # Remove ${ and }
+                model_from_config = os.getenv(env_var)
+            
+            # Fall back to provider-specific model env var
+            if not model_from_config:
+                if self.provider_name == 'grok':
+                    model_from_config = os.getenv('GROK_MODEL', 'grok-4-latest')
+                elif self.provider_name == 'openai':
+                    model_from_config = os.getenv('OPENAI_MODEL', 'gpt-4o')
+                elif self.provider_name == 'anthropic':
+                    model_from_config = os.getenv('ANTHROPIC_MODEL', 'claude-opus-4-20250514')
+            
+            self.model = model_from_config
             
             # Create client
             self.client = UnifiedLLMClient(
-                provider=self.provider_name,
-                model=self.model
+                provider=self.provider_name
             )
             
             self.logger.info(
@@ -140,7 +162,6 @@ class UnifiedProvider(LLMProvider, Plugin):
                 messages=messages,
                 model=kwargs.get('model', self.model),
                 temperature=kwargs.get('temperature', 0.7),
-                max_tokens=kwargs.get('max_tokens'),
                 response_format=kwargs.get('response_format')
             )
             

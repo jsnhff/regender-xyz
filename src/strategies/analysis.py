@@ -71,7 +71,9 @@ class SmartChunkingStrategy(AnalysisStrategy):
     
     async def chunk_book_async(self, book: Book) -> List[str]:
         """Chunk book intelligently."""
-        from book_transform.chunking.token_utils import estimate_tokens
+        # Simple token estimation (roughly 4 characters per token)
+        def estimate_tokens(text: str) -> int:
+            return len(text) // 4
         
         chunks = []
         current_chunk = []

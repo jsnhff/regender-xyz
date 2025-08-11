@@ -53,13 +53,21 @@ class CharacterMerger:
                     continue
                 
                 if name not in character_map:
+                    # Ensure aliases and titles are lists
+                    aliases = char_data.get('aliases', [])
+                    if isinstance(aliases, str):
+                        aliases = [aliases] if aliases else []
+                    titles = char_data.get('titles', [])
+                    if isinstance(titles, str):
+                        titles = [titles] if titles else []
+                    
                     # Create new character
                     character_map[name] = Character(
                         name=name,
                         gender=Gender(char_data.get('gender', 'unknown')),
                         pronouns=char_data.get('pronouns', {}),
-                        titles=char_data.get('titles', []),
-                        aliases=char_data.get('aliases', []),
+                        titles=titles,
+                        aliases=aliases,
                         description=char_data.get('description'),
                         importance=char_data.get('importance', 'supporting'),
                         confidence=char_data.get('confidence', 1.0)
@@ -74,9 +82,12 @@ class CharacterMerger:
                        importance_rank.get(existing.importance, 0):
                         existing.importance = char_data.get('importance')
                     
-                    # Merge aliases
-                    for alias in char_data.get('aliases', []):
-                        if alias not in existing.aliases:
+                    # Merge aliases - handle both string and list
+                    aliases = char_data.get('aliases', [])
+                    if isinstance(aliases, str):
+                        aliases = [aliases] if aliases else []
+                    for alias in aliases:
+                        if alias and alias not in existing.aliases:
                             existing.aliases.append(alias)
                     
                     # Average confidence
@@ -233,8 +244,9 @@ class CharacterService(BaseService):
             for idx, chunk in enumerate(chunks)
         ]
         
-        # Limit concurrency
-        semaphore = asyncio.Semaphore(self.config.max_concurrent)
+        # Limit concurrency - Grok has strict rate limits
+        max_concurrent = 1 if self.provider and 'grok' in self.provider.name.lower() else self.config.max_concurrent
+        semaphore = asyncio.Semaphore(max_concurrent)
         
         async def limited_task(task):
             async with semaphore:
