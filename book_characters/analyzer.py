@@ -1,6 +1,8 @@
 """Character analysis module using only LLM (no regex scanning)."""
 
 import json
+import hashlib
+from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 from datetime import datetime
 from api_client import UnifiedLLMClient
@@ -127,6 +129,42 @@ def extract_json_from_response(content: str) -> Dict[str, Any]:
     return {'characters': {}}
 
 
+def _get_book_cache_key(book_data: Dict[str, Any]) -> str:
+    """Generate a cache key from book data."""
+    # Create a stable hash of the book content
+    book_str = json.dumps(book_data, sort_keys=True)
+    return hashlib.md5(book_str.encode()).hexdigest()
+
+
+def _load_cached_character_analysis(cache_key: str) -> Optional[Tuple[Dict[str, Any], str]]:
+    """Load cached character analysis if available."""
+    cache_dir = Path(".cache/characters")
+    cache_file = cache_dir / f"{cache_key}.json"
+    
+    if cache_file.exists():
+        try:
+            with open(cache_file, 'r') as f:
+                data = json.load(f)
+                return data.get('characters', {}), data.get('context', '')
+        except Exception:
+            pass
+    return None
+
+
+def _save_character_analysis_cache(cache_key: str, characters: Dict[str, Any], context: str):
+    """Save character analysis to cache."""
+    cache_dir = Path(".cache/characters")
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    
+    cache_file = cache_dir / f"{cache_key}.json"
+    with open(cache_file, 'w') as f:
+        json.dump({
+            'characters': characters,
+            'context': context,
+            'timestamp': datetime.now().isoformat()
+        }, f, indent=2)
+
+
 def get_full_text_from_json(book_data: Dict[str, Any]) -> str:
     """Extract full text from JSON book for character analysis."""
     full_text = []
@@ -162,6 +200,16 @@ def analyze_book_characters(book_data: Dict[str, Any],
     Returns:
         Tuple of (character_dict, character_context_string)
     """
+    # Check cache first
+    cache_key = _get_book_cache_key(book_data)
+    cached_result = _load_cached_character_analysis(cache_key)
+    
+    if cached_result:
+        if verbose:
+            timestamp = datetime.now().strftime("%H:%M:%S")
+            print(f"[{timestamp}] Using cached character analysis")
+        return cached_result
+    
     if verbose:
         timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] Analyzing characters using LLM...")
@@ -221,6 +269,8 @@ def analyze_book_characters(book_data: Dict[str, Any],
                 verbose=verbose
             )
             
+            # Save to cache before returning
+            _save_character_analysis_cache(cache_key, characters, character_context)
             return characters, character_context
         else:
             # Other providers - analyze directly
@@ -243,6 +293,8 @@ def analyze_book_characters(book_data: Dict[str, Any],
                 if len(characters) > 5:
                     print(f"  ... and {len(characters) - 5} more")
         
+        # Save to cache before returning
+        _save_character_analysis_cache(cache_key, characters, character_context)
         return characters, character_context
         
     except Exception as e:

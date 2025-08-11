@@ -1,6 +1,7 @@
 """Token counting and chunking utilities for optimal API usage."""
 
 import re
+from functools import lru_cache
 from typing import List, Tuple, Optional, Dict, Any
 from .model_configs import get_model_config
 
@@ -19,6 +20,7 @@ TOKEN_PATTERNS = {
 }
 
 
+@lru_cache(maxsize=1024)
 def estimate_tokens(text: str) -> int:
     """
     Estimate token count for text.
@@ -29,6 +31,9 @@ def estimate_tokens(text: str) -> int:
     - Whitespace doesn't count as tokens
     
     For exact counts, you'd need the actual tokenizer for each model.
+    
+    Note: This function is cached for performance. The same text will
+    return the cached result on subsequent calls.
     """
     if not text:
         return 0

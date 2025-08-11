@@ -3,6 +3,7 @@
 import json
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
@@ -10,6 +11,9 @@ from enum import Enum
 
 # Import existing classes
 from .model_capabilities import ModelTier, PromptComplexity
+
+# Global cache for config data
+_CONFIG_CACHE: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -69,12 +73,25 @@ class ModelConfigLoader:
         self._load_config()
     
     def _load_config(self) -> None:
-        """Load configuration from JSON file."""
-        if not self.config_path.exists():
-            raise FileNotFoundError(f"Model config file not found: {self.config_path}")
+        """Load configuration from JSON file with caching."""
+        global _CONFIG_CACHE
         
-        with open(self.config_path, 'r') as f:
-            self._config_data = json.load(f)
+        # Use cached data if available and file hasn't changed
+        cache_key = str(self.config_path)
+        if _CONFIG_CACHE is not None and cache_key in _CONFIG_CACHE:
+            self._config_data = _CONFIG_CACHE[cache_key]
+        else:
+            # Load from file
+            if not self.config_path.exists():
+                raise FileNotFoundError(f"Model config file not found: {self.config_path}")
+            
+            with open(self.config_path, 'r') as f:
+                self._config_data = json.load(f)
+            
+            # Cache the loaded data
+            if _CONFIG_CACHE is None:
+                _CONFIG_CACHE = {}
+            _CONFIG_CACHE[cache_key] = self._config_data
         
         # Parse verified models
         for model_id, model_data in self._config_data.get("models", {}).items():
@@ -214,10 +231,11 @@ def get_config_loader() -> ModelConfigLoader:
     return _config_loader
 
 
+@lru_cache(maxsize=32)
 def get_verified_model_config(model_name: Optional[str] = None,
                             provider: Optional[str] = None,
                             model_path: Optional[str] = None) -> Optional[VerifiedModelConfig]:
-    """Get verified model configuration."""
+    """Get verified model configuration with caching."""
     loader = get_config_loader()
     return loader.get_model_config(model_name, provider, model_path)
 

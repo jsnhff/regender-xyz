@@ -242,6 +242,10 @@ def transform_chapter(chapter: Dict[str, Any],
         
         if verbose:
             print(f" - {len(changes)} changes")
+        
+        # Clear intermediate variables to save memory
+        del transformed_chunk
+        del changes
     
     # Create transformed chapter
     transformed_chapter = chapter.copy()

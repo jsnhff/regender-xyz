@@ -268,8 +268,9 @@ class UnifiedBookTransformer:
             # If QC made changes, update the book data
             if qc_changes:
                 # This is simplified - in reality we'd need to map changes back to JSON structure
-                # For now, store the QC'd text separately
-                transformed_book['qc_text'] = cleaned_text
+                # Note: We don't store the cleaned text to save memory
+                # It can be regenerated from the JSON if needed
+                pass
             
             report['stages']['quality_control'] = {
                 'success': True,

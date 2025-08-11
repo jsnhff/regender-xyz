@@ -1,7 +1,7 @@
 """Utility to recreate formatted text from paragraph-aware JSON books."""
 
 import json
-from typing import Dict, Any
+from typing import Dict, Any, Generator
 from pathlib import Path
 
 
@@ -73,6 +73,63 @@ def recreate_text_from_json(json_path: str, output_path: str = None) -> str:
         print(f"Recreated text saved to: {output_path}")
     
     return recreated_text
+
+
+def recreate_text_generator(book_data: Dict[str, Any]) -> Generator[str, None, None]:
+    """Generate text lines from book data without building full string in memory.
+    
+    Args:
+        book_data: Book dictionary data
+        
+    Yields:
+        Text lines one at a time
+    """
+    # Add metadata header if available
+    metadata = book_data.get('metadata', {})
+    if metadata.get('title') != 'Unknown':
+        yield f"Title: {metadata.get('title', 'Unknown')}\n"
+    if metadata.get('author') != 'Unknown':
+        yield f"Author: {metadata.get('author', 'Unknown')}\n"
+    if metadata:
+        yield "\n"  # Empty line after metadata
+    
+    # Process chapters
+    for chapter in book_data.get('chapters', []):
+        # Add chapter header
+        chapter_header = []
+        if chapter.get('number'):
+            chapter_header.append(f"Chapter {chapter['number']}")
+        if chapter.get('title'):
+            if chapter_header:
+                chapter_header.append(f": {chapter['title']}")
+            else:
+                chapter_header.append(chapter['title'])
+        
+        if chapter_header:
+            yield ''.join(chapter_header) + "\n\n"
+        
+        # Process paragraphs
+        for paragraph in chapter['paragraphs']:
+            # Join sentences in paragraph
+            para_text = ' '.join(paragraph.get('sentences', []))
+            if para_text:  # Only add non-empty paragraphs
+                yield para_text + "\n\n"
+        
+        # Extra line between chapters
+        yield "\n"
+
+
+def save_text_from_generator(book_data: Dict[str, Any], output_path: str) -> None:
+    """Save text using generator to minimize memory usage.
+    
+    Args:
+        book_data: Book dictionary data
+        output_path: Path to save the text file
+    """
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for line in recreate_text_generator(book_data):
+            f.write(line)
+    print(f"Text saved to: {output_path}")
 
 
 if __name__ == "__main__":
