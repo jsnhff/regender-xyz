@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from .gutenberg import GutenbergParser
 from .detector import FormatDetector, BookFormat
 from .hierarchy import HierarchyBuilder, Section, SectionType
+from .play import PlayParser, play_to_chapters
 
 
 @dataclass
@@ -66,12 +67,23 @@ class IntegratedParser:
         else:
             format_value = detection.format.value
         
-        # Step 3: Build hierarchy
+        # Step 3: Build hierarchy or parse as play
         lines = cleaned_text.split('\n')
-        hierarchy = self.builder.build_hierarchy(lines, format_value, skip_toc=True)
         
-        # Step 4: Convert to chapters format
-        chapters = self._hierarchy_to_chapters(hierarchy)
+        # Use specialized play parser for plays (including mixed format with play elements)
+        if detection.format == BookFormat.PLAY or \
+           (detection.format == BookFormat.MIXED and 'play' in detection.evidence and len(detection.evidence.get('play', [])) > 5):
+            play_parser = PlayParser()
+            play = play_parser.parse(lines)
+            chapters = play_to_chapters(play)
+            hierarchy = None  # Play doesn't use hierarchy
+        else:
+            hierarchy = self.builder.build_hierarchy(lines, format_value, skip_toc=True)
+            chapters = None  # Will be converted from hierarchy
+        
+        # Step 4: Convert to chapters format if not already done
+        if chapters is None:
+            chapters = self._hierarchy_to_chapters(hierarchy)
         
         # Step 5: Extract title and author from metadata
         title = metadata.title if metadata and metadata.title else 'Unknown Title'
