@@ -1,0 +1,62 @@
+{
+  "providers": [
+    {
+      "type": "unified",
+      "module": "src.providers.unified_provider",
+      "config": {
+        "provider": "${DEFAULT_PROVIDER}",
+        "model": "${DEFAULT_MODEL}"
+      }
+    }
+  ],
+  "services": {
+    "parser": {
+      "class": "src.services.parser_service.ParserService",
+      "config": {
+        "cache_enabled": true,
+        "async_enabled": true,
+        "max_retries": 3
+      }
+    },
+    "character": {
+      "class": "src.services.character_service.CharacterService",
+      "config": {
+        "cache_enabled": true,
+        "async_enabled": true,
+        "max_concurrent": 5,
+        "max_retries": 3
+      },
+      "dependencies": {
+        "provider": "llm_provider"
+      }
+    },
+    "transform": {
+      "class": "src.services.transform_service.TransformService",
+      "config": {
+        "cache_enabled": true,
+        "async_enabled": true,
+        "max_concurrent": 5,
+        "max_retries": 3
+      },
+      "dependencies": {
+        "provider": "llm_provider",
+        "character_service": "character"
+      }
+    },
+    "quality": {
+      "class": "src.services.quality_service.QualityService",
+      "config": {
+        "target_quality": 90.0,
+        "max_qc_iterations": 3,
+        "async_enabled": true
+      },
+      "dependencies": {
+        "provider": "llm_provider"
+      }
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  }
+}
