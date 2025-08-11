@@ -13,6 +13,7 @@ import asyncio
 from src.services.base import BaseService, ServiceConfig
 from src.models.book import Book, Chapter, Paragraph
 from src.strategies.parsing import ParsingStrategy, StandardParsingStrategy
+from src.strategies.integrated_parsing import IntegratedParsingStrategy
 
 
 class ParserService(BaseService):
@@ -49,7 +50,8 @@ class ParserService(BaseService):
     
     def _get_default_strategy(self) -> ParsingStrategy:
         """Get the default parsing strategy."""
-        return StandardParsingStrategy()
+        # Use the new integrated parser by default
+        return IntegratedParsingStrategy()
     
     async def process_async(self, input_path: Union[str, Path]) -> Book:
         """
@@ -219,9 +221,13 @@ class ParserService(BaseService):
         # Extract metadata
         metadata = data.get('metadata', {})
         
+        # Check for title/author at top level (new parser) or in metadata (old parser)
+        title = data.get('title') or metadata.get('title')
+        author = data.get('author') or metadata.get('author')
+        
         return Book(
-            title=metadata.get('title'),
-            author=metadata.get('author'),
+            title=title,
+            author=author,
             chapters=chapters,
             metadata={
                 k: v for k, v in metadata.items() 

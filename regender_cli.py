@@ -31,7 +31,7 @@ def setup_logging(verbose: bool = False):
 def process_book(args):
     """Process book using the service-oriented architecture."""
     # Initialize application
-    config_path = args.config or "config/app.json"
+    config_path = args.config or "src/config.json"
     app = Application(config_path)
     
     # Determine input and output paths
@@ -96,7 +96,7 @@ def main():
     # Configuration options
     parser.add_argument(
         '--config',
-        help='Path to configuration file (default: config/app.json)'
+        help='Path to configuration file (default: src/config.json)'
     )
     
     parser.add_argument(

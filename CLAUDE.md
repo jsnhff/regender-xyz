@@ -26,7 +26,7 @@ pip install -r requirements.txt
 python regender_cli.py books/texts/pg1342.txt all_female -o output.json
 
 # Download books from Project Gutenberg (still using downloader)
-python -m book_downloader.download 1342  # Pride and Prejudice
+python -m download.download 1342  # Pride and Prejudice
 
 # Use specific provider
 export DEFAULT_PROVIDER='openai'
@@ -88,13 +88,13 @@ python tests/test_end_to_end.py
 3. **Transformation**: Gender representations are transformed based on type
 4. **Validation**: Results are validated for quality and consistency
 
-### Model Configuration
+### Configuration
 
-The `config/models.json` file defines:
-- Supported models and their context windows
-- Provider-specific settings and rate limits
-- Chunking strategies per model
-- Model tiers and capabilities
+The `src/config.json` file defines:
+- Service configurations and dependencies
+- Provider settings
+- Logging configuration
+- Cache and async settings
 
 ### Key Design Patterns
 

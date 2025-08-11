@@ -44,20 +44,19 @@ regender-xyz/
 │   ├── providers/             # LLM providers (including legacy_client.py)
 │   ├── plugins/               # Plugin system
 │   ├── container.py           # Dependency injection
-│   └── app.py                 # Application bootstrap
+│   ├── app.py                 # Application bootstrap
+│   └── config.json            # Application configuration
 │
-├── books/                     # ✅ Book storage (unchanged)
+├── books/                     # ✅ Book storage
 │   ├── texts/                # Raw text files
 │   ├── json/                  # Parsed JSON
 │   └── output/                # Transformed books
 │
-├── book_downloader/           # ✅ Download functionality (unchanged)
+├── download/                  # ✅ Project Gutenberg downloader
+│   ├── __init__.py
+│   └── download.py
 │
-├── config/                    # ✅ Configuration
-│   ├── app.json              # Application config
-│   └── models.json           # Model definitions
-│
-├── docs/                      # ✅ Documentation (updated)
+├── docs/                      # ✅ Documentation
 ├── tests/                     # Test suite
 ├── regender_cli.py           # ✅ Single CLI entry point
 └── requirements.txt          # Dependencies
@@ -182,7 +181,12 @@ result = app.process_book_sync("input.txt", "all_female")
 
 ### Created
 - `docs/PHASE4_COMPLETE.md` - This document
-- `legacy_backup.tar.gz` - Backup of removed code
+
+### Post-Phase 4 Cleanup
+- Renamed `book_downloader/` → `download/`
+- Moved `config/app.json` → `src/config.json`
+- Removed unused `config/models.json`
+- Removed empty `config/` directory
 
 ## Conclusion
 

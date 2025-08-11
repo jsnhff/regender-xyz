@@ -1,4 +1,4 @@
-# Book Downloader
+# Download Module
 
 Utilities for downloading books from online sources (currently Project Gutenberg).
 
@@ -13,7 +13,7 @@ This package provides functionality for downloading books from Project Gutenberg
 ## Structure
 
 ```
-book_downloader/
+download/
 ├── __init__.py        # Package initialization
 └── download.py        # Download books from online sources
 ```
@@ -35,7 +35,7 @@ python regender_book_cli.py download --count 50 --output book_texts
 ### Python API
 
 ```python
-from book_downloader import GutenbergDownloader
+from download import GutenbergDownloader
 
 # Create downloader
 downloader = GutenbergDownloader(output_dir="book_texts")
@@ -85,17 +85,16 @@ Example: `pg1342-Pride_and_Prejudice.txt`
 
 ## Integration
 
-This package is designed to work with the `book_parser` package for processing downloaded books:
+This package is designed to work with the parser service for processing downloaded books:
 
 ```python
 # Download books
-from book_downloader import GutenbergDownloader
+from download import GutenbergDownloader
 downloader = GutenbergDownloader()
 downloader.download_top_books(100)
 
-# Process books (using book_parser)
-from book_parser import process_all_books
-process_all_books("book_texts", "book_json")
+# Process books (using the CLI)
+# python regender_cli.py book_texts/book.txt all_female
 ```
 
 ## Error Handling
@@ -110,4 +109,4 @@ The downloader includes a 1-second delay between downloads to be respectful to P
 
 ## Notes
 
-This package focuses solely on downloading functionality. For book parsing, validation, and processing, see the `book_parser` package.
+This package focuses solely on downloading functionality. For book parsing, validation, and processing, use the main CLI.
