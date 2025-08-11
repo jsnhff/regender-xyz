@@ -44,7 +44,7 @@ class GutenbergDownloader:
             delay: Delay between downloads (be nice to servers)
         """
         self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.delay = delay
         self.user_agent = 'Mozilla/5.0 (Gutenberg Book Downloader)'
         
@@ -169,14 +169,25 @@ class GutenbergDownloader:
         Returns:
             Sanitized filename
         """
-        # Remove/replace problematic characters
-        title = re.sub(r'[<>:"/\\|?*]', '', title)
+        # Remove/replace problematic characters including semicolons, commas, apostrophes
+        # Keep only alphanumeric, spaces, hyphens, and underscores
+        title = re.sub(r'[<>:"/\\|?*;,\'`"]', '', title)
+        
+        # Replace multiple spaces with single underscore
         title = re.sub(r'\s+', '_', title)
-        title = title.strip('._')
+        
+        # Remove any remaining special characters except letters, numbers, underscore, hyphen
+        title = re.sub(r'[^a-zA-Z0-9_\-]', '', title)
+        
+        # Clean up multiple underscores
+        title = re.sub(r'_+', '_', title)
+        
+        # Strip leading/trailing underscores and periods
+        title = title.strip('._-')
         
         # Limit length
         if len(title) > 100:
-            title = title[:100]
+            title = title[:100].rstrip('_-')
         
         return title
     
@@ -293,8 +304,8 @@ def main():
     )
     parser.add_argument(
         "-o", "--output",
-        default="gutenberg_books",
-        help="Output directory (default: gutenberg_books)"
+        default="books/texts",
+        help="Output directory (default: books/texts)"
     )
     parser.add_argument(
         "-d", "--delay",

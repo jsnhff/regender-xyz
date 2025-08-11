@@ -47,12 +47,20 @@ class GutenbergParser:
         end_idx = self._find_end(lines)
         
         # Extract metadata from header
-        if start_idx and start_idx > 0:
+        # Sometimes metadata is before START marker, sometimes after
+        if start_idx and start_idx > 10:
+            # Metadata likely before START marker
             header_lines = lines[:min(start_idx, 500)]
             metadata = self._extract_metadata(header_lines)
         else:
-            # No clear start, try first 200 lines anyway
-            header_lines = lines[:min(200, len(lines))]
+            # START marker at beginning or not found
+            # Look for metadata after START marker
+            if start_idx is not None:
+                # Look after the START marker
+                header_lines = lines[start_idx:min(start_idx + 200, len(lines))]
+            else:
+                # No clear start, try first 200 lines
+                header_lines = lines[:min(200, len(lines))]
             metadata = self._extract_metadata(header_lines)
         
         # Extract content
@@ -196,6 +204,7 @@ class GutenbergParser:
         """Extract metadata from header lines using simple string operations."""
         metadata = GutenbergMetadata()
         
+        # First pass: Look for explicit metadata markers
         for line in header_lines:
             line_stripped = line.strip()
             
@@ -251,6 +260,40 @@ class GutenbergParser:
                             break
                     if num:
                         metadata.ebook_number = num
+        
+        # Second pass: Try to find title and author in simple format
+        # (common pattern: title on one line, "by Author" on next)
+        if not metadata.title or not metadata.author:
+            non_blank_lines = []
+            for line in header_lines[:50]:  # Look at first 50 lines
+                line_stripped = line.strip()
+                if line_stripped and not line_stripped.startswith('***'):
+                    non_blank_lines.append(line_stripped)
+                    if len(non_blank_lines) >= 10:  # Get enough context
+                        break
+            
+            # Pattern: Title followed by "by Author"
+            for i in range(len(non_blank_lines) - 1):
+                current = non_blank_lines[i]
+                next_line = non_blank_lines[i + 1]
+                
+                # Skip common non-title lines
+                if any(skip in current.lower() for skip in ['contents', 'table of', 'chapter', 'act ', 'scene ', 'volume']):
+                    continue
+                
+                # Check if next line is "by Author"
+                if next_line.lower().startswith('by '):
+                    if not metadata.title and len(current) > 0 and len(current) < 100:
+                        # This looks like a title
+                        metadata.title = current
+                    if not metadata.author:
+                        # Extract author, handling case variations
+                        if next_line.lower().startswith('by '):
+                            author_start = 3
+                        else:  # "BY " case
+                            author_start = 3
+                        metadata.author = next_line[author_start:].strip()
+                    break
         
         return metadata
     

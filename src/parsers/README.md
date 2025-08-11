@@ -30,7 +30,7 @@ The modular parser system for processing Project Gutenberg texts into structured
                                │
                                ▼
                     ┌──────────┴──────────┐
-                    │   Format Router      │
+                    │   Format Router     │
                     └──────────┬──────────┘
                                │
                 ┌──────────────┼──────────────┐
@@ -44,8 +44,8 @@ The modular parser system for processing Project Gutenberg texts into structured
 │ • Handles Part→Chapter    │   │ • Preserves stage dirs    │
 │ • Skips duplicate TOC     │   │ • Character names         │
 └───────────────┬───────────┘   └───────────────┬───────────┘
-                │                                 │
-                └────────────┬────────────────────┘
+                │                               │
+                └────────────┬──────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      parser.py (Integration)                        │

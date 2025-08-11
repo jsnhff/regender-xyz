@@ -39,6 +39,17 @@ class FormatDetector:
     def __init__(self):
         """Initialize the format detector."""
         self._setup_patterns()
+        
+        # Collection/anthology patterns
+        self.collection_patterns = [
+            'complete works',
+            'collected works', 
+            'works of',
+            'anthology',
+            'collection',
+            'complete plays',
+            'complete poems'
+        ]
     
     def _setup_patterns(self):
         """Set up detection patterns."""
@@ -66,7 +77,6 @@ class FormatDetector:
             (r'^\[Exit\s+[A-Z]', 2.0, "Stage direction: Exit"),
             (r'^\[Exeunt', 2.0, "Stage direction: Exeunt"),
             (r'Dramatis Person[aæ]', 3.0, "Character list"),
-            (r'^[A-Z]+\.\s+[A-Z][a-z]+.*[.!?]$', 1.0, "Character dialogue"),
         ]
         
         # Multi-part patterns
@@ -116,6 +126,10 @@ class FormatDetector:
         """
         lines = text.split('\n')
         
+        # Check for collection/anthology first
+        first_500_lines = '\n'.join(lines[:500]).lower()
+        is_collection = any(pattern in first_500_lines for pattern in self.collection_patterns)
+        
         # Sample different parts of the book
         sample_lines = self._get_sample_lines(lines)
         
@@ -123,15 +137,30 @@ class FormatDetector:
         scores = {}
         evidence = {}
         
+        # If it's a collection, handle specially
+        if is_collection:
+            evidence['collection'] = ['Complete Works or Collection detected']
+            # Collections often have many plays/poems as chapters
+            scores['standard'] = 50  # Treat as standard book with many chapters
+        
         # Check standard chapter format
         scores['standard'], evidence['standard'] = self._score_patterns(
             sample_lines, self.chapter_patterns, min_matches=3
         )
         
-        # Check play format
-        scores['play'], evidence['play'] = self._score_patterns(
-            sample_lines, self.play_patterns, min_matches=2
+        # Check play format (require strong evidence - both acts AND scenes)
+        play_score, play_evidence = self._score_patterns(
+            sample_lines, self.play_patterns, min_matches=5
         )
+        # Only consider it a play if we find both acts and scenes
+        has_acts = any('ACT' in str(e).upper() for e in play_evidence)
+        has_scenes = any('SCENE' in str(e).upper() for e in play_evidence)
+        if has_acts and has_scenes:
+            scores['play'] = play_score
+            evidence['play'] = play_evidence
+        else:
+            scores['play'] = play_score * 0.3  # Heavily penalize without both
+            evidence['play'] = play_evidence
         
         # Check multi-part format
         scores['multi_part'], evidence['multi_part'] = self._score_patterns(
@@ -156,17 +185,30 @@ class FormatDetector:
         
         # Determine format and confidence
         if not scores or max(scores.values()) < 5:
+            # Default to standard book format when uncertain
+            # But give reasonable confidence if it's actually parsing well
             return FormatDetection(
-                format=BookFormat.UNKNOWN,
-                confidence=0,
+                format=BookFormat.STANDARD,
+                confidence=50,  # Medium confidence for default format
                 evidence=evidence,
                 hierarchy_levels=1,
-                recommendations=["Manual review recommended - no clear format detected"]
+                recommendations=["No strong format markers found, using standard book format"]
             )
         
         # Get the best format
         best_format = max(scores, key=scores.get)
-        confidence = min(scores[best_format] * 2, 100)  # Scale to 0-100
+        # Scale confidence more generously - if we found patterns, be confident
+        raw_confidence = scores[best_format]
+        if raw_confidence >= 50:
+            confidence = 100  # Very strong signal
+        elif raw_confidence >= 30:
+            confidence = 90   # Strong signal
+        elif raw_confidence >= 20:
+            confidence = 75   # Good signal
+        elif raw_confidence >= 10:
+            confidence = 60   # Decent signal
+        else:
+            confidence = min(raw_confidence * 5, 50)  # Weak signal
         
         # Check for mixed format
         high_scores = [fmt for fmt, score in scores.items() if score > 15]

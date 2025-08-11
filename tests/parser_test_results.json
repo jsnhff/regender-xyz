@@ -5,13 +5,12 @@
     "error": null,
     "format": "play",
     "confidence": 100,
-    "chapters": 48,
-    "paragraphs": 1057,
-    "title": "The Tragedy Of Romeo And Juliet",
-    "author": "Unknown Author",
+    "chapters": 20,
+    "paragraphs": 168,
+    "title": "THE TRAGEDY OF ROMEO AND JULIET",
+    "author": "William Shakespeare",
     "issues": [
-      "Author not extracted",
-      "23 empty chapters"
+      "Very short chapters (avg 8.4 paragraphs)"
     ],
     "raw_size": 142570,
     "cleaned_size": 142449
@@ -20,15 +19,15 @@
     "book": "pg1661-The_Adventures_of_Sherlock_Holmes.txt",
     "success": true,
     "error": null,
-    "format": "standard",
-    "confidence": 28.0,
-    "chapters": 16,
-    "paragraphs": 2527,
+    "format": "play",
+    "confidence": 53.0,
+    "chapters": 0,
+    "paragraphs": 0,
     "title": "The Adventures of Sherlock Holmes",
     "author": "Arthur Conan Doyle",
     "issues": [
-      "Low confidence: 28.0%",
-      "1 empty chapters"
+      "No chapters detected",
+      "No paragraphs detected"
     ],
     "raw_size": 581425,
     "cleaned_size": 562191
@@ -37,15 +36,14 @@
     "book": "pg200-The_Project_Gutenberg_Encyclopedia,_Volume_1_of_28.txt",
     "success": true,
     "error": null,
-    "format": "standard",
-    "confidence": 26.0,
-    "chapters": 868,
-    "paragraphs": 8915,
+    "format": "play",
+    "confidence": 100,
+    "chapters": 1,
+    "paragraphs": 1,
     "title": "The Project Gutenberg Encyclopedia, Volume 1 of 28",
     "author": "Project Gutenberg",
     "issues": [
-      "Low confidence: 26.0%",
-      "64 empty chapters"
+      "Very short chapters (avg 1.0 paragraphs)"
     ],
     "raw_size": 8165614,
     "cleaned_size": 8141770
@@ -54,7 +52,7 @@
     "book": "pg55231-A_history_of_the_Peninsular_War,_Vol._3,_Sep._1809-Dec._1810.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 100,
     "chapters": 86,
     "paragraphs": 1989,
@@ -71,14 +69,14 @@
     "book": "pg26184-Simple_Sabotage_Field_Manual.txt",
     "success": true,
     "error": null,
-    "format": "standard",
-    "confidence": 20.0,
+    "format": "play",
+    "confidence": 26.0,
     "chapters": 5,
     "paragraphs": 284,
     "title": "Simple Sabotage Field Manual",
     "author": "Unknown Author",
     "issues": [
-      "Low confidence: 20.0%",
+      "Low confidence: 26.0%",
       "Author not extracted"
     ],
     "raw_size": 54301,
@@ -88,15 +86,13 @@
     "book": "pg345-Dracula.txt",
     "success": true,
     "error": null,
-    "format": "standard",
-    "confidence": 32.0,
+    "format": "mixed",
+    "confidence": 67.0,
     "chapters": 30,
     "paragraphs": 2146,
     "title": "Dracula",
     "author": "Bram Stoker",
-    "issues": [
-      "Low confidence: 32.0%"
-    ],
+    "issues": [],
     "raw_size": 864989,
     "cleaned_size": 845807
   },
@@ -109,9 +105,8 @@
     "chapters": 92,
     "paragraphs": 2317,
     "title": "Emma",
-    "author": "Unknown Author",
+    "author": "Jane Austen",
     "issues": [
-      "Author not extracted",
       "37 empty chapters"
     ],
     "raw_size": 880527,
@@ -121,16 +116,13 @@
     "book": "pg5197-My_Life_\u2014_Volume_1.txt",
     "success": true,
     "error": null,
-    "format": "multi_part",
-    "confidence": 24.0,
-    "chapters": 5,
-    "paragraphs": 112,
+    "format": "play",
+    "confidence": 61.0,
+    "chapters": 4,
+    "paragraphs": 605,
     "title": "My Life",
     "author": "Richard Wagner",
-    "issues": [
-      "Low confidence: 24.0%",
-      "4 empty chapters"
-    ],
+    "issues": [],
     "raw_size": 1270994,
     "cleaned_size": 1251696
   },
@@ -138,14 +130,14 @@
     "book": "pg7241-Fables_of_La_Fontaine_\u2014_a_New_Edition,_with_Notes.txt",
     "success": true,
     "error": null,
-    "format": "unknown",
-    "confidence": 0,
+    "format": "play",
+    "confidence": 23.0,
     "chapters": 6,
     "paragraphs": 1128,
     "title": "Fables of La Fontaine \u2014 a New Edition, with Notes",
     "author": "Jean de La Fontaine",
     "issues": [
-      "Low confidence: 0%"
+      "Low confidence: 23.0%"
     ],
     "raw_size": 627238,
     "cleaned_size": 607216
@@ -155,7 +147,7 @@
     "success": true,
     "error": null,
     "format": "mixed",
-    "confidence": 96.0,
+    "confidence": 100,
     "chapters": 3,
     "paragraphs": 949,
     "title": "The Importance of Being Earnest",
@@ -170,14 +162,13 @@
     "book": "pg52026-Matthew_Calbraith_Perry_A_Typical_American_Naval_Officer.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 100,
     "chapters": 74,
     "paragraphs": 1287,
     "title": "See 52026-h.htm or 52026-h.zip",
-    "author": "Unknown Author",
+    "author": "Cupples and Hurd.",
     "issues": [
-      "Author not extracted",
       "11 empty chapters"
     ],
     "raw_size": 662063,
@@ -187,7 +178,7 @@
     "book": "pg67979-The_Blue_Castle_a_novel.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 100,
     "chapters": 51,
     "paragraphs": 1524,
@@ -209,11 +200,10 @@
     "chapters": 3,
     "paragraphs": 0,
     "title": "The Adventures of Ferdinand Count Fathom",
-    "author": "Unknown Author",
+    "author": "Tobias Smollett",
     "issues": [
       "No paragraphs detected",
       "Low confidence: 36.0%",
-      "Author not extracted",
       "3 empty chapters",
       "Very short chapters (avg 0.0 paragraphs)"
     ],
@@ -224,14 +214,13 @@
     "book": "pg2707-The_History_of_Herodotus_\u2014_Volume_1.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 100,
     "chapters": 736,
     "paragraphs": 1544,
-    "title": "The History Of Herodotus",
-    "author": "Unknown Author",
+    "title": "THE HISTORY OF HERODOTUS",
+    "author": "Herodotus",
     "issues": [
-      "Author not extracted",
       "Very short chapters (avg 2.1 paragraphs)"
     ],
     "raw_size": 880405,
@@ -242,14 +231,13 @@
     "success": true,
     "error": null,
     "format": "play",
-    "confidence": 16.0,
+    "confidence": 24.0,
     "chapters": 4,
     "paragraphs": 2925,
     "title": "Ulysses",
-    "author": "Unknown Author",
+    "author": "James Joyce",
     "issues": [
-      "Low confidence: 16.0%",
-      "Author not extracted",
+      "Low confidence: 24.0%",
       "Very long chapters (avg 731.2 paragraphs)"
     ],
     "raw_size": 1519815,
@@ -259,14 +247,14 @@
     "book": "pg16328-Beowulf_An_Anglo-Saxon_Epic_Poem_(768).txt",
     "success": true,
     "error": null,
-    "format": "unknown",
-    "confidence": 0,
+    "format": "play",
+    "confidence": 26.0,
     "chapters": 41,
     "paragraphs": 1352,
     "title": "Beowulf",
     "author": "Unknown Author",
     "issues": [
-      "Low confidence: 0%",
+      "Low confidence: 26.0%",
       "Author not extracted"
     ],
     "raw_size": 292921,
@@ -277,16 +265,13 @@
     "success": true,
     "error": null,
     "format": "play",
-    "confidence": 12.0,
-    "chapters": 0,
-    "paragraphs": 0,
-    "title": "Write It Right",
-    "author": "Unknown Author",
+    "confidence": 19.0,
+    "chapters": 1,
+    "paragraphs": 453,
+    "title": "_A LITTLE BLACKLIST OF LITERARY FAULTS_",
+    "author": "AMBROSE BIERCE",
     "issues": [
-      "No chapters detected",
-      "No paragraphs detected",
-      "Low confidence: 12.0%",
-      "Author not extracted"
+      "Low confidence: 19.0%"
     ],
     "raw_size": 74403,
     "cleaned_size": 74287
@@ -295,7 +280,7 @@
     "book": "pg6593-History_of_Tom_Jones,_a_Foundling.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 64.0,
     "chapters": 4,
     "paragraphs": 2059,
@@ -313,14 +298,14 @@
     "success": true,
     "error": null,
     "format": "play",
-    "confidence": 68.0,
-    "chapters": 6,
-    "paragraphs": 1314,
+    "confidence": 85.0,
+    "chapters": 0,
+    "paragraphs": 0,
     "title": "A Doll\u2019s House",
-    "author": "Unknown Author",
+    "author": "Henrik Ibsen",
     "issues": [
-      "Author not extracted",
-      "2 empty chapters"
+      "No chapters detected",
+      "No paragraphs detected"
     ],
     "raw_size": 142336,
     "cleaned_size": 142218
@@ -329,15 +314,13 @@
     "book": "pg1232-The_Prince.txt",
     "success": true,
     "error": null,
-    "format": "standard",
+    "format": "mixed",
     "confidence": 64.0,
     "chapters": 32,
     "paragraphs": 321,
     "title": "The Prince",
-    "author": "Unknown Author",
-    "issues": [
-      "Author not extracted"
-    ],
+    "author": "Nicolo Machiavelli",
+    "issues": [],
     "raw_size": 282736,
     "cleaned_size": 282563
   }

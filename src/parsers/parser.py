@@ -12,6 +12,7 @@ from .gutenberg import GutenbergParser
 from .detector import FormatDetector, BookFormat
 from .hierarchy import HierarchyBuilder, Section, SectionType
 from .play import PlayParser, play_to_chapters
+from .chapter_validator import validate_and_clean_chapters
 
 
 @dataclass
@@ -70,20 +71,24 @@ class IntegratedParser:
         # Step 3: Build hierarchy or parse as play
         lines = cleaned_text.split('\n')
         
-        # Use specialized play parser for plays (including mixed format with play elements)
-        if detection.format == BookFormat.PLAY or \
-           (detection.format == BookFormat.MIXED and 'play' in detection.evidence and len(detection.evidence.get('play', [])) > 5):
+        # Use specialized play parser for plays (only if very high confidence)
+        # Low confidence play detection often means dialogue-heavy fiction
+        if detection.format == BookFormat.PLAY and detection.confidence > 70:
             play_parser = PlayParser()
             play = play_parser.parse(lines)
             chapters = play_to_chapters(play)
             hierarchy = None  # Play doesn't use hierarchy
         else:
+            # For low-confidence plays or other formats, use hierarchy builder
             hierarchy = self.builder.build_hierarchy(lines, format_value, skip_toc=True)
             chapters = None  # Will be converted from hierarchy
         
         # Step 4: Convert to chapters format if not already done
         if chapters is None:
             chapters = self._hierarchy_to_chapters(hierarchy)
+        
+        # Step 4.5: Validate and clean chapters
+        chapters = validate_and_clean_chapters(chapters)
         
         # Step 5: Extract title and author from metadata
         title = metadata.title if metadata and metadata.title else 'Unknown Title'
@@ -124,9 +129,23 @@ class IntegratedParser:
             
             # Skip the root book node
             if section.type == SectionType.BOOK and not parent_path:
-                # Process all subsections
-                for sub in section.subsections:
-                    process_section(sub, parent_path)
+                if section.subsections:
+                    # Process all subsections
+                    for sub in section.subsections:
+                        process_section(sub, parent_path)
+                elif section.content:
+                    # No subsections but has content - treat as single chapter
+                    paragraphs = self._lines_to_paragraphs(section.content)
+                    if paragraphs:
+                        chapter = {
+                            'number': 1,
+                            'title': 'Chapter 1',
+                            'type': 'chapter',
+                            'paragraphs': paragraphs,
+                            'hierarchy': [],
+                            'metadata': {}
+                        }
+                        chapters.append(chapter)
                 return
             
             # Check if this is a leaf node (has content but no subsections)

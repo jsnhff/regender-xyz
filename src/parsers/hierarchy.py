@@ -126,6 +126,8 @@ class HierarchyBuilder:
                 (r'^\s*ACTUS\s+([IVX]+)', lambda m: m.group(1)),  # Latin
             ],
             SectionType.CHAPTER: [
+                (r'^\s*CHAPTER\s+(ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|ELEVEN|TWELVE|THIRTEEN|FOURTEEN|FIFTEEN|SIXTEEN|SEVENTEEN|EIGHTEEN|NINETEEN|TWENTY)', lambda m: m.group(1)),
+                (r'^\s*Chapter\s+(One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)', lambda m: m.group(1)),
                 (r'^\s*CHAPTER\s+([IVX]+)\.?\s*(.*)', lambda m: (m.group(1), m.group(2).strip())),
                 (r'^\s*Chapter\s+([IVX]+)\.?\s*(.*)', lambda m: (m.group(1), m.group(2).strip())),
                 (r'^\s*CHAPTER\s+(\d+)\.?\s*(.*)', lambda m: (m.group(1), m.group(2).strip())),
@@ -133,7 +135,7 @@ class HierarchyBuilder:
                 (r'^\s*([IVX]+)\.\s+([A-Z][A-Z ]+)$', lambda m: (m.group(1), m.group(2).strip())),  # Roman + CAPS title
                 (r'^\s*([IVX]+)\.\s+([A-Z].+)', lambda m: (m.group(1), m.group(2).strip())),  # Roman + title
                 (r'^\s*([IVX]+)\.?\s*$', lambda m: m.group(1)),  # Just Roman numerals
-                (r'^\s*(\d+)\.\s+(.+)', lambda m: (m.group(1), m.group(2).strip())),
+                # Removed the overly broad numbered list pattern
                 (r'^\s*ADVENTURE\s+([IVX]+)', lambda m: m.group(1)),  # Adventure stories
                 (r'^\s*Story\s+([IVX]+)', lambda m: m.group(1)),  # Story format
             ],
