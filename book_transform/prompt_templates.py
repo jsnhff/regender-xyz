@@ -67,6 +67,9 @@ Transform text to use {transform_info['name'].lower()} forms while preserving me
         
         changes = '\n'.join(f"- {change}" for change in transform_info['changes'])
         
+        output_format = self._get_output_format()
+        char_info = f"Character information:\n{character_context}\n" if character_context else ""
+        
         user = f"""Transform this text to use {transform_info['name'].lower()} gender representation.
 
 Required changes:
@@ -78,18 +81,20 @@ Rules:
 3. Preserve all formatting and punctuation
 4. Make changes sound natural
 
-{f"Character information:\n{character_context}\n" if character_context else ""}
+{char_info}
 
 Text to transform:
 {text}
 
-{self._get_output_format()}"""
+{output_format}"""
 
         return {"system": system, "user": user}
     
     def _complex_transform_prompt(self, text: str, transform_info: Dict,
                                  character_context: Optional[str]) -> Dict[str, str]:
         """Complex transformation with detailed instructions."""
+        output_format = self._get_output_format()
+        
         system = """You are an advanced literary transformation system.
 Your task is to precisely transform gender representation while maintaining narrative integrity.
 You must preserve all stylistic elements and ensure consistency."""
@@ -109,7 +114,7 @@ CRITICAL REQUIREMENTS:
 5. Apply transformations uniformly to all character references
 6. Handle context-dependent words appropriately
 
-{f"CHARACTER CONTEXT:\n{character_context}\n" if character_context else ""}
+{f"CHARACTER CONTEXT:{chr(10)}{character_context}{chr(10)}" if character_context else ""}
 
 QUALITY CHECKS:
 - Consistency: Same character = same gender throughout
@@ -120,7 +125,7 @@ QUALITY CHECKS:
 TEXT FOR TRANSFORMATION:
 {text}
 
-{self._get_output_format()}"""
+{output_format}"""
 
         return {"system": system, "user": user}
     

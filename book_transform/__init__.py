@@ -5,11 +5,25 @@ This package handles AI-based transformation of parsed books,
 including gender swapping and other narrative modifications.
 """
 
-from .transform import BookTransformer, transform_book
-# Character analysis moved to book_characters module
+# Import from new unified transformer
+from .book_transformer import (
+    BookTransformer,
+    UnifiedBookTransformer,
+    TransformationResult,
+    transform_book
+)
+
+# Import parallel transformer
+from .parallel_transformer import (
+    ParallelBookTransformer,
+    transform_book_parallel
+)
+
+# Keep legacy imports for backward compatibility
+from .transform import transform_book as legacy_transform_book
 from .llm_transform import transform_text_with_llm, transform_gender_with_context, TRANSFORM_TYPES
 from .quality_control import quality_control_loop, validate_transformation
-from .unified_transform import UnifiedBookTransformer, transform_book_unified
+from .unified_transform import transform_book_unified
 
 # Simple file transformation wrapper
 def transform_text_file(file_path: str, transform_type: str, output_path: str = None, model: str = "gpt-4o-mini", **kwargs):
