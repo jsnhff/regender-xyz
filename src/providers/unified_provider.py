@@ -74,7 +74,7 @@ class UnifiedProvider(LLMProvider, Plugin):
         """
         # Import existing client
         try:
-            from api_client import UnifiedLLMClient
+            from .legacy_client import UnifiedLLMClient
             
             # Get provider from config or environment
             self.provider_name = (

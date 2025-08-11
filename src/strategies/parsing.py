@@ -50,13 +50,12 @@ class StandardParsingStrategy(ParsingStrategy):
     
     def __init__(self):
         """Initialize the standard parsing strategy."""
-        self.pattern_registry = None
-        self._initialize_patterns()
-    
-    def _initialize_patterns(self):
-        """Initialize pattern registry."""
-        from book_parser.patterns.registry import PatternRegistry
-        self.pattern_registry = PatternRegistry()
+        self.chapter_patterns = [
+            r'^Chapter\s+\d+',
+            r'^CHAPTER\s+[IVX]+',
+            r'^\d+\.',
+            r'^Part\s+\d+'
+        ]
     
     async def execute_async(self, data: Any) -> Any:
         """Execute parsing strategy."""
@@ -72,42 +71,69 @@ class StandardParsingStrategy(ParsingStrategy):
     
     async def detect_format_async(self, text: str) -> str:
         """Detect text format."""
-        # Use existing detector logic
-        from book_parser.detectors.section_detector import detect_sections
-        from book_parser.detectors.play_detector import is_play_format
+        import re
         
-        if is_play_format(text):
+        # Simple format detection
+        lines = text.split('\n')[:100]  # Check first 100 lines
+        text_sample = '\n'.join(lines).lower()
+        
+        # Check for play format
+        if 'dramatis personae' in text_sample or re.search(r'act\s+[ivx]', text_sample):
             return "play"
         
-        sections = detect_sections(text.split('\n'))
-        if sections:
-            if any('act' in s.lower() or 'scene' in s.lower() for s in sections):
-                return "play"
-            elif any('chapter' in s.lower() for s in sections):
-                return "standard"
-            elif any('part' in s.lower() or 'book' in s.lower() for s in sections):
-                return "multi_part"
+        # Check for chapters
+        if 'chapter' in text_sample:
+            return "standard"
+        
+        # Check for multi-part
+        if 'part ' in text_sample or 'book ' in text_sample:
+            return "multi_part"
         
         return "standard"
     
     async def parse_async(self, raw_data: str, format_type: str) -> Dict[str, Any]:
         """Parse raw text into structured format."""
-        from book_parser.parser import BookParser
+        import re
         
-        # Use existing parser
-        parser = BookParser()
+        lines = raw_data.split('\n')
+        chapters = []
+        current_chapter = None
+        current_paragraphs = []
         
-        # Parse synchronously (existing parser is not async)
-        import asyncio
-        loop = asyncio.get_event_loop()
+        for line in lines:
+            # Check if line is a chapter header
+            is_chapter = any(re.match(pattern, line.strip()) for pattern in self.chapter_patterns)
+            
+            if is_chapter:
+                # Save previous chapter
+                if current_chapter and current_paragraphs:
+                    chapters.append({
+                        'title': current_chapter,
+                        'paragraphs': current_paragraphs
+                    })
+                current_chapter = line.strip()
+                current_paragraphs = []
+            elif line.strip():  # Non-empty line
+                current_paragraphs.append(line.strip())
         
-        # Run in executor to avoid blocking
-        import concurrent.futures
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(parser.parse_text, raw_data)
-            result = await loop.run_in_executor(None, future.result)
+        # Save last chapter
+        if current_chapter and current_paragraphs:
+            chapters.append({
+                'title': current_chapter,
+                'paragraphs': current_paragraphs
+            })
         
-        return result
+        # If no chapters found, treat as single chapter
+        if not chapters and lines:
+            chapters = [{
+                'title': 'Chapter 1',
+                'paragraphs': [line.strip() for line in lines if line.strip()]
+            }]
+        
+        return {
+            'chapters': chapters,
+            'metadata': {'format': format_type}
+        }
 
 
 class PlayParsingStrategy(ParsingStrategy):
@@ -122,24 +148,31 @@ class PlayParsingStrategy(ParsingStrategy):
     
     async def detect_format_async(self, text: str) -> str:
         """Detect if text is a play."""
-        from book_parser.detectors.play_detector import is_play_format
-        return "play" if is_play_format(text) else "unknown"
+        import re
+        text_lower = text[:5000].lower()  # Check first 5000 chars
+        if 'dramatis personae' in text_lower or re.search(r'act\s+[ivx]', text_lower):
+            return "play"
+        return "unknown"
     
     async def parse_async(self, raw_data: str, format_type: str) -> Dict[str, Any]:
         """Parse play text."""
-        from book_parser.patterns.plays import PlayPattern
+        import re
         
-        pattern = PlayPattern()
         lines = raw_data.split('\n')
-        
-        # Parse using play pattern
         chapters = []
         current_act = None
         current_scene = None
         current_paragraphs = []
         
+        # Simple play parsing patterns
+        act_pattern = re.compile(r'^(ACT|Act)\s+([IVX]+|\d+)', re.IGNORECASE)
+        scene_pattern = re.compile(r'^(SCENE|Scene)\s+([ivx]+|\d+)', re.IGNORECASE)
+        
         for line in lines:
-            if pattern.is_act_header(line):
+            act_match = act_pattern.match(line.strip())
+            scene_match = scene_pattern.match(line.strip())
+            
+            if act_match:
                 # Save previous scene
                 if current_scene and current_paragraphs:
                     chapters.append({
@@ -151,7 +184,7 @@ class PlayParsingStrategy(ParsingStrategy):
                 current_act = line.strip()
                 current_scene = None
                 
-            elif pattern.is_scene_header(line):
+            elif scene_match:
                 # Save previous scene
                 if current_scene and current_paragraphs:
                     chapters.append({

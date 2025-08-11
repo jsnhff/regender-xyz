@@ -205,7 +205,9 @@ class RateLimitedStrategy(AnalysisStrategy):
     async def chunk_book_async(self, book: Book) -> List[str]:
         """Create reasonably sized chunks."""
         # Use smaller chunks for rate-limited analysis
-        from book_transform.chunking.token_utils import estimate_tokens
+        # Simple token estimation (roughly 4 chars per token)
+        def estimate_tokens(text: str) -> int:
+            return len(text) // 4
         
         chunks = []
         current_chunk = []

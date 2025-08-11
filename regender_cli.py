@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Regender CLI v2 - New Architecture
+Regender CLI - Transform gender representation in literature
 
-This CLI uses the new service-oriented architecture from Phase 3.
-It can be enabled with the --use-new-architecture flag or
-by setting the USE_NEW_ARCHITECTURE environment variable.
+This CLI uses the modern service-oriented architecture to process books,
+analyze characters, and apply gender transformations.
 """
 
 import argparse
@@ -29,8 +28,8 @@ def setup_logging(verbose: bool = False):
     )
 
 
-def process_book_new_architecture(args):
-    """Process book using new architecture."""
+def process_book(args):
+    """Process book using the service-oriented architecture."""
     # Initialize application
     config_path = args.config or "config/app.json"
     app = Application(config_path)
@@ -74,7 +73,7 @@ def process_book_new_architecture(args):
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Regender-XYZ CLI v2 - Transform gender representation in literature"
+        description="Regender-XYZ CLI - Transform gender representation in literature"
     )
     
     # Main arguments
@@ -112,58 +111,14 @@ def main():
         help='Enable verbose logging'
     )
     
-    # Architecture selection
-    parser.add_argument(
-        '--use-new-architecture',
-        action='store_true',
-        help='Use the new service-oriented architecture'
-    )
-    
     # Parse arguments
     args = parser.parse_args()
     
     # Set up logging
     setup_logging(args.verbose)
     
-    # Check if we should use new architecture
-    use_new = args.use_new_architecture or os.getenv('USE_NEW_ARCHITECTURE', '').lower() == 'true'
-    
-    if use_new:
-        print("Using new service-oriented architecture...")
-        process_book_new_architecture(args)
-    else:
-        # Fall back to old architecture
-        print("Using legacy architecture (use --use-new-architecture for new version)...")
-        
-        # Import and use old CLI
-        try:
-            from regender_book_cli import main as legacy_main
-            
-            # Build legacy arguments
-            legacy_args = [
-                'transform',
-                args.input,
-                '--type', args.transform_type
-            ]
-            
-            if args.output:
-                legacy_args.extend(['--output', args.output])
-            
-            if args.verbose:
-                legacy_args.append('--verbose')
-            
-            # Modify sys.argv for legacy CLI
-            old_argv = sys.argv
-            sys.argv = ['regender_book_cli.py'] + legacy_args
-            
-            try:
-                legacy_main()
-            finally:
-                sys.argv = old_argv
-                
-        except ImportError:
-            print("Error: Legacy CLI not found. Please use --use-new-architecture")
-            sys.exit(1)
+    # Process the book
+    process_book(args)
 
 
 if __name__ == '__main__':
