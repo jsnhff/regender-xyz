@@ -55,10 +55,15 @@ class CharacterMerger:
                 if name not in character_map:
                     # Ensure aliases and titles are lists
                     aliases = char_data.get('aliases', [])
-                    if isinstance(aliases, str):
+                    if aliases is None:
+                        aliases = []
+                    elif isinstance(aliases, str):
                         aliases = [aliases] if aliases else []
+                    
                     titles = char_data.get('titles', [])
-                    if isinstance(titles, str):
+                    if titles is None:
+                        titles = []
+                    elif isinstance(titles, str):
                         titles = [titles] if titles else []
                     
                     # Create new character
@@ -84,7 +89,9 @@ class CharacterMerger:
                     
                     # Merge aliases - handle both string and list
                     aliases = char_data.get('aliases', [])
-                    if isinstance(aliases, str):
+                    if aliases is None:
+                        aliases = []
+                    elif isinstance(aliases, str):
                         aliases = [aliases] if aliases else []
                     for alias in aliases:
                         if alias and alias not in existing.aliases:
@@ -244,8 +251,16 @@ class CharacterService(BaseService):
             for idx, chunk in enumerate(chunks)
         ]
         
-        # Limit concurrency - Grok has strict rate limits
-        max_concurrent = 1 if self.provider and 'grok' in self.provider.name.lower() else self.config.max_concurrent
+        # Limit concurrency based on provider
+        if self.provider:
+            if 'grok' in self.provider.name.lower():
+                max_concurrent = 1  # Grok has strict rate limits
+            elif 'openai' in self.provider.name.lower():
+                max_concurrent = 10  # OpenAI handles parallel requests well
+            else:
+                max_concurrent = self.config.max_concurrent
+        else:
+            max_concurrent = self.config.max_concurrent
         semaphore = asyncio.Semaphore(max_concurrent)
         
         async def limited_task(task):
