@@ -175,7 +175,7 @@ regender-xyz/
 │   ├── patterns/       # Format detection patterns
 │   ├── detectors/      # Smart section detection
 │   └── utils/          # Validation and batch processing
-├── book_downloader/    # Project Gutenberg downloader
+├── download/           # Project Gutenberg downloader
 ├── book_transform/     # AI transformation system
 │   ├── chunking/       # Smart token-based chunking
 │   └── quality_control.py  # Integrated QC system
