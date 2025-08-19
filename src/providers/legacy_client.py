@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unified API client for multiple LLM providers (OpenAI, Anthropic/Claude, and Grok).
+Unified API client for multiple LLM providers (OpenAI and Anthropic/Claude).
 
 This module provides a consistent interface for interacting with different
 LLM APIs while maintaining security and flexibility.
@@ -40,12 +40,7 @@ except ImportError:
     _ANTHROPIC_AVAILABLE = False
     AnthropicError = Exception  # Fallback
 
-# Try to import requests for Grok
-try:
-    import requests
-    _REQUESTS_AVAILABLE = True
-except ImportError:
-    _REQUESTS_AVAILABLE = False
+# Requests no longer needed (Grok removed)
 
 
 # Import APIError from book_transform.utils to avoid duplication
@@ -241,76 +236,7 @@ class _AnthropicClient(_BaseLLMClient):
             raise APIError(f"Unexpected error calling Anthropic: {e}")
 
 
-class _GrokClient(_BaseLLMClient):
-    """Grok API client implementation."""
-    
-    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
-        self.api_key = api_key or os.environ.get("GROK_API_KEY")
-        self.base_url = base_url or os.environ.get("GROK_API_BASE", "https://api.x.ai/v1")
-        
-        if not _REQUESTS_AVAILABLE:
-            raise APIError("requests library not available. Install with: pip install requests")
-    
-    def is_available(self) -> bool:
-        """Check if Grok client is available."""
-        return bool(self.api_key and self.base_url)
-    
-    def get_default_model(self) -> str:
-        """Get default Grok model from environment or fallback."""
-        return os.environ.get("GROK_MODEL", "grok-4-latest")
-    
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
-        """Complete using Grok API."""
-        if not self.is_available():
-            raise APIError("Grok client not configured. Set GROK_API_KEY.")
-        
-        try:
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}"
-            }
-            
-            data = {
-                "model": model or self.get_default_model(),
-                "messages": messages,
-                "temperature": temperature,
-                "stream": False
-            }
-            
-            # Note: Grok API might not support response_format yet
-            if response_format and response_format.get("type") == "json_object":
-                # Add instruction to return JSON in the last message
-                if messages and messages[-1]["role"] == "user":
-                    messages[-1]["content"] += "\n\nPlease respond with valid JSON only."
-            
-            response = requests.post(
-                f"{self.base_url}/chat/completions",
-                headers=headers,
-                json=data,
-                timeout=int(os.environ.get("API_TIMEOUT", "300"))
-            )
-            
-            if response.status_code != 200:
-                error_data = response.json() if response.content else {}
-                raise APIError(f"Grok API error ({response.status_code}): {error_data}")
-            
-            result = response.json()
-            
-            return _APIResponse(
-                content=result["choices"][0]["message"]["content"],
-                model=result.get("model", model or self.get_default_model()),
-                usage=result.get("usage"),
-                raw_response=result
-            )
-            
-        except requests.RequestException as e:
-            raise APIError(f"Grok API request error: {e}")
-        except Exception as e:
-            raise APIError(f"Unexpected error calling Grok: {e}")
-
+# Grok client removed - not supported
 
 class UnifiedLLMClient:
     """
@@ -319,15 +245,14 @@ class UnifiedLLMClient:
     Priority order:
     1. Explicitly specified provider
     2. Environment variable DEFAULT_PROVIDER
-    3. First available provider (OpenAI, then Anthropic, then Grok)
+    3. First available provider (OpenAI, then Anthropic)
     """
     
     def __init__(self, provider: Optional[str] = None):
         self.providers = {
             "openai": _OpenAIClient(),
             "anthropic": _AnthropicClient(),
-            "claude": _AnthropicClient(),  # Alias for anthropic
-            "grok": _GrokClient()
+            "claude": _AnthropicClient()  # Alias for anthropic
         }
         
         # Handle provider aliases
@@ -353,8 +278,8 @@ class UnifiedLLMClient:
                 )
             else:
                 raise APIError(
-                    "No LLM provider available. Set one of: OPENAI_API_KEY, ANTHROPIC_API_KEY, "
-                    "or GROK_API_KEY in your .env file."
+                    "No LLM provider available. Set one of: OPENAI_API_KEY or ANTHROPIC_API_KEY "
+                    "in your .env file."
                 )
         
         if self.provider not in self.providers:
@@ -376,10 +301,6 @@ class UnifiedLLMClient:
                 error_msg += "1. Copy .env.example to .env\n"
                 error_msg += "2. Add your Anthropic API key: ANTHROPIC_API_KEY=your-key-here\n"
                 error_msg += "3. Get a key from: https://console.anthropic.com/settings/keys\n"
-            elif self.provider == "grok":
-                error_msg += "1. Copy .env.example to .env\n"
-                error_msg += "2. Add your Grok API key: GROK_API_KEY=your-key-here\n"
-                error_msg += "3. Get a key from: https://console.x.ai/\n"
             
             if available:
                 error_msg += f"\nAlternatively, use one of these configured providers: {', '.join(available)}\n"
@@ -411,8 +332,7 @@ class UnifiedLLMClient:
         temp_client = cls.__new__(cls)
         temp_client.providers = {
             "openai": _OpenAIClient(),
-            "anthropic": _AnthropicClient(),
-            "grok": _GrokClient()
+            "anthropic": _AnthropicClient()
         }
         
         for name, client in temp_client.providers.items():
@@ -445,14 +365,8 @@ SUPPORTED_PROVIDERS = {
     },
     "anthropic": {
         "name": "Anthropic/Claude",
-        "models": ["claude-opus-4-20250514"],
+        "models": ["claude-opus-4-20250514", "claude-3-5-sonnet-latest"],
         "env_key": "ANTHROPIC_API_KEY",
         "default_model": "claude-opus-4-20250514"
-    },
-    "grok": {
-        "name": "xAI/Grok",
-        "models": ["grok-4-latest", "grok-3-latest", "grok-3-fast", "grok-3-mini-fast"],
-        "env_key": "GROK_API_KEY",
-        "default_model": "grok-4-latest"
     }
 }

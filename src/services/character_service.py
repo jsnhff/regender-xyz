@@ -252,13 +252,8 @@ class CharacterService(BaseService):
         ]
         
         # Limit concurrency based on provider
-        if self.provider:
-            if 'grok' in self.provider.name.lower():
-                max_concurrent = 1  # Grok has strict rate limits
-            elif 'openai' in self.provider.name.lower():
-                max_concurrent = 10  # OpenAI handles parallel requests well
-            else:
-                max_concurrent = self.config.max_concurrent
+        if self.provider and 'openai' in self.provider.name.lower():
+            max_concurrent = 10  # OpenAI handles parallel requests well
         else:
             max_concurrent = self.config.max_concurrent
         semaphore = asyncio.Semaphore(max_concurrent)
