@@ -1,71 +1,53 @@
-# Archived & Samples folders
-_project_archive/
-logs/_archive/
-samples/
-
-# Character JSON
-# character_roles_genders.json
-# original_character_info.json
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.py.class
-*.py.bak
-*~
-*#
-.DS_Store
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
 
-# Debug and log files
-debug/
-debug_*/
-test_debug/
-logs/
-*.log
+# Environment files (contains API keys)
+.env
+.env.local
+.env.*.local
+
+# Book data directories
+# Uncomment to ignore book files
+# books/texts/
+# books/json/
+# books/output/
+
+# Old directories (cleanup)
+clean_json_books/
+parsed_books/
+book_texts/
+book_json/
+book_transforms/
+
+# Test outputs
+test_*.json
+*_test.json
+*_v2.json
+test_data/
+parsed_books/
+
+# Reports (keep the important ones)
+# Keep: book_format_analysis.json
+# Keep: parser_test_results.json
+# Keep: conversion_report.json
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Temporary files
-*.bak
 *.tmp
-*.swp
+*.bak
 *~
-*#
-*_working_backup.py
-
-# Environment variables
-.env
-.env.*
-!.env.example
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Cache files
 .cache/
-.cache_*/
-*.json.cache
+test_it/
 
 # Output files
 output/
@@ -74,11 +56,18 @@ output/
 *.feminine.txt
 *.masculine.txt
 
-# Virtual environment folder
+# Virtual environment folders
 venv/
 .env/
 myenv/
 my_multi_agent_env/
+test_it/
+*_testing/
+*_v*/
+
+# Transformed output files
+transformed_*.txt
+*_chunk*.txt
 
 # IDE Config Files (optional)
 .vscode/

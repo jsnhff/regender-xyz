@@ -1,0 +1,12 @@
+# Core dependencies
+openai>=1.0.0
+anthropic>=0.18.0
+
+# For Grok API support
+requests>=2.31.0
+
+# For Gutenberg downloads (optional but recommended)
+beautifulsoup4>=4.12.0
+
+# For environment variable management (optional)
+python-dotenv>=1.0.0
