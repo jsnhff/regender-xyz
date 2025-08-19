@@ -1,0 +1,319 @@
+{
+  "metadata": {
+    "title": "Moby Word II",
+    "author": "Grady Ward, grady@gradyward.com",
+    "format": "standard",
+    "format_confidence": 50,
+    "original_metadata": {
+      "title": "Moby Word II",
+      "author": "Grady Ward, grady@gradyward.com",
+      "language": null,
+      "release_date": "May, 2002  [Etext #3201]",
+      "ebook_number": null
+    },
+    "raw_text_length": 16267,
+    "cleaned_text_length": 10832
+  },
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Chapter 1",
+      "paragraphs": [
+        {
+          "sentences": [
+            "You can always email directly to:"
+          ]
+        },
+        {
+          "sentences": [
+            "Michael S.",
+            "Hart <hart@pobox.com>"
+          ]
+        },
+        {
+          "sentences": [
+            "hart@pobox.com forwards to hart@prairienet.org and archive.org if your mail bounces from archive.org, I will still see it, if it bounces from prairienet.org, better resend later on. . . ."
+          ]
+        },
+        {
+          "sentences": [
+            "We would prefer to send you this information by email."
+          ]
+        },
+        {
+          "sentences": [
+            "Example command-line FTP session:"
+          ]
+        },
+        {
+          "sentences": [
+            "ftp metalab.unc.edu login: anonymous password: your@login cd pub/docs/books/gutenberg cd etext90 through etext99 or etext00 through etext01, etc. dir [to see files] get or mget [to get files. . .set bin for zip files] GET GUTINDEX.?? [to get a year's listing of books, e.g., GUTINDEX.99] GET GUTINDEX.ALL [to get a listing of ALL books]"
+          ]
+        },
+        {
+          "sentences": [
+            "**The Legal Small Print**"
+          ]
+        },
+        {
+          "sentences": [
+            "(Three Pages)"
+          ]
+        },
+        {
+          "sentences": [
+            "***START**THE SMALL PRINT!**FOR PUBLIC DOMAIN ETEXTS**START*** Why is this \"Small Print!\" statement here?",
+            "You know: lawyers.",
+            "They tell us you might sue us if there is something wrong with your copy of this etext, even if you got it for free from someone other than us, and even if what's wrong is not our fault.",
+            "So, among other things, this \"Small Print!\" statement disclaims most of our liability to you.",
+            "It also tells you how you can distribute copies of this etext if you want to."
+          ]
+        },
+        {
+          "sentences": [
+            "*BEFORE!* YOU USE OR READ THIS ETEXT By using or reading any part of this PROJECT GUTENBERG-tm etext, you indicate that you understand, agree to and accept this \"Small Print!\" statement.",
+            "If you do not, you can receive a refund of the money (if any) you paid for this etext by sending a request within 30 days of receiving it to the person you got it from.",
+            "If you received this etext on a physical medium (such as a disk), you must return it with your request."
+          ]
+        },
+        {
+          "sentences": [
+            "ABOUT PROJECT GUTENBERG-TM ETEXTS This PROJECT GUTENBERG-tm etext, like most PROJECT GUTENBERG-tm etexts, is a \"public domain\" work distributed by Professor Michael S.",
+            "Hart through the Project Gutenberg Association (the \"Project\").",
+            "Among other things, this means that no one owns a United States copyright on or for this work, so the Project (and you!) can copy and distribute it in the United States without permission and without paying copyright royalties.",
+            "Special rules, set forth below, apply if you wish to copy and distribute this etext under the Project's \"PROJECT GUTENBERG\" trademark."
+          ]
+        },
+        {
+          "sentences": [
+            "To create these etexts, the Project expends considerable efforts to identify, transcribe and proofread public domain works.",
+            "Despite these efforts, the Project's etexts and any medium they may be on may contain \"Defects\".",
+            "Among other things, Defects may take the form of incomplete, inaccurate or corrupt data, transcription errors, a copyright or other intellectual property infringement, a defective or damaged disk or other etext medium, a computer virus, or computer codes that damage or cannot be read by your equipment."
+          ]
+        },
+        {
+          "sentences": [
+            "LIMITED WARRANTY; DISCLAIMER OF DAMAGES But for the \"Right of Replacement or Refund\" described below, [1] the Project (and any other party you may receive this etext from as a PROJECT GUTENBERG-tm etext) disclaims all liability to you for damages, costs and expenses, including legal fees, and [2] YOU HAVE NO REMEDIES FOR NEGLIGENCE OR UNDER STRICT LIABILITY, OR FOR BREACH OF WARRANTY OR CONTRACT, INCLUDING BUT NOT LIMITED TO INDIRECT, CONSEQUENTIAL, PUNITIVE OR INCIDENTAL DAMAGES, EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES."
+          ]
+        },
+        {
+          "sentences": [
+            "If you discover a Defect in this etext within 90 days of receiving it, you can receive a refund of the money (if any) you paid for it by sending an explanatory note within that time to the person you received it from.",
+            "If you received it on a physical medium, you must return it with your note, and such person may choose to alternatively give you a replacement copy.",
+            "If you received it electronically, such person may choose to alternatively give you a second opportunity to receive it electronically."
+          ]
+        },
+        {
+          "sentences": [
+            "THIS ETEXT IS OTHERWISE PROVIDED TO YOU \"AS-IS\".",
+            "NO OTHER WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, ARE MADE TO YOU AS TO THE ETEXT OR ANY MEDIUM IT MAY BE ON, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE."
+          ]
+        },
+        {
+          "sentences": [
+            "Some states do not allow disclaimers of implied warranties or the exclusion or limitation of consequential damages, so the above disclaimers and exclusions may not apply to you, and you may have other legal rights."
+          ]
+        },
+        {
+          "sentences": [
+            "INDEMNITY You will indemnify and hold the Project, its directors, officers, members and agents harmless from all liability, cost and expense, including legal fees, that arise directly or indirectly from any of the following that you do or cause: [1] distribution of this etext, [2] alteration, modification, or addition to the etext, or [3] any Defect."
+          ]
+        },
+        {
+          "sentences": [
+            "DISTRIBUTION UNDER \"PROJECT GUTENBERG-tm\" You may distribute copies of this etext electronically, or by disk, book or any other medium if you either delete this \"Small Print!\" and all other references to Project Gutenberg, or:"
+          ]
+        },
+        {
+          "sentences": [
+            "[1] Only give exact copies of it.",
+            "Among other things, this requires that you do not remove, alter or modify the etext or this \"small print!\" statement.",
+            "You may however, if you wish, distribute this etext in machine readable binary, compressed, mark-up, or proprietary form, including any form resulting from conversion by word pro- cessing or hypertext software, but only so long as *EITHER*:"
+          ]
+        },
+        {
+          "sentences": [
+            "[*] The etext, when displayed, is clearly readable, and does *not* contain characters other than those intended by the author of the work, although tilde (~), asterisk (*) and underline (_) characters may be used to convey punctuation intended by the author, and additional characters may be used to indicate hypertext links; OR"
+          ]
+        },
+        {
+          "sentences": [
+            "[*] The etext may be readily converted by the reader at no expense into plain ASCII, EBCDIC or equivalent form by the program that displays the etext (as is the case, for instance, with most word processors); OR"
+          ]
+        },
+        {
+          "sentences": [
+            "[*] You provide, or agree to also provide on request at no additional cost, fee or expense, a copy of the etext in its original plain ASCII form (or in EBCDIC or other equivalent proprietary form)."
+          ]
+        },
+        {
+          "sentences": [
+            "[2] Honor the etext refund and replacement provisions of this \"Small Print!\" statement."
+          ]
+        },
+        {
+          "sentences": [
+            "[3] Pay a trademark license fee to the Project of 20% of the gross profits you derive calculated using the method you already use to calculate your applicable taxes.",
+            "If you don't derive profits, no royalty is due.",
+            "Royalties are payable to \"Project Gutenberg Literary Archive Foundation\" the 60 days following each date you prepare (or were legally required to prepare) your annual (or equivalent periodic) tax return.",
+            "Please contact us beforehand to let us know your plans and to work out the details."
+          ]
+        },
+        {
+          "sentences": [
+            "WHAT IF YOU *WANT* TO SEND MONEY EVEN IF YOU DON'T HAVE TO?",
+            "The Project gratefully accepts contributions of money, time, public domain etexts, and royalty free copyright licenses.",
+            "If you are interested in contributing scanning equipment or software or other items, please contact Michael Hart at: hart@pobox.com"
+          ]
+        },
+        {
+          "sentences": [
+            "*END THE SMALL PRINT!",
+            "FOR PUBLIC DOMAIN ETEXTS*Ver.04.07.00*END*"
+          ]
+        },
+        {
+          "sentences": [
+            "MOBY (TM) WORDS II DOCUMENTATION NOTES"
+          ]
+        },
+        {
+          "sentences": [
+            "This documentation, the software and/or database are:"
+          ]
+        },
+        {
+          "sentences": [
+            "Public Domain material by grant from the author, January, 2001."
+          ]
+        },
+        {
+          "sentences": [
+            "The vocabulary files included with this product are in ordinary ASCII format with CRLF (ASCII 13/10) delimiters."
+          ]
+        },
+        {
+          "sentences": [
+            "MOBY WORDS II CONTENTS"
+          ]
+        },
+        {
+          "sentences": [
+            "6,213 acronyms (acronyms.txt) common acronyms & abbreviations"
+          ]
+        },
+        {
+          "sentences": [
+            "74,550 common dictionary words (common.txt) A list of words in common with two or more published dictionaries.",
+            "This gives the developer of a custom spelling checker a good beginning pool of relatively common words."
+          ]
+        },
+        {
+          "sentences": [
+            "256,772 compound words (compound.txt) Over 256,700 hyphenated or other entries containing more than one word as well as all capitalized words and acronyms.",
+            "Phrases were considered 'common' if they or variations of them occur in standard dictionaries or thesauruses."
+          ]
+        },
+        {
+          "sentences": [
+            "113,809 official crosswords (crosswd.txt) A list of words permitted in crossword games such as Scrabble(tm).",
+            "Compatible with the first edition of the Official Scrabble Players Dictionary(tm).",
+            "Since this list has all forms: -ing, -ed, -s, and so on of words, it makes a good addition when building a custom spelling dictionary."
+          ]
+        },
+        {
+          "sentences": [
+            "4,160 official crosswords delta (crswd-d.txt) When combined with the 113,809 crosswords file, it produces the official crossword list compatible with the second edition of the Official Scrabble Players Dictionary. (Scrabble is a registered trademark of Milton-Bradley licensed to Merriam-Webster.)"
+          ]
+        },
+        {
+          "sentences": [
+            "467 current fiction substrings (fiction.txt) The most frequently occurring 467 substrings occurring in a best-selling novel by Amy Tan in 1990."
+          ]
+        },
+        {
+          "sentences": [
+            "1,000 by frequency (freq.txt) This file consists of the 1,000 most frequently used English words from a wide variety of common texts listed in decreasing order of frequency"
+          ]
+        },
+        {
+          "sentences": [
+            "1,000 by frequency internet (freq-int.txt) This file consists of the 1,000 most frequently used English words as used on the Internet computer network in 1992."
+          ]
+        },
+        {
+          "sentences": [
+            "1,185 King James Version frequent substrings (KJVfreq.txt) The most frequently occurring 1,185 substrings in the King James Version Bible ranked and counted by order of frequency."
+          ]
+        },
+        {
+          "sentences": [
+            "21,986 names (names.txt) This database contains the most common names used in the United States and Great Britain.",
+            "Spelling checkers may want to supplement their basic word list with this one."
+          ]
+        },
+        {
+          "sentences": [
+            "4,946 female names (names-f.txt) frequent given names of females in English speaking countries"
+          ]
+        },
+        {
+          "sentences": [
+            "3,897 male names (names-m.txt frequent given names of males in English speaking countries"
+          ]
+        },
+        {
+          "sentences": [
+            "366 often misspelled words (oftenmis.txt) many of the most commonly misspelled words in English speaking countries"
+          ]
+        },
+        {
+          "sentences": [
+            "10,196 places (places.txt) a large selection of place names in the United States"
+          ]
+        },
+        {
+          "sentences": [
+            "354,984 single words (single.txt) Over 354,000 single words, excluding proper names, acronyms, or compound words and phrases.",
+            "This list does not exclude archaic words or significant variant spellings."
+          ]
+        },
+        {
+          "sentences": [
+            "USA Constitution (usaconst.txt) The Constitution of the United States, including the Bill of Rights and all amendments current to 1993."
+          ]
+        },
+        {
+          "sentences": [
+            "NOTE: Accents have been stripped from words, e.g., 'etude' does not mark the accent on the initial 'e'."
+          ]
+        },
+        {
+          "sentences": [
+            "Quick Start"
+          ]
+        },
+        {
+          "sentences": [
+            "1) Insure you have at least 10Mb of free disk space to hold the contents of this file."
+          ]
+        },
+        {
+          "sentences": [
+            "2) Create a destination directory to hold the files listed above."
+          ]
+        },
+        {
+          "sentences": [
+            "3) On the PG Catalog page click on the selection \"More Files\".",
+            "You will see a \"files.zip\" folder in the list.",
+            "Copy this zipped folder to your computer.",
+            "Open \"files.zip\" and copy the contents into the destination directory on your computer."
+          ]
+        }
+      ],
+      "metadata": {}
+    }
+  ],
+  "source_file": "books/texts/pg3201-Mo.txt"
+}
