@@ -28,11 +28,11 @@ The `regender` command handles everything automatically:
 
 ## Features
 
-- **Multi-Provider LLM Support**: Choose between OpenAI, Anthropic/Claude, and Grok
+- **Multi-Provider LLM Support**: Choose between OpenAI and Anthropic/Claude
   - Automatic provider detection based on available API keys
   - Provider-specific model optimization
   - Unified interface for seamless switching
-  - Support for latest models including Claude Opus 4 and Grok-4
+  - Support for latest models including Claude Opus 4
 - **Advanced Book Preprocessing**: Convert any text book to clean JSON format
   - Supports diverse book formats (English, French, German, plays, letters, etc.)
   - Smart chapter/section detection with pattern priority system
@@ -77,7 +77,6 @@ The `regender` command handles everything automatically:
 - At least one LLM provider API key:
   - OpenAI (`OPENAI_API_KEY`)
   - Anthropic (`ANTHROPIC_API_KEY`)
-  - Grok (`GROK_API_KEY`)
 
 ## Installation
 
@@ -102,10 +101,9 @@ Edit `.env` with your API keys and preferences:
 # API Keys (at least one required)
 OPENAI_API_KEY=your-openai-api-key
 ANTHROPIC_API_KEY=your-anthropic-api-key
-GROK_API_KEY=your-grok-api-key
 
 # Default provider (optional)
-DEFAULT_PROVIDER=openai  # or 'anthropic' or 'grok'
+DEFAULT_PROVIDER=openai  # or 'anthropic'
 ```
 
 See `.env.example` for all configuration options.
@@ -160,7 +158,6 @@ python regender_book_cli.py regender book.txt
 # Explicitly use a provider
 python regender_book_cli.py regender book.txt --provider openai
 python regender_book_cli.py regender book.txt --provider anthropic
-python regender_book_cli.py regender book.txt --provider grok
 ```
 
 ## Project Structure
