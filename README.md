@@ -221,6 +221,8 @@ MIT
   - [ ] Improve chapter boundary handling to ensure complete novel transformation
   - [ ] Implement full novel verification step using GPT-4.1's 1M token context window
   - [ ] Add validation to ensure consistent character representation throughout the novel
+  - [ ] Set text export option in Python to two choices: Plain ASCII to avoid UTF-8 import glitches in InDesign, and Rich Text needs to replace "_him_" with "<i>him</i>" tags so InDesign can apply italics via character styles
+  - [ ] 
 - **Milestone:** Print-ready version for book design collaboration
 
 ### Release 2: Website & Open Source Launch
