@@ -4,7 +4,7 @@ A command-line tool for analyzing and transforming gender representation in lite
 
 ## Overview
 
-This tool uses AI (OpenAI, Anthropic/Claude, or Grok) to identify characters in books and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles diverse text formats and uses intelligent chunking for optimal API usage.
+This tool uses AI (ChatGPT or Claude) to identify characters in books and transform gender representation while preserving narrative coherence. It features a powerful book parser that handles diverse text formats and uses intelligent chunking for optimal API usage.
 
 ## Quick Start
 
