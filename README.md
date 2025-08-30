@@ -51,6 +51,7 @@ The `regender` command handles everything automatically:
 - **Gender Transformation**: Transform text using different modes
   - `all_male` - Convert all characters to male
   - `all_female` - Convert all characters to female
+  - `nonbinary` - Convert all characters to non-binary/gender-neutral
   - `gender_swap` - Swap each character's gender
   - Character-aware transformations for consistency
   - Preserves exact sentence and paragraph structure
@@ -146,7 +147,8 @@ python regender_book_cli.py transform book.json --characters characters.json
 ### Transformation Types
 
 - `all_male` - Convert all characters to male
-- `all_female` - Convert all characters to female  
+- `all_female` - Convert all characters to female
+- `nonbinary` - Convert all characters to non-binary/gender-neutral
 - `gender_swap` - Swap each character's gender
 
 ### Provider Selection
