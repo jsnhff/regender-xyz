@@ -2,4 +2,4 @@
 
 from .base import BaseService, ServiceConfig
 
-__all__ = ['BaseService', 'ServiceConfig']
+__all__ = ["BaseService", "ServiceConfig"]

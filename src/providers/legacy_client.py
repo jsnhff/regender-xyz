@@ -6,22 +6,22 @@ This module provides a consistent interface for interacting with different
 LLM APIs while maintaining security and flexibility.
 """
 
-import os
 import json
+import os
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Manual .env loading since dotenv might not be available
-env_path = Path(__file__).parent / '.env'
+env_path = Path(__file__).parent / ".env"
 if env_path.exists():
     try:
-        with open(env_path, 'r') as f:
+        with open(env_path) as f:
             for line in f:
                 line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
                     # Only set if not already in environment
                     if key not in os.environ:
                         os.environ[key] = value.strip()
@@ -35,6 +35,7 @@ from openai import OpenAI, OpenAIError
 # Try to import Anthropic client
 try:
     from anthropic import Anthropic, AnthropicError
+
     _ANTHROPIC_AVAILABLE = True
 except ImportError:
     _ANTHROPIC_AVAILABLE = False
@@ -43,6 +44,7 @@ except ImportError:
 # Try to import requests for Grok
 try:
     import requests
+
     _REQUESTS_AVAILABLE = True
 except ImportError:
     _REQUESTS_AVAILABLE = False
@@ -55,12 +57,14 @@ except ImportError:
     # Fallback if utils not available
     class APIError(Exception):
         """Base exception for API-related errors."""
+
         pass
 
 
 @dataclass
 class _APIResponse:
     """Standardized API response across providers."""
+
     content: str
     model: str
     usage: Optional[Dict[str, int]] = None
@@ -69,33 +73,36 @@ class _APIResponse:
 
 class _BaseLLMClient(ABC):
     """Abstract base class for LLM clients."""
-    
+
     @abstractmethod
     def is_available(self) -> bool:
         """Check if the client is properly configured."""
         pass
-    
+
     @abstractmethod
     def get_default_model(self) -> str:
         """Get the default model for this provider."""
         pass
-    
+
     @abstractmethod
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[Dict] = None,
+    ) -> _APIResponse:
         """Send a completion request to the LLM."""
         pass
 
 
 class _OpenAIClient(_BaseLLMClient):
     """OpenAI API client implementation."""
-    
+
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
         self.base_url = base_url or os.environ.get("OPENAI_API_BASE")
-        
+
         if self.api_key:
             kwargs = {"api_key": self.api_key}
             if self.base_url:
@@ -103,46 +110,51 @@ class _OpenAIClient(_BaseLLMClient):
             self.client = OpenAI(**kwargs)
         else:
             self.client = None
-    
+
     def is_available(self) -> bool:
         """Check if OpenAI client is available."""
         return self.client is not None
-    
+
     def get_default_model(self) -> str:
         """Get default OpenAI model from environment or fallback."""
         return os.environ.get("OPENAI_MODEL", "gpt-4o")
-    
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
+
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[Dict] = None,
+    ) -> _APIResponse:
         """Complete using OpenAI API."""
         if not self.client:
             raise APIError("OpenAI client not initialized. Set OPENAI_API_KEY.")
-        
+
         try:
             kwargs = {
                 "model": model or self.get_default_model(),
                 "messages": messages,
-                "temperature": temperature
+                "temperature": temperature,
             }
-            
+
             if response_format:
                 kwargs["response_format"] = response_format
-            
+
             response = self.client.chat.completions.create(**kwargs)
-            
+
             return _APIResponse(
                 content=response.choices[0].message.content,
                 model=response.model,
                 usage={
                     "prompt_tokens": response.usage.prompt_tokens,
                     "completion_tokens": response.usage.completion_tokens,
-                    "total_tokens": response.usage.total_tokens
-                } if response.usage else None,
-                raw_response=response
+                    "total_tokens": response.usage.total_tokens,
+                }
+                if response.usage
+                else None,
+                raw_response=response,
             )
-            
+
         except OpenAIError as e:
             raise APIError(f"OpenAI API error: {e}")
         except Exception as e:
@@ -151,11 +163,11 @@ class _OpenAIClient(_BaseLLMClient):
 
 class _AnthropicClient(_BaseLLMClient):
     """Anthropic/Claude API client implementation."""
-    
+
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         self.base_url = base_url or os.environ.get("ANTHROPIC_API_BASE")
-        
+
         if self.api_key and _ANTHROPIC_AVAILABLE:
             kwargs = {"api_key": self.api_key}
             if self.base_url:
@@ -163,78 +175,82 @@ class _AnthropicClient(_BaseLLMClient):
             self.client = Anthropic(**kwargs)
         else:
             self.client = None
-    
+
     def is_available(self) -> bool:
         """Check if Anthropic client is available."""
         return self.client is not None and _ANTHROPIC_AVAILABLE
-    
+
     def get_default_model(self) -> str:
         """Get default Anthropic model from environment or fallback."""
         return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-20250514")
-    
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
+
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[Dict] = None,
+    ) -> _APIResponse:
         """Complete using Anthropic API."""
         if not self.client:
-            raise APIError("Anthropic client not initialized. Set ANTHROPIC_API_KEY and install anthropic.")
-        
+            raise APIError(
+                "Anthropic client not initialized. Set ANTHROPIC_API_KEY and install anthropic."
+            )
+
         try:
             # Convert OpenAI-style messages to Anthropic format
             # Extract system message if present
             system_message = None
             anthropic_messages = []
-            
+
             for msg in messages:
                 if msg["role"] == "system":
                     system_message = msg["content"]
                 else:
-                    anthropic_messages.append({
-                        "role": msg["role"],
-                        "content": msg["content"]
-                    })
-            
+                    anthropic_messages.append({"role": msg["role"], "content": msg["content"]})
+
             # Build request
             kwargs = {
                 "model": model or self.get_default_model(),
                 "messages": anthropic_messages,
                 "temperature": temperature,
-                "max_tokens": 4096  # Claude requires this
+                "max_tokens": 4096,  # Claude requires this
             }
-            
+
             if system_message:
                 kwargs["system"] = system_message
-            
+
             # Handle JSON response format
             if response_format and response_format.get("type") == "json_object":
                 # Add instruction to return JSON
                 if anthropic_messages and anthropic_messages[-1]["role"] == "user":
                     anthropic_messages[-1]["content"] += "\n\nRespond with valid JSON only."
-            
+
             response = self.client.messages.create(**kwargs)
-            
+
             # Extract content from Claude's response
             content = ""
-            if hasattr(response.content, '__iter__'):
+            if hasattr(response.content, "__iter__"):
                 # Handle multiple content blocks
                 for block in response.content:
-                    if hasattr(block, 'text'):
+                    if hasattr(block, "text"):
                         content += block.text
             else:
                 content = response.content
-            
+
             return _APIResponse(
                 content=content,
                 model=response.model,
                 usage={
                     "prompt_tokens": response.usage.input_tokens,
                     "completion_tokens": response.usage.output_tokens,
-                    "total_tokens": response.usage.input_tokens + response.usage.output_tokens
-                } if hasattr(response, 'usage') else None,
-                raw_response=response
+                    "total_tokens": response.usage.input_tokens + response.usage.output_tokens,
+                }
+                if hasattr(response, "usage")
+                else None,
+                raw_response=response,
             )
-            
+
         except AnthropicError as e:
             raise APIError(f"Anthropic API error: {e}")
         except Exception as e:
@@ -243,69 +259,72 @@ class _AnthropicClient(_BaseLLMClient):
 
 class _GrokClient(_BaseLLMClient):
     """Grok API client implementation."""
-    
+
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or os.environ.get("GROK_API_KEY")
         self.base_url = base_url or os.environ.get("GROK_API_BASE", "https://api.x.ai/v1")
-        
+
         if not _REQUESTS_AVAILABLE:
             raise APIError("requests library not available. Install with: pip install requests")
-    
+
     def is_available(self) -> bool:
         """Check if Grok client is available."""
         return bool(self.api_key and self.base_url)
-    
+
     def get_default_model(self) -> str:
         """Get default Grok model from environment or fallback."""
         return os.environ.get("GROK_MODEL", "grok-4-latest")
-    
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
+
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[Dict] = None,
+    ) -> _APIResponse:
         """Complete using Grok API."""
         if not self.is_available():
             raise APIError("Grok client not configured. Set GROK_API_KEY.")
-        
+
         try:
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}"
+                "Authorization": f"Bearer {self.api_key}",
             }
-            
+
             data = {
                 "model": model or self.get_default_model(),
                 "messages": messages,
                 "temperature": temperature,
-                "stream": False
+                "stream": False,
             }
-            
+
             # Note: Grok API might not support response_format yet
             if response_format and response_format.get("type") == "json_object":
                 # Add instruction to return JSON in the last message
                 if messages and messages[-1]["role"] == "user":
                     messages[-1]["content"] += "\n\nPlease respond with valid JSON only."
-            
+
             response = requests.post(
                 f"{self.base_url}/chat/completions",
                 headers=headers,
                 json=data,
-                timeout=int(os.environ.get("API_TIMEOUT", "300"))
+                timeout=int(os.environ.get("API_TIMEOUT", "300")),
             )
-            
+
             if response.status_code != 200:
                 error_data = response.json() if response.content else {}
                 raise APIError(f"Grok API error ({response.status_code}): {error_data}")
-            
+
             result = response.json()
-            
+
             return _APIResponse(
                 content=result["choices"][0]["message"]["content"],
                 model=result.get("model", model or self.get_default_model()),
                 usage=result.get("usage"),
-                raw_response=result
+                raw_response=result,
             )
-            
+
         except requests.RequestException as e:
             raise APIError(f"Grok API request error: {e}")
         except Exception as e:
@@ -315,35 +334,37 @@ class _GrokClient(_BaseLLMClient):
 class UnifiedLLMClient:
     """
     Unified client that can use multiple LLM providers.
-    
+
     Priority order:
     1. Explicitly specified provider
     2. Environment variable DEFAULT_PROVIDER
     3. First available provider (OpenAI, then Anthropic, then Grok)
     """
-    
+
     def __init__(self, provider: Optional[str] = None):
         self.providers = {
             "openai": _OpenAIClient(),
             "anthropic": _AnthropicClient(),
             "claude": _AnthropicClient(),  # Alias for anthropic
-            "grok": _GrokClient()
+            "grok": _GrokClient(),
         }
-        
+
         # Handle provider aliases
         if provider == "claude":
             provider = "anthropic"
-        
+
         # Determine which provider to use
-        self.provider = provider or os.environ.get("DEFAULT_PROVIDER") or os.environ.get("LLM_PROVIDER")
-        
+        self.provider = (
+            provider or os.environ.get("DEFAULT_PROVIDER") or os.environ.get("LLM_PROVIDER")
+        )
+
         if not self.provider:
             # Auto-detect first available provider
             for name, client in self.providers.items():
                 if name != "claude" and client.is_available():  # Skip alias
                     self.provider = name
                     break
-        
+
         if not self.provider:
             available = self.list_available_providers()
             if available:
@@ -356,18 +377,18 @@ class UnifiedLLMClient:
                     "No LLM provider available. Set one of: OPENAI_API_KEY, ANTHROPIC_API_KEY, "
                     "or GROK_API_KEY in your .env file."
                 )
-        
+
         if self.provider not in self.providers:
             raise APIError(f"Unknown provider: {self.provider}")
-        
+
         self.client = self.providers[self.provider]
         if not self.client.is_available():
             # Check which providers are available
             available = self.list_available_providers()
-            
+
             error_msg = f"Provider {self.provider} is not properly configured.\n\n"
             error_msg += "To fix this:\n"
-            
+
             if self.provider == "openai":
                 error_msg += "1. Copy .env.example to .env\n"
                 error_msg += "2. Add your OpenAI API key: OPENAI_API_KEY=your-key-here\n"
@@ -380,30 +401,33 @@ class UnifiedLLMClient:
                 error_msg += "1. Copy .env.example to .env\n"
                 error_msg += "2. Add your Grok API key: GROK_API_KEY=your-key-here\n"
                 error_msg += "3. Get a key from: https://console.x.ai/\n"
-            
+
             if available:
                 error_msg += f"\nAlternatively, use one of these configured providers: {', '.join(available)}\n"
                 error_msg += f"Example: --provider {available[0]}"
             else:
                 error_msg += "\nNo providers are currently configured. See .env.example for setup instructions."
-                
+
             raise APIError(error_msg)
-    
-    def complete(self, messages: List[Dict[str, str]], 
-                model: Optional[str] = None,
-                temperature: float = 0.0,
-                response_format: Optional[Dict] = None) -> _APIResponse:
+
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[Dict] = None,
+    ) -> _APIResponse:
         """Complete using the configured provider."""
         return self.client.complete(messages, model, temperature, response_format)
-    
+
     def get_provider(self) -> str:
         """Get the name of the current provider."""
         return self.provider
-    
+
     def get_default_model(self) -> str:
         """Get the default model for the current provider."""
         return self.client.get_default_model()
-    
+
     @classmethod
     def list_available_providers(cls) -> List[str]:
         """List all providers that are properly configured."""
@@ -412,23 +436,23 @@ class UnifiedLLMClient:
         temp_client.providers = {
             "openai": _OpenAIClient(),
             "anthropic": _AnthropicClient(),
-            "grok": _GrokClient()
+            "grok": _GrokClient(),
         }
-        
+
         for name, client in temp_client.providers.items():
             if client.is_available():
                 available.append(name)
-        
+
         return available
 
 
 def get_llm_client(provider: Optional[str] = None) -> UnifiedLLMClient:
     """
     Get a unified LLM client.
-    
+
     Args:
         provider: Optional provider name ('openai', 'anthropic', 'claude', or 'grok')
-        
+
     Returns:
         UnifiedLLMClient instance
     """
@@ -441,18 +465,18 @@ SUPPORTED_PROVIDERS = {
         "name": "OpenAI",
         "models": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
         "env_key": "OPENAI_API_KEY",
-        "default_model": "gpt-4o"
+        "default_model": "gpt-4o",
     },
     "anthropic": {
         "name": "Anthropic/Claude",
         "models": ["claude-opus-4-20250514"],
         "env_key": "ANTHROPIC_API_KEY",
-        "default_model": "claude-opus-4-20250514"
+        "default_model": "claude-opus-4-20250514",
     },
     "grok": {
         "name": "xAI/Grok",
         "models": ["grok-4-latest", "grok-3-latest", "grok-3-fast", "grok-3-mini-fast"],
         "env_key": "GROK_API_KEY",
-        "default_model": "grok-4-latest"
-    }
+        "default_model": "grok-4-latest",
+    },
 }

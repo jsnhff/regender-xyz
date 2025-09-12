@@ -75,3 +75,16 @@ transformed_*.txt
 
 # Python specific
 .DS_Store
+
+# Archive
+archive/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Test outputs
+transformed_*.txt
+*_log.json
+character_list.json

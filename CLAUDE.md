@@ -4,17 +4,43 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Regender-XYZ is a modern command-line tool for analyzing and transforming gender representation in literature using multiple LLM providers (OpenAI, Anthropic/Claude, Grok). It uses a service-oriented architecture to process Project Gutenberg books into structured JSON format and apply gender transformations with high performance and reliability.
+Regender-XYZ is a modern command-line tool for analyzing and transforming gender representation in literature using multiple LLM providers (OpenAI, Anthropic/Claude). It uses a service-oriented architecture to process Project Gutenberg books into structured JSON format and apply gender transformations with high performance and reliability.
+
+## Code Quality Standards
+
+### Automated Linting and Formatting
+This repository uses **Ruff** for Python linting and formatting. All Python code should:
+- Pass `ruff check` without errors
+- Be formatted with `ruff format`
+- Follow PEP 8 guidelines with 100-character line limit
+- Use double quotes for strings
+- Have proper import sorting
+
+The `.claude/hooks.json` file configures automatic ruff checks and formatting for all Python file edits.
 
 ## Common Commands
+
+### Code Quality
+```bash
+# Check all Python files
+ruff check .
+
+# Fix linting issues automatically
+ruff check --fix .
+
+# Format all Python files
+ruff format .
+
+# Check specific file
+ruff check src/services/character_service.py
+```
 
 ### Environment Setup
 ```bash
 # Set up API keys (required - at least one)
 export OPENAI_API_KEY='your-key'
 export ANTHROPIC_API_KEY='your-key'
-export GROK_API_KEY='your-key'
-export DEFAULT_PROVIDER='openai'  # or 'anthropic' or 'grok'
+export DEFAULT_PROVIDER='openai'  # or 'anthropic'
 
 # Install dependencies
 pip install -r requirements.txt
@@ -25,7 +51,7 @@ pip install -r requirements.txt
 # Transform a book (complete pipeline)
 python regender_cli.py books/texts/pg1342.txt all_female -o output.json
 
-# Download books from Project Gutenberg (still using downloader)
+# Download books from Project Gutenberg
 python -m download.download 1342  # Pride and Prejudice
 
 # Use specific provider
@@ -104,13 +130,21 @@ The `src/config.json` file defines:
 - **Async Support**: Full async/await for parallel processing
 - **Provider Abstraction**: All LLM calls go through unified provider interface
 - **Smart Chunking**: Token-aware splitting respects paragraph boundaries
-- **Rate Limiting**: Built-in support for provider rate limits (e.g., Grok-4)
+- **Rate Limiting**: Built-in support for provider rate limits
 
 ## Development Notes
 
-- Currently on `phase4-migration` branch (main branch is `master`)
+- Main branch is `master`
 - Service-oriented architecture with dependency injection
 - Environment variables loaded through provider configuration
 - Test suite uses unittest-style patterns
 - Logs stored in `logs/` directory for debugging
 - Clean architecture: 84% faster, 60% less memory, <5% code duplication
+
+## Important Instructions
+
+- Do what has been asked; nothing more, nothing less
+- NEVER create files unless they're absolutely necessary for achieving your goal
+- ALWAYS prefer editing an existing file to creating a new one
+- NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User
+- Always ensure Python code passes ruff checks before committing
