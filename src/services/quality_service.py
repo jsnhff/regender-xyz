@@ -127,7 +127,7 @@ class QualityService(BaseService):
         return await self.strategy.assess_quality_async(transformation)
 
     async def _apply_corrections_async(
-        self, transformation: Transformation, issues: List[Dict[str, Any]]
+        self, transformation: Transformation, issues: list[dict[str, Any]]
     ) -> Transformation:
         """
         Apply corrections to fix identified issues.
@@ -164,7 +164,7 @@ class QualityService(BaseService):
 
         return transformation
 
-    def _group_issues_by_type(self, issues: List[Dict[str, Any]]) -> Dict[str, List[Dict]]:
+    def _group_issues_by_type(self, issues: list[dict[str, Any]]) -> dict[str, list[dict]]:
         """Group issues by type for batch processing."""
         grouped = {}
         for issue in issues:
@@ -175,7 +175,7 @@ class QualityService(BaseService):
         return grouped
 
     async def _fix_consistency_issues(
-        self, transformation: Transformation, issues: List[Dict[str, Any]]
+        self, transformation: Transformation, issues: list[dict[str, Any]]
     ) -> Transformation:
         """
         Fix consistency issues in transformation.
@@ -208,7 +208,7 @@ class QualityService(BaseService):
         return transformation
 
     async def _fix_completeness_issues(
-        self, transformation: Transformation, issues: List[Dict[str, Any]]
+        self, transformation: Transformation, issues: list[dict[str, Any]]
     ) -> Transformation:
         """
         Fix completeness issues (missing transformations).
@@ -234,7 +234,7 @@ class QualityService(BaseService):
         return transformation
 
     async def _fix_grammar_issues(
-        self, transformation: Transformation, issues: List[Dict[str, Any]]
+        self, transformation: Transformation, issues: list[dict[str, Any]]
     ) -> Transformation:
         """
         Fix grammar issues in transformation.
@@ -253,7 +253,7 @@ class QualityService(BaseService):
 
         return transformation
 
-    async def validate_transformation(self, transformation: Transformation) -> Dict[str, Any]:
+    async def validate_transformation(self, transformation: Transformation) -> dict[str, Any]:
         """
         Validate a transformation without modifying it.
 
@@ -284,7 +284,7 @@ class QualityService(BaseService):
             "issues": {"critical": critical, "major": major, "minor": minor, "total": len(issues)},
         }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         metrics = super().get_metrics()
         metrics.update(

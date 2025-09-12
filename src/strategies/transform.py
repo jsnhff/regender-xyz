@@ -14,7 +14,7 @@ class TransformStrategy(Strategy):
     """Base class for transformation strategies."""
 
     @abstractmethod
-    async def transform_async(self, text: str, context: Dict[str, Any]) -> str:
+    async def transform_async(self, text: str, context: dict[str, Any]) -> str:
         """
         Transform text according to strategy.
 
@@ -49,7 +49,7 @@ class ChapterParallelStrategy(TransformStrategy):
         else:
             raise ValueError("TransformStrategy requires dict input with 'text' and 'context'")
 
-    async def transform_async(self, text: str, context: Dict[str, Any]) -> str:
+    async def transform_async(self, text: str, context: dict[str, Any]) -> str:
         """
         Transform text using parallel processing.
 
@@ -75,7 +75,7 @@ class SequentialTransformStrategy(TransformStrategy):
         else:
             raise ValueError("TransformStrategy requires dict input")
 
-    async def transform_async(self, text: str, context: Dict[str, Any]) -> str:
+    async def transform_async(self, text: str, context: dict[str, Any]) -> str:
         """Transform text sequentially."""
         # Placeholder - would use existing transformation logic
         return text
@@ -102,7 +102,7 @@ class SmartTransformStrategy(TransformStrategy):
         else:
             raise ValueError("TransformStrategy requires dict input")
 
-    async def transform_async(self, text: str, context: Dict[str, Any]) -> str:
+    async def transform_async(self, text: str, context: dict[str, Any]) -> str:
         """
         Transform text with smart chunking.
 

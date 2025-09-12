@@ -63,7 +63,7 @@ class UnifiedProvider(LLMProvider, Plugin):
             return 5  # Grok has strict rate limits
         return None
 
-    def initialize(self, config: Dict[str, Any]):
+    def initialize(self, config: dict[str, Any]):
         """
         Initialize unified client.
 
@@ -111,7 +111,7 @@ class UnifiedProvider(LLMProvider, Plugin):
             self.logger.error(f"Failed to import UnifiedLLMClient: {e}")
             raise
 
-    def execute(self, context: Dict[str, Any]) -> Any:
+    def execute(self, context: dict[str, Any]) -> Any:
         """
         Execute plugin (complete a prompt).
 
@@ -127,7 +127,7 @@ class UnifiedProvider(LLMProvider, Plugin):
 
         return self.complete(messages, **context)
 
-    async def complete_async(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    async def complete_async(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Complete a prompt asynchronously.
 
@@ -164,7 +164,7 @@ class UnifiedProvider(LLMProvider, Plugin):
 
         return await loop.run_in_executor(None, sync_complete)
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """
         Validate provider configuration.
 

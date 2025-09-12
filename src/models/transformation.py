@@ -46,7 +46,7 @@ class TransformationChange:
     change_type: str  # pronoun, name, title, etc.
     character_affected: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "location": {
@@ -66,16 +66,16 @@ class Transformation:
     """Represents a complete book transformation."""
 
     original_book: Book
-    transformed_chapters: List[Chapter]
+    transformed_chapters: list[Chapter]
     transform_type: TransformType
     characters_used: CharacterAnalysis
-    changes: List[TransformationChange] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    changes: list[TransformationChange] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
     quality_score: Optional[float] = None
     qc_iterations: int = 0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "original_book_id": self.original_book.hash(),
@@ -111,7 +111,7 @@ class Transformation:
             },
         )
 
-    def get_changes_by_type(self) -> Dict[str, List[TransformationChange]]:
+    def get_changes_by_type(self) -> dict[str, list[TransformationChange]]:
         """Group changes by type."""
         by_type = {}
         for change in self.changes:
@@ -120,7 +120,7 @@ class Transformation:
             by_type[change.change_type].append(change)
         return by_type
 
-    def get_changes_by_character(self) -> Dict[str, List[TransformationChange]]:
+    def get_changes_by_character(self) -> dict[str, list[TransformationChange]]:
         """Group changes by character affected."""
         by_character = {}
         for change in self.changes:
@@ -130,7 +130,7 @@ class Transformation:
             by_character[char_name].append(change)
         return by_character
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """Get transformation statistics."""
         changes_by_type = self.get_changes_by_type()
         changes_by_character = self.get_changes_by_character()
@@ -144,7 +144,7 @@ class Transformation:
             "qc_iterations": self.qc_iterations,
         }
 
-    def validate(self) -> List[str]:
+    def validate(self) -> list[str]:
         """
         Validate the transformation.
 
@@ -187,14 +187,14 @@ class Transformation:
 class TransformationResult:
     """Simplified result for backward compatibility."""
 
-    transformed_book: Dict[str, Any]
-    characters_used: Dict[str, Any]
+    transformed_book: dict[str, Any]
+    characters_used: dict[str, Any]
     transform_type: str
     total_changes: int
     processing_time: float
     quality_score: Optional[float] = None
     qc_iterations: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_transformation(

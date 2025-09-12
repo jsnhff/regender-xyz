@@ -16,7 +16,7 @@ class QualityStrategy(Strategy):
     """Base class for quality control strategies."""
 
     @abstractmethod
-    async def find_issues_async(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def find_issues_async(self, transformation: Transformation) -> list[dict[str, Any]]:
         """
         Find quality issues in a transformation.
 
@@ -63,7 +63,7 @@ class AdaptiveQualityStrategy(QualityStrategy):
         else:
             raise ValueError("QualityStrategy requires Transformation input")
 
-    async def find_issues_async(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def find_issues_async(self, transformation: Transformation) -> list[dict[str, Any]]:
         """
         Find quality issues in transformation.
 
@@ -118,7 +118,7 @@ class AdaptiveQualityStrategy(QualityStrategy):
         # Ensure score stays in range
         return max(0, min(100, score))
 
-    async def _check_consistency(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def _check_consistency(self, transformation: Transformation) -> list[dict[str, Any]]:
         """Check for consistency issues."""
         issues = []
 
@@ -147,7 +147,7 @@ class AdaptiveQualityStrategy(QualityStrategy):
 
         return issues
 
-    async def _check_completeness(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def _check_completeness(self, transformation: Transformation) -> list[dict[str, Any]]:
         """Check for completeness issues."""
         issues = []
 
@@ -173,7 +173,7 @@ class AdaptiveQualityStrategy(QualityStrategy):
 
         return issues
 
-    async def _check_grammar(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def _check_grammar(self, transformation: Transformation) -> list[dict[str, Any]]:
         """Check for grammar issues."""
         # Simplified - real implementation would use grammar checking
         return []
@@ -191,7 +191,7 @@ class StrictQualityStrategy(QualityStrategy):
         else:
             raise ValueError("QualityStrategy requires Transformation input")
 
-    async def find_issues_async(self, transformation: Transformation) -> List[Dict[str, Any]]:
+    async def find_issues_async(self, transformation: Transformation) -> list[dict[str, Any]]:
         """Find any quality issues with strict criteria."""
         issues = []
 

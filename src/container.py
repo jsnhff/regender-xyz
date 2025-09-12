@@ -26,18 +26,18 @@ class ServiceContainer:
 
     def __init__(self):
         """Initialize the service container."""
-        self._services: Dict[str, BaseService] = {}
-        self._factories: Dict[str, Callable] = {}
-        self._configs: Dict[str, ServiceConfig] = {}
-        self._dependencies: Dict[str, Dict[str, str]] = {}
+        self._services: dict[str, BaseService] = {}
+        self._factories: dict[str, Callable] = {}
+        self._configs: dict[str, ServiceConfig] = {}
+        self._dependencies: dict[str, dict[str, str]] = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def register(
         self,
         name: str,
-        service_class: Type[BaseService],
-        config: Optional[Dict] = None,
-        dependencies: Optional[Dict[str, str]] = None,
+        service_class: type[BaseService],
+        config: Optional[dict] = None,
+        dependencies: Optional[dict[str, str]] = None,
     ):
         """
         Register a service with the container.
@@ -69,9 +69,9 @@ class ServiceContainer:
 
     def _create_service(
         self,
-        service_class: Type[BaseService],
+        service_class: type[BaseService],
         config: Optional[ServiceConfig],
-        dependencies: Dict[str, str],
+        dependencies: dict[str, str],
     ) -> BaseService:
         """
         Create a service instance with resolved dependencies.
@@ -171,7 +171,7 @@ class ServiceContainer:
                 dependencies=service_config.get("dependencies"),
             )
 
-    def _get_class(self, class_path: str) -> Type:
+    def _get_class(self, class_path: str) -> type:
         """
         Import and return a class from a module path.
 
@@ -202,7 +202,7 @@ class ServiceContainer:
         self._dependencies.clear()
         self.logger.info("Container cleared")
 
-    def get_all_services(self) -> Dict[str, BaseService]:
+    def get_all_services(self) -> dict[str, BaseService]:
         """
         Get all instantiated services.
 
@@ -216,7 +216,7 @@ class ServiceContainer:
 
         return self._services.copy()
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get container metrics.
 

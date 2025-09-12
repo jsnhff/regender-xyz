@@ -114,7 +114,7 @@ class BaseService(ABC):
         """
         return data is not None
 
-    def handle_error(self, error: Exception, context: Dict) -> None:
+    def handle_error(self, error: Exception, context: dict) -> None:
         """
         Centralized error handling.
 
@@ -169,7 +169,7 @@ class BaseService(ABC):
         if last_error:
             raise last_error
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get service metrics.
 

@@ -34,7 +34,7 @@ class CharacterCache:
 class CharacterMerger:
     """Merges character results from multiple chunks."""
 
-    def merge(self, chunk_results: List[Dict[str, Any]]) -> List[Character]:
+    def merge(self, chunk_results: list[dict[str, Any]]) -> list[Character]:
         """
         Merge character results from multiple chunks.
 
@@ -109,7 +109,7 @@ class CharacterMerger:
 class PromptGenerator:
     """Generates prompts for character analysis."""
 
-    def generate_analysis_prompt(self, text: str) -> Dict[str, str]:
+    def generate_analysis_prompt(self, text: str) -> dict[str, str]:
         """
         Generate character analysis prompt.
 
@@ -230,7 +230,7 @@ class CharacterService(BaseService):
         except Exception as e:
             self.handle_error(e, {"book_title": book.title})
 
-    async def _analyze_chunks_async(self, chunks: List[str]) -> List[Dict]:
+    async def _analyze_chunks_async(self, chunks: list[str]) -> list[dict]:
         """
         Analyze text chunks in parallel.
 
@@ -269,7 +269,7 @@ class CharacterService(BaseService):
         results = await asyncio.gather(*[limited_task(t) for t in tasks])
         return results
 
-    async def _analyze_single_chunk(self, chunk: str, chunk_index: int) -> Dict[str, Any]:
+    async def _analyze_single_chunk(self, chunk: str, chunk_index: int) -> dict[str, Any]:
         """
         Analyze a single text chunk.
 
@@ -313,7 +313,7 @@ class CharacterService(BaseService):
             self.logger.error(f"Error analyzing chunk {chunk_index}: {e}")
             return {"chunk_index": chunk_index, "characters": []}
 
-    def _generate_metadata(self, characters: List[Character]) -> Dict[str, Any]:
+    def _generate_metadata(self, characters: list[Character]) -> dict[str, Any]:
         """
         Generate metadata about the analysis.
 
@@ -337,7 +337,7 @@ class CharacterService(BaseService):
 
         return stats
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         metrics = super().get_metrics()
         metrics.update(

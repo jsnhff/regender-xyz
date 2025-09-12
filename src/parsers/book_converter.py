@@ -59,7 +59,7 @@ class BookConverter:
             "Dec.",
         }
 
-    def split_sentences(self, text: str) -> List[str]:
+    def split_sentences(self, text: str) -> list[str]:
         """
         Split text into sentences.
 

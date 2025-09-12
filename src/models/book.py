@@ -15,14 +15,14 @@ from typing import Any, Dict, List, Optional
 class Paragraph:
     """Represents a paragraph in a book."""
 
-    sentences: List[str]
+    sentences: list[str]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {"sentences": self.sentences}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Paragraph":
+    def from_dict(cls, data: dict[str, Any]) -> "Paragraph":
         """Create from dictionary representation."""
         return cls(sentences=data.get("sentences", []))
 
@@ -41,10 +41,10 @@ class Chapter:
 
     number: Optional[int]
     title: Optional[str]
-    paragraphs: List[Paragraph]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    paragraphs: list[Paragraph]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "number": self.number,
@@ -54,7 +54,7 @@ class Chapter:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Chapter":
+    def from_dict(cls, data: dict[str, Any]) -> "Chapter":
         """Create from dictionary representation."""
         return cls(
             number=data.get("number"),
@@ -67,7 +67,7 @@ class Chapter:
         """Get full text of the chapter."""
         return "\n\n".join(p.get_text() for p in self.paragraphs)
 
-    def get_sentences(self) -> List[str]:
+    def get_sentences(self) -> list[str]:
         """Get all sentences in the chapter."""
         sentences = []
         for paragraph in self.paragraphs:
@@ -85,11 +85,11 @@ class Book:
 
     title: Optional[str]
     author: Optional[str]
-    chapters: List[Chapter]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    chapters: list[Chapter]
+    metadata: dict[str, Any] = field(default_factory=dict)
     source_file: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "metadata": {"title": self.title, "author": self.author, **self.metadata},
@@ -98,7 +98,7 @@ class Book:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Book":
+    def from_dict(cls, data: dict[str, Any]) -> "Book":
         """Create from dictionary representation."""
         metadata = data.get("metadata", {})
         return cls(
@@ -143,7 +143,7 @@ class Book:
         book_repr = json.dumps(self.to_dict(), sort_keys=True)
         return hashlib.sha256(book_repr.encode()).hexdigest()[:16]
 
-    def validate(self) -> List[str]:
+    def validate(self) -> list[str]:
         """
         Validate the book structure.
 

@@ -16,7 +16,7 @@ class AnalysisStrategy(Strategy):
     """Base class for character analysis strategies."""
 
     @abstractmethod
-    async def chunk_book_async(self, book: Book) -> List[str]:
+    async def chunk_book_async(self, book: Book) -> list[str]:
         """
         Chunk book into analyzable pieces.
 
@@ -29,7 +29,7 @@ class AnalysisStrategy(Strategy):
         pass
 
     @abstractmethod
-    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> Dict[str, Any]:
+    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> dict[str, Any]:
         """
         Analyze a single chunk for characters.
 
@@ -71,7 +71,7 @@ class SmartChunkingStrategy(AnalysisStrategy):
         else:
             raise ValueError("SmartChunkingStrategy requires Book input")
 
-    async def chunk_book_async(self, book: Book) -> List[str]:
+    async def chunk_book_async(self, book: Book) -> list[str]:
         """Chunk book intelligently."""
 
         # Simple token estimation (roughly 4 characters per token)
@@ -129,7 +129,7 @@ class SmartChunkingStrategy(AnalysisStrategy):
 
         return chunks
 
-    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> Dict[str, Any]:
+    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> dict[str, Any]:
         """Analyze a chunk (placeholder - actual implementation would use LLM)."""
         # This would be implemented with actual LLM calls
         # For now, return placeholder
@@ -151,11 +151,11 @@ class SequentialStrategy(AnalysisStrategy):
         else:
             raise ValueError("SequentialStrategy requires Book input")
 
-    async def chunk_book_async(self, book: Book) -> List[str]:
+    async def chunk_book_async(self, book: Book) -> list[str]:
         """Create one chunk per chapter."""
         return [chapter.get_text() for chapter in book.chapters]
 
-    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> Dict[str, Any]:
+    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> dict[str, Any]:
         """Analyze a chapter."""
         return {"chunk_index": chunk_index, "characters": [], "text_length": len(chunk)}
 
@@ -199,7 +199,7 @@ class RateLimitedStrategy(AnalysisStrategy):
         else:
             raise ValueError("RateLimitedStrategy requires Book input")
 
-    async def chunk_book_async(self, book: Book) -> List[str]:
+    async def chunk_book_async(self, book: Book) -> list[str]:
         """Create reasonably sized chunks."""
 
         # Use smaller chunks for rate-limited analysis
@@ -230,6 +230,6 @@ class RateLimitedStrategy(AnalysisStrategy):
 
         return chunks
 
-    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> Dict[str, Any]:
+    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> dict[str, Any]:
         """Analyze with rate limiting."""
         return {"chunk_index": chunk_index, "characters": [], "text_length": len(chunk)}

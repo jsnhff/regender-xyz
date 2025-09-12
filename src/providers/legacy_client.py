@@ -67,7 +67,7 @@ class _APIResponse:
 
     content: str
     model: str
-    usage: Optional[Dict[str, int]] = None
+    usage: Optional[dict[str, int]] = None
     raw_response: Optional[Any] = None
 
 
@@ -87,10 +87,10 @@ class _BaseLLMClient(ABC):
     @abstractmethod
     def complete(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
-        response_format: Optional[Dict] = None,
+        response_format: Optional[dict] = None,
     ) -> _APIResponse:
         """Send a completion request to the LLM."""
         pass
@@ -121,10 +121,10 @@ class _OpenAIClient(_BaseLLMClient):
 
     def complete(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
-        response_format: Optional[Dict] = None,
+        response_format: Optional[dict] = None,
     ) -> _APIResponse:
         """Complete using OpenAI API."""
         if not self.client:
@@ -186,10 +186,10 @@ class _AnthropicClient(_BaseLLMClient):
 
     def complete(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
-        response_format: Optional[Dict] = None,
+        response_format: Optional[dict] = None,
     ) -> _APIResponse:
         """Complete using Anthropic API."""
         if not self.client:
@@ -277,10 +277,10 @@ class _GrokClient(_BaseLLMClient):
 
     def complete(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
-        response_format: Optional[Dict] = None,
+        response_format: Optional[dict] = None,
     ) -> _APIResponse:
         """Complete using Grok API."""
         if not self.is_available():
@@ -412,10 +412,10 @@ class UnifiedLLMClient:
 
     def complete(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
-        response_format: Optional[Dict] = None,
+        response_format: Optional[dict] = None,
     ) -> _APIResponse:
         """Complete using the configured provider."""
         return self.client.complete(messages, model, temperature, response_format)
@@ -429,7 +429,7 @@ class UnifiedLLMClient:
         return self.client.get_default_model()
 
     @classmethod
-    def list_available_providers(cls) -> List[str]:
+    def list_available_providers(cls) -> list[str]:
         """List all providers that are properly configured."""
         available = []
         temp_client = cls.__new__(cls)

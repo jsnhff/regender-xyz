@@ -54,7 +54,7 @@ class IntegratedParsingStrategy(ParsingStrategy):
         parsed = self.parser.parse(text)
         return parsed.format.value
 
-    async def parse_async(self, raw_data: str, format_type: Optional[str] = None) -> Dict[str, Any]:
+    async def parse_async(self, raw_data: str, format_type: Optional[str] = None) -> dict[str, Any]:
         """
         Parse raw text into structured format.
 
@@ -72,7 +72,7 @@ class IntegratedParsingStrategy(ParsingStrategy):
         # Convert ParsedBook to dictionary format expected by service
         return self._convert_to_dict(parsed_book)
 
-    def _convert_to_dict(self, parsed_book: ParsedBook) -> Dict[str, Any]:
+    def _convert_to_dict(self, parsed_book: ParsedBook) -> dict[str, Any]:
         """
         Convert ParsedBook to dictionary format.
 
@@ -93,7 +93,7 @@ class IntegratedParsingStrategy(ParsingStrategy):
             },
         }
 
-    def parse_sync(self, raw_data: str, format_type: Optional[str] = None) -> Dict[str, Any]:
+    def parse_sync(self, raw_data: str, format_type: Optional[str] = None) -> dict[str, Any]:
         """
         Synchronous parsing for convenience.
 

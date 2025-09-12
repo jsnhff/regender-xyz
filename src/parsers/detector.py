@@ -28,9 +28,9 @@ class FormatDetection:
 
     format: BookFormat
     confidence: float  # 0-100
-    evidence: Dict[str, List[str]]  # What patterns were found
+    evidence: dict[str, list[str]]  # What patterns were found
     hierarchy_levels: int  # 1=flat, 2=part/chapter, 3=volume/book/chapter
-    recommendations: List[str]  # Suggestions for parsing
+    recommendations: list[str]  # Suggestions for parsing
 
 
 class FormatDetector:
@@ -251,7 +251,7 @@ class FormatDetector:
             recommendations=recommendations,
         )
 
-    def _get_sample_lines(self, lines: List[str], sample_size: int = 2000) -> List[str]:
+    def _get_sample_lines(self, lines: list[str], sample_size: int = 2000) -> list[str]:
         """
         Get a representative sample of lines from the book.
 
@@ -278,8 +278,8 @@ class FormatDetector:
         return samples
 
     def _score_patterns(
-        self, lines: List[str], patterns: List[Tuple], min_matches: int = 1
-    ) -> Tuple[float, List[str]]:
+        self, lines: list[str], patterns: list[tuple], min_matches: int = 1
+    ) -> tuple[float, list[str]]:
         """
         Score lines against patterns.
 
@@ -335,7 +335,7 @@ class FormatDetector:
 
         return None
 
-    def _get_hierarchy_levels(self, format: str, evidence: Dict) -> int:
+    def _get_hierarchy_levels(self, format: str, evidence: dict) -> int:
         """
         Determine hierarchy depth from format and evidence.
         """
@@ -361,8 +361,8 @@ class FormatDetector:
         return 1  # Flat structure
 
     def _get_recommendations(
-        self, format: BookFormat, confidence: float, evidence: Dict
-    ) -> List[str]:
+        self, format: BookFormat, confidence: float, evidence: dict
+    ) -> list[str]:
         """
         Generate parsing recommendations based on detection.
         """

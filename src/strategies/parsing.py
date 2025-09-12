@@ -15,7 +15,7 @@ class ParsingStrategy(Strategy):
     """Base class for parsing strategies."""
 
     @abstractmethod
-    async def parse_async(self, raw_data: str, format_type: str) -> Dict[str, Any]:
+    async def parse_async(self, raw_data: str, format_type: str) -> dict[str, Any]:
         """
         Parse raw text into structured format.
 
@@ -87,7 +87,7 @@ class StandardParsingStrategy(ParsingStrategy):
 
         return "standard"
 
-    async def parse_async(self, raw_data: str, format_type: str) -> Dict[str, Any]:
+    async def parse_async(self, raw_data: str, format_type: str) -> dict[str, Any]:
         """Parse raw text into structured format."""
         import re
 
@@ -144,7 +144,7 @@ class PlayParsingStrategy(ParsingStrategy):
             return "play"
         return "unknown"
 
-    async def parse_async(self, raw_data: str, format_type: str) -> Dict[str, Any]:
+    async def parse_async(self, raw_data: str, format_type: str) -> dict[str, Any]:
         """Parse play text."""
         import re
 

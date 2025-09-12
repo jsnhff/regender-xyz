@@ -27,14 +27,14 @@ class Character:
 
     name: str
     gender: Gender
-    pronouns: Dict[str, str]  # e.g., {"subject": "she", "object": "her", "possessive": "her"}
-    titles: List[str] = field(default_factory=list)  # e.g., ["Mr.", "Lord"]
-    aliases: List[str] = field(default_factory=list)  # Alternative names
+    pronouns: dict[str, str]  # e.g., {"subject": "she", "object": "her", "possessive": "her"}
+    titles: list[str] = field(default_factory=list)  # e.g., ["Mr.", "Lord"]
+    aliases: list[str] = field(default_factory=list)  # Alternative names
     description: Optional[str] = None
     importance: str = "supporting"  # main, supporting, minor
     confidence: float = 1.0  # Confidence in gender identification
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "name": self.name,
@@ -48,7 +48,7 @@ class Character:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Character":
+    def from_dict(cls, data: dict[str, Any]) -> "Character":
         """Create from dictionary representation."""
         return cls(
             name=data["name"],
@@ -61,11 +61,11 @@ class Character:
             confidence=data.get("confidence", 1.0),
         )
 
-    def get_all_names(self) -> List[str]:
+    def get_all_names(self) -> list[str]:
         """Get all names and aliases for this character."""
         return [self.name] + self.aliases
 
-    def get_gendered_terms(self) -> Dict[str, str]:
+    def get_gendered_terms(self) -> dict[str, str]:
         """
         Get all gendered terms for this character.
 
@@ -113,13 +113,13 @@ class CharacterAnalysis:
     """Results of character analysis for a book."""
 
     book_id: str  # Hash or identifier of the analyzed book
-    characters: List[Character]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    characters: list[Character]
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
     provider: Optional[str] = None
     model: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation."""
         return {
             "book_id": self.book_id,
@@ -131,7 +131,7 @@ class CharacterAnalysis:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "CharacterAnalysis":
+    def from_dict(cls, data: dict[str, Any]) -> "CharacterAnalysis":
         """Create from dictionary representation."""
         return cls(
             book_id=data["book_id"],
@@ -151,11 +151,11 @@ class CharacterAnalysis:
                 return character
         return None
 
-    def get_main_characters(self) -> List[Character]:
+    def get_main_characters(self) -> list[Character]:
         """Get all main characters."""
         return [c for c in self.characters if c.importance == "main"]
 
-    def get_by_gender(self, gender: Gender) -> List[Character]:
+    def get_by_gender(self, gender: Gender) -> list[Character]:
         """Get all characters of a specific gender."""
         return [c for c in self.characters if c.gender == gender]
 
@@ -191,7 +191,7 @@ class CharacterAnalysis:
 
         return "\n".join(lines)
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """Get character statistics."""
         total = len(self.characters)
         by_gender = {}

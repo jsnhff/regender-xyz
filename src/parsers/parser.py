@@ -21,10 +21,10 @@ class ParsedBook:
 
     title: str
     author: Optional[str]
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
     format: BookFormat
     format_confidence: float
-    chapters: List[Dict[str, Any]]
+    chapters: list[dict[str, Any]]
     hierarchy: Optional[Section]
     raw_text_length: int
     cleaned_text_length: int
@@ -115,7 +115,7 @@ class IntegratedParser:
             cleaned_text_length=len(cleaned_text),
         )
 
-    def _hierarchy_to_chapters(self, hierarchy: Section) -> List[Dict[str, Any]]:
+    def _hierarchy_to_chapters(self, hierarchy: Section) -> list[dict[str, Any]]:
         """
         Convert hierarchical structure to flat chapter list.
 
@@ -124,7 +124,7 @@ class IntegratedParser:
         chapters = []
         chapter_number = 1
 
-        def process_section(section: Section, parent_path: List[str] = None):
+        def process_section(section: Section, parent_path: list[str] = None):
             nonlocal chapter_number
 
             if parent_path is None:
@@ -186,7 +186,7 @@ class IntegratedParser:
         process_section(hierarchy)
         return chapters
 
-    def _lines_to_paragraphs(self, lines: List[str]) -> List[str]:
+    def _lines_to_paragraphs(self, lines: list[str]) -> list[str]:
         """
         Convert lines to paragraphs.
 

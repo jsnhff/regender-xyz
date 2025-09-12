@@ -30,7 +30,7 @@ class GutenbergParser:
     Uses simple string operations instead of regex for robustness.
     """
 
-    def clean(self, text: str) -> Tuple[str, GutenbergMetadata]:
+    def clean(self, text: str) -> tuple[str, GutenbergMetadata]:
         """
         Clean Gutenberg text and extract metadata.
 
@@ -90,7 +90,7 @@ class GutenbergParser:
 
         return content, metadata
 
-    def _find_start(self, lines: List[str]) -> Optional[int]:
+    def _find_start(self, lines: list[str]) -> Optional[int]:
         """Find start of actual content using line-based checks."""
         for i, line in enumerate(lines[:1000]):
             line_upper = line.upper()
@@ -127,7 +127,7 @@ class GutenbergParser:
 
         return None
 
-    def _find_end(self, lines: List[str]) -> Optional[int]:
+    def _find_end(self, lines: list[str]) -> Optional[int]:
         """Find end of actual content using line-based checks."""
         # Search from the end backwards
         for i in range(len(lines) - 1, max(len(lines) - 1000, 0), -1):
@@ -157,7 +157,7 @@ class GutenbergParser:
 
         return None
 
-    def _find_actual_start(self, lines: List[str]) -> int:
+    def _find_actual_start(self, lines: list[str]) -> int:
         """
         Find actual content start when no markers found.
 
@@ -196,7 +196,7 @@ class GutenbergParser:
 
         return 0
 
-    def _find_actual_end(self, lines: List[str]) -> int:
+    def _find_actual_end(self, lines: list[str]) -> int:
         """Find actual content end when no markers found."""
         # Look for common end phrases
         end_phrases = [
@@ -222,7 +222,7 @@ class GutenbergParser:
 
         return len(lines)
 
-    def _extract_metadata(self, header_lines: List[str]) -> GutenbergMetadata:
+    def _extract_metadata(self, header_lines: list[str]) -> GutenbergMetadata:
         """Extract metadata from header lines using simple string operations."""
         metadata = GutenbergMetadata()
 
@@ -322,7 +322,7 @@ class GutenbergParser:
 
         return metadata
 
-    def _extract_title_from_content(self, lines: List[str]) -> Optional[str]:
+    def _extract_title_from_content(self, lines: list[str]) -> Optional[str]:
         """
         Try to extract title from the beginning of content.
 
@@ -358,7 +358,7 @@ class GutenbergParser:
 
         return None
 
-    def _skip_toc(self, lines: List[str]) -> List[str]:
+    def _skip_toc(self, lines: list[str]) -> list[str]:
         """
         Skip table of contents and illustrations list.
 
@@ -458,7 +458,7 @@ class GutenbergParser:
         # No TOC found or already at content
         return lines
 
-    def _clean_lines(self, lines: List[str]) -> List[str]:
+    def _clean_lines(self, lines: list[str]) -> list[str]:
         """
         Clean content lines.
 
@@ -563,7 +563,7 @@ class GutenbergParser:
 
 
 # Convenience function for backward compatibility
-def clean_gutenberg_text(text: str) -> Tuple[str, GutenbergMetadata]:
+def clean_gutenberg_text(text: str) -> tuple[str, GutenbergMetadata]:
     """
     Clean Project Gutenberg text.
 

@@ -32,9 +32,9 @@ class Section:
     type: SectionType
     number: Optional[str] = None  # Could be "1", "I", "One", etc.
     title: Optional[str] = None
-    content: List[str] = field(default_factory=list)  # Lines of text
-    subsections: List["Section"] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    content: list[str] = field(default_factory=list)  # Lines of text
+    subsections: list["Section"] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def add_line(self, line: str):
         """Add a line to this section's content."""
@@ -55,7 +55,7 @@ class Section:
         else:
             return self.type.value.title()
 
-    def to_flat_chapters(self) -> List[Dict[str, Any]]:
+    def to_flat_chapters(self) -> list[dict[str, Any]]:
         """
         Convert hierarchical structure to flat list of chapters.
         This is for compatibility with the existing JSON format.
@@ -171,7 +171,7 @@ class HierarchyBuilder:
         }
 
     def build_hierarchy(
-        self, lines: List[str], format_hint: str = None, skip_toc: bool = True
+        self, lines: list[str], format_hint: str = None, skip_toc: bool = True
     ) -> Section:
         """
         Build hierarchical structure from lines of text.
@@ -242,7 +242,7 @@ class HierarchyBuilder:
 
         return root
 
-    def _detect_hierarchy(self, lines: List[str]) -> List[SectionType]:
+    def _detect_hierarchy(self, lines: list[str]) -> list[SectionType]:
         """
         Auto-detect the hierarchy levels in the text.
         """
@@ -307,8 +307,8 @@ class HierarchyBuilder:
     def _find_parent_section(
         self,
         section_type: SectionType,
-        current_sections: Dict[SectionType, Section],
-        hierarchy: List[SectionType],
+        current_sections: dict[SectionType, Section],
+        hierarchy: list[SectionType],
     ) -> Optional[Section]:
         """
         Find the appropriate parent for a new section.
@@ -329,7 +329,7 @@ class HierarchyBuilder:
         return current_sections.get(SectionType.BOOK)
 
     def _get_lowest_section(
-        self, current_sections: Dict[SectionType, Section]
+        self, current_sections: dict[SectionType, Section]
     ) -> Optional[Section]:
         """
         Get the lowest level section that's currently active.
@@ -355,8 +355,8 @@ class HierarchyBuilder:
     def _clear_lower_sections(
         self,
         section_type: SectionType,
-        current_sections: Dict[SectionType, Section],
-        hierarchy: List[SectionType],
+        current_sections: dict[SectionType, Section],
+        hierarchy: list[SectionType],
     ):
         """
         Clear sections lower in the hierarchy.
@@ -372,7 +372,7 @@ class HierarchyBuilder:
             if lower_type in current_sections:
                 current_sections[lower_type] = None
 
-    def _find_content_start(self, lines: List[str], hierarchy: List[SectionType]) -> int:
+    def _find_content_start(self, lines: list[str], hierarchy: list[SectionType]) -> int:
         """
         Find where actual content starts (after TOC).
 

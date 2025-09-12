@@ -65,7 +65,7 @@ class TransformService(BaseService):
         """Get default transformation strategy."""
         return SmartTransformStrategy()
 
-    async def process_async(self, data: Dict[str, Any]) -> Transformation:
+    async def process_async(self, data: dict[str, Any]) -> Transformation:
         """
         Transform a book's gender representation.
 
@@ -156,7 +156,7 @@ class TransformService(BaseService):
 
     def _create_context(
         self, characters: CharacterAnalysis, transform_type: TransformType
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create transformation context.
 
@@ -186,7 +186,7 @@ class TransformService(BaseService):
             "character_context": characters.create_context_string(),
         }
 
-    def _get_transformation_rules(self, transform_type: TransformType) -> Dict[str, Any]:
+    def _get_transformation_rules(self, transform_type: TransformType) -> dict[str, Any]:
         """Get transformation rules for the specified type."""
         if transform_type == TransformType.ALL_MALE:
             return {
@@ -246,7 +246,7 @@ class TransformService(BaseService):
         else:
             return {}
 
-    def _get_character_transformation(self, character, transform_type: TransformType) -> Dict:
+    def _get_character_transformation(self, character, transform_type: TransformType) -> dict:
         """Get transformation mappings for a specific character."""
         from src.models.character import Gender
 
@@ -272,8 +272,8 @@ class TransformService(BaseService):
         return mappings
 
     async def _transform_chapters_async(
-        self, chapters: List[Chapter], context: Dict[str, Any]
-    ) -> tuple[List[Chapter], List[TransformationChange]]:
+        self, chapters: list[Chapter], context: dict[str, Any]
+    ) -> tuple[list[Chapter], list[TransformationChange]]:
         """
         Transform chapters with the given context.
 
@@ -298,8 +298,8 @@ class TransformService(BaseService):
             return await self._transform_chapters_sequential(chapters, context)
 
     async def _transform_chapters_sequential(
-        self, chapters: List[Chapter], context: Dict[str, Any]
-    ) -> tuple[List[Chapter], List[TransformationChange]]:
+        self, chapters: list[Chapter], context: dict[str, Any]
+    ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters sequentially."""
         transformed_chapters = []
         all_changes = []
@@ -315,8 +315,8 @@ class TransformService(BaseService):
         return transformed_chapters, all_changes
 
     async def _transform_chapters_parallel(
-        self, chapters: List[Chapter], context: Dict[str, Any]
-    ) -> tuple[List[Chapter], List[TransformationChange]]:
+        self, chapters: list[Chapter], context: dict[str, Any]
+    ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters in parallel."""
 
         # Create tasks for each chapter
@@ -346,8 +346,8 @@ class TransformService(BaseService):
         return transformed_chapters, all_changes
 
     async def _transform_single_chapter(
-        self, chapter: Chapter, chapter_index: int, context: Dict[str, Any]
-    ) -> tuple[Chapter, List[TransformationChange]]:
+        self, chapter: Chapter, chapter_index: int, context: dict[str, Any]
+    ) -> tuple[Chapter, list[TransformationChange]]:
         """
         Transform a single chapter.
 
@@ -366,7 +366,7 @@ class TransformService(BaseService):
         # Real implementation would use book_transformer.py logic
         return chapter, []
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         metrics = super().get_metrics()
         metrics.update(

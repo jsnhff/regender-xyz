@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from src.container import ServiceContainer
 from src.models.book import Book
@@ -49,7 +49,7 @@ class Application:
         # Initialize components
         self._initialize()
 
-    def _load_config(self, path: str) -> Dict[str, Any]:
+    def _load_config(self, path: str) -> dict[str, Any]:
         """
         Load application configuration from file.
 
@@ -74,7 +74,7 @@ class Application:
             self.logger.error(f"Failed to load config: {e}")
             return self._get_default_config()
 
-    def _get_default_config(self) -> Dict[str, Any]:
+    def _get_default_config(self) -> dict[str, Any]:
         """
         Get default application configuration.
 
@@ -188,7 +188,7 @@ class Application:
         transform_type: str,
         output_path: Optional[str] = None,
         quality_control: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
 
@@ -264,7 +264,7 @@ class Application:
 
         self.logger.info(f"Saved output to {output_path}")
 
-    async def parse_book(self, file_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
+    async def parse_book(self, file_path: str, output_path: Optional[str] = None) -> dict[str, Any]:
         """
         Parse a book to canonical JSON format without transformation.
 
@@ -327,7 +327,7 @@ class Application:
             self.logger.error(f"Failed to parse book: {e}")
             return {"success": False, "error": str(e)}
 
-    def parse_book_sync(self, file_path: str, output_path: Optional[str] = None) -> Dict[str, Any]:
+    def parse_book_sync(self, file_path: str, output_path: Optional[str] = None) -> dict[str, Any]:
         """
         Synchronous wrapper for book parsing.
 
@@ -347,7 +347,7 @@ class Application:
 
     async def analyze_characters(
         self, file_path: str, output_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze characters in a book and save to separate character file.
 
@@ -420,7 +420,7 @@ class Application:
 
     def analyze_characters_sync(
         self, file_path: str, output_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Synchronous wrapper for character analysis.
 
@@ -444,7 +444,7 @@ class Application:
         transform_type: str,
         output_path: Optional[str] = None,
         quality_control: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Synchronous wrapper for book processing.
 
@@ -461,7 +461,7 @@ class Application:
             self.process_book(file_path, transform_type, output_path, quality_control)
         )
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get application metrics.
 

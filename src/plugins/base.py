@@ -43,12 +43,12 @@ class Plugin(ABC):
         return ""
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         """List of required plugin dependencies."""
         return []
 
     @abstractmethod
-    def initialize(self, config: Dict[str, Any]):
+    def initialize(self, config: dict[str, Any]):
         """
         Initialize the plugin with configuration.
 
@@ -58,7 +58,7 @@ class Plugin(ABC):
         pass
 
     @abstractmethod
-    def execute(self, context: Dict[str, Any]) -> Any:
+    def execute(self, context: dict[str, Any]) -> Any:
         """
         Execute plugin functionality.
 
@@ -78,7 +78,7 @@ class Plugin(ABC):
         """
         pass
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """
         Validate plugin configuration.
 
@@ -108,8 +108,8 @@ class PluginManager:
 
     def __init__(self):
         """Initialize the plugin manager."""
-        self.plugins: Dict[str, Plugin] = {}
-        self.plugin_paths: List[Path] = []
+        self.plugins: dict[str, Plugin] = {}
+        self.plugin_paths: list[Path] = []
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def add_plugin_path(self, path: str):
@@ -126,7 +126,7 @@ class PluginManager:
         else:
             self.logger.warning(f"Invalid plugin path: {plugin_path}")
 
-    def load_plugin(self, module_path: str, config: Optional[Dict[str, Any]] = None):
+    def load_plugin(self, module_path: str, config: Optional[dict[str, Any]] = None):
         """
         Load a plugin from a module.
 
@@ -167,7 +167,7 @@ class PluginManager:
         except ImportError as e:
             self.logger.error(f"Failed to import module {module_path}: {e}")
 
-    def register(self, plugin: Plugin, config: Optional[Dict[str, Any]] = None):
+    def register(self, plugin: Plugin, config: Optional[dict[str, Any]] = None):
         """
         Register a plugin instance.
 
@@ -221,7 +221,7 @@ class PluginManager:
         """
         return self.plugins.get(name)
 
-    def execute(self, name: str, context: Dict[str, Any]) -> Any:
+    def execute(self, name: str, context: dict[str, Any]) -> Any:
         """
         Execute a plugin by name.
 
@@ -273,7 +273,7 @@ class PluginManager:
                     # Remove from path
                     sys.path.pop(0)
 
-    def list_plugins(self) -> List[Dict[str, Any]]:
+    def list_plugins(self) -> list[dict[str, Any]]:
         """
         Get information about all loaded plugins.
 

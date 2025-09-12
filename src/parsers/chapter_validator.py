@@ -8,8 +8,8 @@ from typing import Any, Dict, List
 
 
 def validate_and_clean_chapters(
-    chapters: List[Dict[str, Any]], min_paragraphs: int = 3
-) -> List[Dict[str, Any]]:
+    chapters: list[dict[str, Any]], min_paragraphs: int = 3
+) -> list[dict[str, Any]]:
     """
     Validate and clean up chapter list.
 
@@ -91,7 +91,7 @@ def validate_and_clean_chapters(
     return cleaned
 
 
-def is_collection(chapters: List[Dict[str, Any]]) -> bool:
+def is_collection(chapters: list[dict[str, Any]]) -> bool:
     """
     Detect if this looks like a collection (many acts/scenes).
 

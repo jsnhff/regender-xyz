@@ -29,7 +29,7 @@ class PlayElement:
 
     type: PlayElementType
     content: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -39,9 +39,9 @@ class Scene:
     number: str
     title: Optional[str]
     location: Optional[str]
-    elements: List[PlayElement] = field(default_factory=list)
+    elements: list[PlayElement] = field(default_factory=list)
 
-    def to_paragraphs(self) -> List[str]:
+    def to_paragraphs(self) -> list[str]:
         """Convert scene to paragraph format for compatibility."""
         paragraphs = []
         current_para = []
@@ -79,7 +79,7 @@ class Act:
 
     number: str
     title: Optional[str]
-    scenes: List[Scene] = field(default_factory=list)
+    scenes: list[Scene] = field(default_factory=list)
 
 
 @dataclass
@@ -88,10 +88,10 @@ class Play:
 
     title: Optional[str]
     author: Optional[str]
-    dramatis_personae: Optional[List[str]]
-    prologue: Optional[List[str]]
-    acts: List[Act]
-    epilogue: Optional[List[str]]
+    dramatis_personae: Optional[list[str]]
+    prologue: Optional[list[str]]
+    acts: list[Act]
+    epilogue: Optional[list[str]]
 
 
 class PlayParser:
@@ -105,7 +105,7 @@ class PlayParser:
     - Prologues and epilogues
     """
 
-    def parse(self, lines: List[str]) -> Play:
+    def parse(self, lines: list[str]) -> Play:
         """
         Parse play text into structured format.
 
@@ -129,7 +129,7 @@ class PlayParser:
 
         return play
 
-    def _skip_toc(self, lines: List[str]) -> int:
+    def _skip_toc(self, lines: list[str]) -> int:
         """
         Skip table of contents to find actual play content.
 
@@ -174,7 +174,7 @@ class PlayParser:
 
         return 0
 
-    def _parse_content(self, lines: List[str], play: Play):
+    def _parse_content(self, lines: list[str], play: Play):
         """Parse play content into acts and scenes."""
         current_act = None
         current_scene = None
@@ -313,7 +313,7 @@ class PlayParser:
             or (line_upper.startswith("THE ") and "ACT" in line_upper)
         )
 
-    def _parse_act_marker(self, line: str) -> Optional[Dict[str, str]]:
+    def _parse_act_marker(self, line: str) -> Optional[dict[str, str]]:
         """Parse act marker for number and title."""
         line_stripped = line.strip().rstrip(".")
 
@@ -340,7 +340,7 @@ class PlayParser:
             or (line_upper.startswith("THE ") and "SCENE" in line_upper)
         )
 
-    def _parse_scene_marker(self, line: str) -> Optional[Dict[str, Any]]:
+    def _parse_scene_marker(self, line: str) -> Optional[dict[str, Any]]:
         """Parse scene marker for number, title, and location."""
         result = {}
 
@@ -423,7 +423,7 @@ class PlayParser:
         line_upper = line.upper().strip()
         return "PROLOGUE" in line_upper and len(line_upper) < 30
 
-    def _parse_prologue(self, lines: List[str], start_idx: int, play: Play) -> int:
+    def _parse_prologue(self, lines: list[str], start_idx: int, play: Play) -> int:
         """Parse prologue content."""
         prologue_lines = []
         i = start_idx
@@ -452,7 +452,7 @@ class PlayParser:
         line_upper = line.upper().strip()
         return "EPILOGUE" in line_upper and len(line_upper) < 30
 
-    def _parse_epilogue(self, lines: List[str], start_idx: int, play: Play) -> int:
+    def _parse_epilogue(self, lines: list[str], start_idx: int, play: Play) -> int:
         """Parse epilogue content."""
         epilogue_lines = []
         i = start_idx
@@ -475,7 +475,7 @@ class PlayParser:
             or line_lower == "persons represented"
         )
 
-    def _parse_dramatis_personae(self, lines: List[str], start_idx: int, play: Play) -> int:
+    def _parse_dramatis_personae(self, lines: list[str], start_idx: int, play: Play) -> int:
         """Parse character list."""
         characters = []
         i = start_idx
@@ -509,7 +509,7 @@ class PlayParser:
         return i
 
 
-def play_to_chapters(play: Play) -> List[Dict[str, Any]]:
+def play_to_chapters(play: Play) -> list[dict[str, Any]]:
     """
     Convert Play structure to chapter format for compatibility.
 

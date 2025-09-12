@@ -39,7 +39,7 @@ class LLMProvider(ABC):
         return None
 
     @abstractmethod
-    async def complete_async(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    async def complete_async(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Complete a prompt asynchronously.
 
@@ -52,7 +52,7 @@ class LLMProvider(ABC):
         """
         pass
 
-    def complete(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    def complete(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Synchronous wrapper for completion.
 
@@ -67,7 +67,7 @@ class LLMProvider(ABC):
 
         return asyncio.run(self.complete_async(messages, **kwargs))
 
-    def validate_messages(self, messages: List[Dict[str, str]]) -> bool:
+    def validate_messages(self, messages: list[dict[str, str]]) -> bool:
         """
         Validate message format.
 

@@ -183,7 +183,7 @@ class ParserService(BaseService):
 
         return format_type
 
-    def _create_book_model(self, data: Dict) -> Book:
+    def _create_book_model(self, data: dict) -> Book:
         """
         Convert parsed data to Book model.
 
@@ -232,7 +232,7 @@ class ParserService(BaseService):
             metadata={k: v for k, v in metadata.items() if k not in ["title", "author"]},
         )
 
-    def _validate_book(self, book: Book) -> List[str]:
+    def _validate_book(self, book: Book) -> list[str]:
         """
         Validate book structure.
 
@@ -275,7 +275,7 @@ class ParserService(BaseService):
         await loop.run_in_executor(None, save_json)
         self.logger.info(f"Saved book to {output_path}")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         metrics = super().get_metrics()
         metrics.update(
