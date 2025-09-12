@@ -341,13 +341,8 @@ class TransformService(BaseService):
         Returns:
             Tuple of (transformed chapters, list of changes)
         """
-        if not self.provider:
-            # Mock transformation without provider
-            self.logger.warning("No provider configured, returning original chapters")
-            return chapters, []
-
         # Check if we should use parallel processing
-        use_parallel = len(chapters) > 2 and self.config.async_enabled
+        use_parallel = len(chapters) > 2 and self.config.async_enabled and self.provider
 
         if use_parallel:
             return await self._transform_chapters_parallel(chapters, context)
@@ -477,8 +472,15 @@ class TransformService(BaseService):
                     temperature=0.3,  # Low temperature for consistency
                 )
                 
+                # Debug logging
+                original_text = paragraph.get_text()
+                if para_idx == 0:  # Log first paragraph for debugging
+                    self.logger.debug(f"Original text: {repr(original_text[:100])}")
+                    self.logger.debug(f"Transformed text: {repr(response[:100])}")
+                    self.logger.debug(f"Are they equal? {response == original_text}")
+                
                 # Track changes
-                if response != paragraph.get_text():
+                if response != original_text:
                     changes.append(TransformationChange(
                         location=f"Chapter {chapter_index + 1}, Paragraph {para_idx + 1}",
                         original=paragraph.get_text(),
