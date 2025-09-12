@@ -1,0 +1,518 @@
+{
+  "book_id": "f42be4e24001d556",
+  "characters": [
+    {
+      "name": "Alice",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [
+        "Queen Alice"
+      ],
+      "description": "A young girl who is the main character, curious and imaginative.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "Dinah",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The old cat who washes the kittens' faces.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Kitty",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [
+        "the black kitten"
+      ],
+      "description": "A mischievous kitten that Alice talks to.",
+      "importance": "supporting",
+      "confidence": 0.95
+    },
+    {
+      "name": "Snowdrop",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [
+        "the white kitten"
+      ],
+      "description": "A kitten that was having its face washed by Dinah.",
+      "importance": "supporting",
+      "confidence": 0.95
+    },
+    {
+      "name": "Alice's sister",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "Alice's sister who likes being very exact.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "Nurse",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "Alice's old nurse who was frightened by Alice's pretend game.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "Red Queen",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A chess piece that Alice imagines the kitten could resemble.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "White Queen",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A chess piece that is concerned about her child, Lily.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "White King",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A chess piece who is puzzled and unhappy.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Lily",
+      "gender": "unknown",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [
+        "imperial kitten"
+      ],
+      "description": "The White Queen's child, a pawn that was squeaking.",
+      "importance": "minor",
+      "confidence": 0.8500000000000001
+    },
+    {
+      "name": "Jabberwock",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A creature mentioned in the poem 'Jabberwocky'.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Jabberwocky's son",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [
+        "beamish boy"
+      ],
+      "description": "The son who slays the Jabberwock in the poem.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Tiger-lily",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A talking flower that interacts with Alice.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Rose",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A talking flower that comments on Alice's appearance.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Daisy",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A group of talking flowers that speak in unison.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Violet",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A talking flower that makes a sudden remark about Alice.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Guard",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A guard on the train who checks tickets.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Gentleman in white paper",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A gentleman dressed in white paper sitting opposite Alice.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Goat",
+      "gender": "unknown",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A goat sitting next to the gentleman in white.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Beetle",
+      "gender": "unknown",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A beetle sitting next to the Goat.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Horse",
+      "gender": "unknown",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A horse that speaks with a hoarse voice.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Gnat",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A large gnat that talks to Alice.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Fawn",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A gentle fawn that Alice encounters in the wood.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Tweedledum",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "One of the two brothers, known for his argumentative nature and involvement in a quarrel over a rattle.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Tweedledee",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The other brother, who often contradicts Tweedledum and participates in their antics.",
+      "importance": "supporting",
+      "confidence": 0.85
+    },
+    {
+      "name": "The Red King",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [
+        "King"
+      ],
+      "aliases": [],
+      "description": "A character who is sleeping and dreaming, mentioned by Tweedledum and Tweedledee.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The Walrus",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A character in the poem recited by Tweedledee, known for eating oysters.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The Carpenter",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "Another character in the poem, who accompanies the Walrus and also eats oysters.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The Oysters",
+      "gender": "unknown",
+      "pronouns": "they/them",
+      "titles": [],
+      "aliases": [],
+      "description": "Characters in the poem who are invited by the Walrus and the Carpenter.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The White Queen",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [
+        "The Queen"
+      ],
+      "aliases": [],
+      "description": "A queen who appears disorganized and has a peculiar way of thinking, living backwards.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "The Sheep",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "An old sheep who knits and runs a shop, appearing after the White Queen.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "The King's Messenger",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A character mentioned by the White Queen, who is in prison and awaiting trial.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Humpty Dumpty",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A character resembling an egg, sitting on a wall, known for his fall.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "The King",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "The King"
+      ],
+      "aliases": [],
+      "description": "A king mentioned by Humpty Dumpty, who promised to send his horses and men.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "The White King and Queen",
+      "gender": "unknown",
+      "pronouns": "they/them/theirs",
+      "titles": [
+        "The White King and Queen"
+      ],
+      "aliases": [],
+      "description": "Royal figures who gave Humpty Dumpty a cravat as an un-birthday present.",
+      "importance": "supporting",
+      "confidence": 0.8
+    },
+    {
+      "name": "Haigha",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [
+        "Anglo-Saxon Messenger"
+      ],
+      "description": "An Anglo-Saxon Messenger known for his happy attitudes and peculiar movements.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Hatta",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [
+        "Messenger"
+      ],
+      "description": "The other messenger who is just out of prison and is very hungry and thirsty.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Lion",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A creature involved in a fight with the Unicorn for the crown.",
+      "importance": "supporting",
+      "confidence": 0.75
+    },
+    {
+      "name": "Unicorn",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A creature fighting the Lion for the crown, known for his horn.",
+      "importance": "supporting",
+      "confidence": 0.75
+    },
+    {
+      "name": "Red Knight",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A knight dressed in crimson armor who claims Alice as his prisoner.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "White Knight",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A knight dressed in tin armor who rescues Alice and accompanies her.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "Red King",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "Mentioned as a character whose dream Alice fears she might be part of.",
+      "importance": "minor",
+      "confidence": 0.95
+    },
+    {
+      "name": "Anglo-Saxon Messengers",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "Mentioned as part of Alice's dream.",
+      "importance": "minor",
+      "confidence": 0.5
+    },
+    {
+      "name": "Knight",
+      "gender": "male",
+      "pronouns": "he/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A character with mild blue eyes and a kindly smile, who sings a ballad to Alice.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Aged Man",
+      "gender": "male",
+      "pronouns": "he/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A character in the Knight's song, described as sitting on a gate and having a mild look.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Frog",
+      "gender": "unknown",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "An old frog who answers Alice at the door.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Pudding",
+      "gender": "unknown",
+      "pronouns": "it/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A talking pudding that Alice interacts with during the feast.",
+      "importance": "minor",
+      "confidence": 1.0
+    }
+  ],
+  "metadata": {
+    "total": 47,
+    "by_gender": {
+      "female": 8,
+      "unknown": 18,
+      "male": 21
+    },
+    "by_importance": {
+      "main": 2,
+      "supporting": 29,
+      "minor": 16
+    }
+  },
+  "timestamp": "2025-09-11T22:17:49.374802",
+  "provider": "unified",
+  "model": "gpt-4o",
+  "book_metadata": {
+    "title": "And What Alice Found There",
+    "author": "Lewis Carroll",
+    "source_file": "books/json/pg12-Through_the_Looking-Glass.json"
+  }
+}

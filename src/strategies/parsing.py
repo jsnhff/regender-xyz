@@ -5,8 +5,7 @@ This module defines strategies for parsing different book formats.
 """
 
 from abc import abstractmethod
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base import Strategy
 

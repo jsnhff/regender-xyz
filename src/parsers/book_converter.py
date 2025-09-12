@@ -3,7 +3,6 @@ Convert ParsedBook to canonical Book format with sentence splitting.
 """
 
 import re
-from typing import List, Optional
 
 from src.models.book import Book, Chapter, Paragraph
 from src.parsers.parser import ParsedBook

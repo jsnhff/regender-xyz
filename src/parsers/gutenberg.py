@@ -6,7 +6,7 @@ Avoids regex where possible for better reliability and maintainability.
 """
 
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import Optional
 
 
 @dataclass

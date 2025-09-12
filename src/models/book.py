@@ -8,7 +8,7 @@ the application.
 import hashlib
 import json
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
 @dataclass

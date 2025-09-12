@@ -8,7 +8,7 @@ and transformation.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
 class Gender(Enum):
@@ -50,10 +50,26 @@ class Character:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Character":
         """Create from dictionary representation."""
+        # Handle pronouns as either dict or string
+        pronouns = data.get("pronouns", {})
+        if isinstance(pronouns, str):
+            # Convert "she/her/hers" or "she/her" format to dict
+            parts = pronouns.split("/") if pronouns else []
+            if len(parts) >= 2:
+                pronouns = {
+                    "subject": parts[0],
+                    "object": parts[1],
+                    "possessive": parts[2] if len(parts) > 2 else parts[1]
+                }
+            else:
+                pronouns = {}
+        elif pronouns is None:
+            pronouns = {}
+            
         return cls(
             name=data["name"],
             gender=Gender(data.get("gender", "unknown")),
-            pronouns=data.get("pronouns", {}),
+            pronouns=pronouns,
             titles=data.get("titles", []),
             aliases=data.get("aliases", []),
             description=data.get("description"),

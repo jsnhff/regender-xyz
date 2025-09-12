@@ -4,10 +4,8 @@ Character Service
 This service handles character analysis and gender identification in books.
 """
 
-import hashlib
 import json
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from src.models.book import Book
 from src.models.character import Character, CharacterAnalysis, Gender
@@ -229,10 +227,18 @@ class CharacterService(BaseService):
 
         except Exception as e:
             self.handle_error(e, {"book_title": book.title})
+            # Return empty analysis on error
+            return CharacterAnalysis(
+                book_id=book.hash(),
+                characters=[],
+                metadata={"error": str(e)},
+                provider=self.provider.name if self.provider else "unknown",
+                model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
+            )
 
     async def _analyze_chunks_async(self, chunks: list[str]) -> list[dict]:
         """
-        Analyze text chunks in parallel.
+        Analyze text chunks with smart rate limiting.
 
         Args:
             chunks: Text chunks to analyze
@@ -241,32 +247,38 @@ class CharacterService(BaseService):
             List of analysis results
         """
         import asyncio
-
+        
         # If no provider, return mock results
         if not self.provider:
             self.logger.warning("No LLM provider configured, returning mock results")
             return [{"characters": []} for _ in chunks]
 
-        # Create analysis tasks
-        tasks = [self._analyze_single_chunk(chunk, idx) for idx, chunk in enumerate(chunks)]
+        # Use rate limiter for OpenAI
+        rate_limiter = None
+        if self.provider and "openai" in self.provider.name.lower():
+            from src.providers.rate_limiter import OpenAIRateLimiter
+            rate_limiter = OpenAIRateLimiter(tier="tier-1")
+            self.logger.info(f"Using OpenAI rate limiter for {len(chunks)} chunks")
 
-        # Limit concurrency based on provider
-        if self.provider:
-            if "grok" in self.provider.name.lower():
-                max_concurrent = 1  # Grok has strict rate limits
-            elif "openai" in self.provider.name.lower():
-                max_concurrent = 10  # OpenAI handles parallel requests well
-            else:
-                max_concurrent = self.config.max_concurrent
-        else:
-            max_concurrent = self.config.max_concurrent
-        semaphore = asyncio.Semaphore(max_concurrent)
-
-        async def limited_task(task):
-            async with semaphore:
-                return await task
-
-        results = await asyncio.gather(*[limited_task(t) for t in tasks])
+        results = []
+        
+        # Process chunks sequentially with rate limiting
+        for idx, chunk in enumerate(chunks):
+            # Apply rate limiting if needed
+            if rate_limiter:
+                # Estimate tokens (chunk length / 4 is rough estimate)
+                estimated_tokens = min(len(chunk) // 3 + 500, 4500)  # Cap at 4500
+                await rate_limiter.acquire(estimated_tokens)
+            
+            # Analyze chunk
+            self.logger.info(f"Analyzing chunk {idx + 1}/{len(chunks)}")
+            result = await self._analyze_single_chunk(chunk, idx)
+            results.append(result)
+            
+            # Show progress
+            if (idx + 1) % 5 == 0:
+                self.logger.info(f"Progress: {idx + 1}/{len(chunks)} chunks analyzed")
+        
         return results
 
     async def _analyze_single_chunk(self, chunk: str, chunk_index: int) -> dict[str, Any]:
@@ -291,12 +303,16 @@ class CharacterService(BaseService):
             {"role": "user", "content": prompts["user"]},
         ]
 
+        if not self.provider:
+            self.logger.error("No LLM provider configured for character analysis")
+            return {"chunk_index": chunk_index, "characters": []}
+
         try:
             # Call LLM
             response = await self.provider.complete_async(
                 messages=messages,
                 temperature=0.1,  # Low temperature for consistency
-                response_format={"type": "json_object"} if self.provider.supports_json else None,
+                response_format={"type": "json_object"} if self.provider and self.provider.supports_json else None,
             )
 
             # Parse response

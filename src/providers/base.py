@@ -5,7 +5,7 @@ This module defines the base interface for LLM providers.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 
 class LLMProvider(ABC):

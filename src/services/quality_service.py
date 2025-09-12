@@ -5,9 +5,9 @@ This service handles quality control and validation of transformations.
 """
 
 import asyncio
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-from src.models.transformation import Transformation, TransformationChange
+from src.models.transformation import Transformation
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.quality import AdaptiveQualityStrategy, QualityStrategy

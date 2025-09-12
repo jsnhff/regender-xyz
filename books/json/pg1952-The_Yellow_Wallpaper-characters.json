@@ -1,0 +1,150 @@
+{
+  "book_id": "41b214cff301c03f",
+  "characters": [
+    {
+      "name": "John",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's husband, a practical physician who does not believe the narrator is sick.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "Narrator",
+      "gender": "female",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [
+        "little girl, darling"
+      ],
+      "description": "The protagonist of the story, suffering from a nervous condition and confined to a room with yellow wallpaper.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "Narrator's brother",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A physician of high standing who agrees with John's diagnosis.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Mary",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A caretaker who is good with the baby.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Jennie",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [
+        "John's sister"
+      ],
+      "description": "John's sister, a careful and enthusiastic housekeeper.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Cousin Henry",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A cousin mentioned as a potential visitor.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Julia",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A cousin mentioned as a potential visitor.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Weir Mitchell",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A physician known for treating nervous conditions, mentioned as a potential doctor for the narrator.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Nellie",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A family member who visits with the mother and children.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Mother",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's mother, who visits with Nellie and the children.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Jane",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "Mentioned at the end, possibly an alternate name or identity for the narrator.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The woman behind the wallpaper",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A figure the narrator perceives behind the wallpaper, symbolizing her own entrapment.",
+      "importance": "supporting",
+      "confidence": 1.0
+    }
+  ],
+  "metadata": {
+    "total": 12,
+    "by_gender": {
+      "male": 4,
+      "female": 7,
+      "unknown": 1
+    },
+    "by_importance": {
+      "main": 2,
+      "supporting": 3,
+      "minor": 7
+    }
+  },
+  "timestamp": "2025-09-11T22:09:42.529205",
+  "provider": "unified",
+  "model": "gpt-4o",
+  "book_metadata": {
+    "title": "The Yellow Wallpaper",
+    "author": "Charlotte Perkins Gilman",
+    "source_file": "books/json/pg1952-The_Yellow_Wallpaper.json"
+  }
+}

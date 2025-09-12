@@ -4,7 +4,7 @@ Chapter Validation and Cleanup
 Merges empty chapters and validates chapter structure.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 def validate_and_clean_chapters(

@@ -7,7 +7,7 @@ Handles complex book structures with nested sections.
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional
 
 
 class SectionType(Enum):

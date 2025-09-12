@@ -8,7 +8,7 @@ service instances and their dependencies.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Optional
 
 from src.services.base import BaseService, ServiceConfig
 
@@ -89,6 +89,10 @@ class ServiceContainer:
         for param_name, service_name in dependencies.items():
             resolved_deps[param_name] = self.get(service_name)
 
+        # Convert config dict to ServiceConfig if needed
+        if config and not isinstance(config, ServiceConfig):
+            config = ServiceConfig(**config)
+
         # Create service instance
         try:
             service = service_class(config=config, **resolved_deps)
@@ -145,12 +149,12 @@ class ServiceContainer:
         Args:
             config_path: Path to configuration file
         """
-        config_path = Path(config_path)
+        path = Path(config_path)
 
-        if not config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_path}")
+        if not path.exists():
+            raise FileNotFoundError(f"Configuration file not found: {path}")
 
-        with open(config_path) as f:
+        with open(path) as f:
             config = json.load(f)
 
         # Register services from config

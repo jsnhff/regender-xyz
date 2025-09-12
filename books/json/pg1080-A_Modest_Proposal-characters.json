@@ -4,164 +4,152 @@
     {
       "name": "Dr. Jonathan Swift",
       "gender": "male",
-      "pronouns": "none/none/none",
-      "titles": "Dr.",
-      "aliases": "",
-      "description": "The author of the essay, mentioned in the byline.",
-      "importance": "minor",
-      "confidence": 1
-    },
-    {
-      "name": "Narrator",
-      "gender": "male",
-      "pronouns": "I/me/my",
-      "titles": "",
-      "aliases": "The Proposer",
-      "description": "The first-person speaker who proposes the satirical scheme for eating children to solve poverty.",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Dr."
+      ],
+      "aliases": [],
+      "description": "The author of the proposal, presenting a satirical solution to poverty.",
       "importance": "main",
-      "confidence": 1
+      "confidence": 1.0
     },
     {
       "name": "The Pretender",
       "gender": "male",
-      "pronouns": "none/none/none",
-      "titles": "",
-      "aliases": "",
-      "description": "Historical figure (likely James Francis Edward Stuart) whom some Irish leave to fight for in Spain, and later referenced as a threat.",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A reference to a claimant to the British throne, often associated with the Jacobite cause.",
       "importance": "minor",
-      "confidence": 1
+      "confidence": 1.0
     },
     {
-      "name": "Principal gentleman in the county of Cavan",
+      "name": "A very knowing American",
+      "gender": "unknown",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An acquaintance of the narrator who provides information about the consumption of children.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "A principal gentleman in the county of Cavan",
       "gender": "male",
       "pronouns": "he/him/his",
-      "titles": "",
-      "aliases": "",
-      "description": "A gentleman who informed the narrator about children's proficiency in thieving, protesting that few under six are skilled.",
-      "importance": "minor",
-      "confidence": 1
-    },
-    {
-      "name": "American acquaintance",
-      "gender": "male",
-      "pronouns": "none/none/none",
-      "titles": "",
-      "aliases": "",
-      "description": "A knowledgeable American in London who assured the narrator that a year-old child is delicious food and later that older boys' flesh is tough.",
+      "titles": [],
+      "aliases": [],
+      "description": "A gentleman who provides information about the proficiency of children in stealing.",
       "importance": "supporting",
-      "confidence": 0.9
+      "confidence": 1.0
     },
     {
-      "name": "Eminent French physician",
-      "gender": "male",
-      "pronouns": "none/none/none",
-      "titles": "",
-      "aliases": "Grave author",
-      "description": "An author who noted that more children are born in Roman Catholic countries nine months after Lent due to fish diet.",
-      "importance": "minor",
-      "confidence": 1
-    },
-    {
-      "name": "Very worthy person",
-      "gender": "male",
+      "name": "A very worthy person",
+      "gender": "unknown",
       "pronouns": "he/him/his",
-      "titles": "",
-      "aliases": "My friend, Excellent friend, Deserving patriot",
-      "description": "A patriotic friend who suggested extending the scheme to eat young lads and maidens as a substitute for venison.",
+      "titles": [],
+      "aliases": [],
+      "description": "A person who suggests a refinement to the narrator's proposal.",
       "importance": "supporting",
-      "confidence": 1
+      "confidence": 1.0
     },
     {
       "name": "Psalmanaazor",
       "gender": "male",
       "pronouns": "he/him/his",
-      "titles": "",
-      "aliases": "Native of the island Formosa",
-      "description": "A man from Formosa who came to London and told the worthy person about selling executed bodies as delicacies in his country.",
-      "importance": "minor",
-      "confidence": 1
+      "titles": [],
+      "aliases": [],
+      "description": "A native of the island Formosa, mentioned in a conversation about the consumption of human flesh.",
+      "importance": "supporting",
+      "confidence": 1.0
     },
     {
       "name": "The Emperor",
       "gender": "male",
-      "pronouns": "none/none/his",
-      "titles": "Emperor",
-      "aliases": "Imperial majesty",
-      "description": "The ruler in Psalmanaazor's story, whom a girl attempted to poison.",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "The ruler mentioned in the context of a girl being executed for attempting to poison him.",
       "importance": "minor",
-      "confidence": 1
+      "confidence": 1.0
     },
     {
-      "name": "Prime minister of state",
+      "name": "The Emperor's prime minister of state",
       "gender": "male",
-      "pronouns": "none/none/none",
-      "titles": "Prime minister",
-      "aliases": "",
-      "description": "A high official who bought the body of an executed girl in Psalmanaazor's account.",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A high-ranking official who purchased the body of a girl executed for poisoning.",
       "importance": "minor",
-      "confidence": 1
+      "confidence": 1.0
     },
     {
-      "name": "Plump girl of fifteen",
+      "name": "Author",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator of the text, proposing a controversial solution.",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Reader",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "The audience to whom the proposal is addressed.",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Wise men",
+      "gender": "male",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Individuals who might propose alternative solutions.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Parents",
+      "gender": "unknown",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Parents of the children mentioned in the proposal.",
+      "importance": "supporting",
+      "confidence": 0.8
+    },
+    {
+      "name": "Wife",
       "gender": "female",
       "pronouns": "she/her/her",
-      "titles": "",
-      "aliases": "",
-      "description": "A girl executed for attempting to poison the Emperor, whose body was sold as a delicacy in Psalmanaazor's story.",
-      "importance": "minor",
-      "confidence": 1
-    },
-    {
-      "name": "The Narrator",
-      "gender": "male",
-      "pronouns": "I/me/my",
-      "titles": [],
-      "aliases": [
-        "The Proposer"
-      ],
-      "description": "The speaker proposing a satirical solution to Ireland's poverty, claims no personal interest, has been offering ideas for years, has a wife and children but none young enough to benefit from the proposal.",
-      "importance": "main",
-      "confidence": 1
-    },
-    {
-      "name": "Narrator's Wife",
-      "gender": "female",
-      "pronouns": "she/her/hers (implied by 'wife')",
-      "titles": [
-        "wife"
-      ],
-      "aliases": [],
-      "description": "Mentioned as being past child-bearing age, part of the narrator's family.",
-      "importance": "minor",
-      "confidence": 1
-    },
-    {
-      "name": "Narrator's Children",
-      "gender": "unknown",
-      "pronouns": "they/them/their (implied for plural group)",
       "titles": [],
       "aliases": [],
-      "description": "The narrator's offspring, with the youngest being nine years old, too old to be involved in the proposal.",
+      "description": "The author's wife, mentioned as past child-bearing.",
       "importance": "minor",
-      "confidence": 1
+      "confidence": 0.9
     }
   ],
   "metadata": {
-    "total": 14,
+    "total": 13,
     "by_gender": {
-      "male": 11,
-      "female": 2,
-      "unknown": 1
+      "male": 7,
+      "unknown": 5,
+      "female": 1
     },
     "by_importance": {
-      "minor": 10,
       "main": 2,
-      "supporting": 2
+      "minor": 5,
+      "supporting": 6
     }
   },
-  "timestamp": "2025-08-10T22:25:14.203776",
+  "timestamp": "2025-09-11T21:50:24.160018",
   "provider": "unified",
-  "model": "grok-4-latest",
+  "model": "gpt-4o",
   "book_metadata": {
     "title": "and for making them beneficial to the publick.",
     "author": "Dr. Jonathan Swift",

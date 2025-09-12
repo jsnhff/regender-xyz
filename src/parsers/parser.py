@@ -4,9 +4,8 @@ Integrated Parser
 Combines all parser components into a complete parsing solution.
 """
 
-import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from .chapter_validator import validate_and_clean_chapters
 from .detector import BookFormat, FormatDetector

@@ -13,6 +13,7 @@ from typing import Any, Optional
 
 from src.container import ServiceContainer
 from src.models.book import Book
+from src.models.character import CharacterAnalysis
 from src.models.transformation import TransformType
 from src.parsers.book_converter import BookConverter
 from src.plugins.base import PluginManager
@@ -181,6 +182,36 @@ class Application:
             Service instance
         """
         return self.container.get(name)
+    
+    async def _get_or_analyze_characters(self, file_path: str, book: Book) -> CharacterAnalysis:
+        """
+        Get existing character analysis or analyze characters.
+        
+        Args:
+            file_path: Path to the book file
+            book: Parsed book object
+            
+        Returns:
+            Character analysis
+        """
+        # Check for existing character analysis file
+        input_path = Path(file_path)
+        if input_path.suffix == '.json':
+            # Look for -characters.json file
+            char_file = input_path.parent / f"{input_path.stem}-characters.json"
+            if char_file.exists():
+                self.logger.info(f"Loading existing character analysis from {char_file}")
+                try:
+                    with open(char_file) as f:
+                        char_data = json.load(f)
+                    return CharacterAnalysis.from_dict(char_data)
+                except Exception as e:
+                    self.logger.warning(f"Failed to load character file: {e}")
+        
+        # No existing analysis, analyze the book
+        self.logger.info("No existing character analysis found, analyzing book...")
+        character_service = self.get_service("character")
+        return await character_service.process_async(book)
 
     async def process_book(
         self,
@@ -209,10 +240,9 @@ class Application:
             book = await parser.process_async(file_path)
             self.logger.info(f"Parsed book: {book.title}")
 
-            # Analyze characters
-            character_service = self.get_service("character")
-            characters = await character_service.process_async(book)
-            self.logger.info(f"Analyzed {len(characters.characters)} characters")
+            # Check for existing character analysis or analyze characters
+            characters = await self._get_or_analyze_characters(file_path, book)
+            self.logger.info(f"Using {len(characters.characters)} characters")
 
             # Transform the book
             transformer = self.get_service("transform")

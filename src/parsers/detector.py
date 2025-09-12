@@ -7,7 +7,7 @@ Detects book format (standard, play, multi-part, etc.) with confidence scoring.
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 
 class BookFormat(Enum):

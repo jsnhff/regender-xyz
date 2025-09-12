@@ -7,7 +7,7 @@ This module defines models for book transformations and their results.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from .book import Book, Chapter
 from .character import CharacterAnalysis

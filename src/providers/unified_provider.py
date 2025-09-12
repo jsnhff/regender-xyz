@@ -1,13 +1,13 @@
 """
 Unified Provider
 
-This module provides a unified interface that wraps the existing
-api_client.py for backward compatibility.
+This module provides a unified interface that wraps the 
+UnifiedLLMClient from llm_client.py for plugin integration.
 """
 
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from src.plugins.base import Plugin
 from src.providers.base import LLMProvider
@@ -59,8 +59,6 @@ class UnifiedProvider(LLMProvider, Plugin):
     @property
     def rate_limit(self) -> Optional[int]:
         """Get rate limit for current provider."""
-        if self.provider_name == "grok":
-            return 5  # Grok has strict rate limits
         return None
 
     def initialize(self, config: dict[str, Any]):
@@ -72,7 +70,7 @@ class UnifiedProvider(LLMProvider, Plugin):
         """
         # Import existing client
         try:
-            from .legacy_client import UnifiedLLMClient
+            from .llm_client import UnifiedLLMClient
 
             # Get provider from config or environment
             # Handle ${VAR} syntax if present in config
@@ -93,9 +91,7 @@ class UnifiedProvider(LLMProvider, Plugin):
 
             # Fall back to provider-specific model env var
             if not model_from_config:
-                if self.provider_name == "grok":
-                    model_from_config = os.getenv("GROK_MODEL", "grok-4-latest")
-                elif self.provider_name == "openai":
+                if self.provider_name == "openai":
                     model_from_config = os.getenv("OPENAI_MODEL", "gpt-4o")
                 elif self.provider_name == "anthropic":
                     model_from_config = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-20250514")
@@ -178,7 +174,6 @@ class UnifiedProvider(LLMProvider, Plugin):
         has_key = (
             os.getenv("OPENAI_API_KEY")
             or os.getenv("ANTHROPIC_API_KEY")
-            or os.getenv("GROK_API_KEY")
         )
 
         if not has_key:

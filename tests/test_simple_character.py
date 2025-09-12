@@ -7,12 +7,21 @@ import json
 import os
 import sys
 from pathlib import Path
+import pytest
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.providers.legacy_client import UnifiedLLMClient
+from src.providers.llm_client import UnifiedLLMClient
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
+@pytest.mark.skipif(
+    not os.getenv('OPENAI_API_KEY') and not os.getenv('ANTHROPIC_API_KEY'),
+    reason="No API keys configured"
+)
 def test_character_analysis():
     """Test character analysis with simple synchronous approach"""
     
@@ -37,8 +46,8 @@ def test_character_analysis():
     full_text = '\n\n'.join(text_chunks)
     print(f"Analyzing {len(full_text)} characters of text...")
     
-    # Analyze with Grok
-    client = UnifiedLLMClient(provider='grok')
+    # Analyze with default provider (auto-detected from env)
+    client = UnifiedLLMClient()
     
     prompt = """Identify all characters/people mentioned in this text.
 Output JSON: {"characters": [{"name": "...", "gender": "male/female/unknown", "importance": "main/supporting/minor"}]}"""
@@ -49,9 +58,17 @@ Output JSON: {"characters": [{"name": "...", "gender": "male/female/unknown", "i
     ]
     
     try:
-        print("Calling Grok API...")
+        print(f"Calling {client.get_provider().upper()} API...")
         response = client.complete(messages, temperature=0.1)
-        result = json.loads(response.content)
+        
+        # Extract JSON from response (may be wrapped in markdown code blocks)
+        content = response.content
+        if '```json' in content:
+            content = content.split('```json')[1].split('```')[0].strip()
+        elif '```' in content:
+            content = content.split('```')[1].split('```')[0].strip()
+        
+        result = json.loads(content)
         
         print(f"\nFound {len(result['characters'])} characters:")
         for char in result['characters']:
@@ -69,8 +86,8 @@ Output JSON: {"characters": [{"name": "...", "gender": "male/female/unknown", "i
             'characters': result['characters'],
             'metadata': {
                 'total': len(result['characters']),
-                'provider': 'grok',
-                'model': 'grok-4-latest'
+                'provider': client.get_provider(),
+                'model': client.get_default_model()
             }
         }
         
@@ -78,13 +95,13 @@ Output JSON: {"characters": [{"name": "...", "gender": "male/female/unknown", "i
             json.dump(character_data, f, indent=2)
         
         print(f"\nSaved to: {output_path}")
-        return True
+        assert True  # Test passed
         
     except Exception as e:
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        assert False, f"Test failed: {e}"
 
 if __name__ == '__main__':
     success = test_character_analysis()

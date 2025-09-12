@@ -5,8 +5,7 @@ Uses the new integrated parser system.
 """
 
 import asyncio
-from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from src.parsers.parser import IntegratedParser, ParsedBook
 

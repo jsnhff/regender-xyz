@@ -1,0 +1,948 @@
+{
+  "book_id": "94f77d7863ccfc5c",
+  "characters": [
+    {
+      "name": "Ogilvy",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A well-known astronomer who was excited about the news of the Martian activity.",
+      "importance": "supporting",
+      "confidence": 0.76875
+    },
+    {
+      "name": "Lavelle of Java",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An astronomer who reported the outbreak of incandescent gas on Mars.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Perrotin of Nice",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An observer who saw the great light on Mars.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Markham",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An editor who was jubilant about securing a new photograph of Mars.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Narrator's wife",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's wife who accompanied him on a walk.",
+      "importance": "supporting",
+      "confidence": 0.9625
+    },
+    {
+      "name": "Schiaparelli",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An astronomer who watched the red planet.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Albin",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "Described the falling star as leaving a greenish streak.",
+      "importance": "minor",
+      "confidence": 0.6
+    },
+    {
+      "name": "Denning",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "Greatest authority on meteorites.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Henderson",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "London journalist who was informed by Ogilvy.",
+      "importance": "supporting",
+      "confidence": 0.9625
+    },
+    {
+      "name": "Stent",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Astronomer Royal"
+      ],
+      "aliases": [],
+      "description": "Astronomer Royal giving directions at the pit.",
+      "importance": "supporting",
+      "confidence": 0.9625
+    },
+    {
+      "name": "Lord Hilton",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Lord"
+      ],
+      "aliases": [],
+      "description": "Lord of the manor, expected to help with crowd control.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Narrator",
+      "gender": "unknown",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [],
+      "description": "The person recounting the events.",
+      "importance": "main",
+      "confidence": 0.9638671875
+    },
+    {
+      "name": "The boy",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A boy who runs towards the narrator, expressing fear about the cylinder.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The shopman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A young man, a shop assistant, who falls into the pit.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "The woman",
+      "gender": "female",
+      "pronouns": "she/her/hers",
+      "titles": [],
+      "aliases": [],
+      "description": "A woman who shrieks in fear at the sight of the Martians.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The narrator",
+      "gender": "unknown",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [],
+      "description": "The person recounting the events, experiencing fear and curiosity.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "The neighbour",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man who is a neighbour of the narrator, expressing horror at the Martians.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Mounted policeman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A policeman who came galloping through the confusion, screaming.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Woman over the gate",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A woman who was part of a group at the gate, skeptical about the Martians.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Two men at the gate",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "Two men who were part of a group at the gate, skeptical about the Martians.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Workman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A workman carrying a basket, who passed the narrator.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Little boy with the workman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A little boy accompanying the workman.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Major Eden",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Major"
+      ],
+      "aliases": [],
+      "description": "An officer reported to be missing.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The colonel",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Colonel"
+      ],
+      "aliases": [],
+      "description": "The colonel of the regiment who was questioning the crowd at midnight.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Milkman",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A person who delivers milk and provides news about the Martians.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Neighbour",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's neighbor who discusses the Martians and offers strawberries.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Marshall",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "A tobacconist whose son was among the dead on the common.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Marshall's son",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "Mentioned as being among the dead on the common.",
+      "importance": "minor",
+      "confidence": 0.6
+    },
+    {
+      "name": "Landlord",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The owner of the Spotted Dog, who rents out a horse and dog cart.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Servant",
+      "gender": "unknown",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's servant, who is evacuated with the narrator's wife.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Doctor",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [
+        "Dr."
+      ],
+      "aliases": [],
+      "description": "Mentioned as having a cart ahead of the narrator.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Narrator's Wife",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's wife, who is silent and seems oppressed with forebodings of evil.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Cousins",
+      "gender": "unknown",
+      "pronouns": "they/them",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's relatives in Leatherhead, who take care of the narrator's wife.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Cousins' Man",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The man who lights the lamps for the narrator's journey back.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Landlord of the Spotted Dog",
+      "gender": "male",
+      "pronouns": "he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The landlord whose conveyance the narrator had taken, found dead by the narrator.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Soldier",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [
+        "artilleryman"
+      ],
+      "description": "A soldier who recounts his experience with the Martian invasion to the narrator.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Martians",
+      "gender": "unknown",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [
+        "mechanical colossi, fighting-machines"
+      ],
+      "description": "Alien invaders operating large mechanical machines.",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "The Narrator",
+      "gender": "unknown",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [],
+      "description": "The person recounting the events, planning to take his wife to safety.",
+      "importance": "main",
+      "confidence": 0.925
+    },
+    {
+      "name": "The Artilleryman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A soldier who plans to rejoin his battery and accompanies the narrator.",
+      "importance": "supporting",
+      "confidence": 0.95
+    },
+    {
+      "name": "The Narrator's Wife",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's wife, whom he plans to take to Newhaven.",
+      "importance": "supporting",
+      "confidence": 0.8500000000000001
+    },
+    {
+      "name": "The Lieutenant",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Lieutenant"
+      ],
+      "aliases": [],
+      "description": "A cavalry officer of the 8th Hussars encountered by the narrator and the artilleryman.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "Brigadier-General Marvin",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Brigadier-General"
+      ],
+      "aliases": [],
+      "description": "A military officer stationed at Weybridge.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "The Vicar",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Vicar"
+      ],
+      "aliases": [],
+      "description": "A religious figure holding a service amidst the chaos.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Shrivelled Old Fellow",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An old man arguing with a soldier about his valuable orchids.",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "The Corporal",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Corporal"
+      ],
+      "aliases": [],
+      "description": "A soldier trying to convince people to leave their belongings.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Woman Beside the Narrator",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A woman expressing doubt about the soldiers' ability to stop the Martians.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Man in a Blue Jersey",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man who shouts upon seeing the Martians.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Martians",
+      "gender": "unknown",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Alien invaders with advanced technology, including Heat-Rays.",
+      "importance": "main",
+      "confidence": 0.95
+    },
+    {
+      "name": "A man in black",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man the narrator pushes aside while trying to see around the bend.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Curate",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A religious figure who is struggling to comprehend the destruction caused by the Martians.",
+      "importance": "supporting",
+      "confidence": 0.925
+    },
+    {
+      "name": "My brother",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "The narrator's brother, who experiences the events in London.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "The man who lodged across the landing",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [
+        "My brother’s fellow lodger"
+      ],
+      "description": "A man living in the same building as my brother, who is curious about the commotion.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Policeman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A policeman warning people about the Martians.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "His landlady",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "The woman who owns or manages the lodging where my brother stays.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Her husband",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "The husband of my brother's landlady.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Newsvendor",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man selling newspapers during the panic.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Miss Elphinstone",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "A woman who is with my brother and shows courage during the events.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "Ellen",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A little girl who is frightened and looking for her mother.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "Ellen's mother",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A woman in the crowd calling for her daughter Ellen.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "Lord Garrick",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Lord"
+      ],
+      "aliases": [
+        "the Chief Justice"
+      ],
+      "description": "A man who is dying and very thirsty, identified as the Chief Justice.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "A little old man",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An old man with a grey military moustache and a filthy black frock coat.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "A man on horseback",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man who warns others that 'they are coming'.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "A coachman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A coachman who is driving a carriage.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "A bearded, eagle-faced man",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man carrying a small handbag filled with sovereigns.",
+      "importance": "minor",
+      "confidence": 1
+    },
+    {
+      "name": "Miss Elphinstone's sister-in-law",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A woman who is with Miss Elphinstone and my brother, weeping and too wretched to call upon 'George'.",
+      "importance": "supporting",
+      "confidence": 1
+    },
+    {
+      "name": "George",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "Referenced by Miss Elphinstone's sister-in-law, but not directly present.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "The captain",
+      "gender": "unknown",
+      "pronouns": "he/him/his",
+      "titles": [
+        "captain"
+      ],
+      "aliases": [],
+      "description": "The captain of the steamer who is actively involved in the events.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Martian",
+      "gender": "unknown",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "An alien being involved in the conflict.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Curate",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A religious figure accompanying the narrator, often in despair.",
+      "importance": "supporting",
+      "confidence": 0.95
+    },
+    {
+      "name": "Narrator's Cousin",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "Described as brave but not quick to realize danger.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Artilleryman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "Mentioned as having taught the narrator something.",
+      "importance": "supporting",
+      "confidence": 0.8
+    },
+    {
+      "name": "The Stout, Ruddy, Middle-aged Man",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man captured by the Martians, described as well-dressed and of considerable consequence.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "The Lad",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A young male who is killed by the Martians.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Sheen",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location expected to be in ruins.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Roehampton",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location near which the narrator finds skeletons.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Putney",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location affected by the Martian invasion.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Richmond",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location where the Thames is affected by the red weed.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Hampton",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location affected by the spread of the red weed.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Twickenham",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A location affected by the spread of the red weed.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Berlin",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A city speculated to be under Martian attack.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Paris",
+      "gender": "unknown",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A city speculated to be under Martian attack.",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Thomas Lobb",
+      "gender": "male",
+      "pronouns": null,
+      "titles": [],
+      "aliases": [],
+      "description": "A greengrocer from New Malden, mentioned in passing.",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "artilleryman",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man the narrator parted from at the beginning of the text.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "man lying at the corner of the lane",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A man found by the narrator, covered in black dust and drunk.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "tattered woman",
+      "gender": "female",
+      "pronouns": "she/her/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A dead woman found on a doorstep with a gashed hand.",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Martian giant",
+      "gender": "unknown",
+      "pronouns": "it/its/its",
+      "titles": [],
+      "aliases": [],
+      "description": "A Martian machine emitting a howling sound.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "narrator",
+      "gender": "unknown",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [],
+      "description": "The person recounting the events in the text.",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "Carver",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "Person who made suggestions about the rapid death of the Martians.",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Lessing",
+      "gender": "unknown",
+      "pronouns": "unknown",
+      "titles": [],
+      "aliases": [],
+      "description": "Person who advanced reasons for the Martians landing on Venus.",
+      "importance": "supporting",
+      "confidence": 1.0
+    }
+  ],
+  "metadata": {
+    "total": 89,
+    "by_gender": {
+      "male": 52,
+      "female": 12,
+      "unknown": 25
+    },
+    "by_importance": {
+      "supporting": 24,
+      "minor": 59,
+      "main": 6
+    }
+  },
+  "timestamp": "2025-09-11T22:04:51.883560",
+  "provider": "unified",
+  "model": "gpt-4o",
+  "book_metadata": {
+    "title": "The War of the Worlds",
+    "author": "H. G. Wells",
+    "source_file": "books/json/pg36-The_War_of_the_Worlds.json"
+  }
+}

@@ -5,7 +5,7 @@ This module defines strategies for text transformation.
 """
 
 from abc import abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base import Strategy
 

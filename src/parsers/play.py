@@ -6,7 +6,7 @@ Specialized parser for theatrical plays with acts, scenes, and dialogue.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 
 class PlayElementType(Enum):

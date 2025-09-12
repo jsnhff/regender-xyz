@@ -5,7 +5,7 @@ This module defines strategies for character analysis.
 """
 
 from abc import abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.models.book import Book
 
