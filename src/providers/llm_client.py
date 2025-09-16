@@ -7,10 +7,28 @@ LLM APIs while maintaining security and flexibility.
 """
 
 import os
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
+
+# Import circuit breaker
+try:
+    from src.utils.circuit_breaker import (
+        CircuitBreaker,
+        CircuitBreakerConfig,
+        CircuitBreakerOpenError,
+        get_circuit_breaker,
+    )
+except ImportError:
+    # Fallback for when called from within the src package
+    from utils.circuit_breaker import (
+        CircuitBreaker,
+        CircuitBreakerConfig,
+        CircuitBreakerOpenError,
+        get_circuit_breaker,
+    )
 
 # Manual .env loading since dotenv might not be available
 env_path = Path(__file__).parent / ".env"
@@ -41,11 +59,33 @@ except ImportError:
     AnthropicError = Exception  # Fallback
 
 
-
 # Define APIError exception
 class APIError(Exception):
     """Base exception for API-related errors."""
+
     pass
+
+
+class RateLimitError(APIError):
+    """Exception for rate limiting errors that shouldn't count as failures."""
+
+    pass
+
+
+class ServiceUnavailableError(APIError):
+    """Exception for service unavailable errors."""
+
+    pass
+
+
+class NetworkTimeoutError(APIError):
+    """Exception for network timeout errors."""
+
+    pass
+
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -143,9 +183,21 @@ class _OpenAIClient(_BaseLLMClient):
             )
 
         except OpenAIError as e:
-            raise APIError(f"OpenAI API error: {e}")
+            error_msg = str(e).lower()
+            if "rate limit" in error_msg or "quota" in error_msg:
+                raise RateLimitError(f"OpenAI rate limit exceeded: {e}")
+            elif "timeout" in error_msg or "connection" in error_msg:
+                raise NetworkTimeoutError(f"OpenAI network timeout: {e}")
+            elif "service unavailable" in error_msg or "502" in error_msg or "503" in error_msg:
+                raise ServiceUnavailableError(f"OpenAI service unavailable: {e}")
+            else:
+                raise APIError(f"OpenAI API error: {e}")
         except Exception as e:
-            raise APIError(f"Unexpected error calling OpenAI: {e}")
+            error_msg = str(e).lower()
+            if "timeout" in error_msg or "connection" in error_msg:
+                raise NetworkTimeoutError(f"Network error calling OpenAI: {e}")
+            else:
+                raise APIError(f"Unexpected error calling OpenAI: {e}")
 
 
 class _AnthropicClient(_BaseLLMClient):
@@ -239,9 +291,21 @@ class _AnthropicClient(_BaseLLMClient):
             )
 
         except AnthropicError as e:
-            raise APIError(f"Anthropic API error: {e}")
+            error_msg = str(e).lower()
+            if "rate limit" in error_msg or "quota" in error_msg:
+                raise RateLimitError(f"Anthropic rate limit exceeded: {e}")
+            elif "timeout" in error_msg or "connection" in error_msg:
+                raise NetworkTimeoutError(f"Anthropic network timeout: {e}")
+            elif "service unavailable" in error_msg or "502" in error_msg or "503" in error_msg:
+                raise ServiceUnavailableError(f"Anthropic service unavailable: {e}")
+            else:
+                raise APIError(f"Anthropic API error: {e}")
         except Exception as e:
-            raise APIError(f"Unexpected error calling Anthropic: {e}")
+            error_msg = str(e).lower()
+            if "timeout" in error_msg or "connection" in error_msg:
+                raise NetworkTimeoutError(f"Network error calling Anthropic: {e}")
+            else:
+                raise APIError(f"Unexpected error calling Anthropic: {e}")
 
 
 class UnifiedLLMClient:
@@ -254,12 +318,15 @@ class UnifiedLLMClient:
     3. First available provider (OpenAI, then Anthropic)
     """
 
-    def __init__(self, provider: Optional[str] = None):
+    def __init__(self, provider: Optional[str] = None, enable_circuit_breaker: bool = True):
         self.providers: dict[str, _BaseLLMClient] = {
             "openai": _OpenAIClient(),
             "anthropic": _AnthropicClient(),
             "claude": _AnthropicClient(),  # Alias for anthropic
         }
+
+        self.enable_circuit_breaker = enable_circuit_breaker
+        self._circuit_breaker: Optional[CircuitBreaker] = None
 
         # Handle provider aliases
         if provider == "claude":
@@ -292,7 +359,7 @@ class UnifiedLLMClient:
 
         if self.provider not in self.providers:
             raise APIError(f"Unknown provider: {self.provider}")
-        
+
         # Type assertion - provider is guaranteed to be non-None here
         assert self.provider is not None
 
@@ -321,15 +388,90 @@ class UnifiedLLMClient:
 
             raise APIError(error_msg)
 
+        # Initialize circuit breaker if enabled
+        if self.enable_circuit_breaker:
+            self._init_circuit_breaker()
+
+    def _init_circuit_breaker(self) -> None:
+        """Initialize circuit breaker for this provider."""
+        # Configure circuit breaker based on provider type
+        config = CircuitBreakerConfig(
+            failure_threshold=5,  # Open after 5 consecutive failures
+            success_threshold=3,  # Close after 3 successes in half-open
+            timeout_duration=60.0,  # Wait 1 minute before trying half-open
+            reset_timeout=300.0,  # Reset failure count after 5 minutes of success
+            monitoring_window=60.0,  # Track failures over 1 minute window
+            half_open_max_calls=3,  # Allow 3 calls in half-open state
+            expected_exceptions=(APIError, ServiceUnavailableError, NetworkTimeoutError),
+            ignore_exceptions=(RateLimitError,),  # Don't count rate limits as failures
+        )
+
+        # Get or create named circuit breaker for this provider
+        cb_name = f"llm_client_{self.provider}"
+        self._circuit_breaker = get_circuit_breaker(cb_name, config)
+
+        logger.info(f"Circuit breaker initialized for provider: {self.provider}")
+
+    def _get_fallback_response(self, messages: list[dict[str, str]]) -> _APIResponse:
+        """Generate a fallback response when circuit breaker is open."""
+        fallback_content = (
+            "I apologize, but the AI service is currently experiencing issues. "
+            "Please try again in a few moments. If the problem persists, "
+            "please contact support."
+        )
+
+        return _APIResponse(
+            content=fallback_content,
+            model="fallback",
+            usage={
+                "prompt_tokens": 0,
+                "completion_tokens": len(fallback_content.split()),
+                "total_tokens": len(fallback_content.split()),
+            },
+            raw_response=None,
+        )
+
     def complete(
         self,
         messages: list[dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.0,
         response_format: Optional[dict] = None,
+        use_fallback: bool = True,
     ) -> _APIResponse:
-        """Complete using the configured provider."""
-        return self.client.complete(messages, model, temperature, response_format)
+        """Complete using the configured provider with circuit breaker protection."""
+        if not self.enable_circuit_breaker or not self._circuit_breaker:
+            # Direct call without circuit breaker
+            return self.client.complete(messages, model, temperature, response_format)
+
+        try:
+            # Use circuit breaker to protect the API call
+            return self._circuit_breaker.call(
+                self.client.complete,
+                messages,
+                model,
+                temperature,
+                response_format,
+            )
+
+        except CircuitBreakerOpenError as e:
+            logger.warning(f"Circuit breaker open for {self.provider}: {e}")
+
+            if use_fallback:
+                logger.info(f"Using fallback response for {self.provider}")
+                return self._get_fallback_response(messages)
+            else:
+                # Re-raise as APIError for upstream handling
+                raise APIError(f"Service temporarily unavailable ({self.provider}): {e}")
+
+        except (RateLimitError, NetworkTimeoutError, ServiceUnavailableError) as e:
+            # These errors are already properly categorized
+            logger.warning(f"Provider {self.provider} error: {e}")
+            raise
+
+        except Exception as e:
+            logger.error(f"Unexpected error in circuit breaker for {self.provider}: {e}")
+            raise APIError(f"Unexpected error: {e}")
 
     def get_provider(self) -> str:
         """Get the name of the current provider."""
@@ -338,6 +480,30 @@ class UnifiedLLMClient:
     def get_default_model(self) -> str:
         """Get the default model for the current provider."""
         return self.client.get_default_model()
+
+    def get_circuit_breaker_metrics(self) -> Optional[dict]:
+        """Get circuit breaker metrics for monitoring."""
+        if self._circuit_breaker:
+            return self._circuit_breaker.get_metrics()
+        return None
+
+    def reset_circuit_breaker(self) -> None:
+        """Reset the circuit breaker to closed state."""
+        if self._circuit_breaker:
+            self._circuit_breaker.reset()
+            logger.info(f"Circuit breaker reset for provider: {self.provider}")
+
+    def force_circuit_open(self) -> None:
+        """Force circuit breaker to open state for testing."""
+        if self._circuit_breaker:
+            self._circuit_breaker.force_open()
+            logger.warning(f"Circuit breaker forced open for provider: {self.provider}")
+
+    def force_circuit_closed(self) -> None:
+        """Force circuit breaker to closed state."""
+        if self._circuit_breaker:
+            self._circuit_breaker.force_close()
+            logger.info(f"Circuit breaker forced closed for provider: {self.provider}")
 
     @classmethod
     def list_available_providers(cls) -> list[str]:
@@ -356,17 +522,20 @@ class UnifiedLLMClient:
         return available
 
 
-def get_llm_client(provider: Optional[str] = None) -> UnifiedLLMClient:
+def get_llm_client(
+    provider: Optional[str] = None, enable_circuit_breaker: bool = True
+) -> UnifiedLLMClient:
     """
     Get a unified LLM client.
 
     Args:
         provider: Optional provider name ('openai', 'anthropic', or 'claude')
+        enable_circuit_breaker: Whether to enable circuit breaker protection
 
     Returns:
         UnifiedLLMClient instance
     """
-    return UnifiedLLMClient(provider)
+    return UnifiedLLMClient(provider, enable_circuit_breaker)
 
 
 # Provider information for CLI help

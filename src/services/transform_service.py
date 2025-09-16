@@ -6,7 +6,7 @@ This service handles gender transformation of books.
 
 import asyncio
 import time
-from typing import Any, Optional, List
+from typing import Any, Optional
 
 from src.models.book import Book, Chapter
 from src.models.character import CharacterAnalysis
@@ -18,6 +18,7 @@ from src.models.transformation import (
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
+from src.utils.token_manager import TokenManager
 
 from .character_service import CharacterService
 
@@ -39,6 +40,7 @@ class TransformService(BaseService):
         character_service: Optional[CharacterService] = None,
         strategy: Optional[TransformStrategy] = None,
         config: Optional[ServiceConfig] = None,
+        token_manager: Optional[TokenManager] = None,
     ):
         """
         Initialize transform service.
@@ -48,15 +50,28 @@ class TransformService(BaseService):
             character_service: Service for character analysis
             strategy: Transformation strategy
             config: Service configuration
+            token_manager: Token manager for consistent estimation
         """
         self.provider = provider
         self.character_service = character_service
         self.strategy = strategy or self._get_default_strategy()
+        self.token_manager = token_manager
         super().__init__(config)
 
     def _initialize(self):
         """Initialize transformation resources."""
         self.transformation_cache = {}
+
+        # Initialize token manager if not provided
+        if not self.token_manager:
+            if self.provider:
+                provider_name = getattr(self.provider, "name", "openai")
+                model_name = getattr(self.provider, "model", None)
+                self.token_manager = TokenManager.for_provider(provider_name, model_name)
+            else:
+                self.token_manager = TokenManager()  # Default to GPT-4
+
+        self.logger.info(f"Using TokenManager for {self.token_manager.config.name}")
         self.logger.info(f"Initialized {self.__class__.__name__}")
 
     def _get_default_strategy(self) -> TransformStrategy:
@@ -96,7 +111,7 @@ class TransformService(BaseService):
         book: Book,
         transform_type: TransformType,
         characters: Optional[CharacterAnalysis] = None,
-        selected_characters: Optional[List[str]] = None,
+        selected_characters: Optional[list[str]] = None,
     ) -> Transformation:
         """
         Transform a book with the specified transformation type.
@@ -152,13 +167,16 @@ class TransformService(BaseService):
 
         except Exception as e:
             import traceback
+
             self.logger.error(f"Transform error: {e}")
             self.logger.error(f"Traceback: {traceback.format_exc()}")
             self.handle_error(e, {"book_title": book.title, "transform_type": transform_type.value})
 
     def _create_context(
-        self, characters: CharacterAnalysis, transform_type: TransformType,
-        selected_characters: Optional[List[str]] = None
+        self,
+        characters: CharacterAnalysis,
+        transform_type: TransformType,
+        selected_characters: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
         Create transformation context.
@@ -177,12 +195,11 @@ class TransformService(BaseService):
         character_mappings = {}
         characters_to_transform = []
         characters_to_preserve = []
-        
+
         for char in characters.characters:
             # Check if this character should be transformed
-            should_transform = (selected_characters is None or 
-                              char.name in selected_characters)
-            
+            should_transform = selected_characters is None or char.name in selected_characters
+
             if should_transform:
                 mappings = self._get_character_transformation(char, transform_type)
                 character_mappings[char.name] = mappings
@@ -195,7 +212,7 @@ class TransformService(BaseService):
                     "original_gender": char.gender,
                     "new_gender": char.gender,
                     "pronouns": char.pronouns,
-                    "preserve": True
+                    "preserve": True,
                 }
                 character_mappings[char.name] = mappings
                 for alias in char.aliases:
@@ -218,31 +235,30 @@ class TransformService(BaseService):
         }
 
     def _create_selective_context_string(
-        self, characters: CharacterAnalysis, 
-        to_transform: List[str], to_preserve: List[str]
+        self, characters: CharacterAnalysis, to_transform: list[str], to_preserve: list[str]
     ) -> str:
         """Create context string for selective transformation."""
         lines = []
-        
+
         if to_transform:
             lines.append("Characters to transform:")
             for name in to_transform:
                 char = next((c for c in characters.characters if c.name == name), None)
                 if char:
                     lines.append(f"  - {name}: {char.gender.value} -> swap gender")
-        
+
         if to_preserve:
             lines.append("\nCharacters to preserve (DO NOT change):")
             for name in to_preserve:
                 char = next((c for c in characters.characters if c.name == name), None)
                 if char:
                     lines.append(f"  - {name}: keep as {char.gender.value}")
-        
+
         if not lines:
             return characters.create_context_string()
-        
+
         return "\n".join(lines)
-    
+
     def _get_transformation_rules(self, transform_type: TransformType) -> dict[str, Any]:
         """Get transformation rules for the specified type."""
         if transform_type == TransformType.ALL_MALE:
@@ -355,29 +371,36 @@ class TransformService(BaseService):
         """Transform chapters sequentially with rate limiting."""
         transformed_chapters = []
         all_changes = []
-        
+
         # Use rate limiter for OpenAI
         rate_limiter = None
         if self.provider and "openai" in self.provider.name.lower():
             from src.providers.rate_limiter import OpenAIRateLimiter
+
             rate_limiter = OpenAIRateLimiter(tier="tier-1")
             self.logger.info(f"Using OpenAI rate limiter for {len(chapters)} chapters")
 
         for i, chapter in enumerate(chapters):
             # Apply rate limiting if needed
             if rate_limiter:
-                # Estimate tokens based on chapter content
+                # Estimate tokens based on chapter content using TokenManager
                 chapter_text = " ".join([p.text for p in chapter.paragraphs])
-                estimated_tokens = min(len(chapter_text) // 3 + 500, 4500)
+                estimated_tokens = min(self.token_manager.estimate_tokens(chapter_text), 4500)
                 await rate_limiter.acquire(estimated_tokens)
-            
+
+                # Track token usage
+                self.token_manager.track_usage(
+                    input_tokens=estimated_tokens,
+                    provider=self.provider.name if self.provider else "unknown",
+                )
+
             self.logger.debug(f"Transforming chapter {i + 1}/{len(chapters)}")
 
             transformed_chapter, changes = await self._transform_single_chapter(chapter, i, context)
 
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
-            
+
             # Show progress
             if (i + 1) % 5 == 0:
                 self.logger.info(f"Progress: {i + 1}/{len(chapters)} chapters transformed")
@@ -388,7 +411,7 @@ class TransformService(BaseService):
         self, chapters: list[Chapter], context: dict[str, Any]
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters in parallel with rate limiting."""
-        
+
         # For OpenAI, force sequential processing due to rate limits
         if self.provider and "openai" in self.provider.name.lower():
             self.logger.info("OpenAI detected - using sequential processing for rate limiting")
@@ -436,150 +459,154 @@ class TransformService(BaseService):
         """
         from src.models.book import Chapter, Paragraph
         from src.models.transformation import TransformationChange
-        
+
         # If no provider, do rule-based transformation
         if not self.provider:
             return await self._rule_based_transform(chapter, chapter_index, context)
-        
+
         # Use LLM for transformation
         changes = []
         transformed_paragraphs = []
-        
+
         # Apply rate limiting if needed
         if self.provider and "openai" in self.provider.name.lower():
             from src.providers.rate_limiter import OpenAIRateLimiter
+
             rate_limiter = OpenAIRateLimiter(tier="tier-1")
-            
-            # Estimate tokens for the chapter
+
+            # Estimate tokens for the chapter using TokenManager
             chapter_text = " ".join([p.get_text() for p in chapter.paragraphs])
-            estimated_tokens = min(len(chapter_text) // 3 + 500, 4500)
+            estimated_tokens = min(self.token_manager.estimate_tokens(chapter_text), 4500)
             await rate_limiter.acquire(estimated_tokens)
-        
+
+            # Track token usage
+            self.token_manager.track_usage(
+                input_tokens=estimated_tokens,
+                provider=self.provider.name if self.provider else "unknown",
+            )
+
         # Transform each paragraph
         for para_idx, paragraph in enumerate(chapter.paragraphs):
             # Create prompt for transformation
             prompt = self._create_transform_prompt(paragraph.get_text(), context)
-            
+
             try:
                 # Call LLM
                 messages = [
                     {"role": "system", "content": prompt["system"]},
-                    {"role": "user", "content": prompt["user"]}
+                    {"role": "user", "content": prompt["user"]},
                 ]
-                
+
                 response = await self.provider.complete_async(
                     messages=messages,
                     temperature=0.3,  # Low temperature for consistency
                 )
-                
+
                 # Debug logging
                 original_text = paragraph.get_text()
                 if para_idx == 0:  # Log first paragraph for debugging
                     self.logger.debug(f"Original text: {repr(original_text[:100])}")
                     self.logger.debug(f"Transformed text: {repr(response[:100])}")
                     self.logger.debug(f"Are they equal? {response == original_text}")
-                
+
                 # Track changes
                 if response != original_text:
-                    changes.append(TransformationChange(
-                        location=f"Chapter {chapter_index + 1}, Paragraph {para_idx + 1}",
-                        original=paragraph.get_text(),
-                        transformed=response,
-                        change_type="gender_swap"
-                    ))
-                
+                    changes.append(
+                        TransformationChange(
+                            location=f"Chapter {chapter_index + 1}, Paragraph {para_idx + 1}",
+                            original=paragraph.get_text(),
+                            transformed=response,
+                            change_type="gender_swap",
+                        )
+                    )
+
                 # Create transformed paragraph
-                transformed_paragraphs.append(Paragraph(
-                    sentences=[response]
-                ))
-                
+                transformed_paragraphs.append(Paragraph(sentences=[response]))
+
             except Exception as e:
                 self.logger.warning(f"Failed to transform paragraph {para_idx}: {e}")
                 # Keep original on error
                 transformed_paragraphs.append(paragraph)
-        
+
         # Create transformed chapter
         transformed_chapter = Chapter(
-            number=chapter.number,
-            title=chapter.title,
-            paragraphs=transformed_paragraphs
+            number=chapter.number, title=chapter.title, paragraphs=transformed_paragraphs
         )
-        
+
         return transformed_chapter, changes
-    
+
     async def _rule_based_transform(
         self, chapter: Chapter, chapter_index: int, context: dict[str, Any]
     ) -> tuple[Chapter, list[TransformationChange]]:
         """Apply rule-based transformation without LLM."""
+        import re
+
         from src.models.book import Chapter, Paragraph
         from src.models.transformation import TransformationChange
-        import re
-        
+
         changes = []
         transformed_paragraphs = []
-        
+
         # Get transformation rules
         rules = context.get("rules", {})
         pronouns = rules.get("pronouns", {})
         titles = rules.get("titles", {})
         terms = rules.get("terms", {})
-        
+
         for para_idx, paragraph in enumerate(chapter.paragraphs):
             text = paragraph.get_text()
             original_text = text
-            
+
             # Apply pronoun swaps (case-sensitive with word boundaries)
             for old, new in pronouns.items():
                 # Handle capitalized versions
-                text = re.sub(r'\b' + old.capitalize() + r'\b', new.capitalize(), text)
-                text = re.sub(r'\b' + old + r'\b', new, text)
-            
+                text = re.sub(r"\b" + old.capitalize() + r"\b", new.capitalize(), text)
+                text = re.sub(r"\b" + old + r"\b", new, text)
+
             # Apply title swaps
             for old, new in titles.items():
                 text = text.replace(old, new)
-            
+
             # Apply term swaps (case-insensitive)
             for old, new in terms.items():
-                text = re.sub(r'\b' + old + r'\b', new, text, flags=re.IGNORECASE)
-                text = re.sub(r'\b' + old.capitalize() + r'\b', new.capitalize(), text)
-            
+                text = re.sub(r"\b" + old + r"\b", new, text, flags=re.IGNORECASE)
+                text = re.sub(r"\b" + old.capitalize() + r"\b", new.capitalize(), text)
+
             # Track changes
             if text != original_text:
-                changes.append(TransformationChange(
-                    location=f"Chapter {chapter_index + 1}, Paragraph {para_idx + 1}",
-                    original=original_text,
-                    transformed=text,
-                    change_type="rule_based_swap"
-                ))
-            
+                changes.append(
+                    TransformationChange(
+                        location=f"Chapter {chapter_index + 1}, Paragraph {para_idx + 1}",
+                        original=original_text,
+                        transformed=text,
+                        change_type="rule_based_swap",
+                    )
+                )
+
             # Create transformed paragraph
             # Split text into sentences
             sentences = [s.strip() + "." for s in text.split(". ") if s.strip()]
             if text and not sentences:  # Handle text without periods
                 sentences = [text]
-            transformed_paragraphs.append(Paragraph(
-                sentences=sentences
-            ))
-        
+            transformed_paragraphs.append(Paragraph(sentences=sentences))
+
         # Create transformed chapter
         transformed_chapter = Chapter(
-            number=chapter.number,
-            title=chapter.title,
-            paragraphs=transformed_paragraphs
+            number=chapter.number, title=chapter.title, paragraphs=transformed_paragraphs
         )
-        
+
         return transformed_chapter, changes
-    
+
     def _create_transform_prompt(self, text: str, context: dict[str, Any]) -> dict[str, str]:
         """Create prompt for LLM transformation."""
         character_context = context.get("character_context", "")
         transform_type = context.get("transform_type", "gender_swap")
         to_preserve = context.get("characters_to_preserve", [])
-        
+
         preserve_instruction = ""
         if to_preserve:
             preserve_instruction = f"\nIMPORTANT: DO NOT change the gender of these characters: {', '.join(to_preserve)}"
-        
+
         system_prompt = f"""You are a literary text transformer specializing in gender representation changes.
 Your task is to transform the given text according to the '{transform_type}' transformation type.
 
@@ -614,4 +641,10 @@ Return ONLY the transformed text, no explanations."""
                 "cache_size": len(self.transformation_cache),
             }
         )
+
+        # Add token usage metrics
+        if self.token_manager:
+            metrics["token_usage"] = self.token_manager.get_usage_stats()
+            metrics["model_info"] = self.token_manager.get_model_info()
+
         return metrics

@@ -5,6 +5,9 @@ anthropic>=0.18.0
 # HTTP requests
 requests>=2.31.0
 
+# Async file I/O
+aiofiles>=23.0.0
+
 # For Gutenberg downloads (optional but recommended)
 beautifulsoup4>=4.12.0
 
