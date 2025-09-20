@@ -1,3 +1,7 @@
+---
+name: backend-specialist
+---
+
 # backend-specialist
 
 Expert in LLM integrations, API design, and high-performance text processing for the regender-xyz system.

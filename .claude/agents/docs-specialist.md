@@ -1,3 +1,7 @@
+---
+name: docs-specialist
+---
+
 # docs-specialist
 
 Technical documentation expert focused on creating clear, comprehensive documentation for developers and users.

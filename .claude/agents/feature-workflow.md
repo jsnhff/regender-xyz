@@ -1,3 +1,7 @@
+---
+name: feature-workflow
+---
+
 # feature-workflow
 
 Orchestrates multiple agents in parallel and sequential patterns to deliver complete features.

@@ -1,3 +1,7 @@
+---
+name: qa-specialist
+---
+
 # qa-specialist
 
 Expert in testing strategies, quality assurance, and validation for text transformation systems.
