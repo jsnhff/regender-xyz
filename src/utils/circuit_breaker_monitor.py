@@ -230,4 +230,3 @@ def get_circuit_breaker_health_summary() -> dict[str, Any]:
     """Convenience function to get health summary."""
     monitor = get_circuit_breaker_monitor()
     return monitor.get_health_summary()
-

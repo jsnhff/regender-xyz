@@ -9,7 +9,7 @@ async/sync execution.
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 
@@ -28,6 +28,29 @@ class ServiceConfig:
     # Cache-specific configuration
     cache_max_size: int = 100
     cache_ttl: Optional[float] = None  # TTL in seconds, None for no expiration
+
+    # Transform-specific configuration
+    llm_temperature: float = 0.3
+    chunk_size: int = 1000
+    rate_limit_tier: str = "tier-1"
+
+    # Additional configuration data
+    extra_config: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        """Initialize extra config as empty dict if None."""
+        if self.extra_config is None:
+            self.extra_config = {}
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """Get config value by key, supporting both attributes and extra_config."""
+        # First check if it's a direct attribute
+        if hasattr(self, key):
+            return getattr(self, key)
+        # Then check extra_config
+        elif self.extra_config:
+            return self.extra_config.get(key, default)
+        return default
 
 
 class BaseService(ABC):

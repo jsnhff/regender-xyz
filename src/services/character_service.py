@@ -459,7 +459,7 @@ class CharacterService(BaseService):
                 book_id=book_hash,
                 characters=characters,
                 metadata=self._generate_metadata(characters),
-                provider=self.provider.name if self.provider else "unknown",
+                provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
                 model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
             )
 
@@ -476,7 +476,7 @@ class CharacterService(BaseService):
                 book_id=book.hash(),
                 characters=[],
                 metadata={"error": str(e)},
-                provider=self.provider.name if self.provider else "unknown",
+                provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
                 model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
             )
 
@@ -498,7 +498,8 @@ class CharacterService(BaseService):
 
         # Use rate limiter for OpenAI
         rate_limiter = None
-        if self.provider and "openai" in self.provider.name.lower():
+        provider_name = getattr(self.provider, 'name', None) or getattr(self.provider, 'get_provider', lambda: '')()
+        if provider_name and "openai" in str(provider_name).lower():
             from src.providers.rate_limiter import OpenAIRateLimiter
 
             rate_limiter = OpenAIRateLimiter(tier="tier-1")
@@ -517,13 +518,15 @@ class CharacterService(BaseService):
                 # Apply rate limiting if needed
                 if rate_limiter:
                     # Use TokenManager for consistent estimation
-                    estimated_tokens = min(self.token_manager.estimate_tokens(chunk), 4500)  # Cap at 4500
+                    estimated_tokens = min(
+                        self.token_manager.estimate_tokens(chunk), 4500
+                    )  # Cap at 4500
                     await rate_limiter.acquire(estimated_tokens)
 
                     # Track token usage
                     self.token_manager.track_usage(
                         input_tokens=estimated_tokens,
-                        provider=self.provider.name if self.provider else "unknown"
+                        provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
                     )
 
                 # Analyze chunk
@@ -650,7 +653,7 @@ class CharacterService(BaseService):
         metrics = super().get_metrics()
         metrics.update(
             {
-                "provider": self.provider.name if self.provider else "none",
+                "provider": getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'none')()) if self.provider else "none",
                 "strategy": self.strategy.__class__.__name__,
             }
         )

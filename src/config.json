@@ -36,7 +36,10 @@
         "cache_enabled": true,
         "async_enabled": true,
         "max_concurrent": 5,
-        "max_retries": 3
+        "max_retries": 3,
+        "llm_temperature": 0.3,
+        "chunk_size": 1000,
+        "rate_limit_tier": "tier-1"
       },
       "dependencies": {
         "provider": "llm_provider",

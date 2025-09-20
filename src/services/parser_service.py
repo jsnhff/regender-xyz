@@ -76,6 +76,12 @@ class ParserService(BaseService):
             raise ValueError(f"Invalid input: {input_path}")
 
         try:
+            # If input is already JSON, load it directly
+            if input_path.suffix == '.json':
+                self.logger.info(f"Loading existing JSON file: {input_path}")
+                return await self.parse_json_async(input_path)
+
+            # Otherwise, parse the text file
             # Read file
             raw_data = await self._read_file_async(input_path)
 

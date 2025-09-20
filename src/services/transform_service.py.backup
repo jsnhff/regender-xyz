@@ -460,9 +460,12 @@ class TransformService(BaseService):
         from src.models.book import Chapter, Paragraph
         from src.models.transformation import TransformationChange
 
-        # Require LLM provider for transformation
-        if not self.provider:
-            raise ValueError("LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic).")
+        # Check configuration for transformation method preference
+        use_llm = self.config.get("use_llm_transformation", False)
+
+        # If no provider or configuration says to use rule-based, use rule-based
+        if not self.provider or not use_llm:
+            return await self._rule_based_transform(chapter, chapter_index, context)
 
         # Use LLM for transformation
         changes = []
@@ -529,6 +532,196 @@ class TransformService(BaseService):
                 self.logger.warning(f"Failed to transform paragraph {para_idx}: {e}")
                 # Keep original on error
                 transformed_paragraphs.append(paragraph)
+
+        # Create transformed chapter
+        transformed_chapter = Chapter(
+            number=chapter.number, title=chapter.title, paragraphs=transformed_paragraphs
+        )
+
+        return transformed_chapter, changes
+
+    async def _rule_based_transform(
+        self, chapter: Chapter, chapter_index: int, context: dict[str, Any]
+    ) -> tuple[Chapter, list[TransformationChange]]:
+        """Apply rule-based transformation without LLM."""
+        import re
+
+        from src.models.book import Chapter, Paragraph
+        from src.models.transformation import TransformationChange
+
+        changes = []
+        transformed_paragraphs = []
+
+        # Enhanced transformation rules for gender swap
+        transform_type = context.get("transform_type")
+
+        # Define comprehensive gender swap patterns
+        if transform_type == TransformType.GENDER_SWAP:
+            # Order matters! Process longer patterns first to avoid partial replacements
+            gender_patterns = [
+                # Possessive forms (must come before object forms)
+                (r'\bhis\b', 'her'),
+                (r'\bHis\b', 'Her'),
+                (r'\bhers\b', 'his'),
+                (r'\bHers\b', 'His'),
+
+                # Subject pronouns
+                (r'\bhe\b', 'she'),
+                (r'\bHe\b', 'She'),
+                (r'\bshe\b', 'he'),
+                (r'\bShe\b', 'He'),
+
+                # Object pronouns
+                (r'\bhim\b', 'her'),
+                (r'\bHim\b', 'Her'),
+                (r'\bher\b', 'him'),
+                (r'\bHer\b', 'Him'),
+
+                # Reflexive pronouns
+                (r'\bhimself\b', 'herself'),
+                (r'\bHimself\b', 'Herself'),
+                (r'\bherself\b', 'himself'),
+                (r'\bHerself\b', 'Himself'),
+
+                # Titles
+                (r'\bMr\.', 'Ms.'),
+                (r'\bMrs\.', 'Mr.'),
+                (r'\bMs\.', 'Mr.'),
+                (r'\bMiss\b', 'Mr.'),
+                (r'\bSir\b', 'Madam'),
+                (r'\bsir\b', 'madam'),
+                (r'\bMadam\b', 'Sir'),
+                (r'\bmadam\b', 'sir'),
+
+                # Family terms
+                (r'\bfather\b', 'mother'),
+                (r'\bFather\b', 'Mother'),
+                (r'\bmother\b', 'father'),
+                (r'\bMother\b', 'Father'),
+                (r'\bson\b', 'daughter'),
+                (r'\bSon\b', 'Daughter'),
+                (r'\bdaughter\b', 'son'),
+                (r'\bDaughter\b', 'Son'),
+                (r'\bbrother\b', 'sister'),
+                (r'\bBrother\b', 'Sister'),
+                (r'\bsister\b', 'brother'),
+                (r'\bSister\b', 'Brother'),
+                (r'\bhusband\b', 'wife'),
+                (r'\bHusband\b', 'Wife'),
+                (r'\bwife\b', 'husband'),
+                (r'\bWife\b', 'Husband'),
+                (r'\buncle\b', 'aunt'),
+                (r'\bUncle\b', 'Aunt'),
+                (r'\baunt\b', 'uncle'),
+                (r'\bAunt\b', 'Uncle'),
+                (r'\bnephew\b', 'niece'),
+                (r'\bNephew\b', 'Niece'),
+                (r'\bniece\b', 'nephew'),
+                (r'\bNiece\b', 'Nephew'),
+
+                # Royal/noble terms
+                (r'\bking\b', 'queen'),
+                (r'\bKing\b', 'Queen'),
+                (r'\bqueen\b', 'king'),
+                (r'\bQueen\b', 'King'),
+                (r'\bprince\b', 'princess'),
+                (r'\bPrince\b', 'Princess'),
+                (r'\bprincess\b', 'prince'),
+                (r'\bPrincess\b', 'Prince'),
+                (r'\blord\b', 'lady'),
+                (r'\bLord\b', 'Lady'),
+                (r'\blady\b', 'lord'),
+                (r'\bLady\b', 'Lord'),
+                (r'\bduke\b', 'duchess'),
+                (r'\bDuke\b', 'Duchess'),
+                (r'\bduchess\b', 'duke'),
+                (r'\bDuchess\b', 'Duke'),
+
+                # Gender-specific terms
+                (r'\bman\b', 'woman'),
+                (r'\bMan\b', 'Woman'),
+                (r'\bwoman\b', 'man'),
+                (r'\bWoman\b', 'Man'),
+                (r'\bmen\b', 'women'),
+                (r'\bMen\b', 'Women'),
+                (r'\bwomen\b', 'men'),
+                (r'\bWomen\b', 'Men'),
+                (r'\bboy\b', 'girl'),
+                (r'\bBoy\b', 'Girl'),
+                (r'\bgirl\b', 'boy'),
+                (r'\bGirl\b', 'Boy'),
+                (r'\bmale\b', 'female'),
+                (r'\bMale\b', 'Female'),
+                (r'\bfemale\b', 'male'),
+                (r'\bFemale\b', 'Male'),
+                (r'\bgentleman\b', 'lady'),
+                (r'\bGentleman\b', 'Lady'),
+                (r'\bgentlemen\b', 'ladies'),
+                (r'\bGentlemen\b', 'Ladies'),
+                (r'\bladies\b', 'gentlemen'),
+                (r'\bLadies\b', 'Gentlemen'),
+            ]
+        else:
+            # Use existing rules from context for other transformation types
+            rules = context.get("rules", {})
+            gender_patterns = []
+
+            # Convert rules to pattern format
+            for old, new in rules.get("pronouns", {}).items():
+                gender_patterns.append((r'\b' + old + r'\b', new))
+                gender_patterns.append((r'\b' + old.capitalize() + r'\b', new.capitalize()))
+
+            for old, new in rules.get("titles", {}).items():
+                gender_patterns.append((old, new))
+
+            for old, new in rules.get("terms", {}).items():
+                gender_patterns.append((r'\b' + old + r'\b', new))
+                gender_patterns.append((r'\b' + old.capitalize() + r'\b', new.capitalize()))
+
+        for para_idx, paragraph in enumerate(chapter.paragraphs):
+            text = paragraph.get_text()
+            original_text = text
+
+            # Apply all gender patterns
+            # Use a two-pass approach to handle overlapping replacements
+            # First pass: mark replacements with placeholders
+            replacements = {}
+            placeholder_id = 0
+
+            for pattern, replacement in gender_patterns:
+                matches = list(re.finditer(pattern, text))
+                for match in reversed(matches):  # Process from end to avoid offset issues
+                    placeholder = f"__PLACEHOLDER_{placeholder_id}__"
+                    replacements[placeholder] = replacement
+                    text = text[:match.start()] + placeholder + text[match.end():]
+                    placeholder_id += 1
+
+            # Second pass: replace placeholders with actual values
+            for placeholder, replacement in replacements.items():
+                text = text.replace(placeholder, replacement)
+
+            # Track changes
+            if text != original_text:
+                changes.append(
+                    TransformationChange(
+                        chapter_index=chapter_index,
+                        paragraph_index=para_idx,
+                        sentence_index=0,  # We're treating whole paragraph as one unit
+                        original=original_text,
+                        transformed=text,
+                        change_type="rule_based_swap",
+                    )
+                )
+
+            # Create transformed paragraph
+            # Preserve original sentence structure from the paragraph
+            if hasattr(paragraph, 'sentences'):
+                # If original paragraph has sentences, preserve that structure
+                # but use our transformed text
+                transformed_paragraphs.append(Paragraph(sentences=[text]))
+            else:
+                # Otherwise preserve as-is
+                transformed_paragraphs.append(Paragraph(sentences=[text]))
 
         # Create transformed chapter
         transformed_chapter = Chapter(

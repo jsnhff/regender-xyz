@@ -110,9 +110,7 @@ class TestTextSplitters(unittest.TestCase):
 
     def setUp(self):
         """Set up test configuration."""
-        self.config = ModelConfig(
-            name="test-model", chars_per_token=4.0, max_context_tokens=8192
-        )
+        self.config = ModelConfig(name="test-model", chars_per_token=4.0, max_context_tokens=8192)
         self.estimator = TokenEstimator(self.config)
 
     def test_sentence_splitter(self):
