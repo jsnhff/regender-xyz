@@ -131,30 +131,6 @@ class SmartChunkingStrategy(AnalysisStrategy):
         return {"chunk_index": chunk_index, "characters": [], "text_length": len(chunk)}
 
 
-class SequentialStrategy(AnalysisStrategy):
-    """Sequential chapter-by-chapter analysis."""
-
-    async def execute_async(self, data: Any) -> Any:
-        """Execute sequential analysis."""
-        if isinstance(data, Book):
-            chunks = await self.chunk_book_async(data)
-            results = []
-            for i, chunk in enumerate(chunks):
-                result = await self.analyze_chunk_async(chunk, i)
-                results.append(result)
-            return results
-        else:
-            raise ValueError("SequentialStrategy requires Book input")
-
-    async def chunk_book_async(self, book: Book) -> list[str]:
-        """Create one chunk per chapter."""
-        return [chapter.get_text() for chapter in book.chapters]
-
-    async def analyze_chunk_async(self, chunk: str, chunk_index: int) -> dict[str, Any]:
-        """Analyze a chapter."""
-        return {"chunk_index": chunk_index, "characters": [], "text_length": len(chunk)}
-
-
 class RateLimitedStrategy(AnalysisStrategy):
     """Rate-limited analysis for API constraints."""
 

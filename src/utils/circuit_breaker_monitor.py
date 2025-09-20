@@ -6,8 +6,6 @@ used throughout the application.
 """
 
 import logging
-import time
-from dataclasses import asdict
 from typing import Any, Optional
 
 from .circuit_breaker import CircuitState, get_all_circuit_breakers

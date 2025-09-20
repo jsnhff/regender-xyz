@@ -5,8 +5,11 @@ Implements token bucket algorithm for rate limiting.
 """
 
 import asyncio
+import logging
 import time
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 class TokenBucketRateLimiter:
@@ -58,7 +61,7 @@ class TokenBucketRateLimiter:
                 wait_time = ((tokens - self.available_tokens) / self.max_tokens) * 60.0
                 wait_time = max(wait_time, self.min_delay)  # At least min_delay
 
-                print(f"Rate limit: waiting {wait_time:.1f}s for {tokens} tokens...")
+                logger.info(f"Rate limit: waiting {wait_time:.1f}s for {tokens} tokens...")
                 await asyncio.sleep(wait_time)
 
                 # Refill again after waiting

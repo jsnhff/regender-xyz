@@ -101,52 +101,6 @@ class BaseService(ABC):
         """
         pass
 
-    def process(self, data: Any) -> Any:
-        """
-        Synchronous wrapper for async processing.
-
-        DEPRECATED: This method is deprecated. Use process_async() directly in async contexts.
-
-        This method provides backward compatibility but should be avoided in new code.
-        It only works when called from a non-async context (no running event loop).
-
-        Args:
-            data: Input data to process
-
-        Returns:
-            Processed result
-
-        Raises:
-            RuntimeError: If called from within an async context (event loop is running)
-        """
-        import warnings
-
-        # Check if we're in an async context
-        try:
-            asyncio.get_running_loop()
-            # If we get here, there's a running loop - this is dangerous
-            raise RuntimeError(
-                "BaseService.process() cannot be called from an async context. "
-                "Use 'await service.process_async(data)' instead. "
-                "This prevents event loop conflicts and deadlocks."
-            )
-        except RuntimeError as e:
-            # Check if this is our custom error or the expected "no running loop" error
-            if "cannot be called from an async context" in str(e):
-                raise
-            # No loop running - this is the safe case
-            pass
-
-        # Issue deprecation warning
-        warnings.warn(
-            "BaseService.process() is deprecated. Use process_async() in async contexts for better performance and safety.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        # Safe to use asyncio.run() here since we confirmed no loop is running
-        return asyncio.run(self.process_async(data))
-
     def validate_input(self, data: Any) -> bool:
         """
         Validate input data.

@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from src.container import ApplicationContext, ServiceContainer
+from src.container import ApplicationContext
 from src.models.book import Book
 from src.models.character import CharacterAnalysis
 from src.models.transformation import TransformType
@@ -220,43 +220,27 @@ class Application:
         # Convert to lowercase and replace spaces/underscores with hyphens
         book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
 
-        # Check in book's output folder first
-        output_dir = Path("books/output") / book_folder
-        char_file = output_dir / "characters.json"
+        # Check for most recent character analysis in timestamped folders
+        output_base = Path("books/output")
+        matching_folders = sorted(output_base.glob(f"{book_folder}-*"))
 
-        if char_file.exists():
-            self.logger.info(f"Loading existing character analysis from {char_file}")
-            try:
-                with open(char_file) as f:
-                    char_data = json.load(f)
-                return CharacterAnalysis.from_dict(char_data)
-            except Exception as e:
-                self.logger.warning(f"Failed to load character file: {e}")
-
-        # Also check legacy location (same folder as book)
-        if input_path.suffix == ".json":
-            legacy_char_file = input_path.parent / f"{input_path.stem}-characters.json"
-            if legacy_char_file.exists():
-                self.logger.info(f"Loading existing character analysis from {legacy_char_file}")
+        for folder in reversed(matching_folders):  # Check newest first
+            char_file = folder / "characters.json"
+            if char_file.exists():
+                self.logger.info(f"Loading existing character analysis from {char_file}")
                 try:
-                    with open(legacy_char_file) as f:
+                    with open(char_file) as f:
                         char_data = json.load(f)
                     return CharacterAnalysis.from_dict(char_data)
                 except Exception as e:
                     self.logger.warning(f"Failed to load character file: {e}")
 
-        # No existing analysis, analyze the book and save to output folder
+        # No existing analysis, analyze the book
         self.logger.info("No existing character analysis found, analyzing book...")
         character_service = self.get_service("character")
         characters = await character_service.process_async(book)
 
-        # Save character analysis to book's output folder
-        output_dir.mkdir(parents=True, exist_ok=True)
-        char_file = output_dir / "characters.json"
-        with open(char_file, "w", encoding="utf-8") as f:
-            json.dump(characters.to_dict(), f, indent=2, ensure_ascii=False)
-        self.logger.info(f"Saved character analysis to {char_file}")
-
+        # Note: Character analysis will be saved by the CLI with a timestamp
         return characters
 
     async def process_book(

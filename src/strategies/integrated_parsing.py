@@ -16,9 +16,8 @@ class IntegratedParsingStrategy(ParsingStrategy):
     """
     Parsing strategy using the new integrated parser.
 
-    This replaces the simplified StandardParsingStrategy with a robust
-    parser that handles Gutenberg texts, multiple formats, and
-    hierarchical structures.
+    This provides a robust parser that handles Gutenberg texts,
+    multiple formats, and hierarchical structures.
     """
 
     def __init__(self):

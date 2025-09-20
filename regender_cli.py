@@ -11,6 +11,7 @@ import asyncio
 import logging
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Load environment variables from .env file
@@ -44,13 +45,16 @@ def process_book(args):
         # Generate output path based on input and transform type
         input_file = Path(input_path)
 
-        # Extract book name and create folder name
+        # Extract book name and create folder name with timestamp
         book_name = input_file.stem
         # Remove common prefixes like pg12- or pg43-
         if book_name.startswith("pg") and "-" in book_name:
             book_name = book_name.split("-", 1)[1]
         # Convert to lowercase and replace spaces/underscores with hyphens
-        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
+        book_base = book_name.lower().replace("_", "-").replace(" ", "-")
+        # Add timestamp to folder name (YYYYMMDD-HHMMSS format)
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        book_folder = f"{book_base}-{timestamp}"
 
         if args.transform_type == "parse_only":
             # For parsing: keep in books/json/ with same name

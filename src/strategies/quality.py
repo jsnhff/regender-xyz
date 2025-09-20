@@ -152,12 +152,12 @@ class AdaptiveQualityStrategy(QualityStrategy):
         issues = []
 
         # Check if all characters were transformed
-        expected_characters = set(c.name for c in transformation.characters_used.characters)
-        transformed_characters = set(
+        expected_characters = {c.name for c in transformation.characters_used.characters}
+        transformed_characters = {
             change.character_affected
             for change in transformation.changes
             if change.character_affected
-        )
+        }
 
         missing = expected_characters - transformed_characters
         if missing:
