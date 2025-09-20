@@ -1,7 +1,7 @@
 """
 Unified Provider
 
-This module provides a unified interface that wraps the 
+This module provides a unified interface that wraps the
 UnifiedLLMClient from llm_client.py for plugin integration.
 """
 
@@ -171,10 +171,7 @@ class UnifiedProvider(LLMProvider, Plugin):
             True if valid
         """
         # Check that at least one API key is available
-        has_key = (
-            os.getenv("OPENAI_API_KEY")
-            or os.getenv("ANTHROPIC_API_KEY")
-        )
+        has_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
 
         if not has_key:
             self.logger.error("No API keys found in environment")

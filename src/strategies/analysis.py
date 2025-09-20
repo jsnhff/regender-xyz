@@ -95,9 +95,7 @@ class SmartChunkingStrategy(AnalysisStrategy):
 
                 # Use TokenManager's intelligent chunking for large chapters
                 chapter_chunks = self.token_manager.chunk_text(
-                    chapter_text,
-                    max_tokens=self.max_tokens,
-                    preserve_boundaries=True
+                    chapter_text, max_tokens=self.max_tokens, preserve_boundaries=True
                 )
 
                 # Extract text from TextChunk objects

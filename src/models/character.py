@@ -59,13 +59,13 @@ class Character:
                 pronouns = {
                     "subject": parts[0],
                     "object": parts[1],
-                    "possessive": parts[2] if len(parts) > 2 else parts[1]
+                    "possessive": parts[2] if len(parts) > 2 else parts[1],
                 }
             else:
                 pronouns = {}
         elif pronouns is None:
             pronouns = {}
-            
+
         return cls(
             name=data["name"],
             gender=Gender(data.get("gender", "unknown")),

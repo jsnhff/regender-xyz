@@ -50,7 +50,6 @@ Thumbs.db
 test_it/
 
 # Output files
-output/
 *.transformed.txt
 *.neutral.txt
 *.feminine.txt

@@ -7,16 +7,24 @@ and validates proper state transitions.
 """
 
 import asyncio
-import time
-import unittest
-from unittest.mock import Mock, patch
-from typing import Any
 
 # Add the src directory to the path
 import sys
+import time
+import unittest
 from pathlib import Path
+from typing import Any
+from unittest.mock import Mock, patch
+
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from src.providers.llm_client import (
+    APIError,
+    NetworkTimeoutError,
+    RateLimitError,
+    ServiceUnavailableError,
+    UnifiedLLMClient,
+)
 from src.utils.circuit_breaker import (
     CircuitBreaker,
     CircuitBreakerConfig,
@@ -28,13 +36,6 @@ from src.utils.circuit_breaker import (
 from src.utils.circuit_breaker_monitor import (
     CircuitBreakerMonitor,
     get_circuit_breaker_monitor,
-)
-from src.providers.llm_client import (
-    UnifiedLLMClient,
-    APIError,
-    RateLimitError,
-    NetworkTimeoutError,
-    ServiceUnavailableError,
 )
 
 
@@ -159,7 +160,7 @@ class TestCircuitBreaker(unittest.TestCase):
         self.assertEqual(metrics["total_calls"], 3)
         self.assertEqual(metrics["total_successes"], 2)
         self.assertEqual(metrics["total_failures"], 1)
-        self.assertAlmostEqual(metrics["failure_rate"], 1/3, places=2)
+        self.assertAlmostEqual(metrics["failure_rate"], 1 / 3, places=2)
 
     def test_reset_circuit_breaker(self):
         """Test circuit breaker reset functionality."""
@@ -185,8 +186,8 @@ class TestCircuitBreakerWithLLMClient(unittest.TestCase):
         # Reset any existing circuit breakers
         reset_all_circuit_breakers()
 
-    @patch('src.providers.llm_client._OpenAIClient')
-    @patch('src.providers.llm_client._AnthropicClient')
+    @patch("src.providers.llm_client._OpenAIClient")
+    @patch("src.providers.llm_client._AnthropicClient")
     def test_llm_client_circuit_breaker_integration(self, mock_anthropic, mock_openai):
         """Test LLM client with circuit breaker."""
         # Mock the client to be available
@@ -196,11 +197,11 @@ class TestCircuitBreakerWithLLMClient(unittest.TestCase):
         mock_openai.return_value = mock_openai_instance
 
         # Set up environment for OpenAI
-        with patch.dict('os.environ', {'DEFAULT_PROVIDER': 'openai', 'OPENAI_API_KEY': 'test-key'}):
+        with patch.dict("os.environ", {"DEFAULT_PROVIDER": "openai", "OPENAI_API_KEY": "test-key"}):
             client = UnifiedLLMClient(enable_circuit_breaker=True)
             self.assertIsNotNone(client._circuit_breaker)
 
-    @patch('src.providers.llm_client._OpenAIClient')
+    @patch("src.providers.llm_client._OpenAIClient")
     def test_circuit_breaker_fallback_response(self, mock_openai):
         """Test fallback response when circuit breaker is open."""
         # Mock the client
@@ -210,7 +211,7 @@ class TestCircuitBreakerWithLLMClient(unittest.TestCase):
         mock_openai_instance.complete.side_effect = ServiceUnavailableError("Service down")
         mock_openai.return_value = mock_openai_instance
 
-        with patch.dict('os.environ', {'DEFAULT_PROVIDER': 'openai', 'OPENAI_API_KEY': 'test-key'}):
+        with patch.dict("os.environ", {"DEFAULT_PROVIDER": "openai", "OPENAI_API_KEY": "test-key"}):
             client = UnifiedLLMClient(enable_circuit_breaker=True)
 
             # Trigger failures to open circuit
@@ -334,7 +335,7 @@ if __name__ == "__main__":
     print("Running Circuit Breaker Tests...")
 
     # Run synchronous tests
-    unittest.main(argv=[''], exit=False, verbosity=2)
+    unittest.main(argv=[""], exit=False, verbosity=2)
 
     # Run async tests
     run_async_tests()

@@ -1,18 +1,18 @@
-# Core dependencies
-openai>=1.0.0
-anthropic>=0.18.0
+# Core dependencies - pinned versions for stability
+openai==1.86.0
+anthropic==0.54.0
 
 # HTTP requests
-requests>=2.31.0
+requests==2.32.3
+aiofiles==24.1.0
 
-# Async file I/O
-aiofiles>=23.0.0
+# For Gutenberg downloads
+beautifulsoup4==4.13.4
 
-# For Gutenberg downloads (optional but recommended)
-beautifulsoup4>=4.12.0
+# Environment variable management
+python-dotenv==1.1.1
 
-# For environment variable management (optional)
-python-dotenv>=1.0.0
-
-# Development tools
-ruff>=0.11.0
+# Development and testing tools
+ruff==0.13.1
+pytest==8.4.1
+pytest-asyncio==1.0.0

@@ -11,17 +11,17 @@
       "importance": "main"
     },
     {
-      "name": "mothers of poor children",
+      "name": "mothers",
       "gender": "female",
       "importance": "supporting"
     },
     {
-      "name": "children of poor people",
+      "name": "children",
       "gender": "unknown",
       "importance": "supporting"
     },
     {
-      "name": "fathers of poor children",
+      "name": "fathers",
       "gender": "male",
       "importance": "minor"
     },

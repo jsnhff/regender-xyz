@@ -6,8 +6,8 @@ This module provides a consistent interface for interacting with different
 LLM APIs while maintaining security and flexibility.
 """
 
-import os
 import logging
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -47,16 +47,8 @@ if env_path.exists():
         pass
 
 # Import providers
+from anthropic import Anthropic, AnthropicError
 from openai import OpenAI, OpenAIError
-
-# Try to import Anthropic client
-try:
-    from anthropic import Anthropic, AnthropicError
-
-    _ANTHROPIC_AVAILABLE = True
-except ImportError:
-    _ANTHROPIC_AVAILABLE = False
-    AnthropicError = Exception  # Fallback
 
 
 # Define APIError exception
@@ -131,12 +123,30 @@ class _OpenAIClient(_BaseLLMClient):
         self.base_url = base_url or os.environ.get("OPENAI_API_BASE")
 
         if self.api_key:
+            # Validate API key format
+            self._validate_api_key(self.api_key)
             kwargs = {"api_key": self.api_key}
             if self.base_url:
                 kwargs["base_url"] = self.base_url
             self.client = OpenAI(**kwargs)
         else:
             self.client = None
+
+    def _validate_api_key(self, key: str) -> None:
+        """Validate OpenAI API key format."""
+        if not key or not isinstance(key, str):
+            raise APIError("OpenAI API key must be a non-empty string")
+
+        key = key.strip()
+        if not key.startswith("sk-") and not key.startswith("org-"):
+            # Allow org- prefix for organization keys
+            raise APIError("OpenAI API key must start with 'sk-' or 'org-'")
+
+        if len(key) < 20:
+            raise APIError("OpenAI API key appears too short")
+
+        if " " in key:
+            raise APIError("OpenAI API key contains spaces")
 
     def is_available(self) -> bool:
         """Check if OpenAI client is available."""
@@ -185,19 +195,19 @@ class _OpenAIClient(_BaseLLMClient):
         except OpenAIError as e:
             error_msg = str(e).lower()
             if "rate limit" in error_msg or "quota" in error_msg:
-                raise RateLimitError(f"OpenAI rate limit exceeded: {e}")
+                raise RateLimitError(f"OpenAI rate limit exceeded: {e}") from e
             elif "timeout" in error_msg or "connection" in error_msg:
-                raise NetworkTimeoutError(f"OpenAI network timeout: {e}")
+                raise NetworkTimeoutError(f"OpenAI network timeout: {e}") from e
             elif "service unavailable" in error_msg or "502" in error_msg or "503" in error_msg:
-                raise ServiceUnavailableError(f"OpenAI service unavailable: {e}")
+                raise ServiceUnavailableError(f"OpenAI service unavailable: {e}") from e
             else:
-                raise APIError(f"OpenAI API error: {e}")
+                raise APIError(f"OpenAI API error: {e}") from e
         except Exception as e:
             error_msg = str(e).lower()
             if "timeout" in error_msg or "connection" in error_msg:
-                raise NetworkTimeoutError(f"Network error calling OpenAI: {e}")
+                raise NetworkTimeoutError(f"Network error calling OpenAI: {e}") from e
             else:
-                raise APIError(f"Unexpected error calling OpenAI: {e}")
+                raise APIError(f"Unexpected error calling OpenAI: {e}") from e
 
 
 class _AnthropicClient(_BaseLLMClient):
@@ -207,7 +217,9 @@ class _AnthropicClient(_BaseLLMClient):
         self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         self.base_url = base_url or os.environ.get("ANTHROPIC_API_BASE")
 
-        if self.api_key and _ANTHROPIC_AVAILABLE:
+        if self.api_key:
+            # Validate API key format
+            self._validate_api_key(self.api_key)
             kwargs = {"api_key": self.api_key}
             if self.base_url:
                 kwargs["base_url"] = self.base_url
@@ -215,9 +227,24 @@ class _AnthropicClient(_BaseLLMClient):
         else:
             self.client = None
 
+    def _validate_api_key(self, key: str) -> None:
+        """Validate Anthropic API key format."""
+        if not key or not isinstance(key, str):
+            raise APIError("Anthropic API key must be a non-empty string")
+
+        key = key.strip()
+        if not key.startswith("sk-ant-"):
+            raise APIError("Anthropic API key must start with 'sk-ant-'")
+
+        if len(key) < 30:
+            raise APIError("Anthropic API key appears too short")
+
+        if " " in key:
+            raise APIError("Anthropic API key contains spaces")
+
     def is_available(self) -> bool:
         """Check if Anthropic client is available."""
-        return self.client is not None and _ANTHROPIC_AVAILABLE
+        return self.client is not None
 
     def get_default_model(self) -> str:
         """Get default Anthropic model from environment or fallback."""
@@ -293,19 +320,19 @@ class _AnthropicClient(_BaseLLMClient):
         except AnthropicError as e:
             error_msg = str(e).lower()
             if "rate limit" in error_msg or "quota" in error_msg:
-                raise RateLimitError(f"Anthropic rate limit exceeded: {e}")
+                raise RateLimitError(f"Anthropic rate limit exceeded: {e}") from e
             elif "timeout" in error_msg or "connection" in error_msg:
-                raise NetworkTimeoutError(f"Anthropic network timeout: {e}")
+                raise NetworkTimeoutError(f"Anthropic network timeout: {e}") from e
             elif "service unavailable" in error_msg or "502" in error_msg or "503" in error_msg:
-                raise ServiceUnavailableError(f"Anthropic service unavailable: {e}")
+                raise ServiceUnavailableError(f"Anthropic service unavailable: {e}") from e
             else:
-                raise APIError(f"Anthropic API error: {e}")
+                raise APIError(f"Anthropic API error: {e}") from e
         except Exception as e:
             error_msg = str(e).lower()
             if "timeout" in error_msg or "connection" in error_msg:
-                raise NetworkTimeoutError(f"Network error calling Anthropic: {e}")
+                raise NetworkTimeoutError(f"Network error calling Anthropic: {e}") from e
             else:
-                raise APIError(f"Unexpected error calling Anthropic: {e}")
+                raise APIError(f"Unexpected error calling Anthropic: {e}") from e
 
 
 class UnifiedLLMClient:
@@ -327,6 +354,7 @@ class UnifiedLLMClient:
 
         self.enable_circuit_breaker = enable_circuit_breaker
         self._circuit_breaker: Optional[CircuitBreaker] = None
+        self._executor = None  # Lazy-initialized thread pool
 
         # Handle provider aliases
         if provider == "claude":
@@ -431,6 +459,42 @@ class UnifiedLLMClient:
             raw_response=None,
         )
 
+    @property
+    def supports_json(self) -> bool:
+        """Check if provider supports JSON response format."""
+        # OpenAI supports JSON mode
+        return self.provider == "openai"
+
+    async def complete_async(
+        self,
+        messages: list[dict[str, str]],
+        model: Optional[str] = None,
+        temperature: float = 0.0,
+        response_format: Optional[dict] = None,
+        use_fallback: bool = True,
+    ) -> str:
+        """Async wrapper for complete - returns just the content string."""
+        import asyncio
+        import concurrent.futures
+
+        # Lazy-initialize the executor for better parallelism
+        if self._executor is None:
+            self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+
+        loop = asyncio.get_event_loop()
+
+        # Run the sync method in the thread pool
+        response = await loop.run_in_executor(
+            self._executor,
+            self.complete,
+            messages,
+            model,
+            temperature,
+            response_format,
+            use_fallback,
+        )
+        return response.content
+
     def complete(
         self,
         messages: list[dict[str, str]],
@@ -462,7 +526,7 @@ class UnifiedLLMClient:
                 return self._get_fallback_response(messages)
             else:
                 # Re-raise as APIError for upstream handling
-                raise APIError(f"Service temporarily unavailable ({self.provider}): {e}")
+                raise APIError(f"Service temporarily unavailable ({self.provider}): {e}") from e
 
         except (RateLimitError, NetworkTimeoutError, ServiceUnavailableError) as e:
             # These errors are already properly categorized
@@ -471,7 +535,7 @@ class UnifiedLLMClient:
 
         except Exception as e:
             logger.error(f"Unexpected error in circuit breaker for {self.provider}: {e}")
-            raise APIError(f"Unexpected error: {e}")
+            raise APIError(f"Unexpected error: {e}") from e
 
     def get_provider(self) -> str:
         """Get the name of the current provider."""

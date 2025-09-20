@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "title": "Unknown Title (gender_swap)",
+    "author": "Unknown Author",
+    "language": null,
+    "release_date": null,
+    "ebook_number": null,
+    "transformation": {
+      "type": "gender_swap",
+      "timestamp": "2025-09-19T23:07:58.479554",
+      "quality_score": null,
+      "total_changes": 0
+    }
+  },
+  "chapters": [],
+  "source_file": null
+}

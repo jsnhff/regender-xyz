@@ -211,22 +211,53 @@ class Application:
         """
         # Check for existing character analysis file
         input_path = Path(file_path)
+
+        # Determine book name for output folder
+        book_name = input_path.stem
+        # Remove common prefixes like pg12- or pg43-
+        if book_name.startswith("pg") and "-" in book_name:
+            book_name = book_name.split("-", 1)[1]
+        # Convert to lowercase and replace spaces/underscores with hyphens
+        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
+
+        # Check in book's output folder first
+        output_dir = Path("books/output") / book_folder
+        char_file = output_dir / "characters.json"
+
+        if char_file.exists():
+            self.logger.info(f"Loading existing character analysis from {char_file}")
+            try:
+                with open(char_file) as f:
+                    char_data = json.load(f)
+                return CharacterAnalysis.from_dict(char_data)
+            except Exception as e:
+                self.logger.warning(f"Failed to load character file: {e}")
+
+        # Also check legacy location (same folder as book)
         if input_path.suffix == ".json":
-            # Look for -characters.json file
-            char_file = input_path.parent / f"{input_path.stem}-characters.json"
-            if char_file.exists():
-                self.logger.info(f"Loading existing character analysis from {char_file}")
+            legacy_char_file = input_path.parent / f"{input_path.stem}-characters.json"
+            if legacy_char_file.exists():
+                self.logger.info(f"Loading existing character analysis from {legacy_char_file}")
                 try:
-                    with open(char_file) as f:
+                    with open(legacy_char_file) as f:
                         char_data = json.load(f)
                     return CharacterAnalysis.from_dict(char_data)
                 except Exception as e:
                     self.logger.warning(f"Failed to load character file: {e}")
 
-        # No existing analysis, analyze the book
+        # No existing analysis, analyze the book and save to output folder
         self.logger.info("No existing character analysis found, analyzing book...")
         character_service = self.get_service("character")
-        return await character_service.process_async(book)
+        characters = await character_service.process_async(book)
+
+        # Save character analysis to book's output folder
+        output_dir.mkdir(parents=True, exist_ok=True)
+        char_file = output_dir / "characters.json"
+        with open(char_file, "w", encoding="utf-8") as f:
+            json.dump(characters.to_dict(), f, indent=2, ensure_ascii=False)
+        self.logger.info(f"Saved character analysis to {char_file}")
+
+        return characters
 
     async def process_book(
         self,
@@ -234,6 +265,7 @@ class Application:
         transform_type: str,
         output_path: Optional[str] = None,
         quality_control: bool = True,
+        selected_characters: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -243,6 +275,7 @@ class Application:
             transform_type: Type of transformation
             output_path: Optional output path
             quality_control: Whether to apply quality control
+            selected_characters: Optional list of character names to transform
 
         Returns:
             Processing results
@@ -261,8 +294,13 @@ class Application:
 
             # Transform the book
             transformer = self.get_service("transform")
+
+            # Log selected characters if specified
+            if selected_characters:
+                self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
+
             transformation = await transformer.transform_book_async(
-                book, TransformType(transform_type), characters
+                book, TransformType(transform_type), characters, selected_characters
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
@@ -489,6 +527,7 @@ class Application:
         transform_type: str,
         output_path: Optional[str] = None,
         quality_control: bool = True,
+        selected_characters: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
         Synchronous wrapper for book processing.
@@ -503,7 +542,7 @@ class Application:
             Processing results
         """
         return asyncio.run(
-            self.process_book(file_path, transform_type, output_path, quality_control)
+            self.process_book(file_path, transform_type, output_path, quality_control, selected_characters)
         )
 
     def get_metrics(self) -> dict[str, Any]:
