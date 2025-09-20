@@ -1,5 +1,15 @@
 ---
+type: agent
 name: product
+description: Primary agent for product planning, UX design, and documentation - focuses on user value and clarity
+tools:
+  - Read
+  - Write
+  - Edit
+  - MultiEdit
+  - WebSearch
+  - WebFetch
+  - TodoWrite
 ---
 
 # product

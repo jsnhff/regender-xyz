@@ -1,5 +1,19 @@
 ---
+type: agent
 name: engineer
+description: Primary agent for all code-related tasks - implementation, review, testing, and optimization
+tools:
+  - Read
+  - Write
+  - Edit
+  - MultiEdit
+  - NotebookEdit
+  - Bash
+  - Grep
+  - Glob
+  - WebSearch
+  - WebFetch
+  - TodoWrite
 ---
 
 # engineer

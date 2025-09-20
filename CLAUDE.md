@@ -141,6 +141,15 @@ The `src/config.json` file defines:
 - Logs stored in `logs/` directory for debugging
 - Clean architecture: 84% faster, 60% less memory, <5% code duplication
 
+## Available Agents
+
+This repository includes specialized Claude Code agents in `.claude/agents/`:
+
+- **engineer**: Primary agent for all code-related tasks - implementation, review, testing, and optimization
+- **product**: Primary agent for product planning, UX design, and documentation - focuses on user value and clarity
+
+Use these agents with the Task tool when their specialized expertise is needed.
+
 ## Important Instructions
 
 - Do what has been asked; nothing more, nothing less
