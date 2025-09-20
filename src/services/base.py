@@ -25,6 +25,10 @@ class ServiceConfig:
     target_quality: float = 90.0
     max_qc_iterations: int = 3
 
+    # Cache-specific configuration
+    cache_max_size: int = 100
+    cache_ttl: Optional[float] = None  # TTL in seconds, None for no expiration
+
 
 class BaseService(ABC):
     """
@@ -78,27 +82,47 @@ class BaseService(ABC):
         """
         Synchronous wrapper for async processing.
 
-        This allows services to be used in non-async contexts.
+        DEPRECATED: This method is deprecated. Use process_async() directly in async contexts.
+
+        This method provides backward compatibility but should be avoided in new code.
+        It only works when called from a non-async context (no running event loop).
 
         Args:
             data: Input data to process
 
         Returns:
             Processed result
-        """
-        try:
-            # Check if there's already an event loop running
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            # No loop running, create a new one
-            return asyncio.run(self.process_async(data))
-        else:
-            # Loop already running, schedule the coroutine
-            import concurrent.futures
 
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future = executor.submit(asyncio.run, self.process_async(data))
-                return future.result()
+        Raises:
+            RuntimeError: If called from within an async context (event loop is running)
+        """
+        import warnings
+
+        # Check if we're in an async context
+        try:
+            asyncio.get_running_loop()
+            # If we get here, there's a running loop - this is dangerous
+            raise RuntimeError(
+                "BaseService.process() cannot be called from an async context. "
+                "Use 'await service.process_async(data)' instead. "
+                "This prevents event loop conflicts and deadlocks."
+            )
+        except RuntimeError as e:
+            # Check if this is our custom error or the expected "no running loop" error
+            if "cannot be called from an async context" in str(e):
+                raise
+            # No loop running - this is the safe case
+            pass
+
+        # Issue deprecation warning
+        warnings.warn(
+            "BaseService.process() is deprecated. Use process_async() in async contexts for better performance and safety.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+        # Safe to use asyncio.run() here since we confirmed no loop is running
+        return asyncio.run(self.process_async(data))
 
     def validate_input(self, data: Any) -> bool:
         """

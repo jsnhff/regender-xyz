@@ -248,15 +248,38 @@ class TestAsyncServices(unittest.TestCase):
         class AsyncService(BaseService):
             def _initialize(self):
                 pass
-            
+
             async def process_async(self, data):
                 await asyncio.sleep(0.01)
                 return data + 1
-        
-        # Test sync wrapper
+
+        # Test sync wrapper - should work in non-async context
         service = AsyncService()
-        result = service.process(10)
+        with self.assertWarns(DeprecationWarning):
+            result = service.process(10)
         self.assertEqual(result, 11)
+
+    def test_sync_wrapper_in_async_context_fails(self):
+        """Test that sync wrapper properly fails when called from async context."""
+        # Create an async service
+        class AsyncService(BaseService):
+            def _initialize(self):
+                pass
+
+            async def process_async(self, data):
+                return data + 1
+
+        # Test that calling sync method from async context raises error
+        async def test_in_async_context():
+            service = AsyncService()
+            with self.assertRaises(RuntimeError) as cm:
+                service.process(10)  # This should fail
+
+            self.assertIn("cannot be called from an async context", str(cm.exception))
+            self.assertIn("Use 'await service.process_async(data)' instead", str(cm.exception))
+
+        # Run the async test
+        asyncio.run(test_in_async_context())
 
 
 class TestIntegration(unittest.TestCase):

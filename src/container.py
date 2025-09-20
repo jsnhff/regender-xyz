@@ -233,6 +233,20 @@ class ServiceContainer:
             "services": {name: service.get_metrics() for name, service in self._services.items()},
         }
 
+    def register_instance(self, name: str, instance: Any):
+        """
+        Register a pre-existing service instance.
+
+        This is useful for registering providers or other external objects
+        that need to be available for dependency injection.
+
+        Args:
+            name: Service identifier
+            instance: Service instance to register
+        """
+        self._services[name] = instance
+        self.logger.info(f"Registered service instance: {name} -> {instance.__class__.__name__}")
+
     def __repr__(self) -> str:
         """String representation of the container."""
         return (
@@ -242,46 +256,171 @@ class ServiceContainer:
         )
 
 
-# Global container instance
-_container = None
-
-
-def get_container() -> ServiceContainer:
+class ApplicationContext:
     """
-    Get the global service container instance.
+    Application context that owns and manages the service container.
 
-    Returns:
-        Global ServiceContainer instance
+    This class provides:
+    - Ownership of the ServiceContainer lifecycle
+    - Configuration management per context
+    - Support for multiple independent contexts (useful for testing)
+    - Proper initialization and shutdown procedures
     """
-    global _container
-    if _container is None:
-        _container = ServiceContainer()
-    return _container
 
+    def __init__(self, config_path: Optional[str] = None, environment: str = "production"):
+        """
+        Initialize the application context.
 
-def configure_container(config_path: Optional[str] = None):
-    """
-    Configure the global container.
+        Args:
+            config_path: Optional path to configuration file
+            environment: Environment name (e.g., "production", "test", "development")
+        """
+        self.environment = environment
+        self.config_path = config_path
+        self.container = ServiceContainer()
+        self.logger = logging.getLogger(f"{self.__class__.__name__}.{environment}")
+        self._initialized = False
 
-    Args:
-        config_path: Optional path to configuration file
-    """
-    container = get_container()
+    def initialize(self):
+        """Initialize the context and configure services."""
+        if self._initialized:
+            self.logger.warning("Context already initialized")
+            return
 
-    if config_path:
-        container.configure_from_file(config_path)
-    else:
+        self.logger.info(f"Initializing {self.environment} context...")
+
+        if self.config_path:
+            self.container.configure_from_file(self.config_path)
+        else:
+            self._register_default_services()
+
+        self._initialized = True
+        self.logger.info(f"{self.environment} context initialized successfully")
+
+    def _register_default_services(self):
+        """Register default services for the context."""
         # Register default services
         from src.services.character_service import CharacterService
         from src.services.parser_service import ParserService
         from src.services.quality_service import QualityService
         from src.services.transform_service import TransformService
 
-        container.register("parser", ParserService)
-        container.register("character", CharacterService, dependencies={"provider": "llm_provider"})
-        container.register(
+        self.container.register("parser", ParserService)
+        self.container.register(
+            "character", CharacterService, dependencies={"provider": "llm_provider"}
+        )
+        self.container.register(
             "transform",
             TransformService,
             dependencies={"provider": "llm_provider", "character_service": "character"},
         )
-        container.register("quality", QualityService, dependencies={"provider": "llm_provider"})
+        self.container.register(
+            "quality", QualityService, dependencies={"provider": "llm_provider"}
+        )
+
+    def get_service(self, name: str):
+        """
+        Get a service from the context's container.
+
+        Args:
+            name: Service identifier
+
+        Returns:
+            Service instance
+
+        Raises:
+            RuntimeError: If context is not initialized
+            ValueError: If service is not registered
+        """
+        if not self._initialized:
+            raise RuntimeError("Context must be initialized before accessing services")
+        return self.container.get(name)
+
+    def register_service(
+        self,
+        name: str,
+        service_class: type,
+        config: Optional[dict] = None,
+        dependencies: Optional[dict[str, str]] = None,
+    ):
+        """
+        Register a service with the context's container.
+
+        Args:
+            name: Service identifier
+            service_class: Service class to instantiate
+            config: Configuration dictionary for the service
+            dependencies: Map of parameter names to service names
+        """
+        self.container.register(name, service_class, config, dependencies)
+
+    def register_instance(self, name: str, instance: Any):
+        """
+        Register a pre-existing service instance.
+
+        Args:
+            name: Service identifier
+            instance: Service instance to register
+        """
+        self.container.register_instance(name, instance)
+
+    def shutdown(self):
+        """Shutdown the context and clean up resources."""
+        if not self._initialized:
+            return
+
+        self.logger.info(f"Shutting down {self.environment} context...")
+        self.container.clear()
+        self._initialized = False
+        self.logger.info(f"{self.environment} context shutdown complete")
+
+    def __enter__(self):
+        """Context manager entry."""
+        self.initialize()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.shutdown()
+
+
+# Global context for backward compatibility
+_default_context: Optional[ApplicationContext] = None
+
+
+def get_container() -> ServiceContainer:
+    """
+    Get the global service container instance.
+
+    DEPRECATED: Use ApplicationContext instead for better control and testing.
+    This function is maintained for backward compatibility only.
+
+    Returns:
+        Global ServiceContainer instance
+    """
+    global _default_context
+    if _default_context is None:
+        _default_context = ApplicationContext(environment="legacy_global")
+        _default_context.initialize()
+    return _default_context.container
+
+
+def configure_container(config_path: Optional[str] = None):
+    """
+    Configure the global container.
+
+    DEPRECATED: Use ApplicationContext instead for better control and testing.
+    This function is maintained for backward compatibility only.
+
+    Args:
+        config_path: Optional path to configuration file
+    """
+    global _default_context
+    if _default_context is None:
+        _default_context = ApplicationContext(config_path=config_path, environment="legacy_global")
+        _default_context.initialize()
+    elif config_path and config_path != _default_context.config_path:
+        # Re-initialize with new config
+        _default_context.shutdown()
+        _default_context = ApplicationContext(config_path=config_path, environment="legacy_global")
+        _default_context.initialize()

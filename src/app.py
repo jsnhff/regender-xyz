@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from src.container import ServiceContainer
+from src.container import ApplicationContext, ServiceContainer
 from src.models.book import Book
 from src.models.character import CharacterAnalysis
 from src.models.transformation import TransformType
@@ -30,15 +30,26 @@ class Application:
     - Handles configuration loading
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(
+        self, config_path: Optional[str] = None, context: Optional[ApplicationContext] = None
+    ):
         """
         Initialize the application.
 
         Args:
             config_path: Optional path to configuration file
+            context: Optional pre-configured ApplicationContext (useful for testing)
         """
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.container = ServiceContainer()
+
+        # Use provided context or create new one
+        if context:
+            self.context = context
+            self._owns_context = False
+        else:
+            self.context = ApplicationContext(config_path=config_path, environment="application")
+            self._owns_context = True
+
         self.plugin_manager = PluginManager()
 
         # Load configuration
@@ -113,6 +124,10 @@ class Application:
         """Initialize application components."""
         self.logger.info("Initializing application...")
 
+        # Initialize context if we own it
+        if self._owns_context:
+            self.context.initialize()
+
         # Load provider plugins
         self._load_providers()
 
@@ -135,8 +150,8 @@ class Application:
                 # Register as service for dependency injection
                 provider = self.plugin_manager.get(provider_config.get("type", "unified"))
                 if provider:
-                    # Register the provider as a service
-                    self.container._services["llm_provider"] = provider
+                    # Register the provider as a service using proper API
+                    self.context.register_instance("llm_provider", provider)
                     self.logger.info(f"Registered provider: {provider.name}")
 
             except Exception as e:
@@ -161,7 +176,7 @@ class Application:
                 service_class = getattr(module, class_name)
 
                 # Register with container
-                self.container.register(
+                self.context.register_service(
                     name=service_name,
                     service_class=service_class,
                     config=service_config.get("config"),
@@ -181,22 +196,22 @@ class Application:
         Returns:
             Service instance
         """
-        return self.container.get(name)
-    
+        return self.context.get_service(name)
+
     async def _get_or_analyze_characters(self, file_path: str, book: Book) -> CharacterAnalysis:
         """
         Get existing character analysis or analyze characters.
-        
+
         Args:
             file_path: Path to the book file
             book: Parsed book object
-            
+
         Returns:
             Character analysis
         """
         # Check for existing character analysis file
         input_path = Path(file_path)
-        if input_path.suffix == '.json':
+        if input_path.suffix == ".json":
             # Look for -characters.json file
             char_file = input_path.parent / f"{input_path.stem}-characters.json"
             if char_file.exists():
@@ -207,7 +222,7 @@ class Application:
                     return CharacterAnalysis.from_dict(char_data)
                 except Exception as e:
                     self.logger.warning(f"Failed to load character file: {e}")
-        
+
         # No existing analysis, analyze the book
         self.logger.info("No existing character analysis found, analyzing book...")
         character_service = self.get_service("character")
@@ -499,7 +514,7 @@ class Application:
             Metrics dictionary
         """
         return {
-            "container": self.container.get_metrics(),
+            "container": self.context.container.get_metrics(),
             "plugins": self.plugin_manager.list_plugins(),
         }
 
@@ -510,7 +525,8 @@ class Application:
         # Shutdown plugins
         self.plugin_manager.shutdown_all()
 
-        # Clear container
-        self.container.clear()
+        # Shutdown context if we own it
+        if self._owns_context:
+            self.context.shutdown()
 
         self.logger.info("Application shutdown complete")

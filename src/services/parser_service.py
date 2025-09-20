@@ -10,6 +10,8 @@ import json
 from pathlib import Path
 from typing import Any, Optional, Union
 
+import aiofiles
+
 from src.models.book import Book, Chapter, Paragraph
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.integrated_parsing import IntegratedParsingStrategy
@@ -110,9 +112,9 @@ class ParserService(BaseService):
         """
         json_path = Path(json_path)
 
-        async with asyncio.Lock():
-            with open(json_path, encoding="utf-8") as f:
-                data = json.load(f)
+        async with asyncio.Lock(), aiofiles.open(json_path, encoding="utf-8") as f:
+            content = await f.read()
+            data = json.loads(content)
 
         return Book.from_dict(data)
 
@@ -152,13 +154,8 @@ class ParserService(BaseService):
         Returns:
             File contents
         """
-        loop = asyncio.get_event_loop()
-
-        def read_file():
-            with open(file_path, encoding="utf-8") as f:
-                return f.read()
-
-        return await loop.run_in_executor(None, read_file)
+        async with aiofiles.open(file_path, encoding="utf-8") as f:
+            return await f.read()
 
     async def _detect_format(self, text: str) -> str:
         """
@@ -265,14 +262,11 @@ class ParserService(BaseService):
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         data = book.to_dict()
+        json_content = json.dumps(data, indent=2, ensure_ascii=False)
 
-        loop = asyncio.get_event_loop()
+        async with aiofiles.open(output_path, "w", encoding="utf-8") as f:
+            await f.write(json_content)
 
-        def save_json():
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-
-        await loop.run_in_executor(None, save_json)
         self.logger.info(f"Saved book to {output_path}")
 
     def get_metrics(self) -> dict[str, Any]:
