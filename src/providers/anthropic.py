@@ -4,6 +4,7 @@ Anthropic Provider Plugin
 Implements Anthropic API support for Claude models.
 """
 
+import asyncio
 import json
 from typing import Any
 
@@ -31,7 +32,7 @@ class AnthropicProvider(BaseProviderPlugin):
     @property
     def default_model(self) -> str:
         """Default model."""
-        return "claude-opus-4-20250514"  # Claude Opus 4.1
+        return "claude-opus-4-1-20250805"  # Claude Opus 4.1 (latest)
 
     @property
     def supports_json(self) -> bool:
@@ -51,10 +52,10 @@ class AnthropicProvider(BaseProviderPlugin):
     def _initialize_client(self):
         """Initialize Anthropic client."""
         try:
-            from anthropic import Anthropic
+            from anthropic import AsyncAnthropic
 
-            self.client = Anthropic(api_key=self.api_key)
-            self.logger.debug("Anthropic client initialized")
+            self.client = AsyncAnthropic(api_key=self.api_key)
+            self.logger.debug("Anthropic async client initialized")
         except ImportError as e:
             raise ImportError(
                 "anthropic package not installed. Run: pip install anthropic"
@@ -100,8 +101,11 @@ class AnthropicProvider(BaseProviderPlugin):
             if system_message:
                 request_params["system"] = system_message
 
-            # Make the API call
-            response = self.client.messages.create(**request_params)
+            # Make the API call with await and timeout (60 seconds)
+            response = await asyncio.wait_for(
+                self.client.messages.create(**request_params),
+                timeout=60.0
+            )
 
             # Extract the response text
             content = response.content[0].text
@@ -115,8 +119,15 @@ class AnthropicProvider(BaseProviderPlugin):
 
             return content
 
+        except asyncio.TimeoutError:
+            self.logger.error("Anthropic API call timed out after 60 seconds")
+            raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.")
         except Exception as e:
-            self.logger.error(f"Anthropic API error: {e}")
+            # Check for overloaded error (529)
+            if "529" in str(e) or "overloaded" in str(e).lower():
+                self.logger.warning("Anthropic API overloaded (529)")
+            else:
+                self.logger.error(f"Anthropic API error: {e}")
             raise
 
     def get_model_info(self) -> dict[str, Any]:
@@ -127,7 +138,7 @@ class AnthropicProvider(BaseProviderPlugin):
             Dictionary with model capabilities
         """
         model_info = {
-            "claude-opus-4-20250514": {  # Claude Opus 4.1 (Latest Opus)
+            "claude-opus-4-1-20250805": {  # Claude Opus 4.1 (Latest, August 2025)
                 "context_window": 200000,
                 "max_output": 8192,
                 "supports_vision": True,
@@ -135,7 +146,15 @@ class AnthropicProvider(BaseProviderPlugin):
                 "cost_per_1k_input": 0.015,
                 "cost_per_1k_output": 0.075,
             },
-            "claude-sonnet-4-20250514": {  # Claude Sonnet 4 (if available)
+            "claude-opus-4-20250514": {  # Claude Opus 4 (May 2025)
+                "context_window": 200000,
+                "max_output": 8192,
+                "supports_vision": True,
+                "supports_json": True,
+                "cost_per_1k_input": 0.015,
+                "cost_per_1k_output": 0.075,
+            },
+            "claude-sonnet-4-20250514": {  # Claude Sonnet 4 (May 2025)
                 "context_window": 200000,
                 "max_output": 8192,
                 "supports_vision": True,
@@ -143,8 +162,7 @@ class AnthropicProvider(BaseProviderPlugin):
                 "cost_per_1k_input": 0.003,
                 "cost_per_1k_output": 0.015,
             },
-            # Keeping Claude 3.5 Sonnet as fallback since it's newer than 3.0
-            "claude-3-5-sonnet-20241022": {  # Claude 3.5 Sonnet (Latest pre-v4)
+            "claude-3-7-sonnet-20250219": {  # Claude Sonnet 3.7
                 "context_window": 200000,
                 "max_output": 8192,
                 "supports_vision": True,

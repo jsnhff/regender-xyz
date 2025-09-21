@@ -23,7 +23,7 @@
       "config": {
         "cache_enabled": true,
         "async_enabled": true,
-        "max_concurrent": 5,
+        "max_concurrent": 20,
         "max_retries": 3
       },
       "dependencies": {

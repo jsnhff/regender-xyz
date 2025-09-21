@@ -17,7 +17,7 @@ from src.models.character import Character, CharacterAnalysis, Gender
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.analysis import AnalysisStrategy, SmartChunkingStrategy
-from src.utils.smart_character_registry import SmartCharacterRegistry
+# from src.utils.smart_character_registry import SmartCharacterRegistry  # No longer needed with global dedup
 from src.utils.token_manager import TokenManager
 
 
@@ -509,7 +509,11 @@ class CharacterService(BaseService):
 
     async def _analyze_with_smart_deduplication(self, text_chunks: list[str]) -> list[Character]:
         """
-        Analyze chunks with incremental LLM-based character deduplication.
+        Analyze chunks with global LLM-based character deduplication.
+
+        Two-phase approach:
+        1. Extract all characters from all chunks (deterministic)
+        2. Perform global deduplication in a single LLM call
 
         Args:
             text_chunks: Text chunks to analyze
@@ -517,78 +521,324 @@ class CharacterService(BaseService):
         Returns:
             List of unique characters with aliases
         """
-        # Initialize improved smart registry with progress feedback
-        registry = SmartCharacterRegistry(self.provider, self.logger, show_progress=True)
-        self.logger.info("🚀 Using SmartCharacterRegistry with intelligent indexing and progress feedback")
+        self.logger.info("🚀 Using global LLM deduplication for accurate character analysis")
 
-        # Process each chunk and deduplicate incrementally
+        # Phase 1: Extract all characters from all chunks
+        all_raw_characters = await self._extract_all_characters(text_chunks)
+
+        # Phase 2: Global LLM deduplication
+        deduplicated_characters = await self._global_llm_deduplication(
+            all_raw_characters,
+            "Unknown Book"  # We'll improve this later
+        )
+
+        return deduplicated_characters
+
+    async def _extract_all_characters(self, text_chunks: list[str]) -> list[dict]:
+        """
+        Extract characters from all chunks without deduplication.
+        Uses lower temperature for consistency.
+        """
         total_chunks = len(text_chunks)
-        self.logger.info(f"📚 Processing {total_chunks} text chunks for character analysis...")
+        self.logger.info(f"📚 Phase 1: Extracting characters from {total_chunks} chunks")
+
+        all_characters = []
+        raw_count = 0
 
         for i, chunk in enumerate(text_chunks):
-            # Show detailed progress
             progress_pct = ((i + 1) / total_chunks) * 100
-            self.logger.info(f"\n📖 Chunk {i+1}/{total_chunks} ({progress_pct:.1f}% complete)")
+            self.logger.info(f"  Processing chunk {i+1}/{total_chunks} ({progress_pct:.1f}% complete)")
 
-            # Analyze chunk for characters
-            result = await self._analyze_single_chunk(chunk, i)
+            # Extract with lower temperature for consistency
+            result = await self._analyze_single_chunk(chunk, i, temperature=0.3)
 
-            if not result or "characters" not in result:
+            if result and "characters" in result:
+                # Add source tracking for better deduplication
+                for char in result["characters"]:
+                    if char.get("name"):
+                        char["source_chunk"] = i
+                        char["source_context"] = chunk[:200]  # Store context snippet
+                        all_characters.append(char)
+                        raw_count += 1
+
+        self.logger.info(f"✅ Extracted {raw_count} raw character mentions")
+        return all_characters
+
+    async def _global_llm_deduplication(self, all_characters: list[dict], book_title: str) -> list[Character]:
+        """
+        Perform global LLM-based deduplication in a single call.
+        """
+        if not all_characters:
+            return []
+
+        self.logger.info(f"📊 Phase 2: Global deduplication of {len(all_characters)} character mentions")
+
+        # Group potential duplicates
+        character_groups = self._group_potential_duplicates(all_characters)
+        self.logger.info(f"  Identified {len(character_groups)} potential character groups")
+
+        # Create deduplication prompt
+        dedup_prompt = self._create_global_dedup_prompt(character_groups, book_title)
+
+        try:
+            # Single LLM call for ALL deduplication decisions
+            messages = [
+                {"role": "system", "content": dedup_prompt["system"]},
+                {"role": "user", "content": dedup_prompt["user"]}
+            ]
+
+            response = await self.provider.complete_async(
+                messages=messages,
+                temperature=0.3,  # Low temperature for consistency
+                max_tokens=4000
+            )
+
+            # Parse and apply deduplication
+            dedup_result = self._parse_dedup_response(response)
+            final_characters = self._apply_deduplication_decisions(
+                dedup_result, character_groups, all_characters
+            )
+
+            # Log statistics
+            unique_count = len(final_characters)
+            merged_count = len(all_characters) - unique_count
+
+            self.logger.info("\n" + "="*60)
+            self.logger.info("✅ CHARACTER ANALYSIS COMPLETE")
+            self.logger.info("="*60)
+            self.logger.info(f"📊 Final Statistics:")
+            self.logger.info(f"  • Raw character mentions: {len(all_characters)}")
+            self.logger.info(f"  • Unique characters: {unique_count}")
+            self.logger.info(f"  • Duplicates merged: {merged_count}")
+            self.logger.info(f"  • Deduplication rate: {merged_count/max(1, len(all_characters))*100:.1f}%")
+            self.logger.info("="*60 + "\n")
+
+            return final_characters
+
+        except Exception as e:
+            self.logger.error(f"Global deduplication failed: {e}")
+            # Fallback to simple deduplication
+            return self._fallback_deduplication(all_characters)
+
+    def _group_potential_duplicates(self, all_characters: list[dict]) -> list[list[dict]]:
+        """
+        Group characters that might be duplicates for LLM review.
+        """
+        groups = []
+        processed = set()
+
+        for i, char1 in enumerate(all_characters):
+            if i in processed:
                 continue
 
-            # Convert to Character objects
-            chunk_characters = []
-            for char_data in result["characters"]:
-                if not char_data.get("name"):
+            group = [char1]
+            processed.add(i)
+
+            # Find potential duplicates
+            for j, char2 in enumerate(all_characters[i+1:], i+1):
+                if j in processed:
                     continue
 
-                # Ensure aliases and titles are lists
-                aliases = char_data.get("aliases", [])
-                if aliases is None:
-                    aliases = []
-                elif isinstance(aliases, str):
-                    aliases = [aliases] if aliases else []
+                # Check if potentially same character
+                if self._potentially_same_character(char1, char2):
+                    group.append(char2)
+                    processed.add(j)
 
-                titles = char_data.get("titles", [])
-                if titles is None:
-                    titles = []
-                elif isinstance(titles, str):
-                    titles = [titles] if titles else []
+            groups.append(group)
 
-                character = Character(
-                    name=char_data["name"],
-                    gender=Gender(char_data.get("gender", "unknown")),
-                    pronouns=char_data.get("pronouns", {}),
-                    titles=titles,
-                    aliases=aliases,
-                    description=char_data.get("description"),
-                    importance=char_data.get("importance", "supporting"),
-                    confidence=char_data.get("confidence", 1.0),
+        return groups
+
+    def _potentially_same_character(self, char1: dict, char2: dict) -> bool:
+        """
+        Quick heuristic to check if two characters might be the same.
+        Intentionally broad - LLM makes final decision.
+        """
+        name1 = char1.get("name", "").lower()
+        name2 = char2.get("name", "").lower()
+
+        # Exact match
+        if name1 == name2:
+            return True
+
+        # One contains the other
+        if name1 in name2 or name2 in name1:
+            return True
+
+        # Share significant name parts
+        parts1 = set(name1.split())
+        parts2 = set(name2.split())
+        if parts1 & parts2:  # Intersection
+            return True
+
+        # Same gender and similar role
+        if (char1.get("gender") == char2.get("gender") and
+            char1.get("importance") == char2.get("importance")):
+            desc1 = (char1.get("description") or "").lower()
+            desc2 = (char2.get("description") or "").lower()
+            if desc1 and desc2 and (desc1 in desc2 or desc2 in desc1):
+                return True
+
+        return False
+
+    def _create_global_dedup_prompt(self, character_groups: list[list[dict]], book_title: str) -> dict:
+        """
+        Create comprehensive prompt for global deduplication.
+        """
+        system_prompt = f"""You are an expert at identifying duplicate character references in literature.
+
+Analyzing the book: "{book_title}"
+
+Consider:
+- Nicknames and variations (Tom/Tommy/Thomas, Huck/Huckleberry)
+- Titles and full names (Mr. Smith/John Smith/Smith)
+- Role descriptions (the narrator/the author/Swift)
+- Context from descriptions
+
+Be thorough but accurate - only merge if confident they're the same person."""
+
+        # Format groups for review
+        groups_json = []
+        for i, group in enumerate(character_groups):
+            groups_json.append({
+                "group_id": i,
+                "characters": [
+                    {
+                        "name": c.get("name"),
+                        "gender": c.get("gender"),
+                        "description": c.get("description"),
+                        "chunk": c.get("source_chunk")
+                    }
+                    for c in group
+                ]
+            })
+
+        user_prompt = f"""Review these character groups and identify which characters in each group are the same person.
+
+{json.dumps(groups_json, indent=2)}
+
+For each group, return:
+{{
+  "group_id": <number>,
+  "is_same": true/false,
+  "primary_name": "most complete name if same",
+  "aliases": ["other variations"],
+  "confidence": 0.0-1.0
+}}
+
+Return JSON with a 'groups' array."""
+
+        return {"system": system_prompt, "user": user_prompt}
+
+    def _parse_dedup_response(self, response: str) -> dict:
+        """Parse deduplication response from LLM."""
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            # Try extracting from markdown
+            import re
+            json_match = re.search(r'```(?:json)?\s*({.*?})\s*```', response, re.DOTALL)
+            if json_match:
+                try:
+                    return json.loads(json_match.group(1))
+                except:
+                    pass
+
+            # Try raw JSON
+            json_match = re.search(r'\{.*\}', response, re.DOTALL)
+            if json_match:
+                try:
+                    return json.loads(json_match.group())
+                except:
+                    pass
+
+        return {"groups": []}
+
+    def _apply_deduplication_decisions(
+        self, dedup_result: dict, character_groups: list[list[dict]], all_characters: list[dict]
+    ) -> list[Character]:
+        """
+        Apply LLM deduplication decisions to create final character list.
+        """
+        final_characters = []
+
+        for group_decision in dedup_result.get("groups", []):
+            group_id = group_decision.get("group_id", 0)
+            if group_id >= len(character_groups):
+                continue
+
+            group = character_groups[group_id]
+
+            if group_decision.get("is_same", False):
+                # Merge into single character
+                primary = group[0]
+
+                # Use LLM's suggested primary name
+                if group_decision.get("primary_name"):
+                    primary["name"] = group_decision["primary_name"]
+
+                # Collect aliases
+                aliases = set(group_decision.get("aliases", []))
+                for char in group[1:]:
+                    if char["name"] != primary["name"]:
+                        aliases.add(char["name"])
+
+                character = self._create_character_object(primary, list(aliases))
+                final_characters.append(character)
+
+                self.logger.info(
+                    f"  ✓ Merged {len(group)} mentions into '{character.name}' "
+                    f"(aliases: {', '.join(aliases) if aliases else 'none'})"
                 )
-                chunk_characters.append(character)
-
-            # Add/merge characters with registry using batch processing
-            if chunk_characters:
-                await registry.add_or_merge_batch(chunk_characters, chunk)
             else:
-                self.logger.debug(f"  ⚠️ No characters found in chunk {i+1}")
+                # Keep as separate characters
+                for char_data in group:
+                    character = self._create_character_object(char_data)
+                    final_characters.append(character)
 
-        # Get final deduplicated list and show comprehensive statistics
-        characters = registry.get_all()
-        stats = registry.get_statistics()
+        return final_characters
 
-        self.logger.info("\n" + "="*60)
-        self.logger.info("✅ CHARACTER ANALYSIS COMPLETE")
-        self.logger.info("="*60)
-        self.logger.info(f"📊 Final Statistics:")
-        self.logger.info(f"  • Unique characters: {stats['unique_characters']}")
-        self.logger.info(f"  • Total processed: {stats['total_checked']}")
-        self.logger.info(f"  • Fast matches: {stats['fast_matches']} ({stats['efficiency_rate']})")
-        self.logger.info(f"  • LLM verifications: {stats['llm_verifications']}")
-        self.logger.info(f"  • Characters merged: {stats['characters_merged']}")
-        self.logger.info("="*60 + "\n")
+    def _create_character_object(self, char_data: dict, aliases: list = None) -> Character:
+        """Create a Character object from raw data."""
+        # Ensure lists
+        if aliases is None:
+            aliases = char_data.get("aliases", [])
+        if isinstance(aliases, str):
+            aliases = [aliases]
+        elif aliases is None:
+            aliases = []
 
-        return characters
+        titles = char_data.get("titles", [])
+        if isinstance(titles, str):
+            titles = [titles]
+        elif titles is None:
+            titles = []
+
+        return Character(
+            name=char_data["name"],
+            gender=Gender(char_data.get("gender", "unknown")),
+            pronouns=char_data.get("pronouns", {}),
+            titles=titles,
+            aliases=aliases,
+            description=char_data.get("description"),
+            importance=char_data.get("importance", "supporting"),
+            confidence=char_data.get("confidence", 0.8)
+        )
+
+    def _fallback_deduplication(self, all_characters: list[dict]) -> list[Character]:
+        """
+        Simple fallback if LLM deduplication fails.
+        """
+        seen_names = set()
+        unique_characters = []
+
+        for char_data in all_characters:
+            name = char_data.get("name", "")
+            if name and name not in seen_names:
+                seen_names.add(name)
+                unique_characters.append(self._create_character_object(char_data))
+
+        self.logger.warning(f"Using fallback deduplication: {len(unique_characters)} unique from {len(all_characters)} raw")
+        return unique_characters
 
     async def _analyze_chunks_async(self, chunks: list[str]) -> list[dict]:
         """
@@ -615,8 +865,14 @@ class CharacterService(BaseService):
             rate_limiter = OpenAIRateLimiter(tier="tier-1")
             self.logger.info(f"Using OpenAI rate limiter for {len(chunks)} chunks")
 
-        # Get concurrency limit from config
+        # Get concurrency limit from config, but adjust for provider
         max_concurrent = self.config.max_concurrent
+
+        # Reduce concurrency for Anthropic to avoid overwhelming the async client
+        if provider_name and "anthropic" in str(provider_name).lower():
+            max_concurrent = min(max_concurrent, 5)  # Cap at 5 for Anthropic
+            self.logger.info(f"Using reduced concurrency for Anthropic: {max_concurrent}")
+
         self.logger.info(f"Processing {len(chunks)} chunks with max_concurrent={max_concurrent}")
 
         # Create semaphore for concurrency control
@@ -684,7 +940,7 @@ class CharacterService(BaseService):
         self.logger.info(f"Completed analysis of {len(results)} chunks")
         return results
 
-    async def _analyze_single_chunk(self, chunk: str, chunk_index: int) -> dict[str, Any]:
+    async def _analyze_single_chunk(self, chunk: str, chunk_index: int, temperature: float = 0.3) -> dict[str, Any]:
         """
         Analyze a single text chunk.
 
@@ -714,7 +970,7 @@ class CharacterService(BaseService):
             # Call LLM
             response = await self.provider.complete_async(
                 messages=messages,
-                temperature=1.0,  # GPT-5-mini only supports temperature=1
+                temperature=temperature,  # Use passed temperature for consistency
                 response_format={"type": "json_object"}
                 if self.provider and self.provider.supports_json
                 else None,
@@ -723,9 +979,23 @@ class CharacterService(BaseService):
             # Parse response
             try:
                 result = json.loads(response)
-            except json.JSONDecodeError:
-                self.logger.warning(f"Failed to parse JSON from chunk {chunk_index}")
-                result = {"characters": []}
+            except json.JSONDecodeError as e:
+                self.logger.warning(f"Failed to parse JSON from chunk {chunk_index}: {e}")
+                self.logger.debug(f"Response preview: {response[:500]}...")
+
+                # Try to extract JSON from the response
+                import re
+                json_match = re.search(r'\{.*"characters".*\}', response, re.DOTALL)
+                if json_match:
+                    try:
+                        result = json.loads(json_match.group())
+                        self.logger.info(f"Extracted JSON from response")
+                    except:
+                        self.logger.error("Could not parse extracted JSON")
+                        result = {"characters": []}
+                else:
+                    self.logger.error("No JSON found in response")
+                    result = {"characters": []}
 
             result["chunk_index"] = chunk_index
             return result

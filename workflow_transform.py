@@ -32,15 +32,35 @@ def run_command(cmd: List[str]) -> bool:
 def analyze_characters(book_path: str) -> dict:
     """Run character analysis and return results."""
     print("\n📊 Analyzing characters...")
+    print("🔍 Running character analysis...")
+
+    # Add verbose flag for debugging
     cmd = [
         sys.executable, "regender_cli.py",
         book_path,
-        "character_analysis"
+        "character_analysis",
+        "-v"  # Add verbose flag
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    print(f"📝 Command: {' '.join(cmd)}")
+    print("⏳ This may take 2-4 minutes...")
+    print("⚙️  Processing chunks in parallel with increased concurrency (20)...")
+    print("")
+
+    import subprocess
+    import os
+
+    # Force Python subprocess to be unbuffered
+    env = os.environ.copy()
+    env['PYTHONUNBUFFERED'] = '1'
+
+    # Just run it without trying to capture real-time output
+    # The hanging was caused by trying to read line-by-line from a buffered pipe
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+
     if result.returncode != 0:
-        print(f"Error during character analysis: {result.stderr}")
+        print(f"❌ Error: Character analysis failed")
+        print(f"Stderr: {result.stderr}")
         return None
 
     # Parse the output to find the characters.json path
@@ -50,6 +70,12 @@ def analyze_characters(book_path: str) -> dict:
         if 'Output:' in line:
             char_file = line.split('Output:')[1].strip()
             break
+        # Also print important lines
+        if any(keyword in line for keyword in ['characters', 'Found', 'Analyzing', 'Complete']):
+            print(f"  {line}")
+
+    if result.stderr:
+        print(f"⚠️ Warnings:\n{result.stderr}")
 
     if not char_file or not Path(char_file).exists():
         print("Could not find character analysis output file")

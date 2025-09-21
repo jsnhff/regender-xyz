@@ -1,0 +1,317 @@
+{
+  "book_id": "5331e299df48799a",
+  "characters": [
+    {
+      "name": "Dr. Jonathan Swift",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Dr."
+      ],
+      "aliases": [],
+      "description": "Author of 'A Modest Proposal'",
+      "importance": "main",
+      "confidence": 1.0
+    },
+    {
+      "name": "American acquaintance",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [
+        "very knowing American"
+      ],
+      "description": "A knowledgeable American living in London who informed the narrator about the culinary qualities of children",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Principal gentleman in the county of Cavan",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A gentleman who provided information about children's proficiency in stealing",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Very worthy person",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [
+        "true lover of his country",
+        "excellent friend",
+        "deserving patriot"
+      ],
+      "description": "A patriotic friend who suggested refinements to the proposal regarding older children",
+      "importance": "supporting",
+      "confidence": 0.9
+    },
+    {
+      "name": "Psalmanaazor",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [
+        "famous Psalmanaazor"
+      ],
+      "description": "A native of Formosa who came to London and shared stories about eating human flesh in his country",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "The Pretender",
+      "gender": "male",
+      "pronouns": "implicit he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "Political figure in Spain that Irish people fight for",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Emperor",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [
+        "Emperor"
+      ],
+      "aliases": [
+        "his imperial majesty"
+      ],
+      "description": "The Emperor of Formosa mentioned in Psalmanaazor's story",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "Prime minister of state",
+      "gender": "male",
+      "pronouns": "implicit he/him",
+      "titles": [],
+      "aliases": [],
+      "description": "The Emperor's prime minister who purchased human flesh",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Plump girl of fifteen",
+      "gender": "female",
+      "pronouns": "she/her",
+      "titles": [],
+      "aliases": [],
+      "description": "A girl who was crucified for attempting to poison the Emperor and whose body was sold",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Grave author",
+      "gender": "unknown",
+      "pronouns": "not specified",
+      "titles": [],
+      "aliases": [
+        "eminent French physician"
+      ],
+      "description": "A French physician who wrote about dietary effects on reproduction",
+      "importance": "minor",
+      "confidence": 0.5
+    },
+    {
+      "name": "vintners",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Tavern owners who would prepare and serve the proposed food",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "fine gentlemen",
+      "gender": "male",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Wealthy men who value themselves on their knowledge of good eating",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "skilful cook",
+      "gender": "male",
+      "pronouns": "he/him/his",
+      "titles": [],
+      "aliases": [],
+      "description": "A cook who understands how to please guests",
+      "importance": "minor",
+      "confidence": 0.9
+    },
+    {
+      "name": "mothers",
+      "gender": "female",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Women who would care for their children knowing of future profit",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "married women",
+      "gender": "female",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Wives who would compete to bring the fattest child to market",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "men",
+      "gender": "male",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Husbands who would become fond of their pregnant wives",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "wives",
+      "gender": "female",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Women during pregnancy who would be better treated by their husbands",
+      "importance": "supporting",
+      "confidence": 1.0
+    },
+    {
+      "name": "Lord Mayor",
+      "gender": "male",
+      "pronouns": "implicit he/him/his",
+      "titles": [
+        "Lord Mayor"
+      ],
+      "aliases": [],
+      "description": "Official who would host feasts featuring the proposed dish",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "reader",
+      "gender": "unknown",
+      "pronouns": "implied they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "The intended audience of the proposal",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "our women",
+      "gender": "female",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Irish women criticized for pride, vanity, idleness, and gaming",
+      "importance": "minor",
+      "confidence": 1.0
+    },
+    {
+      "name": "Laplanders",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "People used as comparison for loving one's country",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "inhabitants of Topinamboo",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "People used as comparison for loving one's country",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Jews",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Historical reference to infighting during siege",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "landlords",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Property owners who should show mercy to tenants",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "shopkeepers",
+      "gender": "neutral",
+      "pronouns": "they/them/their",
+      "titles": [],
+      "aliases": [],
+      "description": "Merchants who would cheat customers",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "narrator/author",
+      "gender": "male",
+      "pronouns": "I/me/my",
+      "titles": [],
+      "aliases": [],
+      "description": "The person making the proposal, claims to have no personal interest, has no young children",
+      "importance": "main",
+      "confidence": 0.9
+    },
+    {
+      "name": "author's wife",
+      "gender": "female",
+      "pronouns": "she/her/her (implied)",
+      "titles": [],
+      "aliases": [
+        "my wife"
+      ],
+      "description": "Wife of the narrator, described as past child-bearing",
+      "importance": "minor",
+      "confidence": 1.0
+    }
+  ],
+  "metadata": {
+    "total": 27,
+    "by_gender": {
+      "male": 13,
+      "female": 6,
+      "unknown": 2,
+      "neutral": 6
+    },
+    "by_importance": {
+      "main": 2,
+      "supporting": 6,
+      "minor": 19
+    }
+  },
+  "timestamp": "2025-09-21T08:30:33.539279",
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514",
+  "book_metadata": {
+    "title": "and for making them beneficial to the publick.",
+    "author": "Dr. Jonathan Swift",
+    "source_file": "books/json/pg1080-A_Modest_Proposal.json"
+  }
+}

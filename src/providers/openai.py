@@ -4,6 +4,7 @@ OpenAI Provider Plugin
 Implements OpenAI API support including GPT-4, GPT-4o, and other models.
 """
 
+import asyncio
 import json
 from typing import Any, Dict, List
 
@@ -52,10 +53,10 @@ class OpenAIProvider(BaseProviderPlugin):
     def _initialize_client(self):
         """Initialize OpenAI client."""
         try:
-            from openai import OpenAI
+            from openai import AsyncOpenAI
 
-            self.client = OpenAI(api_key=self.api_key)
-            self.logger.debug("OpenAI client initialized")
+            self.client = AsyncOpenAI(api_key=self.api_key)
+            self.logger.debug("OpenAI async client initialized")
         except ImportError:
             raise ImportError("openai package not installed. Run: pip install openai")
 
@@ -88,8 +89,11 @@ class OpenAIProvider(BaseProviderPlugin):
             if kwargs.get("response_format") == "json_object":
                 request_params["response_format"] = {"type": "json_object"}
 
-            # Make the API call
-            response = self.client.chat.completions.create(**request_params)
+            # Make the API call with await and timeout (60 seconds)
+            response = await asyncio.wait_for(
+                self.client.chat.completions.create(**request_params),
+                timeout=60.0
+            )
 
             # Extract the response text
             content = response.choices[0].message.content
@@ -103,6 +107,9 @@ class OpenAIProvider(BaseProviderPlugin):
 
             return content
 
+        except asyncio.TimeoutError:
+            self.logger.error("OpenAI API call timed out after 60 seconds")
+            raise TimeoutError("OpenAI API call timed out. The API may be slow or overloaded.")
         except Exception as e:
             self.logger.error(f"OpenAI API error: {e}")
             raise
