@@ -6,6 +6,7 @@ This service handles character analysis and gender identification in books.
 
 import asyncio
 import json
+import logging
 import time
 from collections import OrderedDict
 from threading import RLock
@@ -16,6 +17,7 @@ from src.models.character import Character, CharacterAnalysis, Gender
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.analysis import AnalysisStrategy, SmartChunkingStrategy
+from src.utils.smart_character_registry import SmartCharacterRegistry
 from src.utils.token_manager import TokenManager
 
 
@@ -252,6 +254,9 @@ class CharacterCache:
 class CharacterMerger:
     """Merges character results from multiple chunks."""
 
+    def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
+
     def merge(self, chunk_results: list[dict[str, Any]]) -> list[Character]:
         """
         Merge character results from multiple chunks.
@@ -285,9 +290,27 @@ class CharacterMerger:
                         titles = [titles] if titles else []
 
                     # Create new character
+                    # Handle gender with fallback for invalid values
+                    gender_str = char_data.get("gender", "unknown").lower()
+                    # Map common variations to valid values
+                    gender_map = {
+                        "unknown/mixed": "unknown",
+                        "mixed": "unknown",
+                        "other": "non-binary",
+                        "nonbinary": "non-binary"
+                    }
+                    gender_str = gender_map.get(gender_str, gender_str)
+
+                    # Try to create Gender enum, fallback to unknown if invalid
+                    try:
+                        gender = Gender(gender_str)
+                    except ValueError:
+                        self.logger.warning(f"Invalid gender '{gender_str}' for character {name}, using 'unknown'")
+                        gender = Gender.UNKNOWN
+
                     character_map[name] = Character(
                         name=name,
-                        gender=Gender(char_data.get("gender", "unknown")),
+                        gender=gender,
                         pronouns=char_data.get("pronouns", {}),
                         titles=titles,
                         aliases=aliases,
@@ -341,7 +364,7 @@ class PromptGenerator:
 
 For each character, provide:
 1. Name (full name if available)
-2. Gender (male, female, non-binary, or unknown)
+2. Gender (MUST be exactly one of: male, female, non-binary, unknown, neutral)
 3. Pronouns used (subject/object/possessive)
 4. Any titles (Mr., Mrs., Dr., etc.)
 5. Aliases or nicknames
@@ -447,12 +470,16 @@ class CharacterService(BaseService):
             text_chunks = await self.strategy.chunk_book_async(book)
             self.logger.info(f"Created {len(text_chunks)} chunks for analysis")
 
-            # Analyze each chunk
-            chunk_results = await self._analyze_chunks_async(text_chunks)
-
-            # Merge results
-            characters = self.character_merger.merge(chunk_results)
-            self.logger.info(f"Identified {len(characters)} characters")
+            # Use incremental LLM-based deduplication
+            if self.provider:
+                characters = await self._analyze_with_smart_deduplication(text_chunks)
+            else:
+                # Without a provider, can't do smart deduplication
+                # Just merge results without deduplication
+                chunk_results = await self._analyze_chunks_async(text_chunks)
+                characters = self.character_merger.merge(chunk_results)
+                self.logger.warning("No LLM provider available for smart deduplication")
+                self.logger.info(f"Identified {len(characters)} characters (no deduplication)")
 
             # Create analysis result
             analysis = CharacterAnalysis(
@@ -479,6 +506,89 @@ class CharacterService(BaseService):
                 provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
                 model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
             )
+
+    async def _analyze_with_smart_deduplication(self, text_chunks: list[str]) -> list[Character]:
+        """
+        Analyze chunks with incremental LLM-based character deduplication.
+
+        Args:
+            text_chunks: Text chunks to analyze
+
+        Returns:
+            List of unique characters with aliases
+        """
+        # Initialize improved smart registry with progress feedback
+        registry = SmartCharacterRegistry(self.provider, self.logger, show_progress=True)
+        self.logger.info("🚀 Using SmartCharacterRegistry with intelligent indexing and progress feedback")
+
+        # Process each chunk and deduplicate incrementally
+        total_chunks = len(text_chunks)
+        self.logger.info(f"📚 Processing {total_chunks} text chunks for character analysis...")
+
+        for i, chunk in enumerate(text_chunks):
+            # Show detailed progress
+            progress_pct = ((i + 1) / total_chunks) * 100
+            self.logger.info(f"\n📖 Chunk {i+1}/{total_chunks} ({progress_pct:.1f}% complete)")
+
+            # Analyze chunk for characters
+            result = await self._analyze_single_chunk(chunk, i)
+
+            if not result or "characters" not in result:
+                continue
+
+            # Convert to Character objects
+            chunk_characters = []
+            for char_data in result["characters"]:
+                if not char_data.get("name"):
+                    continue
+
+                # Ensure aliases and titles are lists
+                aliases = char_data.get("aliases", [])
+                if aliases is None:
+                    aliases = []
+                elif isinstance(aliases, str):
+                    aliases = [aliases] if aliases else []
+
+                titles = char_data.get("titles", [])
+                if titles is None:
+                    titles = []
+                elif isinstance(titles, str):
+                    titles = [titles] if titles else []
+
+                character = Character(
+                    name=char_data["name"],
+                    gender=Gender(char_data.get("gender", "unknown")),
+                    pronouns=char_data.get("pronouns", {}),
+                    titles=titles,
+                    aliases=aliases,
+                    description=char_data.get("description"),
+                    importance=char_data.get("importance", "supporting"),
+                    confidence=char_data.get("confidence", 1.0),
+                )
+                chunk_characters.append(character)
+
+            # Add/merge characters with registry using batch processing
+            if chunk_characters:
+                await registry.add_or_merge_batch(chunk_characters, chunk)
+            else:
+                self.logger.debug(f"  ⚠️ No characters found in chunk {i+1}")
+
+        # Get final deduplicated list and show comprehensive statistics
+        characters = registry.get_all()
+        stats = registry.get_statistics()
+
+        self.logger.info("\n" + "="*60)
+        self.logger.info("✅ CHARACTER ANALYSIS COMPLETE")
+        self.logger.info("="*60)
+        self.logger.info(f"📊 Final Statistics:")
+        self.logger.info(f"  • Unique characters: {stats['unique_characters']}")
+        self.logger.info(f"  • Total processed: {stats['total_checked']}")
+        self.logger.info(f"  • Fast matches: {stats['fast_matches']} ({stats['efficiency_rate']})")
+        self.logger.info(f"  • LLM verifications: {stats['llm_verifications']}")
+        self.logger.info(f"  • Characters merged: {stats['characters_merged']}")
+        self.logger.info("="*60 + "\n")
+
+        return characters
 
     async def _analyze_chunks_async(self, chunks: list[str]) -> list[dict]:
         """
@@ -604,7 +714,7 @@ class CharacterService(BaseService):
             # Call LLM
             response = await self.provider.complete_async(
                 messages=messages,
-                temperature=0.1,  # Low temperature for consistency
+                temperature=1.0,  # GPT-5-mini only supports temperature=1
                 response_format={"type": "json_object"}
                 if self.provider and self.provider.supports_json
                 else None,

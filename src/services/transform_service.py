@@ -384,7 +384,7 @@ class TransformService(BaseService):
             # Apply rate limiting if needed
             if rate_limiter:
                 # Estimate tokens based on chapter content using TokenManager
-                chapter_text = " ".join([p.text for p in chapter.paragraphs])
+                chapter_text = " ".join([p.get_text() for p in chapter.paragraphs])
                 estimated_tokens = min(self.token_manager.estimate_tokens(chapter_text), 4500)
                 await rate_limiter.acquire(estimated_tokens)
 
@@ -485,13 +485,24 @@ class TransformService(BaseService):
                 provider=self.provider.name if self.provider else "unknown",
             )
 
-        # Transform each paragraph
-        for para_idx, paragraph in enumerate(chapter.paragraphs):
-            # Create prompt for transformation
-            prompt = self._create_transform_prompt(paragraph.get_text(), context)
+        # Transform paragraphs in batches for efficiency
+        # Smaller batches for more reliable processing
+        batch_size = getattr(self.config, 'batch_size', 10)  # Default to 10 paragraphs at a time
+        total_paragraphs = len(chapter.paragraphs)
+        total_batches = (total_paragraphs + batch_size - 1) // batch_size
+        self.logger.info(f"Processing {total_paragraphs} paragraphs in {total_batches} batches of {batch_size}")
+
+        for batch_num, batch_start in enumerate(range(0, total_paragraphs, batch_size), 1):
+            batch_end = min(batch_start + batch_size, total_paragraphs)
+            batch_paragraphs = chapter.paragraphs[batch_start:batch_end]
+
+            self.logger.info(f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start+1}-{batch_end})")
+
+            # Create batch prompt with the actual paragraph objects
+            prompt = self._create_batch_transform_prompt(batch_paragraphs, context, len(batch_paragraphs))
 
             try:
-                # Call LLM
+                # Call LLM for batch
                 messages = [
                     {"role": "system", "content": prompt["system"]},
                     {"role": "user", "content": prompt["user"]},
@@ -499,36 +510,43 @@ class TransformService(BaseService):
 
                 response = await self.provider.complete_async(
                     messages=messages,
-                    temperature=self.config.llm_temperature,  # Use configured temperature
+                    temperature=self.config.llm_temperature,
                 )
 
-                # Debug logging
-                original_text = paragraph.get_text()
-                if para_idx == 0:  # Log first paragraph for debugging
-                    self.logger.debug(f"Original text: {repr(original_text[:100])}")
-                    self.logger.debug(f"Transformed text: {repr(response[:100])}")
-                    self.logger.debug(f"Are they equal? {response == original_text}")
+                # Split response by paragraph markers
+                transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
 
-                # Track changes
-                if response != original_text:
-                    changes.append(
-                        TransformationChange(
-                            chapter_index=chapter_index,
-                            paragraph_index=para_idx,
-                            sentence_index=0,
-                            original=paragraph.get_text(),
-                            transformed=response,
-                            change_type="gender_swap",
+                # Process each paragraph in the batch
+                for i, (paragraph, transformed_text) in enumerate(zip(batch_paragraphs, transformed_texts)):
+                    para_idx = batch_start + i
+                    original_text = paragraph.get_text()
+
+                    # Debug logging for first paragraph
+                    if para_idx == 0:
+                        self.logger.debug(f"Original text: {repr(original_text[:100])}")
+                        self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
+
+                    # Track changes
+                    if transformed_text != original_text:
+                        changes.append(
+                            TransformationChange(
+                                chapter_index=chapter_index,
+                                paragraph_index=para_idx,
+                                sentence_index=0,
+                                original=original_text,
+                                transformed=transformed_text,
+                                change_type="gender_swap",
+                            )
                         )
-                    )
 
-                # Create transformed paragraph
-                transformed_paragraphs.append(Paragraph(sentences=[response]))
+                    # Create transformed paragraph
+                    transformed_paragraphs.append(Paragraph(sentences=[transformed_text]))
 
             except Exception as e:
-                self.logger.warning(f"Failed to transform paragraph {para_idx}: {e}")
-                # Keep original on error
-                transformed_paragraphs.append(paragraph)
+                self.logger.warning(f"Failed to transform batch {batch_start}-{batch_end}: {e}")
+                # Keep originals on error
+                for paragraph in batch_paragraphs:
+                    transformed_paragraphs.append(paragraph)
 
         # Create transformed chapter
         transformed_chapter = Chapter(
@@ -536,6 +554,62 @@ class TransformService(BaseService):
         )
 
         return transformed_chapter, changes
+
+    def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
+        """Parse batch response into individual paragraph texts."""
+        # Simple approach: split by double newlines
+        # The LLM should return paragraphs separated by blank lines
+        paragraphs = response.strip().split("\n\n")
+
+        # If we got the expected number, great!
+        if len(paragraphs) == expected_count:
+            return paragraphs
+
+        # Otherwise, try to be smart about it
+        self.logger.warning(f"Expected {expected_count} paragraphs, got {len(paragraphs)}")
+
+        # Pad or truncate as needed
+        if len(paragraphs) < expected_count:
+            # Pad with empty strings
+            paragraphs.extend([""] * (expected_count - len(paragraphs)))
+        else:
+            # Truncate
+            paragraphs = paragraphs[:expected_count]
+
+        return paragraphs
+
+    def _create_batch_transform_prompt(self, batch_paragraphs: list, context: dict[str, Any], batch_size: int) -> dict[str, str]:
+        """Create prompt for batch transformation."""
+        transform_type = context.get("transform_type", TransformType.GENDER_SWAP)
+        rules = context.get("rules", self._get_transformation_rules(transform_type))
+        character_context = context.get("character_context", "")
+
+        system_prompt = f"""You are a literary transformation expert. Transform the following {batch_size} paragraphs according to these rules:
+
+{rules}
+
+{character_context}
+
+IMPORTANT:
+1. Transform each paragraph independently
+2. Return EXACTLY {batch_size} paragraphs
+3. Separate each paragraph with a blank line (double newline)
+4. Maintain the original style and tone
+5. Only change gender-related language
+6. Do not add or remove content
+7. Do not add any markers or labels - just the transformed text"""
+
+        # Simpler format without markers - just numbered paragraphs
+        paragraphs_text = "\n\n".join(
+            p.get_text() for p in batch_paragraphs
+        )
+
+        user_prompt = f"Transform these {batch_size} paragraphs (separated by blank lines):\n\n{paragraphs_text}"
+
+        return {
+            "system": system_prompt,
+            "user": user_prompt
+        }
 
     def _create_transform_prompt(self, text: str, context: dict[str, Any]) -> dict[str, str]:
         """Create prompt for LLM transformation."""

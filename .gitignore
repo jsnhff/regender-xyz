@@ -48,6 +48,7 @@ Thumbs.db
 *~
 .cache/
 test_it/
+logs/
 
 # Output files
 *.transformed.txt

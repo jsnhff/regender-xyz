@@ -141,7 +141,10 @@ class PluginManager:
             # Find Plugin subclasses in the module
             plugin_classes = []
             for name, obj in inspect.getmembers(module):
-                if inspect.isclass(obj) and issubclass(obj, Plugin) and obj != Plugin:
+                if (inspect.isclass(obj) and
+                    issubclass(obj, Plugin) and
+                    obj != Plugin and
+                    not inspect.isabstract(obj)):  # Skip abstract classes
                     plugin_classes.append(obj)
 
             if not plugin_classes:
@@ -153,13 +156,18 @@ class PluginManager:
                 try:
                     plugin = plugin_class()
 
-                    # Validate configuration
-                    if config and not plugin.validate_config(config):
-                        self.logger.error(f"Invalid configuration for plugin {plugin.name}")
-                        continue
+                    # Register the plugin without initializing yet
+                    # (providers need API keys which might not be available during discovery)
+                    self.plugins[plugin.name] = plugin
+                    self.logger.info(f"Discovered plugin: {plugin.name} v{plugin.version}")
 
-                    # Register the plugin
-                    self.register(plugin, config)
+                    # Try to initialize if config is provided and valid
+                    if config and plugin.validate_config(config):
+                        try:
+                            plugin.initialize(config)
+                            self.logger.info(f"Initialized plugin: {plugin.name}")
+                        except Exception as e:
+                            self.logger.debug(f"Plugin {plugin.name} not initialized: {e}")
 
                 except Exception as e:
                     self.logger.error(f"Failed to instantiate plugin {plugin_class.__name__}: {e}")

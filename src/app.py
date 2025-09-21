@@ -138,24 +138,48 @@ class Application:
 
     def _load_providers(self):
         """Load and initialize provider plugins."""
-        for provider_config in self.config.get("providers", []):
-            module_path = provider_config.get("module")
-            if not module_path:
-                continue
+        import os
+        from pathlib import Path
 
+        # Auto-discover provider plugins in src/providers/
+        providers_dir = Path(__file__).parent / "providers"
+
+        # List of provider files to try loading (excluding base classes)
+        provider_modules = {
+            "openai": "src.providers.openai",
+            "anthropic": "src.providers.anthropic"
+        }
+
+        # Load all available provider plugins
+        for name, module_path in provider_modules.items():
             try:
-                # Load the provider plugin
-                self.plugin_manager.load_plugin(module_path, provider_config.get("config", {}))
+                self.plugin_manager.load_plugin(module_path)
+                self.logger.info(f"Loaded provider plugin: {name}")
+            except Exception as e:
+                self.logger.debug(f"Could not load {name} provider: {e}")
+
+        # Determine which provider to use
+        default_provider = os.getenv("DEFAULT_PROVIDER", "openai")
+
+        # Get and initialize the selected provider
+        provider = self.plugin_manager.get(default_provider)
+        if not provider:
+            # Fallback to OpenAI if specific one not found
+            self.logger.warning(f"Provider '{default_provider}' not found, trying openai")
+            provider = self.plugin_manager.get("openai")
+
+        if provider:
+            try:
+                # Initialize provider (it will read API keys from environment)
+                provider.initialize({})
 
                 # Register as service for dependency injection
-                provider = self.plugin_manager.get(provider_config.get("type", "unified"))
-                if provider:
-                    # Register the provider as a service using proper API
-                    self.context.register_instance("llm_provider", provider)
-                    self.logger.info(f"Registered provider: {provider.name}")
-
+                self.context.register_instance("llm_provider", provider)
+                self.logger.info(f"Registered provider: {provider.name}")
             except Exception as e:
-                self.logger.error(f"Failed to load provider {module_path}: {e}")
+                self.logger.error(f"Failed to initialize provider: {e}")
+        else:
+            self.logger.error("No LLM provider could be loaded")
 
     def _register_services(self):
         """Register services with the container."""
@@ -325,9 +349,21 @@ class Application:
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(transformed_book.to_dict(), f, indent=2, ensure_ascii=False)
         else:
-            # Save as text
+            # Save as text using TextExportService for proper Unicode handling
+            from src.services.text_export_service import TextExportService
+            from src.services.base import ServiceConfig
+
+            config = ServiceConfig(
+                name="text_export",
+                preserve_unicode=False,
+                normalize_method="unidecode"  # Use unidecode for clean ASCII
+            )
+
+            text_export_service = TextExportService(config, self.logger)
+            text_content = await text_export_service.process_async(transformed_book)
+
             with open(output_path, "w", encoding="utf-8") as f:
-                f.write(transformed_book.get_text())
+                f.write(text_content)
 
         self.logger.info(f"Saved output to {output_path}")
 
