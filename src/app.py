@@ -262,7 +262,7 @@ class Application:
         # No existing analysis, analyze the book
         self.logger.info("No existing character analysis found, analyzing book...")
         character_service = self.get_service("character")
-        characters = await character_service.process_async(book)
+        characters = await character_service.process(book)
 
         # Note: Character analysis will be saved by the CLI with a timestamp
         return characters
@@ -293,7 +293,7 @@ class Application:
         try:
             # Parse the book
             parser = self.get_service("parser")
-            book = await parser.process_async(file_path)
+            book = await parser.process(file_path)
             self.logger.info(f"Parsed book: {book.title}")
 
             # Check for existing character analysis or analyze characters
@@ -315,7 +315,7 @@ class Application:
             # Apply quality control
             if quality_control:
                 qc_service = self.get_service("quality")
-                transformation = await qc_service.process_async(transformation)
+                transformation = await qc_service.process(transformation)
                 self.logger.info(f"Quality score: {transformation.quality_score}/100")
 
             # Save output if requested
@@ -360,7 +360,7 @@ class Application:
             )
 
             text_export_service = TextExportService(config, self.logger)
-            text_content = await text_export_service.process_async(transformed_book)
+            text_content = await text_export_service.process(transformed_book)
 
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(text_content)
@@ -478,12 +478,12 @@ class Application:
             else:
                 # Parse from text
                 parser = self.get_service("parser")
-                book = await parser.process_async(file_path)
+                book = await parser.process(file_path)
                 self.logger.info(f"Parsed book: {book.title}")
 
             # Analyze characters
             character_service = self.get_service("character")
-            characters = await character_service.process_async(book)
+            characters = await character_service.process(book)
             self.logger.info(f"Found {len(characters.characters)} characters")
 
             # Save output if requested
