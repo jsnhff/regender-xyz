@@ -39,9 +39,9 @@ class LLMProvider(ABC):
         return None
 
     @abstractmethod
-    async def complete_async(self, messages: list[dict[str, str]], **kwargs) -> str:
+    async def complete(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
-        Complete a prompt asynchronously.
+        Complete a prompt (async by default).
 
         Args:
             messages: List of message dictionaries with 'role' and 'content'
@@ -52,9 +52,9 @@ class LLMProvider(ABC):
         """
         pass
 
-    def complete(self, messages: list[dict[str, str]], **kwargs) -> str:
+    def complete_sync(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
-        Synchronous wrapper for completion.
+        Synchronous wrapper for completion (use only when async is not possible).
 
         Args:
             messages: List of message dictionaries
@@ -65,7 +65,7 @@ class LLMProvider(ABC):
         """
         import asyncio
 
-        return asyncio.run(self.complete_async(messages, **kwargs))
+        return asyncio.run(self.complete(messages, **kwargs))
 
     def validate_messages(self, messages: list[dict[str, str]]) -> bool:
         """

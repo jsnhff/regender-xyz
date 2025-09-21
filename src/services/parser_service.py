@@ -55,7 +55,7 @@ class ParserService(BaseService):
         # Use the new integrated parser by default
         return IntegratedParsingStrategy()
 
-    async def process_async(self, input_path: Union[str, Path]) -> Book:
+    async def process(self, input_path: Union[str, Path]) -> Book:
         """
         Parse a book from file.
 
@@ -106,7 +106,7 @@ class ParserService(BaseService):
         except Exception as e:
             self.handle_error(e, {"input_path": str(input_path)})
 
-    async def parse_json_async(self, json_path: Union[str, Path]) -> Book:
+    async def parse_json(self, json_path: Union[str, Path]) -> Book:
         """
         Load a book from JSON file.
 
@@ -150,7 +150,7 @@ class ParserService(BaseService):
 
         return True
 
-    async def _read_file_async(self, file_path: Path) -> str:
+    async def _read_file(self, file_path: Path) -> str:
         """
         Read file asynchronously.
 
@@ -256,7 +256,7 @@ class ParserService(BaseService):
 
         return errors
 
-    async def save_as_json_async(self, book: Book, output_path: Union[str, Path]) -> None:
+    async def save_as_json(self, book: Book, output_path: Union[str, Path]) -> None:
         """
         Save book as JSON.
 

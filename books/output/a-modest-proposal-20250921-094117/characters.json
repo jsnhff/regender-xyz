@@ -1,0 +1,17 @@
+{
+  "book_id": "5331e299df48799a",
+  "characters": [],
+  "metadata": {
+    "total": 0,
+    "by_gender": {},
+    "by_importance": {}
+  },
+  "timestamp": "2025-09-21T09:41:53.867838",
+  "provider": null,
+  "model": null,
+  "book_metadata": {
+    "title": "and for making them beneficial to the publick.",
+    "author": "Dr. Jonathan Swift",
+    "source_file": "books/json/pg1080-A_Modest_Proposal.json"
+  }
+}

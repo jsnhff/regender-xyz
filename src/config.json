@@ -21,10 +21,21 @@
     "character": {
       "class": "src.services.character_service.CharacterService",
       "config": {
-        "cache_enabled": true,
-        "async_enabled": true,
-        "max_concurrent": 20,
-        "max_retries": 3
+        "extraction": {
+          "chunk_size": 2000,
+          "temperature": 0.3,
+          "max_retries": 3
+        },
+        "grouping": {
+          "algorithm": "union_find",
+          "similarity_threshold": 0.7,
+          "max_group_size": 20
+        },
+        "merging": {
+          "temperature": 0.3,
+          "timeout": 30,
+          "batch_size": 50
+        }
       },
       "dependencies": {
         "provider": "llm_provider"

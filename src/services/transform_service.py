@@ -78,7 +78,7 @@ class TransformService(BaseService):
         """Get default transformation strategy."""
         return SmartTransformStrategy()
 
-    async def process_async(self, data: dict[str, Any]) -> Transformation:
+    async def process(self, data: dict[str, Any]) -> Transformation:
         """
         Transform a book's gender representation.
 
@@ -104,9 +104,9 @@ class TransformService(BaseService):
 
         characters = data.get("characters")
 
-        return await self.transform_book_async(book, transform_type, characters)
+        return await self.transform_book(book, transform_type, characters)
 
-    async def transform_book_async(
+    async def transform_book(
         self,
         book: Book,
         transform_type: TransformType,
@@ -133,14 +133,14 @@ class TransformService(BaseService):
                     raise ValueError("Character service required when characters not provided")
 
                 self.logger.info("Analyzing characters...")
-                characters = await self.character_service.process_async(book)
+                characters = await self.character_service.process(book)
 
             # Create transformation context
             context = self._create_context(characters, transform_type, selected_characters)
 
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
-            transformed_chapters, all_changes = await self._transform_chapters_async(
+            transformed_chapters, all_changes = await self._transform_chapters(
                 book.chapters, context
             )
 
@@ -344,7 +344,7 @@ class TransformService(BaseService):
 
         return mappings
 
-    async def _transform_chapters_async(
+    async def _transform_chapters(
         self, chapters: list[Chapter], context: dict[str, Any]
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """
@@ -508,7 +508,7 @@ class TransformService(BaseService):
                     {"role": "user", "content": prompt["user"]},
                 ]
 
-                response = await self.provider.complete_async(
+                response = await self.provider.complete(
                     messages=messages,
                     temperature=self.config.llm_temperature,
                 )

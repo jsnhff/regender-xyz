@@ -138,11 +138,11 @@ class BaseProviderPlugin(LLMProvider, Plugin):
 
         return self.complete(messages, **context)
 
-    async def complete_async(
+    async def complete(
         self, messages: List[Dict[str, str]], **kwargs
     ) -> str:
         """
-        Complete a prompt asynchronously.
+        Complete a prompt (async by default).
 
         Args:
             messages: List of message dicts
@@ -177,9 +177,9 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         """
         pass
 
-    def complete(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    def complete_sync(self, messages: List[Dict[str, str]], **kwargs) -> str:
         """
-        Synchronous wrapper for completion.
+        Synchronous wrapper for completion (use only when async is not possible).
 
         Args:
             messages: List of message dicts
@@ -191,7 +191,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         import asyncio
 
         loop = asyncio.get_event_loop()
-        return loop.run_until_complete(self.complete_async(messages, **kwargs))
+        return loop.run_until_complete(self.complete(messages, **kwargs))
 
     def shutdown(self):
         """Clean up provider resources."""

@@ -54,7 +54,7 @@ class QualityService(BaseService):
             target_quality=self.config.target_quality if self.config else 90.0
         )
 
-    async def process_async(self, transformation: Transformation) -> Transformation:
+    async def process(self, transformation: Transformation) -> Transformation:
         """
         Improve transformation quality.
 
@@ -89,7 +89,7 @@ class QualityService(BaseService):
                 self.logger.info(f"Found {len(issues)} issues")
 
                 # Apply corrections
-                transformation = await self._apply_corrections_async(transformation, issues)
+                transformation = await self._apply_corrections(transformation, issues)
 
                 # Reassess quality
                 current_quality = await self._assess_quality(transformation)
@@ -126,7 +126,7 @@ class QualityService(BaseService):
         """
         return await self.strategy.assess_quality_async(transformation)
 
-    async def _apply_corrections_async(
+    async def _apply_corrections(
         self, transformation: Transformation, issues: list[dict[str, Any]]
     ) -> Transformation:
         """

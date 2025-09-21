@@ -175,7 +175,7 @@ class TextExportService(BaseService):
 
         return ''.join(ascii_text)
 
-    async def process_async(self, book: Book) -> str:
+    async def process(self, book: Book) -> str:
         """
         Export a book to text format.
 

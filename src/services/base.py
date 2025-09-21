@@ -17,11 +17,14 @@ from typing import Any, Optional
 class ServiceConfig:
     """Configuration for services."""
 
-    cache_enabled: bool = True
+    # Core configuration that all services might use
+    cache_enabled: bool = False
     async_enabled: bool = True
     max_retries: int = 3
     timeout: int = 300
     max_concurrent: int = 5
+
+    # Quality control
     target_quality: float = 90.0
     max_qc_iterations: int = 3
 
@@ -34,19 +37,36 @@ class ServiceConfig:
     chunk_size: int = 1000
     rate_limit_tier: str = "tier-1"
 
+    # Character service configuration (new)
+    extraction: dict = field(default_factory=dict)
+    grouping: dict = field(default_factory=dict)
+    merging: dict = field(default_factory=dict)
+
     # Additional configuration data
     extra_config: dict = field(default_factory=dict)
+    config: dict = field(default_factory=dict)  # For nested config
 
     def __post_init__(self):
-        """Initialize extra config as empty dict if None."""
+        """Initialize config dicts and handle nested configuration."""
         if self.extra_config is None:
             self.extra_config = {}
+        if self.config is None:
+            self.config = {}
+
+        # Merge any nested config into attributes
+        if self.config:
+            for key, value in self.config.items():
+                if not hasattr(self, key) or getattr(self, key) == {}:
+                    setattr(self, key, value)
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get config value by key, supporting both attributes and extra_config."""
         # First check if it's a direct attribute
         if hasattr(self, key):
             return getattr(self, key)
+        # Then check config dict
+        if key in self.config:
+            return self.config[key]
         # Then check extra_config
         elif self.extra_config:
             return self.extra_config.get(key, default)
@@ -87,9 +107,9 @@ class BaseService(ABC):
         pass
 
     @abstractmethod
-    async def process_async(self, data: Any) -> Any:
+    async def process(self, data: Any) -> Any:
         """
-        Process data asynchronously.
+        Process data.
 
         This is the main processing method that all services must implement.
 
@@ -131,14 +151,14 @@ class BaseService(ABC):
         )
         raise
 
-    async def _retry_async(
+    async def _retry(
         self, func: callable, *args, max_retries: Optional[int] = None, **kwargs
     ) -> Any:
         """
-        Retry an async function with exponential backoff.
+        Retry a function with exponential backoff.
 
         Args:
-            func: Async function to retry
+            func: Function to retry
             args: Positional arguments for func
             max_retries: Maximum number of retries (uses config if not specified)
             kwargs: Keyword arguments for func
