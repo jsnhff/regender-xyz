@@ -31,7 +31,7 @@ def setup_logging(verbose: bool = False):
     logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
-def process_book(args):
+async def process_book(args):
     """Process book using the service-oriented architecture."""
     # Initialize application
     config_path = args.config or "src/config.json"
@@ -90,17 +90,16 @@ def process_book(args):
             print(f"  Selective transformation for: {', '.join(selected_characters)}")
         elif args.characters_file:
             # Read from file
-            with open(args.characters_file, "r") as f:
+            with open(args.characters_file) as f:
                 selected_characters = [line.strip() for line in f if line.strip()]
             print(f"  Selective transformation for {len(selected_characters)} characters from file")
 
         # Process the book with transformation
         print(f"Processing {input_path} with {args.transform_type} transformation...")
-        result = app.process_book_sync(
+        result = await app.process_book(
             file_path=input_path,
             transform_type=args.transform_type,
             output_path=str(output_path),
-            quality_control=not args.no_qc,
             selected_characters=selected_characters,
         )
 
@@ -121,8 +120,6 @@ def process_book(args):
         else:
             print(f"  Characters: {result['characters']}")
             print(f"  Changes: {result['changes']}")
-            if result.get("quality_score"):
-                print(f"  Quality: {result['quality_score']}/100")
         print(f"  Output: {result['output_path']}")
     else:
         print(f"\n❌ Error: {result['error']}")
@@ -132,8 +129,8 @@ def process_book(args):
     app.shutdown()
 
 
-def main():
-    """Main CLI entry point."""
+async def async_main():
+    """Async main entry point."""
     parser = argparse.ArgumentParser(
         description="Regender-XYZ CLI - Transform gender representation in literature"
     )
@@ -161,7 +158,6 @@ def main():
     # Configuration options
     parser.add_argument("--config", help="Path to configuration file (default: src/config.json)")
 
-    parser.add_argument("--no-qc", action="store_true", help="Skip quality control")
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
 
@@ -183,7 +179,19 @@ def main():
     setup_logging(args.verbose)
 
     # Process the book
-    process_book(args)
+    await process_book(args)
+
+
+def main():
+    """Main CLI entry point."""
+    try:
+        asyncio.run(async_main())
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user")
+        sys.exit(0)
+    except Exception as e:
+        logging.error(f"Fatal error: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -205,9 +205,8 @@ class PlayParser:
                 scene_info = self._parse_scene_marker(line)
                 if scene_info:
                     # Save previous scene if exists
-                    if current_scene and current_scene.elements:
-                        if current_act:
-                            current_act.scenes.append(current_scene)
+                    if current_scene and current_scene.elements and current_act:
+                        current_act.scenes.append(current_scene)
 
                     current_scene = Scene(
                         number=scene_info["number"],
@@ -286,9 +285,8 @@ class PlayParser:
             i += 1
 
         # Save final act and scene
-        if current_scene and current_scene.elements:
-            if current_act:
-                current_act.scenes.append(current_scene)
+        if current_scene and current_scene.elements and current_act:
+            current_act.scenes.append(current_scene)
 
         if current_act and current_act.scenes:
             play.acts.append(current_act)

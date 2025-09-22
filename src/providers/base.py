@@ -89,3 +89,47 @@ class LLMProvider(ABC):
                 return False
 
         return True
+
+    @abstractmethod
+    async def get_rate_limits(self) -> dict:
+        """
+        Get current rate limit status.
+
+        Returns:
+            Dictionary with rate limit info:
+            - requests_remaining: Number of requests remaining
+            - requests_limit: Total requests allowed
+            - tokens_remaining: Tokens remaining (if applicable)
+            - reset_time: When limits reset
+        """
+        pass
+
+    @abstractmethod
+    def get_model_info(self) -> dict:
+        """
+        Get information about the current model.
+
+        Returns:
+            Dictionary with model capabilities:
+            - context_window: Maximum context size
+            - max_output: Maximum output tokens
+            - supports_vision: Whether it supports images
+            - supports_json: Whether it supports JSON mode
+            - cost_per_1k_input: Input token cost
+            - cost_per_1k_output: Output token cost
+        """
+        pass
+
+    def get_capabilities(self) -> dict:
+        """
+        Get provider capabilities.
+
+        Returns:
+            Dictionary of capabilities
+        """
+        return {
+            "supports_json": self.supports_json,
+            "max_tokens": self.max_tokens,
+            "rate_limit": self.rate_limit,
+            "model_info": self.get_model_info(),
+        }

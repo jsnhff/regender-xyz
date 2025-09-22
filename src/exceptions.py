@@ -3,13 +3,13 @@ Custom exceptions for the regender-xyz application.
 Provides structured error handling across all services.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 
 class RegenderError(Exception):
     """Base exception for all regender-xyz errors."""
 
-    def __init__(self, message: str, context: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, context: Optional[dict[str, Any]] = None):
         super().__init__(message)
         self.context = context or {}
 
@@ -29,7 +29,7 @@ class APIKeyError(ValidationError):
 class ProviderError(RegenderError):
     """Base exception for LLM provider errors."""
 
-    def __init__(self, message: str, provider: str, context: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, provider: str, context: Optional[dict[str, Any]] = None):
         super().__init__(message, context)
         self.provider = provider
 

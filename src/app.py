@@ -112,11 +112,6 @@ class Application:
                     "config": {"cache_enabled": True, "max_concurrent": 5},
                     "dependencies": {"provider": "llm_provider", "character_service": "character"},
                 },
-                "quality": {
-                    "class": "src.services.quality_service.QualityService",
-                    "config": {"target_quality": 90.0, "max_qc_iterations": 3},
-                    "dependencies": {"provider": "llm_provider"},
-                },
             },
         }
 
@@ -272,7 +267,6 @@ class Application:
         file_path: str,
         transform_type: str,
         output_path: Optional[str] = None,
-        quality_control: bool = True,
         selected_characters: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
@@ -296,9 +290,23 @@ class Application:
             book = await parser.process(file_path)
             self.logger.info(f"Parsed book: {book.title}")
 
+            # Determine output directory early if we have an output path
+            output_dir = None
+            if output_path:
+                output_dir = Path(output_path).parent
+                output_dir.mkdir(parents=True, exist_ok=True)
+
             # Check for existing character analysis or analyze characters
             characters = await self._get_or_analyze_characters(file_path, book)
             self.logger.info(f"Using {len(characters.characters)} characters")
+
+            # Save character analysis immediately if we have output path and it's not already saved
+            if output_dir:
+                char_file = output_dir / "characters.json"
+                if not char_file.exists():
+                    with open(char_file, 'w') as f:
+                        json.dump(characters.to_dict(), f, indent=2, default=str)
+                    self.logger.info(f"Saved character analysis to {char_file}")
 
             # Transform the book
             transformer = self.get_service("transform")
@@ -307,27 +315,33 @@ class Application:
             if selected_characters:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
-            transformation = await transformer.transform_book_async(
+            transformation = await transformer.transform_book(
                 book, TransformType(transform_type), characters, selected_characters
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
-            # Apply quality control
-            if quality_control:
-                qc_service = self.get_service("quality")
-                transformation = await qc_service.process(transformation)
-                self.logger.info(f"Quality score: {transformation.quality_score}/100")
+            # Quality control removed - transformations are applied directly
 
             # Save output if requested
             if output_path:
+                # Save JSON transformation immediately
                 await self._save_output(transformation, output_path)
+                self.logger.info(f"Saved transformation JSON to {output_path}")
+
+                # Export as text file (this could fail, but JSON is already saved)
+                output_dir = Path(output_path).parent
+                text_output = output_dir / f"{TransformType(transform_type).value}.txt"
+                try:
+                    await self._save_output(transformation, str(text_output))
+                    self.logger.info(f"Exported text to {text_output}")
+                except Exception as e:
+                    self.logger.warning(f"Failed to export text: {e}, but JSON is saved")
 
             return {
                 "success": True,
                 "book_title": book.title,
                 "characters": len(characters.characters),
                 "changes": len(transformation.changes),
-                "quality_score": transformation.quality_score,
                 "output_path": output_path,
             }
 
@@ -350,16 +364,18 @@ class Application:
                 json.dump(transformed_book.to_dict(), f, indent=2, ensure_ascii=False)
         else:
             # Save as text using TextExportService for proper Unicode handling
-            from src.services.text_export_service import TextExportService
             from src.services.base import ServiceConfig
+            from src.services.text_export_service import TextExportService
 
             config = ServiceConfig(
-                name="text_export",
-                preserve_unicode=False,
-                normalize_method="unidecode"  # Use unidecode for clean ASCII
+                extra_config={
+                    "preserve_unicode": False,
+                    "normalize_method": "unidecode"  # Use unidecode for clean ASCII
+                }
             )
 
-            text_export_service = TextExportService(config, self.logger)
+            text_export_service = TextExportService(config)
+            text_export_service.logger = self.logger
             text_content = await text_export_service.process(transformed_book)
 
             with open(output_path, "w", encoding="utf-8") as f:
@@ -546,7 +562,6 @@ class Application:
         file_path: str,
         transform_type: str,
         output_path: Optional[str] = None,
-        quality_control: bool = True,
         selected_characters: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
@@ -562,7 +577,7 @@ class Application:
             Processing results
         """
         return asyncio.run(
-            self.process_book(file_path, transform_type, output_path, quality_control, selected_characters)
+            self.process_book(file_path, transform_type, output_path, selected_characters)
         )
 
     def get_metrics(self) -> dict[str, Any]:

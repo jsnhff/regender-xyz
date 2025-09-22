@@ -1,9 +1,10 @@
 """
 Integration test - does the whole pipeline work?
 """
-import pytest
 import json
 from pathlib import Path
+
+import pytest
 
 
 def test_pipeline_works_with_mock(app_with_mock, simple_story_path, tmp_path):

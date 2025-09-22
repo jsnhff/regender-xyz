@@ -26,16 +26,14 @@ class TextExportService(BaseService):
     def __init__(
         self,
         config: ServiceConfig,
-        logger: Optional[logging.Logger] = None,
     ):
         """
         Initialize text export service.
 
         Args:
             config: Service configuration
-            logger: Optional logger instance
         """
-        super().__init__(config, logger)
+        super().__init__(config)
 
         # Try to import text normalization libraries
         self.unidecode = None
@@ -56,10 +54,15 @@ class TextExportService(BaseService):
             self.logger.debug("ftfy not available")
 
         # Configuration options
-        self.use_unicode = getattr(config, "preserve_unicode", False)
-        self.normalize_method = getattr(config, "normalize_method", "unidecode")  # unidecode, ftfy, or basic
+        extra = config.extra_config if hasattr(config, 'extra_config') else {}
+        self.use_unicode = extra.get("preserve_unicode", False)
+        self.normalize_method = extra.get("normalize_method", "unidecode")  # unidecode, ftfy, or basic
 
         self.logger.info(f"Initialized {self.__class__.__name__}")
+
+    def _initialize(self):
+        """Initialize the service (required by BaseService)."""
+        pass
 
     def simplify_text(self, text: str) -> str:
         """
@@ -265,11 +268,12 @@ class TextExportService(BaseService):
             Path to created text file
         """
         import json
+
         from src.models.book import Book
 
         # Load JSON
         json_path_obj = Path(json_path)
-        with open(json_path_obj, 'r', encoding='utf-8') as f:
+        with open(json_path_obj, encoding='utf-8') as f:
             data = json.load(f)
 
         # Create Book object from JSON

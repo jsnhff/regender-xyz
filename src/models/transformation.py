@@ -167,9 +167,8 @@ class Transformation:
             errors.append("No changes recorded for transformation")
 
         # Validate quality score if present
-        if self.quality_score is not None:
-            if not 0 <= self.quality_score <= 100:
-                errors.append(f"Invalid quality score: {self.quality_score}")
+        if self.quality_score is not None and not 0 <= self.quality_score <= 100:
+            errors.append(f"Invalid quality score: {self.quality_score}")
 
         return errors
 

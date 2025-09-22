@@ -35,6 +35,7 @@ class ServiceConfig:
     # Transform-specific configuration
     llm_temperature: float = 0.3
     chunk_size: int = 1000
+    batch_size: int = 10
     rate_limit_tier: str = "tier-1"
 
     # Character service configuration (new)

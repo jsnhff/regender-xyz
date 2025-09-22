@@ -5,6 +5,7 @@ This service handles gender transformation of books.
 """
 
 import asyncio
+import os
 import time
 from typing import Any, Optional
 
@@ -17,6 +18,7 @@ from src.models.transformation import (
 )
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
+from src.services.prompts import TRANSFORM_BATCH_PROMPT_TEMPLATE, TRANSFORM_SIMPLE_PROMPT_TEMPLATE
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
 from src.utils.token_manager import TokenManager
 
@@ -234,6 +236,52 @@ class TransformService(BaseService):
             "characters_to_preserve": characters_to_preserve,
         }
 
+    def _build_character_instructions(
+        self, characters: Optional[CharacterAnalysis], transform_type: TransformType, character_mappings: dict
+    ) -> str:
+        """Build character context for LLM transformation."""
+        if not characters:
+            return ""
+
+        lines = ["\nKNOWN CHARACTERS:"]
+
+        # Build compact character list with their transformations
+        for char in characters.characters:
+            if char.name not in character_mappings:
+                continue
+
+            mapping = character_mappings[char.name]
+            current_gender = char.gender.value if hasattr(char.gender, 'value') else str(char.gender)
+
+            # Determine target gender based on transform type
+            if mapping.get("preserve", False):
+                target = "KEEP UNCHANGED"
+            elif transform_type == TransformType.GENDER_SWAP:
+                if current_gender == "male":
+                    target = "→female"
+                elif current_gender == "female":
+                    target = "→male"
+                else:
+                    target = "→swap"
+            elif transform_type == TransformType.ALL_FEMALE:
+                target = "→female"
+            elif transform_type == TransformType.ALL_MALE:
+                target = "→male"
+            elif transform_type == TransformType.NONBINARY:
+                target = "→they/them"
+            else:
+                target = "→transform"
+
+            # Compact format: Name (aliases) [current→target]
+            name_str = char.name
+            if char.aliases:
+                name_str += f" (aka {', '.join(char.aliases[:3])})"  # Limit to 3 aliases
+            lines.append(f"- {name_str}: {current_gender}{target}")
+
+        lines.append("\nApply these specific character transformations consistently throughout the text.")
+
+        return "\n".join(lines)
+
     def _create_selective_context_string(
         self, characters: CharacterAnalysis, to_transform: list[str], to_preserve: list[str]
     ) -> str:
@@ -320,27 +368,25 @@ class TransformService(BaseService):
             return {}
 
     def _get_character_transformation(self, character, transform_type: TransformType) -> dict:
-        """Get transformation mappings for a specific character."""
-        from src.models.character import Gender
+        """Get transformation info for a specific character - let LLM handle the actual transformation."""
+        mappings = {
+            "original_gender": character.gender,
+            "name": character.name,
+            "aliases": character.aliases
+        }
 
-        mappings = {"original_gender": character.gender}
+        # Just track whether to transform or preserve - let LLM handle the actual transformation
+        current_gender = character.gender.value if hasattr(character.gender, 'value') else str(character.gender)
 
-        if transform_type == TransformType.ALL_MALE:
-            mappings["new_gender"] = Gender.MALE
-            mappings["pronouns"] = {"subject": "he", "object": "him", "possessive": "his"}
-        elif transform_type == TransformType.ALL_FEMALE:
-            mappings["new_gender"] = Gender.FEMALE
-            mappings["pronouns"] = {"subject": "she", "object": "her", "possessive": "her"}
-        elif transform_type == TransformType.GENDER_SWAP:
-            if character.gender == Gender.MALE:
-                mappings["new_gender"] = Gender.FEMALE
-                mappings["pronouns"] = {"subject": "she", "object": "her", "possessive": "her"}
-            elif character.gender == Gender.FEMALE:
-                mappings["new_gender"] = Gender.MALE
-                mappings["pronouns"] = {"subject": "he", "object": "him", "possessive": "his"}
-            else:
-                mappings["new_gender"] = character.gender
-                mappings["pronouns"] = character.pronouns
+        if transform_type == TransformType.GENDER_SWAP:
+            # LLM will swap genders
+            mappings["transform"] = True
+        elif transform_type in [TransformType.ALL_MALE, TransformType.ALL_FEMALE, TransformType.NONBINARY]:
+            # LLM will apply the transformation type
+            mappings["transform"] = True
+        else:
+            # Keep original
+            mappings["preserve"] = True
 
         return mappings
 
@@ -485,18 +531,38 @@ class TransformService(BaseService):
                 provider=self.provider.name if self.provider else "unknown",
             )
 
-        # Transform paragraphs in batches for efficiency
-        # Smaller batches for more reliable processing
-        batch_size = getattr(self.config, 'batch_size', 10)  # Default to 10 paragraphs at a time
+        # Transform paragraphs in token-optimized batches
+        from src.utils.config import config as app_config
+
+        # Get batches optimized by token count
+        batches = self._create_token_optimized_batches(chapter.paragraphs, context)
         total_paragraphs = len(chapter.paragraphs)
-        total_batches = (total_paragraphs + batch_size - 1) // batch_size
-        self.logger.info(f"Processing {total_paragraphs} paragraphs in {total_batches} batches of {batch_size}")
+        total_batches = len(batches)
 
-        for batch_num, batch_start in enumerate(range(0, total_paragraphs, batch_size), 1):
-            batch_end = min(batch_start + batch_size, total_paragraphs)
-            batch_paragraphs = chapter.paragraphs[batch_start:batch_end]
+        avg_batch_size = sum(len(b) for b in batches) / len(batches) if batches else 0
+        self.logger.info(f"Processing {total_paragraphs} paragraphs in {total_batches} token-optimized batches (avg size: {avg_batch_size:.1f})")
 
-            self.logger.info(f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start+1}-{batch_end})")
+        # Setup progress bar
+        disable_progress = not os.isatty(1) if hasattr(os, 'isatty') else True
+        try:
+            from tqdm import tqdm
+            progress_bar = tqdm(
+                total=total_batches,
+                desc=f"Transforming {chapter.title or 'chapter'}",
+                disable=disable_progress,
+                unit="batch"
+            )
+        except ImportError:
+            progress_bar = None
+
+        batch_start = 0
+        for batch_num, batch_paragraphs in enumerate(batches, 1):
+            batch_end = batch_start + len(batch_paragraphs)
+
+            if not progress_bar:
+                self.logger.info(f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start+1}-{batch_end}, ~{self._estimate_batch_tokens(batch_paragraphs, context)} tokens)")
+            else:
+                progress_bar.set_postfix({"paragraphs": f"{batch_start+1}-{batch_end}"})
 
             # Create batch prompt with the actual paragraph objects
             prompt = self._create_batch_transform_prompt(batch_paragraphs, context, len(batch_paragraphs))
@@ -542,11 +608,22 @@ class TransformService(BaseService):
                     # Create transformed paragraph
                     transformed_paragraphs.append(Paragraph(sentences=[transformed_text]))
 
+                # Update batch_start for next iteration
+                batch_start = batch_end
+
+                # Update progress
+                if progress_bar:
+                    progress_bar.update(1)
+
             except Exception as e:
                 self.logger.warning(f"Failed to transform batch {batch_start}-{batch_end}: {e}")
                 # Keep originals on error
                 for paragraph in batch_paragraphs:
                     transformed_paragraphs.append(paragraph)
+
+        # Close progress bar
+        if progress_bar:
+            progress_bar.close()
 
         # Create transformed chapter
         transformed_chapter = Chapter(
@@ -578,26 +655,106 @@ class TransformService(BaseService):
 
         return paragraphs
 
+    def _create_token_optimized_batches(self, paragraphs: list, context: dict[str, Any]) -> list[list]:
+        """Create batches of paragraphs optimized for token count."""
+        if not self.token_manager:
+            # Fallback to fixed batch size if no token manager
+            from src.utils.config import config as app_config
+            batch_size = app_config.transform_batch_size
+            return [paragraphs[i:i + batch_size] for i in range(0, len(paragraphs), batch_size)]
+
+        # Get configuration
+        from src.utils.config import config as app_config
+        target_utilization = app_config._config.get("transformation", {}).get("target_token_utilization", 0.66)
+        max_request_tokens = app_config._config.get("transformation", {}).get("max_tokens_per_request", 120000)
+
+        # Get max tokens for this model
+        max_context = self.token_manager.get_model_config(self.provider.model if self.provider else "gpt-4").max_context_tokens
+        max_context = min(max_context, max_request_tokens)  # Cap at configured maximum
+
+        # Reserve tokens for prompt overhead, response, and character context
+        prompt_overhead = 1500  # Estimated tokens for system prompt and instructions
+        response_overhead = 2000  # Reserve space for response
+        char_context_tokens = self._estimate_character_context_tokens(context)
+
+        available_tokens = int((max_context * target_utilization) - prompt_overhead - response_overhead - char_context_tokens)
+
+        self.logger.debug(f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})")
+
+        batches = []
+        current_batch = []
+        current_tokens = 0
+
+        for para in paragraphs:
+            para_text = para.get_text()
+            para_tokens = self.token_manager.estimate_tokens(para_text)
+
+            # Start new batch if adding this paragraph would exceed limit
+            if current_tokens + para_tokens > available_tokens and current_batch:
+                batches.append(current_batch)
+                current_batch = []
+                current_tokens = 0
+
+            # Add paragraph to current batch
+            current_batch.append(para)
+            current_tokens += para_tokens
+
+            # If single paragraph exceeds limit, put it in its own batch
+            if para_tokens > available_tokens:
+                self.logger.warning(f"Paragraph exceeds token limit ({para_tokens} > {available_tokens})")
+                if len(current_batch) > 1:
+                    # Remove it and add to next batch
+                    current_batch.pop()
+                    batches.append(current_batch)
+                    current_batch = [para]
+                    current_tokens = para_tokens
+
+        # Add remaining batch
+        if current_batch:
+            batches.append(current_batch)
+
+        return batches
+
+    def _estimate_batch_tokens(self, batch_paragraphs: list, context: dict[str, Any]) -> int:
+        """Estimate total tokens for a batch including prompt."""
+        if not self.token_manager:
+            return len(batch_paragraphs) * 200  # Rough estimate
+
+        total_tokens = 0
+        # Add paragraph text tokens
+        for para in batch_paragraphs:
+            total_tokens += self.token_manager.estimate_tokens(para.get_text())
+
+        # Add prompt overhead
+        total_tokens += 1500  # System prompt
+        total_tokens += self._estimate_character_context_tokens(context)
+
+        return total_tokens
+
+    def _estimate_character_context_tokens(self, context: dict[str, Any]) -> int:
+        """Estimate tokens used by character context."""
+        if not self.token_manager:
+            return 500  # Default estimate
+
+        char_info = context.get("character_info", "")
+        return self.token_manager.estimate_tokens(char_info) if char_info else 200
+
     def _create_batch_transform_prompt(self, batch_paragraphs: list, context: dict[str, Any], batch_size: int) -> dict[str, str]:
         """Create prompt for batch transformation."""
         transform_type = context.get("transform_type", TransformType.GENDER_SWAP)
         rules = context.get("rules", self._get_transformation_rules(transform_type))
-        character_context = context.get("character_context", "")
+        character_mappings = context.get("character_mappings", {})
+        characters = context.get("characters")
 
-        system_prompt = f"""You are a literary transformation expert. Transform the following {batch_size} paragraphs according to these rules:
+        # Build character-specific transformation instructions
+        character_instructions = self._build_character_instructions(characters, transform_type, character_mappings)
+
+        system_prompt = f"""Gender transformation expert. Transform {batch_size} paragraphs.
 
 {rules}
+{character_instructions}
 
-{character_context}
-
-IMPORTANT:
-1. Transform each paragraph independently
-2. Return EXACTLY {batch_size} paragraphs
-3. Separate each paragraph with a blank line (double newline)
-4. Maintain the original style and tone
-5. Only change gender-related language
-6. Do not add or remove content
-7. Do not add any markers or labels - just the transformed text"""
+Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
 
         # Simpler format without markers - just numbered paragraphs
         paragraphs_text = "\n\n".join(

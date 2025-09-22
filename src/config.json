@@ -1,76 +1,17 @@
 {
-  "providers": [
-    {
-      "type": "unified",
-      "module": "src.providers.unified_provider",
-      "config": {
-        "provider": "${DEFAULT_PROVIDER}",
-        "model": "${DEFAULT_MODEL}"
-      }
-    }
-  ],
-  "services": {
-    "parser": {
-      "class": "src.services.parser_service.ParserService",
-      "config": {
-        "cache_enabled": true,
-        "async_enabled": true,
-        "max_retries": 3
-      }
-    },
-    "character": {
-      "class": "src.services.character_service.CharacterService",
-      "config": {
-        "extraction": {
-          "chunk_size": 2000,
-          "temperature": 0.3,
-          "max_retries": 3
-        },
-        "grouping": {
-          "algorithm": "union_find",
-          "similarity_threshold": 0.7,
-          "max_group_size": 20
-        },
-        "merging": {
-          "temperature": 0.3,
-          "timeout": 30,
-          "batch_size": 50
-        }
-      },
-      "dependencies": {
-        "provider": "llm_provider"
-      }
-    },
-    "transform": {
-      "class": "src.services.transform_service.TransformService",
-      "config": {
-        "cache_enabled": true,
-        "async_enabled": true,
-        "max_concurrent": 5,
-        "max_retries": 3,
-        "llm_temperature": 0.3,
-        "chunk_size": 1000,
-        "rate_limit_tier": "tier-1"
-      },
-      "dependencies": {
-        "provider": "llm_provider",
-        "character_service": "character"
-      }
-    },
-    "quality": {
-      "class": "src.services.quality_service.QualityService",
-      "config": {
-        "target_quality": 90.0,
-        "max_qc_iterations": 3,
-        "async_enabled": true
-      },
-      "dependencies": {
-        "provider": "llm_provider"
-      }
-    }
+  "character_extraction": {
+    "chunk_size_tokens": 32000,
+    "temperature": 0.3,
+    "similarity_threshold": 0.8
+  },
+  "transformation": {
+    "paragraphs_per_batch": 100,
+    "temperature": 0.3,
+    "max_retries": 3,
+    "target_token_utilization": 0.66,
+    "max_tokens_per_request": 120000
   },
   "logging": {
-    "level": "INFO",
-    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    "level": "INFO"
   }
 }

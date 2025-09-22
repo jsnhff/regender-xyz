@@ -7,7 +7,7 @@ Each provider (OpenAI, Anthropic, etc.) should inherit from this.
 
 import logging
 from abc import abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from src.plugins.base import Plugin
 from src.providers.base import LLMProvider
@@ -76,7 +76,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         """Requests per minute limit."""
         return 60  # Default, can be overridden
 
-    def initialize(self, config: Dict[str, Any]):
+    def initialize(self, config: dict[str, Any]):
         """
         Initialize the provider with configuration.
 
@@ -122,7 +122,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         """Initialize the provider-specific client."""
         pass
 
-    def execute(self, context: Dict[str, Any]) -> Any:
+    def execute(self, context: dict[str, Any]) -> Any:
         """
         Execute plugin (complete a prompt).
 
@@ -139,7 +139,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         return self.complete(messages, **context)
 
     async def complete(
-        self, messages: List[Dict[str, str]], **kwargs
+        self, messages: list[dict[str, str]], **kwargs
     ) -> str:
         """
         Complete a prompt (async by default).
@@ -163,7 +163,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
 
     @abstractmethod
     async def _complete_impl(
-        self, messages: List[Dict[str, str]], **kwargs
+        self, messages: list[dict[str, str]], **kwargs
     ) -> str:
         """
         Provider-specific completion implementation.
@@ -177,7 +177,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         """
         pass
 
-    def complete_sync(self, messages: List[Dict[str, str]], **kwargs) -> str:
+    def complete_sync(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Synchronous wrapper for completion (use only when async is not possible).
 
@@ -198,7 +198,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         self._initialized = False
         self.logger.info(f"Shut down {self.provider_name} provider")
 
-    def validate_config(self, config: Dict[str, Any]) -> bool:
+    def validate_config(self, config: dict[str, Any]) -> bool:
         """
         Validate provider configuration.
 

@@ -2,6 +2,7 @@
 Parser smoke tests - does our parsing logic work?
 """
 import pytest
+
 from src.parsers.parser import IntegratedParser
 
 

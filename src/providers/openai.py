@@ -6,7 +6,7 @@ Implements OpenAI API support including GPT-4, GPT-4o, and other models.
 
 import asyncio
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 from src.providers.base_provider import BaseProviderPlugin
 
@@ -61,7 +61,7 @@ class OpenAIProvider(BaseProviderPlugin):
             raise ImportError("openai package not installed. Run: pip install openai")
 
     async def _complete_impl(
-        self, messages: List[Dict[str, str]], **kwargs
+        self, messages: list[dict[str, str]], **kwargs
     ) -> str:
         """
         OpenAI-specific completion implementation.
@@ -111,10 +111,33 @@ class OpenAIProvider(BaseProviderPlugin):
             self.logger.error("OpenAI API call timed out after 60 seconds")
             raise TimeoutError("OpenAI API call timed out. The API may be slow or overloaded.")
         except Exception as e:
+            error_message = str(e)
+
+            # Handle rate limiting specifically
+            if "rate_limit" in error_message.lower() or "429" in error_message:
+                self.logger.warning(f"Rate limit hit: {e}")
+                # Extract retry-after if available
+                wait_time = 60  # Default to 60 seconds
+                if hasattr(e, 'response') and e.response:
+                    retry_after = e.response.headers.get('retry-after')
+                    if retry_after:
+                        wait_time = int(retry_after)
+
+                self.logger.info(f"Waiting {wait_time} seconds before retry...")
+                await asyncio.sleep(wait_time)
+                # Retry once
+                return await self._complete_impl(messages, **kwargs)
+
+            # Handle other API errors
+            elif "insufficient_quota" in error_message.lower():
+                self.logger.error("OpenAI API quota exceeded")
+                raise ValueError("OpenAI API quota exceeded. Please check your billing.")
+
+            # Log and re-raise other errors
             self.logger.error(f"OpenAI API error: {e}")
             raise
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """
         Get information about the current model.
 
@@ -165,3 +188,20 @@ class OpenAIProvider(BaseProviderPlugin):
                 "supports_json": True,
             },
         )
+
+    async def get_rate_limits(self) -> dict:
+        """
+        Get current rate limit status for OpenAI.
+
+        Returns:
+            Dictionary with rate limit info
+        """
+        # OpenAI doesn't provide a direct API for checking rate limits
+        # Return estimated values based on tier
+        return {
+            "requests_remaining": "N/A",
+            "requests_limit": self.rate_limit,
+            "tokens_remaining": "N/A",
+            "reset_time": "Rolling window",
+            "note": "OpenAI uses rolling rate limits"
+        }

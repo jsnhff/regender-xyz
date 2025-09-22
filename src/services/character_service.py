@@ -13,6 +13,7 @@ Key improvements:
 import asyncio
 import json
 import logging
+import os
 import re
 from typing import Any, Optional
 
@@ -20,6 +21,7 @@ from src.models.book import Book
 from src.models.character import Character, CharacterAnalysis, Gender
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
+from src.services.prompts import EXTRACTION_PROMPT_TEMPLATE, MERGE_PROMPT_TEMPLATE
 
 
 class UnionFind:
@@ -75,33 +77,24 @@ class CharacterService(BaseService):
         self.provider = provider
         self.logger = logging.getLogger(__name__)
 
-        # Load configuration from config or use defaults
-        if config:
-            # Try to get from attributes first (new style)
-            self.extraction_config = getattr(config, "extraction", None) or {
-                "chunk_size": 2000,
-                "temperature": 0.3,
-                "max_retries": 3,
-            }
-            self.grouping_config = getattr(config, "grouping", None) or {
-                "algorithm": "union_find",
-                "similarity_threshold": 0.7,
-                "max_group_size": 20,
-            }
-            self.merging_config = getattr(config, "merging", None) or {
-                "temperature": 0.3,
-                "timeout": 30,
-                "batch_size": 50,
-            }
-        else:
-            # Use defaults if no config provided
-            self.extraction_config = {"chunk_size": 2000, "temperature": 0.3, "max_retries": 3}
-            self.grouping_config = {
-                "algorithm": "union_find",
-                "similarity_threshold": 0.7,
-                "max_group_size": 20,
-            }
-            self.merging_config = {"temperature": 0.3, "timeout": 30, "batch_size": 50}
+        # Load configuration from simple config
+        from src.simple_config import config as app_config
+
+        self.extraction_config = {
+            "chunk_size": app_config.character_chunk_size,
+            "temperature": app_config.character_temperature,
+            "max_retries": app_config.max_retries,
+        }
+        self.grouping_config = {
+            "algorithm": "union_find",
+            "similarity_threshold": app_config.similarity_threshold,
+            "max_group_size": 20,
+        }
+        self.merging_config = {
+            "temperature": app_config.character_temperature,
+            "timeout": 30,
+            "batch_size": 50,
+        }
 
     def _initialize(self):
         """Initialize service resources (required by BaseService)."""
@@ -173,20 +166,68 @@ class CharacterService(BaseService):
         Returns:
             List of raw character dictionaries
         """
-        chunks = self._create_chunks(text)
+        # Make chunking async-safe to avoid blocking
+        chunks = await asyncio.to_thread(self._create_chunks, text)
         raw_characters = []
 
-        for i, chunk in enumerate(chunks):
-            try:
-                characters = await self._extract_from_chunk(chunk, i)
-                raw_characters.extend(characters)
-            except Exception as e:
-                self.logger.warning(f"Failed to extract from chunk {i}: {e}")
-                continue
+        # Process chunks with limited concurrency to avoid overwhelming the API
+        # Use batch size of 1 for OpenAI to avoid rate limiting
+        max_concurrent = 1 if 'openai' in str(type(self.provider)).lower() else 3
+
+        async def process_chunk_batch(batch_chunks: list[tuple[int, str]]):
+            """Process a batch of chunks concurrently."""
+            tasks = []
+            for i, chunk in batch_chunks:
+                tasks.append(self._extract_from_chunk(chunk, i))
+
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+
+            batch_characters = []
+            for i, result in enumerate(results):
+                chunk_idx = batch_chunks[i][0]
+                if isinstance(result, Exception):
+                    self.logger.warning(f"Failed to extract from chunk {chunk_idx}: {result}")
+                else:
+                    batch_characters.extend(result)
+
+            return batch_characters
+
+        # Process in batches with progress
+        # Check if we're in a TTY/interactive environment
+        disable_progress = not os.isatty(1) if hasattr(os, 'isatty') else True
+
+        try:
+            from tqdm.asyncio import tqdm
+            progress_bar = tqdm(
+                total=len(chunks),
+                desc="Extracting characters",
+                disable=disable_progress,
+                unit="chunk"
+            )
+        except ImportError:
+            progress_bar = None
+
+        for batch_start in range(0, len(chunks), max_concurrent):
+            batch_end = min(batch_start + max_concurrent, len(chunks))
+            batch_chunks = [(i, chunks[i]) for i in range(batch_start, batch_end)]
+
+            self.logger.debug(f"Processing chunks {batch_start} to {batch_end-1}")
+            batch_results = await process_chunk_batch(batch_chunks)
+            raw_characters.extend(batch_results)
+
+            if progress_bar:
+                progress_bar.update(batch_end - batch_start)
+
+            # Add a small delay between batches to avoid rate limiting
+            if batch_end < len(chunks):
+                await asyncio.sleep(1)
+
+        if progress_bar:
+            progress_bar.close()
 
         return raw_characters
 
-    def _create_chunks(self, text: str, chunk_size: int = 2000) -> list[str]:
+    def _create_chunks(self, text: str, chunk_size: int = None) -> list[str]:
         """
         Split text into manageable chunks.
 
@@ -197,24 +238,34 @@ class CharacterService(BaseService):
         Returns:
             List of text chunks
         """
-        # Simple word-based chunking (4 chars per token approximation)
-        words = text.split()
+        # Use configured chunk size if not specified
+        if chunk_size is None:
+            chunk_size = self.extraction_config.get("chunk_size", 2000)
+
+        # Better tokenization approximation:
+        # GPT models use ~1.3 chars per token for English text
+        # So we need chunk_size * 1.3 characters per chunk
+        chars_per_chunk = int(chunk_size * 1.3)
+
+        # Split text into chunks by character count, respecting word boundaries
         chunks = []
+        words = text.split()
         current_chunk = []
-        current_size = 0
+        current_chars = 0
 
         for word in words:
-            word_tokens = len(word) / 4
-            if current_size + word_tokens > chunk_size and current_chunk:
+            word_len = len(word) + 1  # +1 for space
+            if current_chars + word_len > chars_per_chunk and current_chunk:
                 chunks.append(" ".join(current_chunk))
                 current_chunk = []
-                current_size = 0
+                current_chars = 0
             current_chunk.append(word)
-            current_size += word_tokens
+            current_chars += word_len
 
         if current_chunk:
             chunks.append(" ".join(current_chunk))
 
+        self.logger.info(f"Created {len(chunks)} chunks of ~{chunk_size} tokens ({chars_per_chunk} chars) each")
         return chunks
 
     async def _extract_from_chunk(self, chunk: str, chunk_index: int) -> list[dict]:
@@ -228,17 +279,7 @@ class CharacterService(BaseService):
         Returns:
             List of character dictionaries
         """
-        prompt = f"""Extract all characters mentioned in this text. Include:
-- Full name
-- Gender (if identifiable)
-- Pronouns used
-- Brief description
-- Any aliases or titles
-
-Text:
-{chunk}
-
-Return as JSON list with fields: name, gender, pronouns, description, aliases"""
+        prompt = EXTRACTION_PROMPT_TEMPLATE.format(text=chunk)
 
         for attempt in range(self.extraction_config["max_retries"]):
             try:
@@ -248,11 +289,29 @@ Return as JSON list with fields: name, gender, pronouns, description, aliases"""
 
                 characters = self._parse_json_response(response)
 
-                # Add chunk metadata
-                for char in characters:
-                    char["chunk_index"] = chunk_index
+                # Handle different response formats
+                if isinstance(characters, dict):
+                    # Expected format: {"characters": [...]}
+                    characters = characters.get("characters", [])
+                elif not isinstance(characters, list):
+                    # Unexpected format
+                    self.logger.warning(f"Unexpected response type: {type(characters)}")
+                    characters = []
 
-                return characters
+                # Validate and add metadata
+                valid_chars = []
+                for char in characters:
+                    if isinstance(char, dict) and char.get("name"):
+                        # Ensure required fields
+                        char.setdefault("gender", "unknown")
+                        char.setdefault("pronouns", "")
+                        char.setdefault("description", "")
+                        char.setdefault("aliases", [])
+                        char.setdefault("titles", [])
+                        char["chunk_index"] = chunk_index
+                        valid_chars.append(char)
+
+                return valid_chars
 
             except Exception as e:
                 if attempt == self.extraction_config["max_retries"] - 1:
@@ -348,23 +407,43 @@ Return as JSON list with fields: name, gender, pronouns, description, aliases"""
         Returns:
             True if similar enough to group
         """
-        name1_tokens = self._tokenize_name(char1.get("name", ""))
-        name2_tokens = self._tokenize_name(char2.get("name", ""))
+        name1 = char1.get("name", "")
+        name2 = char2.get("name", "")
+
+        # Don't merge if both have first and last names but first names differ
+        # This prevents merging "Elizabeth Bennet" with "Jane Bennet"
+        parts1 = name1.split()
+        parts2 = name2.split()
+
+        if len(parts1) >= 2 and len(parts2) >= 2:
+            # Both have at least first and last name
+            if parts1[0].lower() != parts2[0].lower() and parts1[-1].lower() == parts2[-1].lower():
+                # Different first names, same last name - likely family members
+                self.logger.debug(f"Not merging family members: {name1} vs {name2}")
+                return False
+
+        name1_tokens = self._tokenize_name(name1)
+        name2_tokens = self._tokenize_name(name2)
 
         # Check for exact match
         if name1_tokens == name2_tokens:
             return True
 
-        # Check for subset relationship (one name contains the other)
+        # Be more careful with subset relationships
+        # "Elizabeth" should match "Elizabeth Bennet" but not "Jane Bennet"
         if name1_tokens.issubset(name2_tokens) or name2_tokens.issubset(name1_tokens):
-            return True
+            # Only merge if it's clearly the same person
+            if len(name1_tokens) == 1 and len(name2_tokens) <= 2:
+                # Like "Elizabeth" and "Elizabeth Bennet"
+                return True
 
-        # Calculate Jaccard similarity
+        # Calculate Jaccard similarity with stricter threshold
         if name1_tokens and name2_tokens:
             intersection = len(name1_tokens & name2_tokens)
             union = len(name1_tokens | name2_tokens)
             similarity = intersection / union
-            return similarity >= self.grouping_config["similarity_threshold"]
+            # Use stricter threshold (0.8 instead of 0.7) to avoid over-merging
+            return similarity >= 0.8
 
         return False
 
@@ -406,20 +485,7 @@ Return as JSON list with fields: name, gender, pronouns, description, aliases"""
         # Prepare group for LLM
         group_desc = json.dumps(group, indent=2)
 
-        prompt = f"""Analyze these character mentions and determine if they refer to the same person.
-If they are the same, provide the canonical name and list any aliases.
-If they are different people, keep them separate.
-
-Character mentions:
-{group_desc}
-
-Return JSON with:
-- is_same_person: boolean
-- canonical_name: string (primary name if same person)
-- aliases: list of strings (alternate names/titles)
-- gender: string
-- pronouns: string
-- description: string (combined description)"""
+        prompt = MERGE_PROMPT_TEMPLATE.format(characters=group_desc)
 
         try:
             response = await self._complete_with_retry(
@@ -427,6 +493,20 @@ Return JSON with:
             )
 
             result = self._parse_json_response(response)
+
+            # Handle both object and array responses
+            if isinstance(result, list):
+                # If LLM returned an array, take the first item
+                if result:
+                    result = result[0]
+                else:
+                    # Empty array, use first from group
+                    return self._dict_to_character(group[0])
+
+            # Ensure result is a dict
+            if not isinstance(result, dict):
+                self.logger.warning(f"Unexpected result type: {type(result)}")
+                return self._dict_to_character(group[0])
 
             if result.get("is_same_person", True):
                 # Merge into single character
@@ -468,9 +548,24 @@ Return JSON with:
 
         for attempt in range(self.extraction_config["max_retries"]):
             try:
-                response = await self.provider.complete(
-                    messages, temperature=temperature, response_format="json_object"
-                )
+                # Only use JSON mode if provider supports it
+                # Our new prompts already explicitly request JSON
+                kwargs = {}
+
+                # Some models like gpt-5-mini only support temperature=1.0
+                # Check if the model has this limitation
+                model_name = getattr(self.provider, 'model', '')
+                if 'gpt-5-mini' in model_name or 'gpt-5-nano' in model_name:
+                    # These models only support temperature=1.0
+                    kwargs["temperature"] = 1.0
+                else:
+                    kwargs["temperature"] = temperature
+
+                if hasattr(self.provider, "supports_json") and self.provider.supports_json:
+                    # For providers that support JSON mode, use it
+                    kwargs["response_format"] = "json_object"
+
+                response = await self.provider.complete(messages, **kwargs)
                 return response
 
             except Exception as e:
@@ -490,38 +585,73 @@ Return JSON with:
         Returns:
             Parsed JSON object
         """
+        if not response or not response.strip():
+            self.logger.warning("Empty response received")
+            return {"characters": []}
+
         # Strategy 1: Direct parse
         try:
-            return json.loads(response)
-        except json.JSONDecodeError:
-            pass
+            result = json.loads(response)
+            return result
+        except json.JSONDecodeError as e:
+            self.logger.debug(f"Direct parse failed: {e}")
 
         # Strategy 2: Clean and parse
         try:
             cleaned = self._clean_json_text(response)
-            return json.loads(cleaned)
-        except json.JSONDecodeError:
-            pass
+            result = json.loads(cleaned)
+            return result
+        except json.JSONDecodeError as e:
+            self.logger.debug(f"Cleaned parse failed: {e}")
 
         # Strategy 3: Extract JSON from markdown
         try:
+            # Look for code blocks
             json_match = re.search(r"```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```", response, re.DOTALL)
             if json_match:
-                return json.loads(json_match.group(1))
-        except (json.JSONDecodeError, AttributeError):
-            pass
+                result = json.loads(json_match.group(1))
+                return result
+        except (json.JSONDecodeError, AttributeError) as e:
+            self.logger.debug(f"Markdown extraction failed: {e}")
 
         # Strategy 4: Find JSON-like content
         try:
-            json_match = re.search(r"(\{.*\}|\[.*\])", response, re.DOTALL)
+            # More precise regex for JSON objects/arrays
+            json_match = re.search(r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])", response, re.DOTALL)
             if json_match:
-                return json.loads(json_match.group(1))
-        except (json.JSONDecodeError, AttributeError):
-            pass
+                result = json.loads(json_match.group(1))
+                return result
+        except (json.JSONDecodeError, AttributeError) as e:
+            self.logger.debug(f"JSON extraction failed: {e}")
 
-        # Strategy 5: Return empty structure
+        # Strategy 5: Try to fix common issues and parse
+        try:
+            # Remove everything before first { or [
+            start_idx = min(
+                response.find('{') if '{' in response else len(response),
+                response.find('[') if '[' in response else len(response)
+            )
+            if start_idx < len(response):
+                trimmed = response[start_idx:]
+                # Find matching close
+                if trimmed[0] == '{':
+                    end_idx = trimmed.rfind('}')
+                    if end_idx > 0:
+                        trimmed = trimmed[:end_idx + 1]
+                else:
+                    end_idx = trimmed.rfind(']')
+                    if end_idx > 0:
+                        trimmed = trimmed[:end_idx + 1]
+
+                cleaned = self._clean_json_text(trimmed)
+                result = json.loads(cleaned)
+                return result
+        except Exception as e:
+            self.logger.debug(f"Advanced extraction failed: {e}")
+
+        # Final fallback: Return empty structure with proper format
         self.logger.warning(f"Could not parse JSON from response: {response[:200]}...")
-        return [] if "[" in response else {}
+        return {"characters": []}
 
     def _clean_json_text(self, text: str) -> str:
         """
@@ -535,9 +665,42 @@ Return JSON with:
         """
         # Remove common issues
         text = text.strip()
+
+        # Remove markdown code blocks
         text = re.sub(r"^\s*```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```\s*$", "", text)
-        text = re.sub(r'(?<!\\)"(\w+)":\s*"([^"]*)"', r'"\1": "\2"', text)
+
+        # Remove any text before/after JSON
+        text = re.sub(r"^[^{\[]*", "", text)  # Remove text before JSON
+        text = re.sub(r"[}\]][^}\]]*$", lambda m: m.group(0)[0], text)  # Keep only last } or ]
+
+        # Fix missing commas between array elements (common LLM error)
+        text = re.sub(r'"\s*\n\s*"', '",\n"', text)
+        text = re.sub(r'}\s*\n\s*{', '},\n{', text)
+        text = re.sub(r'\]\s*\n\s*\[', '],\n[', text)
+
+        # Fix trailing commas (not allowed in JSON)
+        text = re.sub(r',\s*}', '}', text)
+        text = re.sub(r',\s*]', ']', text)
+        text = re.sub(r',\s*,', ',', text)  # Remove double commas
+
+        # Fix incomplete strings at the end (truncation issue)
+        if text.count('"') % 2 != 0:
+            # Odd number of quotes, likely truncated
+            # Try to close the last string and array/object
+            if '...' in text[-10:]:
+                text = re.sub(r'\.\.\..*$', '"}]', text)
+            elif text.rstrip().endswith(','):
+                text = text.rstrip()[:-1] + '}]'
+            else:
+                # Determine what needs closing
+                open_braces = text.count('{') - text.count('}')
+                open_brackets = text.count('[') - text.count(']')
+                closing = '"'
+                closing += '}' * open_braces
+                closing += ']' * open_brackets
+                text += closing
+
         return text
 
     def _dict_to_character(self, char_dict: dict) -> Character:

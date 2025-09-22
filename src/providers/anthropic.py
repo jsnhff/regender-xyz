@@ -97,6 +97,14 @@ class AnthropicProvider(BaseProviderPlugin):
                 "temperature": kwargs.get("temperature", 0.7),
             }
 
+            # Add JSON instruction if JSON format is requested
+            if kwargs.get("response_format") == "json_object":
+                json_instruction = "\n\nIMPORTANT: You must respond with valid JSON only. Do not include any explanatory text, markdown formatting, or code blocks. Return only the raw JSON object or array."
+                if system_message:
+                    system_message += json_instruction
+                else:
+                    system_message = json_instruction
+
             # Add system message if present
             if system_message:
                 request_params["system"] = system_message
@@ -123,11 +131,29 @@ class AnthropicProvider(BaseProviderPlugin):
             self.logger.error("Anthropic API call timed out after 60 seconds")
             raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.")
         except Exception as e:
-            # Check for overloaded error (529)
-            if "529" in str(e) or "overloaded" in str(e).lower():
-                self.logger.warning("Anthropic API overloaded (529)")
-            else:
-                self.logger.error(f"Anthropic API error: {e}")
+            error_message = str(e)
+
+            # Check for overloaded error (529) and retry
+            if "529" in error_message or "overloaded" in error_message.lower():
+                self.logger.warning("Anthropic API overloaded (529), waiting 30 seconds...")
+                await asyncio.sleep(30)
+                # Retry once
+                return await self._complete_impl(messages, **kwargs)
+
+            # Check for rate limit (429)
+            elif "429" in error_message or "rate" in error_message.lower():
+                self.logger.warning(f"Anthropic rate limit hit: {e}")
+                await asyncio.sleep(60)  # Wait 60 seconds for rate limit
+                # Retry once
+                return await self._complete_impl(messages, **kwargs)
+
+            # Check for insufficient credits
+            elif "credit" in error_message.lower() or "billing" in error_message.lower():
+                self.logger.error("Anthropic API credits/billing issue")
+                raise ValueError("Anthropic API billing issue. Please check your account.")
+
+            # Log and re-raise other errors
+            self.logger.error(f"Anthropic API error: {e}")
             raise
 
     def get_model_info(self) -> dict[str, Any]:
@@ -183,3 +209,19 @@ class AnthropicProvider(BaseProviderPlugin):
                 "supports_json": True,
             },
         )
+
+    async def get_rate_limits(self) -> dict:
+        """
+        Get current rate limit status for Anthropic.
+
+        Returns:
+            Dictionary with rate limit info
+        """
+        # Anthropic doesn't provide a direct API for checking rate limits
+        return {
+            "requests_remaining": "N/A",
+            "requests_limit": self.rate_limit,
+            "tokens_remaining": "N/A",
+            "reset_time": "Per minute",
+            "note": "Anthropic uses per-minute rate limits"
+        }
