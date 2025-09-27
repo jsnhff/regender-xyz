@@ -302,7 +302,6 @@ class ApplicationContext:
         # Register default services
         from src.services.character_service import CharacterService
         from src.services.parser_service import ParserService
-        from src.services.quality_service import QualityService
         from src.services.transform_service import TransformService
 
         self.container.register("parser", ParserService)
@@ -313,9 +312,6 @@ class ApplicationContext:
             "transform",
             TransformService,
             dependencies={"provider": "llm_provider", "character_service": "character"},
-        )
-        self.container.register(
-            "quality", QualityService, dependencies={"provider": "llm_provider"}
         )
 
     def get_service(self, name: str):

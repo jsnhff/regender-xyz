@@ -17,11 +17,19 @@ import os
 import re
 from typing import Any, Optional
 
+from rapidfuzz import fuzz, process
+
 from src.models.book import Book
 from src.models.character import Character, CharacterAnalysis, Gender
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import EXTRACTION_PROMPT_TEMPLATE, MERGE_PROMPT_TEMPLATE
+from src.utils.errors import (
+    ValidationError,
+    CharacterExtractionError,
+    ConfigurationError,
+    ErrorHandler,
+)
 
 
 class UnionFind:
@@ -72,26 +80,63 @@ class CharacterService(BaseService):
     def __init__(
         self, provider: Optional[LLMProvider] = None, config: Optional[ServiceConfig] = None
     ):
-        """Initialize service."""
+        """Initialize service with validation."""
         super().__init__(config)
         self.provider = provider
         self.logger = logging.getLogger(__name__)
+        self.error_handler = ErrorHandler(self.logger)
 
-        # Load configuration from simple config
-        from src.simple_config import config as app_config
+        # Load configuration from config.json or use defaults
+        if config and hasattr(config, 'character_extraction'):
+            char_config = config.character_extraction
+        else:
+            # Load from config.json file
+            config_path = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+            if os.path.exists(config_path):
+                with open(config_path) as f:
+                    config_data = json.load(f)
+                    char_config = config_data.get('character_extraction', {})
+            else:
+                char_config = {}
 
+        # Set up configuration with defaults and validation
         self.extraction_config = {
-            "chunk_size": app_config.character_chunk_size,
-            "temperature": app_config.character_temperature,
-            "max_retries": app_config.max_retries,
+            "chunk_size": char_config.get("chunk_size_tokens", 32000),
+            "temperature": char_config.get("temperature", 0.3),
+            "max_retries": 3,
         }
+
+        # Validate chunk size
+        if self.extraction_config["chunk_size"] <= 0:
+            raise ConfigurationError(
+                "Chunk size must be positive",
+                config_key="chunk_size_tokens",
+                details={"value": self.extraction_config["chunk_size"]}
+            )
+        if self.extraction_config["chunk_size"] > 100000:
+            raise ConfigurationError(
+                "Chunk size too large (max 100000)",
+                config_key="chunk_size_tokens",
+                details={"value": self.extraction_config["chunk_size"]}
+            )
+
         self.grouping_config = {
             "algorithm": "union_find",
-            "similarity_threshold": app_config.similarity_threshold,
+            "similarity_threshold": char_config.get("similarity_threshold", 0.8),
+            "deduplication_similarity_threshold": char_config.get("deduplication_similarity_threshold", 80),
             "max_group_size": 20,
         }
+
+        # Validate thresholds
+        if not 0 <= self.grouping_config["deduplication_similarity_threshold"] <= 100:
+            raise ConfigurationError(
+                "Deduplication threshold must be between 0 and 100",
+                config_key="deduplication_similarity_threshold",
+                details={"value": self.grouping_config["deduplication_similarity_threshold"]}
+            )
+
         self.merging_config = {
-            "temperature": app_config.character_temperature,
+            "temperature": char_config.get("temperature", 0.3),
             "timeout": 30,
             "batch_size": 50,
         }
@@ -120,19 +165,50 @@ class CharacterService(BaseService):
 
     async def analyze_book(self, book: Book) -> CharacterAnalysis:
         """
-        Analyze characters in a book.
+        Analyze characters in a book with input validation.
 
         Args:
             book: Book to analyze
 
         Returns:
             CharacterAnalysis with deduplicated characters
+
+        Raises:
+            ValidationError: If input is invalid
+            CharacterExtractionError: If extraction fails
         """
+        # Input validation
+        if not book:
+            raise ValidationError("Book cannot be None")
+
+        if not isinstance(book, Book):
+            raise ValidationError(
+                f"Expected Book instance, got {type(book).__name__}",
+                field="book"
+            )
+
+        # Validate book has content
+        book_text = book.get_text()
+        if not book_text or not book_text.strip():
+            raise ValidationError(
+                "Book has no content to analyze",
+                field="book.text",
+                details={"book_title": book.title or "Unknown"}
+            )
+
+        # Validate provider is initialized
+        if not self.provider:
+            raise ConfigurationError(
+                "LLM provider not initialized",
+                config_key="provider",
+                details={"service": "CharacterService"}
+            )
+
         try:
             self.logger.info(f"Starting character analysis for book: {book.title or 'Unknown'}")
 
             # Phase 1: Extract all character mentions
-            raw_characters = await self._extract_all_characters(book.get_text())
+            raw_characters = await self._extract_all_characters(book_text)
             self.logger.info(f"Extracted {len(raw_characters)} raw character mentions")
 
             # Phase 2: Group similar characters efficiently
@@ -150,9 +226,17 @@ class CharacterService(BaseService):
                 metadata=self._calculate_metadata(final_characters),
             )
 
-        except Exception as e:
-            self.logger.error(f"Character analysis failed: {e}")
+        except (ValidationError, CharacterExtractionError, ConfigurationError):
+            # Re-raise our custom errors
             raise
+        except Exception as e:
+            # Convert unexpected errors
+            error = self.error_handler.handle_error(e)
+            self.error_handler.log_error(error)
+            raise CharacterExtractionError(
+                f"Character analysis failed: {str(e)}",
+                details={"book_title": book.title or "Unknown"}
+            ) from e
 
     # === EXTRACTION METHODS ===
 
@@ -168,7 +252,11 @@ class CharacterService(BaseService):
         """
         # Make chunking async-safe to avoid blocking
         chunks = await asyncio.to_thread(self._create_chunks, text)
-        raw_characters = []
+
+        # Memory management: limit characters to prevent unbounded growth
+        MAX_CHARACTERS = 1000
+        seen_names = set()
+        unique_characters = []
 
         # Process chunks with limited concurrency to avoid overwhelming the API
         # Use batch size of 1 for OpenAI to avoid rate limiting
@@ -188,7 +276,15 @@ class CharacterService(BaseService):
                 if isinstance(result, Exception):
                     self.logger.warning(f"Failed to extract from chunk {chunk_idx}: {result}")
                 else:
-                    batch_characters.extend(result)
+                    # Early deduplication to prevent memory growth
+                    for char in result:
+                        char_name = char.get("name", "").lower().strip()
+                        if char_name and char_name not in seen_names:
+                            if len(unique_characters) < MAX_CHARACTERS:
+                                seen_names.add(char_name)
+                                batch_characters.append(char)
+                            else:
+                                self.logger.debug(f"Character limit reached, skipping: {char_name}")
 
             return batch_characters
 
@@ -213,7 +309,17 @@ class CharacterService(BaseService):
 
             self.logger.debug(f"Processing chunks {batch_start} to {batch_end-1}")
             batch_results = await process_chunk_batch(batch_chunks)
-            raw_characters.extend(batch_results)
+
+            # Add unique characters and manage memory
+            unique_characters.extend(batch_results)
+
+            # Clear batch results to free memory
+            del batch_results
+
+            # Apply early deduplication if getting too large
+            if len(unique_characters) > MAX_CHARACTERS * 0.8:
+                self.logger.debug(f"Applying early deduplication at {len(unique_characters)} characters")
+                unique_characters = self._apply_early_deduplication(unique_characters)
 
             if progress_bar:
                 progress_bar.update(batch_end - batch_start)
@@ -225,7 +331,26 @@ class CharacterService(BaseService):
         if progress_bar:
             progress_bar.close()
 
-        return raw_characters
+        # Clear chunks from memory
+        del chunks
+
+        self.logger.info(f"Extracted {len(unique_characters)} unique characters (deduped from {len(seen_names)} names)")
+        return unique_characters
+
+    def _apply_early_deduplication(self, characters: list[dict]) -> list[dict]:
+        """Apply early deduplication to prevent memory overflow."""
+        name_groups = {}
+        for char in characters:
+            name = char.get("name", "").strip()
+            if name:
+                if name not in name_groups:
+                    name_groups[name] = char
+                else:
+                    # Keep the one with more details
+                    existing = name_groups[name]
+                    if len(str(char.get("description", ""))) > len(str(existing.get("description", ""))):
+                        name_groups[name] = char
+        return list(name_groups.values())
 
     def _create_chunks(self, text: str, chunk_size: int = None) -> list[str]:
         """
@@ -248,22 +373,40 @@ class CharacterService(BaseService):
         chars_per_chunk = int(chunk_size * 1.3)
 
         # Split text into chunks by character count, respecting word boundaries
+        # Use memory-efficient approach with chunk limit
+        MAX_CHUNKS = 100  # Limit chunks to prevent excessive memory usage
         chunks = []
-        words = text.split()
+
+        # Process text line by line to avoid loading all words at once
+        lines = text.splitlines()
         current_chunk = []
         current_chars = 0
 
-        for word in words:
-            word_len = len(word) + 1  # +1 for space
-            if current_chars + word_len > chars_per_chunk and current_chunk:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                current_chars = 0
-            current_chunk.append(word)
-            current_chars += word_len
+        for line in lines:
+            if len(chunks) >= MAX_CHUNKS:
+                self.logger.warning(f"Reached maximum chunk limit ({MAX_CHUNKS}), truncating text")
+                break
 
-        if current_chunk:
+            words = line.split()
+            for word in words:
+                word_len = len(word) + 1  # +1 for space
+                if current_chars + word_len > chars_per_chunk and current_chunk:
+                    chunks.append(" ".join(current_chunk))
+                    current_chunk = []
+                    current_chars = 0
+
+                    if len(chunks) >= MAX_CHUNKS:
+                        break
+
+                current_chunk.append(word)
+                current_chars += word_len
+
+        if current_chunk and len(chunks) < MAX_CHUNKS:
             chunks.append(" ".join(current_chunk))
+
+        # Clear intermediate variables
+        del lines
+        del current_chunk
 
         self.logger.info(f"Created {len(chunks)} chunks of ~{chunk_size} tokens ({chars_per_chunk} chars) each")
         return chunks
@@ -396,9 +539,36 @@ class CharacterService(BaseService):
 
         return candidates
 
+    def _find_best_matches(self, name: str, candidates: list[str], threshold: int = 80) -> list[tuple[str, float, int]]:
+        """
+        Find best matching names from candidates using rapidfuzz.
+
+        Args:
+            name: Name to match
+            candidates: List of candidate names
+            threshold: Minimum similarity score (0-100)
+
+        Returns:
+            List of (name, score, index) tuples for matches above threshold
+        """
+        if not candidates:
+            return []
+
+        # Use rapidfuzz's extract to get best matches
+        # Returns list of (match, score, index) tuples
+        matches = process.extract(
+            name,
+            candidates,
+            scorer=fuzz.token_set_ratio,
+            limit=None,
+            score_cutoff=threshold
+        )
+
+        return matches
+
     def _are_similar(self, char1: dict, char2: dict) -> bool:
         """
-        Check if two characters are similar enough to group.
+        Check if two characters are similar enough to group using rapidfuzz.
 
         Args:
             char1: First character
@@ -412,38 +582,56 @@ class CharacterService(BaseService):
 
         # Don't merge if both have first and last names but first names differ
         # This prevents merging "Elizabeth Bennet" with "Jane Bennet"
-        parts1 = name1.split()
-        parts2 = name2.split()
+        # First, normalize by removing periods from abbreviations
+        normalized1 = name1.replace(".", "")
+        normalized2 = name2.replace(".", "")
+
+        parts1 = normalized1.split()
+        parts2 = normalized2.split()
 
         if len(parts1) >= 2 and len(parts2) >= 2:
             # Both have at least first and last name
-            if parts1[0].lower() != parts2[0].lower() and parts1[-1].lower() == parts2[-1].lower():
+            # Check if these might be family members (different first name, same last name)
+            first1 = parts1[0].lower()
+            first2 = parts2[0].lower()
+            last1 = parts1[-1].lower()
+            last2 = parts2[-1].lower()
+
+            # Skip titles when comparing (Dr, Mr, Mrs, Ms, etc.)
+            titles = {"dr", "mr", "mrs", "ms", "prof", "sir", "lady", "lord"}
+            if first1 in titles:
+                first1 = parts1[1].lower() if len(parts1) > 2 else first1
+            if first2 in titles:
+                first2 = parts2[1].lower() if len(parts2) > 2 else first2
+
+            if first1 != first2 and last1 == last2:
                 # Different first names, same last name - likely family members
                 self.logger.debug(f"Not merging family members: {name1} vs {name2}")
                 return False
 
-        name1_tokens = self._tokenize_name(name1)
-        name2_tokens = self._tokenize_name(name2)
+        # Get similarity threshold from config
+        threshold = self.grouping_config.get("deduplication_similarity_threshold", 80)
 
-        # Check for exact match
-        if name1_tokens == name2_tokens:
+        # Use rapidfuzz for advanced fuzzy matching
+        # Token set ratio handles out-of-order tokens well (e.g., "Jekyll Dr." vs "Dr. Jekyll")
+        token_set_ratio = fuzz.token_set_ratio(name1, name2)
+        if token_set_ratio >= threshold:
             return True
 
-        # Be more careful with subset relationships
-        # "Elizabeth" should match "Elizabeth Bennet" but not "Jane Bennet"
-        if name1_tokens.issubset(name2_tokens) or name2_tokens.issubset(name1_tokens):
-            # Only merge if it's clearly the same person
-            if len(name1_tokens) == 1 and len(name2_tokens) <= 2:
-                # Like "Elizabeth" and "Elizabeth Bennet"
+        # Partial ratio for substring matching (e.g., "Elizabeth" vs "Elizabeth Bennet")
+        partial_ratio = fuzz.partial_ratio(name1.lower(), name2.lower())
+        if partial_ratio >= 95:  # Higher threshold for partial matches
+            # Additional check: ensure the shorter name is actually contained
+            if len(name1) < len(name2):
+                if name1.lower() in name2.lower():
+                    return True
+            elif name2.lower() in name1.lower():
                 return True
 
-        # Calculate Jaccard similarity with stricter threshold
-        if name1_tokens and name2_tokens:
-            intersection = len(name1_tokens & name2_tokens)
-            union = len(name1_tokens | name2_tokens)
-            similarity = intersection / union
-            # Use stricter threshold (0.8 instead of 0.7) to avoid over-merging
-            return similarity >= 0.8
+        # Token sort ratio for reordered names (e.g., "Bennet, Elizabeth" vs "Elizabeth Bennet")
+        token_sort_ratio = fuzz.token_sort_ratio(name1, name2)
+        if token_sort_ratio >= threshold + 5:  # Slightly higher threshold
+            return True
 
         return False
 

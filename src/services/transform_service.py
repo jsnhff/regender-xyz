@@ -20,6 +20,12 @@ from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import TRANSFORM_BATCH_PROMPT_TEMPLATE, TRANSFORM_SIMPLE_PROMPT_TEMPLATE
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
+from src.utils.errors import (
+    ValidationError,
+    TransformationError,
+    ConfigurationError,
+    ErrorHandler,
+)
 from src.utils.token_manager import TokenManager
 
 from .character_service import CharacterService
@@ -45,7 +51,7 @@ class TransformService(BaseService):
         token_manager: Optional[TokenManager] = None,
     ):
         """
-        Initialize transform service.
+        Initialize transform service with validation.
 
         Args:
             provider: LLM provider for transformations
@@ -58,6 +64,7 @@ class TransformService(BaseService):
         self.character_service = character_service
         self.strategy = strategy or self._get_default_strategy()
         self.token_manager = token_manager
+        self.error_handler = ErrorHandler()
         super().__init__(config)
 
     def _initialize(self):
@@ -82,7 +89,7 @@ class TransformService(BaseService):
 
     async def process(self, data: dict[str, Any]) -> Transformation:
         """
-        Transform a book's gender representation.
+        Transform a book's gender representation with validation.
 
         Args:
             data: Dictionary containing:
@@ -92,19 +99,53 @@ class TransformService(BaseService):
 
         Returns:
             Transformation result
+
+        Raises:
+            ValidationError: If input is invalid
         """
-        # Extract parameters
+        # Validate input data structure
+        if not data:
+            raise ValidationError("Input data cannot be None")
+        if not isinstance(data, dict):
+            raise ValidationError(f"Expected dict, got {type(data).__name__}")
+
+        # Extract and validate book
         book = data.get("book")
+        if not book:
+            raise ValidationError("'book' is required", field="book")
         if not isinstance(book, Book):
-            raise ValueError("'book' must be a Book object")
+            raise ValidationError(
+                f"'book' must be a Book object, got {type(book).__name__}",
+                field="book"
+            )
 
+        # Extract and validate transform type
         transform_type = data.get("transform_type")
-        if isinstance(transform_type, str):
-            transform_type = TransformType(transform_type)
-        elif not isinstance(transform_type, TransformType):
-            raise ValueError("'transform_type' must be a TransformType or string")
+        if not transform_type:
+            raise ValidationError("'transform_type' is required", field="transform_type")
 
+        if isinstance(transform_type, str):
+            try:
+                transform_type = TransformType(transform_type)
+            except ValueError as e:
+                raise ValidationError(
+                    f"Invalid transform type: {transform_type}",
+                    field="transform_type",
+                    details={"valid_types": [t.value for t in TransformType]}
+                ) from e
+        elif not isinstance(transform_type, TransformType):
+            raise ValidationError(
+                f"'transform_type' must be a TransformType or string, got {type(transform_type).__name__}",
+                field="transform_type"
+            )
+
+        # Optional characters validation
         characters = data.get("characters")
+        if characters and not isinstance(characters, CharacterAnalysis):
+            raise ValidationError(
+                f"'characters' must be a CharacterAnalysis object if provided, got {type(characters).__name__}",
+                field="characters"
+            )
 
         return await self.transform_book(book, transform_type, characters)
 
@@ -122,17 +163,71 @@ class TransformService(BaseService):
             book: Book to transform
             transform_type: Type of transformation
             characters: Pre-analyzed characters (optional)
+            selected_characters: Specific characters to transform (optional)
 
         Returns:
             Transformation object with results
+
+        Raises:
+            ValidationError: If input is invalid
+            TransformationError: If transformation fails
         """
+        # Input validation
+        if not book:
+            raise ValidationError("Book cannot be None")
+
+        if not isinstance(book, Book):
+            raise ValidationError(
+                f"Expected Book instance, got {type(book).__name__}",
+                field="book"
+            )
+
+        # Validate book has content
+        if not book.chapters or len(book.chapters) == 0:
+            raise ValidationError(
+                "Book has no chapters to transform",
+                field="book.chapters",
+                details={"book_title": book.title or "Unknown"}
+            )
+
+        # Validate provider
+        if not self.provider:
+            raise ConfigurationError(
+                "LLM provider not initialized",
+                config_key="provider",
+                details={"service": "TransformService"}
+            )
+
+        # Validate transform type
+        if not isinstance(transform_type, TransformType):
+            raise ValidationError(
+                f"Invalid transform type: {transform_type}",
+                field="transform_type"
+            )
+
+        # Validate selected characters if provided
+        if selected_characters is not None:
+            if not isinstance(selected_characters, list):
+                raise ValidationError(
+                    f"selected_characters must be a list, got {type(selected_characters).__name__}",
+                    field="selected_characters"
+                )
+            if not all(isinstance(char, str) for char in selected_characters):
+                raise ValidationError(
+                    "All selected characters must be strings",
+                    field="selected_characters"
+                )
+
         start_time = time.time()
 
         try:
             # Get character analysis if not provided
             if not characters:
                 if not self.character_service:
-                    raise ValueError("Character service required when characters not provided")
+                    raise ConfigurationError(
+                        "Character service required when characters not provided",
+                        config_key="character_service"
+                    )
 
                 self.logger.info("Analyzing characters...")
                 characters = await self.character_service.process(book)
@@ -167,12 +262,21 @@ class TransformService(BaseService):
 
             return transformation
 
+        except (ValidationError, TransformationError, ConfigurationError):
+            # Re-raise our custom errors
+            raise
         except Exception as e:
-            import traceback
-
-            self.logger.error(f"Transform error: {e}")
-            self.logger.error(f"Traceback: {traceback.format_exc()}")
-            self.handle_error(e, {"book_title": book.title, "transform_type": transform_type.value})
+            # Convert unexpected errors
+            error = self.error_handler.handle_error(e)
+            self.error_handler.log_error(error)
+            raise TransformationError(
+                f"Transformation failed: {str(e)}",
+                transform_type=transform_type.value,
+                details={
+                    "book_title": book.title or "Unknown",
+                    "processing_time": time.time() - start_time
+                }
+            ) from e
 
     def _create_context(
         self,
