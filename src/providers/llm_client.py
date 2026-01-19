@@ -154,7 +154,7 @@ class _OpenAIClient(_BaseLLMClient):
 
     def get_default_model(self) -> str:
         """Get default OpenAI model from environment or fallback."""
-        return os.environ.get("OPENAI_MODEL", "gpt-4o")
+        return os.environ.get("OPENAI_MODEL", "gpt-5")
 
     def complete(
         self,
@@ -248,7 +248,7 @@ class _AnthropicClient(_BaseLLMClient):
 
     def get_default_model(self) -> str:
         """Get default Anthropic model from environment or fallback."""
-        return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-20250514")
+        return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
 
     def complete(
         self,
@@ -606,14 +606,14 @@ def get_llm_client(
 SUPPORTED_PROVIDERS = {
     "openai": {
         "name": "OpenAI",
-        "models": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
+        "models": ["gpt-5", "gpt-5-mini", "gpt-5-nano", "gpt-4o"],
         "env_key": "OPENAI_API_KEY",
-        "default_model": "gpt-4o",
+        "default_model": "gpt-5",
     },
     "anthropic": {
         "name": "Anthropic/Claude",
-        "models": ["claude-opus-4-20250514"],
+        "models": ["claude-opus-4-5-20251101", "claude-sonnet-4-5-20241022", "claude-haiku-4-5-20241022"],
         "env_key": "ANTHROPIC_API_KEY",
-        "default_model": "claude-opus-4-20250514",
+        "default_model": "claude-opus-4-5-20251101",
     },
 }

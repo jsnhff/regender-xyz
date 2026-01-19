@@ -92,9 +92,9 @@ class UnifiedProvider(LLMProvider, Plugin):
             # Fall back to provider-specific model env var
             if not model_from_config:
                 if self.provider_name == "openai":
-                    model_from_config = os.getenv("OPENAI_MODEL", "gpt-4o")
+                    model_from_config = os.getenv("OPENAI_MODEL", "gpt-5")
                 elif self.provider_name == "anthropic":
-                    model_from_config = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-20250514")
+                    model_from_config = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
 
             self.model = model_from_config
 
