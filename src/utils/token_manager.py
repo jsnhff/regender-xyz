@@ -412,6 +412,10 @@ class TokenManager:
             default_model = model_name or "gpt-4"
         elif provider_lower == "anthropic":
             default_model = model_name or "claude-3-sonnet"
+        elif provider_lower == "unified":
+            # TODO: The unified provider is a wrapper - ideally should detect
+            # the underlying provider. For now, default to gpt-4 tokenization.
+            default_model = model_name or "gpt-4"
         else:
             logger.warning(f"Unknown provider {provider_name}, using gpt-4")
             default_model = "gpt-4"

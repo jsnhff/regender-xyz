@@ -6,6 +6,7 @@ This service handles character analysis and gender identification in books.
 
 import asyncio
 import json
+import re
 import time
 from collections import OrderedDict
 from threading import RLock
@@ -13,6 +14,7 @@ from typing import Any, Optional
 
 from src.models.book import Book
 from src.models.character import Character, CharacterAnalysis, Gender
+from src.progress import CharacterPreview, ProgressContext, Stage
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.analysis import AnalysisStrategy, SmartChunkingStrategy
@@ -424,12 +426,15 @@ class CharacterService(BaseService):
         """Get default analysis strategy."""
         return SmartChunkingStrategy()
 
-    async def process_async(self, book: Book) -> CharacterAnalysis:
+    async def process_async(
+        self, book: Book, progress_context: Optional[ProgressContext] = None
+    ) -> CharacterAnalysis:
         """
         Analyze characters in a book.
 
         Args:
             book: Book to analyze
+            progress_context: Optional progress context for reporting
 
         Returns:
             Character analysis results
@@ -448,7 +453,7 @@ class CharacterService(BaseService):
             self.logger.info(f"Created {len(text_chunks)} chunks for analysis")
 
             # Analyze each chunk
-            chunk_results = await self._analyze_chunks_async(text_chunks)
+            chunk_results = await self._analyze_chunks_async(text_chunks, progress_context)
 
             # Merge results
             characters = self.character_merger.merge(chunk_results)
@@ -459,7 +464,13 @@ class CharacterService(BaseService):
                 book_id=book_hash,
                 characters=characters,
                 metadata=self._generate_metadata(characters),
-                provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
+                provider=getattr(
+                    self.provider,
+                    "name",
+                    getattr(self.provider, "get_provider", lambda: "unknown")(),
+                )
+                if self.provider
+                else "unknown",
                 model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
             )
 
@@ -476,16 +487,25 @@ class CharacterService(BaseService):
                 book_id=book.hash(),
                 characters=[],
                 metadata={"error": str(e)},
-                provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
+                provider=getattr(
+                    self.provider,
+                    "name",
+                    getattr(self.provider, "get_provider", lambda: "unknown")(),
+                )
+                if self.provider
+                else "unknown",
                 model=getattr(self.provider, "model", "unknown") if self.provider else "unknown",
             )
 
-    async def _analyze_chunks_async(self, chunks: list[str]) -> list[dict]:
+    async def _analyze_chunks_async(
+        self, chunks: list[str], progress_context: Optional[ProgressContext] = None
+    ) -> list[dict]:
         """
         Analyze text chunks with concurrent processing and smart rate limiting.
 
         Args:
             chunks: Text chunks to analyze
+            progress_context: Optional progress context for reporting
 
         Returns:
             List of analysis results (maintains order despite concurrent processing)
@@ -498,7 +518,10 @@ class CharacterService(BaseService):
 
         # Use rate limiter for OpenAI
         rate_limiter = None
-        provider_name = getattr(self.provider, 'name', None) or getattr(self.provider, 'get_provider', lambda: '')()
+        provider_name = (
+            getattr(self.provider, "name", None)
+            or getattr(self.provider, "get_provider", lambda: "")()
+        )
         if provider_name and "openai" in str(provider_name).lower():
             from src.providers.rate_limiter import OpenAIRateLimiter
 
@@ -526,7 +549,13 @@ class CharacterService(BaseService):
                     # Track token usage
                     self.token_manager.track_usage(
                         input_tokens=estimated_tokens,
-                        provider=getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'unknown')()) if self.provider else "unknown",
+                        provider=getattr(
+                            self.provider,
+                            "name",
+                            getattr(self.provider, "get_provider", lambda: "unknown")(),
+                        )
+                        if self.provider
+                        else "unknown",
                     )
 
                 # Analyze chunk
@@ -552,6 +581,14 @@ class CharacterService(BaseService):
                 idx, result = await coro
                 results_dict[idx] = result
                 completed_count += 1
+
+                # Report progress
+                if progress_context:
+                    progress_context.report_progress(
+                        stage=Stage.ANALYZING,
+                        current=completed_count,
+                        total=len(chunks),
+                    )
 
                 # Show progress every 5 completions or at the end
                 if completed_count % 5 == 0 or completed_count == len(chunks):
@@ -610,11 +647,15 @@ class CharacterService(BaseService):
                 else None,
             )
 
-            # Parse response
+            # Parse response - strip markdown code blocks if present
             try:
-                result = json.loads(response)
+                clean_response = self._extract_json_from_response(response)
+                result = json.loads(clean_response)
             except json.JSONDecodeError:
-                self.logger.warning(f"Failed to parse JSON from chunk {chunk_index}")
+                self.logger.warning(
+                    f"Failed to parse JSON from chunk {chunk_index}. "
+                    f"Response preview: {response[:200] if response else 'empty'}..."
+                )
                 result = {"characters": []}
 
             result["chunk_index"] = chunk_index
@@ -623,6 +664,51 @@ class CharacterService(BaseService):
         except Exception as e:
             self.logger.error(f"Error analyzing chunk {chunk_index}: {e}")
             return {"chunk_index": chunk_index, "characters": []}
+
+    def _extract_json_from_response(self, response: str) -> str:
+        """
+        Extract JSON from an LLM response that might contain markdown code blocks.
+
+        Handles responses like:
+        - Pure JSON: {"characters": [...]}
+        - Markdown-wrapped: ```json\n{"characters": [...]}\n```
+        - With text: Here is the analysis:\n```{"characters": [...]}```
+
+        Args:
+            response: Raw LLM response string
+
+        Returns:
+            Cleaned JSON string ready for parsing
+        """
+        if not response:
+            return "{}"
+
+        text = response.strip()
+
+        # Try to extract from markdown code blocks
+        # Matches ```json ... ``` or ``` ... ```
+        code_block_pattern = r"```(?:json)?\s*([\s\S]*?)```"
+        matches = re.findall(code_block_pattern, text)
+        if matches:
+            # Return the first code block content
+            return matches[0].strip()
+
+        # Try to find JSON object or array directly
+        # Look for content starting with { and ending with }
+        json_obj_pattern = r"(\{[\s\S]*\})"
+        obj_matches = re.findall(json_obj_pattern, text)
+        if obj_matches:
+            # Return the longest match (most complete JSON)
+            return max(obj_matches, key=len)
+
+        # Look for content starting with [ and ending with ]
+        json_arr_pattern = r"(\[[\s\S]*\])"
+        arr_matches = re.findall(json_arr_pattern, text)
+        if arr_matches:
+            return max(arr_matches, key=len)
+
+        # Return original text if no patterns match
+        return text
 
     def _generate_metadata(self, characters: list[Character]) -> dict[str, Any]:
         """
@@ -653,7 +739,11 @@ class CharacterService(BaseService):
         metrics = super().get_metrics()
         metrics.update(
             {
-                "provider": getattr(self.provider, 'name', getattr(self.provider, 'get_provider', lambda: 'none')()) if self.provider else "none",
+                "provider": getattr(
+                    self.provider, "name", getattr(self.provider, "get_provider", lambda: "none")()
+                )
+                if self.provider
+                else "none",
                 "strategy": self.strategy.__class__.__name__,
             }
         )

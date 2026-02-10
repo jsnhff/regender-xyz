@@ -17,6 +17,7 @@ from src.models.character import CharacterAnalysis
 from src.models.transformation import TransformType
 from src.parsers.book_converter import BookConverter
 from src.plugins.base import PluginManager
+from src.progress import CharacterPreview, ProgressContext, Stage
 
 
 class Application:
@@ -327,6 +328,272 @@ class Application:
             self.logger.error(f"Failed to process book: {e}")
             return {"success": False, "error": str(e)}
 
+    async def process_book_with_progress(
+        self,
+        file_path: str,
+        transform_type: str,
+        progress_context: ProgressContext,
+        output_path: Optional[str] = None,
+        quality_control: bool = True,
+        selected_characters: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
+        """
+        Process a book with progress reporting.
+
+        Args:
+            file_path: Path to input file
+            transform_type: Type of transformation
+            progress_context: Progress context for reporting
+            output_path: Optional output path
+            quality_control: Whether to apply quality control
+            selected_characters: Optional list of character names to transform
+
+        Returns:
+            Processing results with additional stats
+        """
+        import time
+
+        start_time = time.time()
+        self.logger.info(f"Processing book with progress: {file_path}")
+
+        try:
+            # Stage 1: Parse the book
+            parse_start = time.time()
+            progress_context.report_progress(Stage.PARSING, 0, 1)
+
+            parser = self.get_service("parser")
+            book = await parser.process_async(file_path)
+            self.logger.info(f"Parsed book: {book.title}")
+
+            total_paragraphs = sum(len(ch.paragraphs) for ch in book.chapters)
+            progress_context.report_progress(Stage.PARSING, 1, 1)
+            progress_context.report_stage_complete(
+                Stage.PARSING,
+                elapsed_seconds=time.time() - parse_start,
+                stats={"chapters": len(book.chapters), "paragraphs": total_paragraphs},
+            )
+
+            # Stage 2: Analyze characters
+            analyze_start = time.time()
+            characters = await self._get_or_analyze_characters_with_progress(
+                file_path, book, progress_context
+            )
+            self.logger.info(f"Using {len(characters.characters)} characters")
+
+            # Build character previews for display
+            character_previews = self._build_character_previews(
+                characters, TransformType(transform_type)
+            )
+
+            progress_context.report_stage_complete(
+                Stage.ANALYZING,
+                elapsed_seconds=time.time() - analyze_start,
+                stats={"total_characters": len(characters.characters)},
+                characters=character_previews,
+            )
+
+            # Stage 3: Transform the book
+            transform_start = time.time()
+            transformer = self.get_service("transform")
+
+            if selected_characters:
+                self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
+
+            transformation = await transformer.transform_book_async(
+                book,
+                TransformType(transform_type),
+                characters,
+                selected_characters,
+                progress_context,
+            )
+            self.logger.info(f"Applied {len(transformation.changes)} transformations")
+
+            progress_context.report_stage_complete(
+                Stage.TRANSFORMING,
+                elapsed_seconds=time.time() - transform_start,
+                stats={"changes": len(transformation.changes)},
+            )
+
+            # Stage 4: Quality control (if enabled)
+            if quality_control:
+                qc_start = time.time()
+                progress_context.report_progress(Stage.QUALITY_CONTROL, 0, 1)
+
+                qc_service = self.get_service("quality")
+                transformation = await qc_service.process_async(transformation)
+                self.logger.info(f"Quality score: {transformation.quality_score}/100")
+
+                progress_context.report_progress(Stage.QUALITY_CONTROL, 1, 1)
+                progress_context.report_stage_complete(
+                    Stage.QUALITY_CONTROL,
+                    elapsed_seconds=time.time() - qc_start,
+                    stats={"quality_score": transformation.quality_score},
+                )
+
+            # Save output if requested
+            if output_path:
+                await self._save_output(transformation, output_path)
+
+            # Get token usage stats
+            token_stats = self._get_token_stats()
+
+            return {
+                "success": True,
+                "book_title": book.title,
+                "characters": len(characters.characters),
+                "changes": len(transformation.changes),
+                "quality_score": transformation.quality_score,
+                "output_path": output_path,
+                "elapsed_seconds": time.time() - start_time,
+                "api_calls": token_stats.get("total_calls", 0),
+                "total_tokens": token_stats.get("total_tokens", 0),
+            }
+
+        except Exception as e:
+            self.logger.error(f"Failed to process book: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def _get_or_analyze_characters_with_progress(
+        self, file_path: str, book: Book, progress_context: ProgressContext
+    ) -> CharacterAnalysis:
+        """
+        Get existing character analysis or analyze with progress reporting.
+
+        Args:
+            file_path: Path to the book file
+            book: Parsed book object
+            progress_context: Progress context for reporting
+
+        Returns:
+            Character analysis
+        """
+        # Check for existing character analysis file
+        input_path = Path(file_path)
+
+        # Determine book name for output folder
+        book_name = input_path.stem
+        if book_name.startswith("pg") and "-" in book_name:
+            book_name = book_name.split("-", 1)[1]
+        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
+
+        # Check in book's output folder first
+        output_dir = Path("books/output") / book_folder
+        char_file = output_dir / "characters.json"
+
+        if char_file.exists():
+            self.logger.info(f"Loading existing character analysis from {char_file}")
+            try:
+                with open(char_file) as f:
+                    char_data = json.load(f)
+                # Report quick progress for cached analysis
+                progress_context.report_progress(Stage.ANALYZING, 1, 1)
+                return CharacterAnalysis.from_dict(char_data)
+            except Exception as e:
+                self.logger.warning(f"Failed to load character file: {e}")
+
+        # No existing analysis, analyze with progress reporting
+        self.logger.info("No existing character analysis found, analyzing book...")
+        character_service = self.get_service("character")
+        characters = await character_service.process_async(book, progress_context)
+
+        # Save character analysis
+        output_dir.mkdir(parents=True, exist_ok=True)
+        char_file = output_dir / "characters.json"
+        with open(char_file, "w", encoding="utf-8") as f:
+            json.dump(characters.to_dict(), f, indent=2, ensure_ascii=False)
+        self.logger.info(f"Saved character analysis to {char_file}")
+
+        return characters
+
+    def _build_character_previews(
+        self, characters: CharacterAnalysis, transform_type: TransformType
+    ) -> list[CharacterPreview]:
+        """Build character transformation previews."""
+        from src.models.character import Gender
+
+        previews = []
+        for char in characters.characters:
+            original_gender = char.gender.value
+
+            # Determine new gender based on transform type
+            if transform_type == TransformType.ALL_MALE:
+                new_gender = "male"
+            elif transform_type == TransformType.ALL_FEMALE:
+                new_gender = "female"
+            elif transform_type == TransformType.GENDER_SWAP:
+                if char.gender == Gender.MALE:
+                    new_gender = "female"
+                elif char.gender == Gender.FEMALE:
+                    new_gender = "male"
+                else:
+                    new_gender = original_gender
+            else:
+                new_gender = original_gender
+
+            previews.append(
+                CharacterPreview(
+                    name=char.name,
+                    original_gender=original_gender,
+                    new_gender=new_gender,
+                )
+            )
+
+        return previews
+
+    def _get_token_stats(self) -> dict[str, Any]:
+        """Get token usage stats from services."""
+        try:
+            # Try to get stats from character service
+            char_service = self.get_service("character")
+            if char_service and hasattr(char_service, "token_manager"):
+                return char_service.token_manager.get_usage_stats()
+        except Exception:
+            pass
+
+        try:
+            # Try to get stats from transform service
+            transform_service = self.get_service("transform")
+            if transform_service and hasattr(transform_service, "token_manager"):
+                return transform_service.token_manager.get_usage_stats()
+        except Exception:
+            pass
+
+        return {"total_calls": 0, "total_tokens": 0}
+
+    def process_book_with_progress_sync(
+        self,
+        file_path: str,
+        transform_type: str,
+        progress_context: ProgressContext,
+        output_path: Optional[str] = None,
+        quality_control: bool = True,
+        selected_characters: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
+        """
+        Synchronous wrapper for book processing with progress.
+
+        Args:
+            file_path: Path to input file
+            transform_type: Type of transformation
+            progress_context: Progress context for reporting
+            output_path: Optional output path
+            quality_control: Whether to apply quality control
+            selected_characters: Optional list of character names to transform
+
+        Returns:
+            Processing results
+        """
+        return asyncio.run(
+            self.process_book_with_progress(
+                file_path,
+                transform_type,
+                progress_context,
+                output_path,
+                quality_control,
+                selected_characters,
+            )
+        )
+
     async def _save_output(self, transformation, output_path: str):
         """Save transformation output."""
         output_path = Path(output_path)
@@ -542,7 +809,9 @@ class Application:
             Processing results
         """
         return asyncio.run(
-            self.process_book(file_path, transform_type, output_path, quality_control, selected_characters)
+            self.process_book(
+                file_path, transform_type, output_path, quality_control, selected_characters
+            )
         )
 
     def get_metrics(self) -> dict[str, Any]:

@@ -15,6 +15,7 @@ from src.models.transformation import (
     TransformationChange,
     TransformType,
 )
+from src.progress import ProgressContext, Stage
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
@@ -112,6 +113,7 @@ class TransformService(BaseService):
         transform_type: TransformType,
         characters: Optional[CharacterAnalysis] = None,
         selected_characters: Optional[list[str]] = None,
+        progress_context: Optional[ProgressContext] = None,
     ) -> Transformation:
         """
         Transform a book with the specified transformation type.
@@ -120,6 +122,8 @@ class TransformService(BaseService):
             book: Book to transform
             transform_type: Type of transformation
             characters: Pre-analyzed characters (optional)
+            selected_characters: Optional list of character names to transform
+            progress_context: Optional progress context for reporting
 
         Returns:
             Transformation object with results
@@ -133,7 +137,7 @@ class TransformService(BaseService):
                     raise ValueError("Character service required when characters not provided")
 
                 self.logger.info("Analyzing characters...")
-                characters = await self.character_service.process_async(book)
+                characters = await self.character_service.process_async(book, progress_context)
 
             # Create transformation context
             context = self._create_context(characters, transform_type, selected_characters)
@@ -141,7 +145,7 @@ class TransformService(BaseService):
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
             transformed_chapters, all_changes = await self._transform_chapters_async(
-                book.chapters, context
+                book.chapters, context, progress_context
             )
 
             # Create transformation result
@@ -345,7 +349,10 @@ class TransformService(BaseService):
         return mappings
 
     async def _transform_chapters_async(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        progress_context: Optional[ProgressContext] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """
         Transform chapters with the given context.
@@ -353,6 +360,7 @@ class TransformService(BaseService):
         Args:
             chapters: Chapters to transform
             context: Transformation context
+            progress_context: Optional progress context for reporting
 
         Returns:
             Tuple of (transformed chapters, list of changes)
@@ -361,12 +369,15 @@ class TransformService(BaseService):
         use_parallel = len(chapters) > 2 and self.config.async_enabled and self.provider
 
         if use_parallel:
-            return await self._transform_chapters_parallel(chapters, context)
+            return await self._transform_chapters_parallel(chapters, context, progress_context)
         else:
-            return await self._transform_chapters_sequential(chapters, context)
+            return await self._transform_chapters_sequential(chapters, context, progress_context)
 
     async def _transform_chapters_sequential(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        progress_context: Optional[ProgressContext] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters sequentially with rate limiting."""
         transformed_chapters = []
@@ -401,6 +412,14 @@ class TransformService(BaseService):
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
 
+            # Report progress
+            if progress_context:
+                progress_context.report_progress(
+                    stage=Stage.TRANSFORMING,
+                    current=i + 1,
+                    total=len(chapters),
+                )
+
             # Show progress
             if (i + 1) % 5 == 0:
                 self.logger.info(f"Progress: {i + 1}/{len(chapters)} chapters transformed")
@@ -408,14 +427,17 @@ class TransformService(BaseService):
         return transformed_chapters, all_changes
 
     async def _transform_chapters_parallel(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        progress_context: Optional[ProgressContext] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters in parallel with rate limiting."""
 
         # For OpenAI, force sequential processing due to rate limits
         if self.provider and "openai" in self.provider.name.lower():
             self.logger.info("OpenAI detected - using sequential processing for rate limiting")
-            return await self._transform_chapters_sequential(chapters, context)
+            return await self._transform_chapters_sequential(chapters, context, progress_context)
 
         # Create tasks for each chapter
         tasks = [
@@ -462,7 +484,9 @@ class TransformService(BaseService):
 
         # Require LLM provider for transformation
         if not self.provider:
-            raise ValueError("LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic).")
+            raise ValueError(
+                "LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic)."
+            )
 
         # Use LLM for transformation
         changes = []
@@ -557,7 +581,7 @@ Examples of transformations:
 
         system_prompt = f"""You are a precise text transformer. Apply gender swapping rules to the text.
 
-TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, 'value') else transform_type}
+TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, "value") else transform_type}
 
 {examples}
 
