@@ -12,10 +12,10 @@ Transform any book with a single command:
 
 ```bash
 # Transform a book with automatic quality control
-python regender_book_cli.py regender book.txt --type all_female
+python regender_cli.py regender book.txt --type all_female
 
 # Test without using API credits
-python regender_book_cli.py regender book.txt --dry-run
+python regender_cli.py regender book.txt --dry-run
 ```
 
 The `regender` command handles everything automatically:
@@ -117,13 +117,13 @@ Use the `regender` command for the complete transformation:
 
 ```bash
 # Transform any book (text or JSON)
-python regender_book_cli.py regender book.txt --type all_female
+python regender_cli.py regender book.txt --type all_female
 
 # Specify provider
-python regender_book_cli.py regender book.txt --provider anthropic
+python regender_cli.py regender book.txt --provider anthropic
 
 # Test without API usage
-python regender_book_cli.py regender book.txt --dry-run
+python regender_cli.py regender book.txt --dry-run
 ```
 
 ### Alternative Workflows
@@ -132,16 +132,16 @@ For more control, you can use individual commands:
 
 ```bash
 # Download books from Project Gutenberg
-python regender_book_cli.py download 1342  # Pride and Prejudice
+python regender_cli.py download 1342  # Pride and Prejudice
 
 # Process text to JSON
-python regender_book_cli.py process book.txt -o book.json
+python regender_cli.py process book.txt -o book.json
 
 # Analyze characters separately
-python regender_book_cli.py analyze-characters book.json -o characters.json
+python regender_cli.py analyze-characters book.json -o characters.json
 
 # Transform with pre-analyzed characters
-python regender_book_cli.py transform book.json --characters characters.json
+python regender_cli.py transform book.json --characters characters.json
 ```
 
 ### Transformation Types
@@ -155,11 +155,11 @@ python regender_book_cli.py transform book.json --characters characters.json
 
 ```bash
 # Use default provider (auto-detected from .env)
-python regender_book_cli.py regender book.txt
+python regender_cli.py regender book.txt
 
 # Explicitly use a provider
-python regender_book_cli.py regender book.txt --provider openai
-python regender_book_cli.py regender book.txt --provider anthropic
+python regender_cli.py regender book.txt --provider openai
+python regender_cli.py regender book.txt --provider anthropic
 ```
 
 ## Project Structure
@@ -168,19 +168,17 @@ python regender_book_cli.py regender book.txt --provider anthropic
 regender-xyz/
 ├── books/               # All book files
 │   ├── texts/          # Source text files
-│   ├── json/           # Parsed JSON files  
+│   ├── json/           # Parsed JSON files
 │   └── output/         # Transformed books
-├── book_parser/         # Book parsing system
-│   ├── patterns/       # Format detection patterns
-│   ├── detectors/      # Smart section detection
-│   └── utils/          # Validation and batch processing
-├── download/           # Project Gutenberg downloader
-├── book_transform/     # AI transformation system
-│   ├── chunking/       # Smart token-based chunking
-│   └── quality_control.py  # Integrated QC system
-├── book_characters/    # Character analysis module
-├── api_client.py       # Unified LLM client
-├── regender_book_cli.py # Main CLI interface
+├── src/
+│   ├── services/       # Parser, Character, Transform, Quality
+│   ├── strategies/     # Parsing, analysis, transform, quality strategies
+│   ├── providers/      # OpenAI, Anthropic LLM clients
+│   ├── models/         # Book, Chapter, Character, Transformation
+│   ├── parsers/        # Gutenberg, play, integrated parser
+│   ├── cli/            # TUI, display, interactive
+│   └── exporters.py    # Plain text, RTF export
+├── regender_cli.py     # Main CLI entry point
 └── docs/               # Documentation
 ```
 
@@ -190,14 +188,14 @@ regender-xyz/
 
 ```bash
 # Download a specific book
-python regender_book_cli.py download 1342  # Pride and Prejudice
+python regender_cli.py download 1342  # Pride and Prejudice
 
 # Transform with unified command
-python regender_book_cli.py regender books/texts/pg1342-Pride_and_Prejudice.txt --type all_female
+python regender_cli.py regender books/texts/pg1342-Pride_and_Prejudice.txt --type all_female
 
 # Batch transform multiple books
 for book in books/texts/*.txt; do
-    python regender_book_cli.py regender "$book" --type gender_swap
+    python regender_cli.py regender "$book" --type gender_swap
 done
 ```
 
@@ -211,17 +209,14 @@ MIT
 ### Release 1: Complete Pride and Prejudice (Uniform Gender Swap)
 - **Goal:** Transform the entire text of Pride and Prejudice by uniformly swapping all gendered language (pronouns, titles, etc.), with no character-specific choices. Keep it simple and consistent for the whole book.
 - **Testing Plan:**
-  - [x] Fix JSON parsing error in API response handling ("Unterminated string starting at: line 2 column 11")
+  - [x] Fix JSON parsing error in API response handling (markdown/JSON extraction in character_service)
   - [ ] Run gender swap transformation on the full novel text
   - [ ] Spot-check key scenes (opening, ball, proposal)
   - [ ] Validate pronoun, title, and relationship consistency throughout
   - [ ] Prepare print-ready manuscript for book design with Matt Bucknall
-- **Critical Fixes Needed:**
-  - [ ] Fix file writing logic to collect all transformed chunks in memory and write once at the end
-  - [ ] Improve chapter boundary handling to ensure complete novel transformation
-  - [ ] Implement full novel verification step using GPT-4.1's 1M token context window
-  - [ ] Add validation to ensure consistent character representation throughout the novel
-  - [ ] Set text export option in Python to two choices: Plain ASCII to avoid UTF-8 import glitches in InDesign, and Rich Text needs to replace "_him_" with "<i>him</i>" tags so InDesign can apply italics via character styles
+- **Remaining for print-ready:**
+  - [ ] Optional: Full-novel verification step (e.g. large-context model) to catch cross-chapter consistency
+  - [ ] Text export options for InDesign: Plain ASCII (avoid UTF-8 import issues), and Rich Text with `_word_` → `<i>word</i>` for italics via character styles
 - **Milestone:** Print-ready version for book design collaboration
 
 ### Release 2: Website & Open Source Launch
@@ -243,39 +238,24 @@ MIT
 
 ## Completed
 
-### Core Platform Development
-- [x] **Third major rewrite:** Streamlined the codebase with a CLI-first focus and improved architecture ([77f59c0], [74505b6], [54d31a1])
-- [x] Archived and cleaned up legacy versions, moving old code to `/archive` ([74505b6], [54d31a1])
-- [x] Created project README and initial documentation ([5d623d5], [1ba486a])
-- [x] Set up project structure and repository
-- [x] Implemented main CLI entry point (`regender_cli.py`)
-- [x] Implemented core character analysis and gender transformation modules
-- [x] Added pronoun validator for transformation consistency
-- [x] Added support for gender-neutral transformation with Mx. titles
-- [x] Added post-processing validation for relationship possessives
-- [x] Added colorful CLI visuals and animations
-- [x] Implemented gender-themed animated spinners and progress bars
-- [x] Fixed OpenAI API JSON format compatibility issue
-- [x] Improved pronoun consistency in gender transformations
-- [x] Fixed pronoun validator patterns for neutral transformation
+### Core Platform & Service Architecture
+- [x] Service-oriented architecture: ParserService, CharacterService, TransformService, QualityService with strategy pattern
+- [x] Main CLI entry point (`regender_cli.py`) with TUI when run with no args
+- [x] Character analysis and gender transformation with OpenAI and Anthropic
+- [x] Output written once at end (full transformation in memory; no chunk-by-chunk file writes)
+- [x] Chapter-by-chapter transform with count validation; no boundary gaps in current pipeline
+- [x] Quality control: AdaptiveQualityStrategy with consistency checks, completeness, and iterative correction
+- [x] Pronoun validator, gender-neutral (nonbinary) with Mx. titles, relationship possessives
+- [x] Ruff linting/formatting and Claude hooks for code quality
 
-### AI Chunking System (June 2025)
-- [x] **Bulletproof AI Chunking:** Developed hybrid AI + Python chunking system achieving 100% text coverage
-  - [x] Created `ai_chunking.py` module with guaranteed coverage for any Project Gutenberg book
-  - [x] Implemented Python regex fallback when AI analysis unavailable
-  - [x] Added automatic chapter pattern detection (Roman numerals, numbered chapters, titled chapters)
-  - [x] Built size-aware chunking that adapts to book characteristics and respects 32k output limits
-  - [x] Tested successfully on Pride & Prejudice (17 chunks) and Moby Dick (140 chunks)
-- [x] **Consolidated Pipeline Testing:** Built unified test interface with command-line options
-  - [x] Created `test_pipeline.py` with support for different transformation types
-  - [x] Added `--save`, `--transform`, and `--all-books` flags for flexible testing
-  - [x] Integrated AI chunking with character analysis and gender transformation pipeline
-- [x] **Major Codebase Cleanup:** Prepared master branch for clean merge
-  - [x] Removed 4,700+ unnecessary files (1.2M+ lines of code/dependencies)
-  - [x] Deleted entire virtual environment directories that shouldn't be in git
-  - [x] Enhanced .gitignore with comprehensive patterns for future cleanup prevention
-  - [x] Preserved core functionality while removing all development cruft
-- [x] **Competition-Ready Architecture:** Designed modular system for easy comparison with alternative approaches
-  - [x] Separated AI chunking logic into standalone module for A/B testing
-  - [x] Created clean APIs for swapping chunking implementations
-  - [x] Focused transform logic purely on gender transformation, isolated from chunking concerns
+### Bill’s Contributions (refactors, agents, pipeline)
+- [x] Major refactors: parser, character_service, phase 2–4 refactors, QC fixes
+- [x] Real LLM transformation and CLI support for targeting specific characters
+- [x] Character analysis with rate limiting; merge of book_parser branch
+- [x] Agent definitions and repo maintenance tooling
+
+### Recent (progress, export, TUI, JSON fix)
+- [x] Progress tracking (ProgressContext, Stage enum) and export utilities (plain text, RTF for InDesign)
+- [x] Polished TUI (Textual): progress bars, book analysis, character selection, LLM setup check
+- [x] JSON parsing fix: strip markdown code blocks from LLM responses in character_service
+- [x] Default LLM models updated to latest versions
