@@ -2,7 +2,9 @@
 Export Formats for Regender
 
 Converts transformed JSON output to various formats:
-- Plain text (.txt)
+- Plain text (.txt) UTF-8
+- Plain text ASCII (for InDesign, avoids UTF-8 import issues)
+- Plain text with italics markup (_word_ → <i>word</i>) for InDesign character styles
 - RTF with UTF-8 encoding (for InDesign)
 """
 
@@ -18,58 +20,107 @@ def load_transformed_json(json_path: str) -> dict:
         return json.load(f)
 
 
+def _book_title(data: dict) -> Optional[str]:
+    """Get book title from JSON (top-level or metadata)."""
+    return data.get("title") or (data.get("metadata") or {}).get("title")
+
+
+def _book_author(data: dict) -> Optional[str]:
+    """Get book author from JSON (top-level or metadata)."""
+    return data.get("author") or (data.get("metadata") or {}).get("author")
+
+
+def _paragraph_text(para: dict) -> str:
+    """Get paragraph text from JSON (sentences, transformed_text, or text)."""
+    if "sentences" in para:
+        return " ".join(para["sentences"]) if para["sentences"] else ""
+    return para.get("transformed_text") or para.get("text", "")
+
+
+def _italicize_markup(text: str) -> str:
+    """Replace _word_ with <i>word</i> for InDesign character styles."""
+    return re.sub(r"_([^_]+)_", r"<i>\1</i>", text)
+
+
 def export_plain_text(json_path: str, output_path: Optional[str] = None) -> str:
     """
-    Export transformed book to plain text.
-
-    Args:
-        json_path: Path to the transformed JSON file
-        output_path: Optional output path (defaults to same name with .txt)
-
-    Returns:
-        Path to the exported file
+    Export transformed book to plain text (UTF-8).
     """
+    return _export_plain_impl(json_path, output_path, encoding="utf-8", use_italics_markup=False)
+
+
+def export_plain_ascii(json_path: str, output_path: Optional[str] = None) -> str:
+    """
+    Export as plain ASCII for InDesign (avoids UTF-8 import issues).
+    Non-ASCII characters are replaced with '?'.
+    """
+    return _export_plain_impl(
+        json_path,
+        output_path,
+        encoding="ascii",
+        errors="replace",
+        use_italics_markup=False,
+        suffix=".ascii.txt",
+    )
+
+
+def export_plain_text_italics(json_path: str, output_path: Optional[str] = None) -> str:
+    """
+    Export plain text with _word_ → <i>word</i> for InDesign character styles.
+    """
+    return _export_plain_impl(
+        json_path,
+        output_path,
+        encoding="utf-8",
+        use_italics_markup=True,
+        suffix=".italics.txt",
+    )
+
+
+def _export_plain_impl(
+    json_path: str,
+    output_path: Optional[str] = None,
+    encoding: str = "utf-8",
+    errors: str = "strict",
+    use_italics_markup: bool = False,
+    suffix: str = ".txt",
+) -> str:
+    """Shared implementation for plain text exports."""
     data = load_transformed_json(json_path)
 
     if output_path is None:
-        output_path = str(Path(json_path).with_suffix(".txt"))
+        output_path = str(Path(json_path).with_suffix(suffix))
 
     lines = []
+    title = _book_title(data)
+    author = _book_author(data)
 
-    # Title
-    if data.get("title"):
-        lines.append(data["title"].upper())
+    if title:
+        lines.append(title.upper())
+        lines.append("")
+        lines.append("")
+    if author:
+        lines.append(f"by {author}")
         lines.append("")
         lines.append("")
 
-    # Author
-    if data.get("author"):
-        lines.append(f"by {data['author']}")
-        lines.append("")
-        lines.append("")
-
-    # Chapters
     chapters = data.get("chapters", [])
     for chapter in chapters:
-        # Chapter heading
         if chapter.get("title"):
             lines.append("")
             lines.append(chapter["title"].upper())
             lines.append("")
-
-        # Paragraphs
-        paragraphs = chapter.get("paragraphs", [])
-        for para in paragraphs:
-            # Get transformed text if available, otherwise original
-            text = para.get("transformed_text") or para.get("text", "")
+        for para in chapter.get("paragraphs", []):
+            text = _paragraph_text(para)
             if text.strip():
+                if use_italics_markup:
+                    text = _italicize_markup(text)
                 lines.append(text)
                 lines.append("")
 
-    # Write output
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-
+    content = "\n".join(lines)
+    with open(output_path, "w", encoding=encoding, errors=errors) as f:
+        f.write(content)
     return output_path
 
 
@@ -123,56 +174,39 @@ def export_rtf(json_path: str, output_path: Optional[str] = None) -> str:
         output_path = str(Path(json_path).with_suffix(".rtf"))
 
     # RTF header with UTF-8 support
-    # \ansi\ansicpg1252 is standard, \deff0 sets default font
-    # We use Unicode escapes for non-ASCII characters
     rtf_lines = [
         "{\\rtf1\\ansi\\ansicpg1252\\deff0",
-        # Font table
         "{\\fonttbl{\\f0\\froman Times New Roman;}{\\f1\\fswiss Helvetica;}}",
-        # Color table (black)
         "{\\colortbl;\\red0\\green0\\blue0;}",
-        # Document settings
-        "\\paperw12240\\paperh15840",  # Letter size
-        "\\margl1440\\margr1440\\margt1440\\margb1440",  # 1 inch margins
+        "\\paperw12240\\paperh15840",
+        "\\margl1440\\margr1440\\margt1440\\margb1440",
         "\\widowctrl\\ftnbj\\aenddoc",
-        # Default paragraph formatting
-        "\\pard\\plain\\f0\\fs24",  # Times, 12pt
+        "\\pard\\plain\\f0\\fs24",
         "",
     ]
 
-    # Title
-    if data.get("title"):
-        title = _escape_rtf(data["title"].upper())
-        rtf_lines.append(f"\\pard\\qc\\b\\fs36 {title}\\b0\\par")
+    title = _book_title(data)
+    author = _book_author(data)
+    if title:
+        rtf_lines.append(f"\\pard\\qc\\b\\fs36 {_escape_rtf(title.upper())}\\b0\\par")
         rtf_lines.append("\\par")
-
-    # Author
-    if data.get("author"):
-        author = _escape_rtf(f"by {data['author']}")
-        rtf_lines.append(f"\\pard\\qc\\i {author}\\i0\\par")
+    if author:
+        rtf_lines.append(f"\\pard\\qc\\i {_escape_rtf('by ' + author)}\\i0\\par")
         rtf_lines.append("\\par\\par")
-
-    # Reset to left-aligned body text
     rtf_lines.append("\\pard\\ql\\fs24")
 
-    # Chapters
     chapters = data.get("chapters", [])
     for i, chapter in enumerate(chapters):
-        # Chapter heading
         if chapter.get("title"):
-            chapter_title = _escape_rtf(chapter["title"].upper())
             rtf_lines.append("\\par")
-            rtf_lines.append(f"\\pard\\qc\\b\\fs28 {chapter_title}\\b0\\par")
+            rtf_lines.append(
+                f"\\pard\\qc\\b\\fs28 {_escape_rtf(chapter['title'].upper())}\\b0\\par"
+            )
             rtf_lines.append("\\pard\\ql\\fs24\\par")
-
-        # Paragraphs
-        paragraphs = chapter.get("paragraphs", [])
-        for para in paragraphs:
-            # Get transformed text if available, otherwise original
-            text = para.get("transformed_text") or para.get("text", "")
+        for para in chapter.get("paragraphs", []):
+            text = _paragraph_text(para)
             if text.strip():
-                escaped = _escape_rtf(text)
-                rtf_lines.append(f"\\fi720 {escaped}\\par")  # First line indent
+                rtf_lines.append(f"\\fi720 {_escape_rtf(text)}\\par")
 
         # Page break between chapters (except last)
         if i < len(chapters) - 1:
@@ -193,8 +227,20 @@ FORMATS = {
     "txt": {
         "name": "Plain Text",
         "extension": ".txt",
-        "description": "Simple UTF-8 text file",
+        "description": "UTF-8 text file",
         "exporter": export_plain_text,
+    },
+    "ascii": {
+        "name": "Plain ASCII",
+        "extension": ".txt",
+        "description": "ASCII only (InDesign-safe, no UTF-8 issues)",
+        "exporter": export_plain_ascii,
+    },
+    "txt_italics": {
+        "name": "Plain Text + Italics",
+        "extension": ".txt",
+        "description": "_word_ → <i>word</i> for InDesign character styles",
+        "exporter": export_plain_text_italics,
     },
     "rtf": {
         "name": "Rich Text Format",
@@ -211,7 +257,7 @@ def export_book(json_path: str, format_key: str, output_path: Optional[str] = No
 
     Args:
         json_path: Path to the transformed JSON file
-        format_key: Format key (txt, rtf)
+        format_key: Format key (txt, ascii, txt_italics, rtf)
         output_path: Optional output path
 
     Returns:

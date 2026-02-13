@@ -974,14 +974,17 @@ class RegenderTUI(App):
         if self._json_output_path:
             self.print(f"  [#005500]JSON:[/#005500] [#00ff00]{self._json_output_path}[/#00ff00]")
 
-        # Show export options
+        # Show export options from FORMATS
         self._stage = "export"
+        self._export_format_list = list(FORMATS.keys())
         self.print("")
         self.print("[#005500]? [/#005500][bold #00ff00]Export format[/bold #00ff00]")
         self.print("")
-        self.print("  [#00ff00]1[/#00ff00]  txt  [#005500]Plain text (UTF-8)[/#005500]")
-        self.print("  [#00ff00]2[/#00ff00]  rtf  [#005500]Rich Text Format (InDesign)[/#005500]")
-        self.print("  [#00ff00]3[/#00ff00]  skip [#005500]JSON only[/#005500]")
+        for i, key in enumerate(self._export_format_list, 1):
+            info = FORMATS[key]
+            self.print(f"  [#00ff00]{i}[/#00ff00]  {key}  [#005500]{info['description']}[/#005500]")
+        skip_num = len(self._export_format_list) + 1
+        self.print(f"  [#00ff00]{skip_num}[/#00ff00]  skip [#005500]JSON only[/#005500]")
         self.print("")
 
         self.status_text = "Export?"
@@ -996,22 +999,20 @@ class RegenderTUI(App):
 
     def _handle_export_input(self, value: str) -> None:
         """Handle export format selection."""
-        if value in ("3", "skip", "s", ""):
+        value = (value or "").strip()
+        format_list = getattr(self, "_export_format_list", None) or list(FORMATS.keys())
+        skip_num = len(format_list) + 1
+        if value in (str(skip_num), "skip", "s", ""):
             self.print("[#00ff00]✓[/#00ff00] Skipped export")
             self._show_final()
             return
 
-        format_map = {
-            "1": "txt",
-            "txt": "txt",
-            "text": "txt",
-            "2": "rtf",
-            "rtf": "rtf",
-        }
-
-        format_key = format_map.get(value.lower())
+        format_map = {str(i): k for i, k in enumerate(format_list, 1)}
+        format_map.update({k: k for k in format_list})
+        format_map["text"] = "txt"
+        format_key = format_map.get(value.lower() if value else "")
         if not format_key:
-            self.print("[#ff0000]Enter 1, 2, or 3[/#ff0000]")
+            self.print(f"[#ff0000]Enter 1-{skip_num} or format key[/#ff0000]")
             return
 
         if not self._json_output_path:

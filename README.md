@@ -216,8 +216,19 @@ MIT
   - [ ] Prepare print-ready manuscript for book design with Matt Bucknall
 - **Remaining for print-ready:**
   - [ ] Optional: Full-novel verification step (e.g. large-context model) to catch cross-chapter consistency
-  - [ ] Text export options for InDesign: Plain ASCII (avoid UTF-8 import issues), and Rich Text with `_word_` → `<i>word</i>` for italics via character styles
+  - [x] Text export options for InDesign: Plain ASCII and `_word_` → `<i>word</i>` italics (see `src/exporters.py`: `ascii`, `txt_italics`)
 - **Milestone:** Print-ready version for book design collaboration
+
+### Release 1 checklist (run tonight)
+1. **Full novel transform** (ensure `books/texts/` has the P&P text, e.g. from `python regender_cli.py download 1342`):
+   ```bash
+   python regender_cli.py regender books/texts/pg1342-Pride_and_Prejudice.txt --type gender_swap -o books/output/pride-and-prejudice/gender_swap.json
+   ```
+   Output: `books/output/pride-and-prejudice/gender_swap.json`. Omit `-o` to use the default path (same folder, same name).
+2. **Export for InDesign:** After the run, export from the saved JSON (or use TUI export after transform):
+   - Plain ASCII: `python -c "from src.exporters import export_book; export_book('books/output/pride-and-prejudice/gender_swap.json', 'ascii')"`
+   - Italics markup: same with `'txt_italics'`, or choose from TUI (2=ascii, 3=txt_italics).
+3. Spot-check a few scenes in the output; then hand off to Matt for book design.
 
 ### Release 2: Website & Open Source Launch
 - **Goal:** Launch a public website to open source the uniform gender-swapped version and sell print-on-demand copies.
