@@ -773,7 +773,7 @@ class TransformService(BaseService):
         max_request_tokens = app_config._config.get("transformation", {}).get("max_tokens_per_request", 120000)
 
         # Get max tokens for this model
-        max_context = self.token_manager.get_model_config(self.provider.model if self.provider else "gpt-4").max_context_tokens
+        max_context = self.token_manager.config.max_context_tokens
         max_context = min(max_context, max_request_tokens)  # Cap at configured maximum
 
         # Reserve tokens for prompt overhead, response, and character context

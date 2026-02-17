@@ -12,6 +12,35 @@
     "target_token_utilization": 0.66,
     "max_tokens_per_request": 120000
   },
+  "services": {
+    "parser": {
+      "class": "src.services.parser_service.ParserService",
+      "config": {
+        "cache_enabled": true
+      }
+    },
+    "character": {
+      "class": "src.services.character_service.CharacterService",
+      "config": {
+        "cache_enabled": true,
+        "max_concurrent": 5
+      },
+      "dependencies": {
+        "provider": "llm_provider"
+      }
+    },
+    "transform": {
+      "class": "src.services.transform_service.TransformService",
+      "config": {
+        "cache_enabled": true,
+        "max_concurrent": 5
+      },
+      "dependencies": {
+        "provider": "llm_provider",
+        "character_service": "character"
+      }
+    }
+  },
   "logging": {
     "level": "INFO"
   }

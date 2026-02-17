@@ -83,7 +83,7 @@ class ParserService(BaseService):
 
             # Otherwise, parse the text file
             # Read file
-            raw_data = await self._read_file_async(input_path)
+            raw_data = await self._read_file(input_path)
 
             # Detect format
             format_type = await self._detect_format(raw_data)
