@@ -219,33 +219,7 @@ def _launch_tui():
 
     from src.cli.tui import run_tui
 
-    def process_callback(
-        input_path,
-        transform_type,
-        no_qc,
-        output_path=None,
-        progress_callback=None,
-        stage_callback=None,
-    ):
-        """Bridge between TUI and Application for book processing."""
-        app = Application("src/config.json")
-
-        if output_path:
-            final_path = Path(output_path)
-        else:
-            final_path = _calc_output_path(input_path, transform_type)
-        final_path.parent.mkdir(parents=True, exist_ok=True)
-
-        result = app.process_book_sync(
-            file_path=input_path,
-            transform_type=transform_type,
-            output_path=str(final_path),
-        )
-
-        app.shutdown()
-        return result
-
-    run_tui(process_callback=process_callback)
+    run_tui()
 
 
 def main():

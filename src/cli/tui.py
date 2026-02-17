@@ -923,37 +923,90 @@ class RegenderTUI(App):
             self.print("")
             self._show_transform_menu()
 
-    @work(exclusive=True, thread=True)
-    def _run_character_analysis(self) -> None:
-        """Run character analysis in background."""
-        import asyncio
+    @work(exclusive=True)
+    async def _run_character_analysis(self) -> None:
+        """Run character analysis as async worker on Textual's event loop."""
         import logging
+        import sys
+        import traceback
 
         from dotenv import load_dotenv
 
-        from src.app import Application
+        # Set up file-based debug logging (TUI owns the terminal)
+        debug_log = logging.getLogger("tui_debug")
+        debug_log.setLevel(logging.DEBUG)
+        debug_log.handlers.clear()
+        from pathlib import Path as _P
 
-        # Load environment and suppress logging
+        _P("logs").mkdir(exist_ok=True)
+        _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
+        _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+        debug_log.addHandler(_fh)
+
+        # Undo global logging.disable(CRITICAL) set by _launch_tui()
+        logging.disable(logging.NOTSET)
+
+        debug_log.info("=" * 60)
+        debug_log.info("CHARACTER ANALYSIS START")
+        debug_log.info(f"Python {sys.version}")
+        debug_log.info(f"Platform: {sys.platform}")
+        debug_log.info(f"Book: {self._selected_book}")
+
+        # Load environment
         load_dotenv()
-        logging.disable(logging.CRITICAL)
+        debug_log.info("dotenv loaded")
 
-        # Create event loop for this thread (required by openai/anthropic SDKs)
-        try:
-            asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        # Patch tqdm: its multiprocessing lock triggers fds_to_keep
+        # on macOS Python 3.9 inside Textual. Replace with threading lock.
+        import threading
+        import tqdm.std
+        tqdm.std.TqdmDefaultWriteLock.create_mp_lock = classmethod(
+            lambda cls: setattr(cls, "mp_lock", threading.RLock())
+        )
+        debug_log.info("tqdm mp_lock patched to threading.RLock")
+
+        # Suppress noisy library logs but keep our debug logger
+        logging.getLogger("anthropic").setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
 
         try:
+            debug_log.info("Creating Application...")
+            from src.app import Application
+
             app = Application("src/config.json")
+            debug_log.info("Application created OK")
 
-            # Run character analysis
-            result = app.analyze_characters_sync(
-                file_path=str(self._selected_book),
-                output_path=None,  # Don't save to file
-            )
+            # --- Inline the steps so we get full tracebacks ---
+            debug_log.info("Step 1: Getting parser service...")
+            parser = app.get_service("parser")
+            debug_log.info(f"  parser = {type(parser).__name__}")
+
+            debug_log.info("Step 2: Parsing book...")
+            book = await parser.process(str(self._selected_book))
+            debug_log.info(f"  book parsed: {book.title}, {len(book.chapters)} chapters")
+
+            debug_log.info("Step 3: Getting character service...")
+            character_service = app.get_service("character")
+            debug_log.info(f"  character_service = {type(character_service).__name__}")
+
+            debug_log.info("Step 4: Analyzing characters (LLM call)...")
+            characters = await character_service.process(book)
+            debug_log.info(f"  found {len(characters.characters)} characters")
+
+            stats = characters.get_statistics()
+            result = {
+                "success": True,
+                "book_title": book.title,
+                "total_characters": stats["total"],
+                "by_gender": stats["by_gender"],
+                "by_importance": stats["by_importance"],
+                "main_characters": stats["main_characters"],
+            }
+            debug_log.info(f"Analysis complete: {result}")
 
             app.shutdown()
+            debug_log.info("App shutdown OK")
 
             if result.get("success"):
                 by_gender = result.get("by_gender", {})
@@ -1001,33 +1054,11 @@ class RegenderTUI(App):
                     self.print("")
                     self._show_transform_menu()
 
-                self.call_from_thread(show_results)
+                show_results()
             else:
                 error_msg = result.get("error", "Unknown error")
-
-                def show_error():
-                    # Stop braille loader
-                    self._analysis_running = False
-                    if hasattr(self, '_analysis_loader'):
-                        try:
-                            self._analysis_loader.stop()
-                            self._analysis_loader.remove()
-                        except Exception:
-                            pass
-                    self.status_text = "Ready"
-
-                    self.print(f"\n[#ff006e]Analysis failed:[/] {error_msg}")
-                    self._show_api_key_help(error_msg)
-                    self.print("")
-                    self._show_transform_menu()
-
-                self.call_from_thread(show_error)
-
-        except Exception as e:
-            error_msg = str(e)
-
-            def show_error():
-                # Stop braille loader (exception case)
+                debug_log.error(f"Analysis returned failure: {error_msg}")
+                # Stop braille loader
                 self._analysis_running = False
                 if hasattr(self, '_analysis_loader'):
                     try:
@@ -1037,12 +1068,32 @@ class RegenderTUI(App):
                         pass
                 self.status_text = "Ready"
 
-                self.print(f"\n[#ff006e]Error:[/] {error_msg}")
+                self.print(f"\n[#ff006e]Analysis failed:[/] {error_msg}")
+                self.print("[#b8a0cc]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
                 self._show_transform_menu()
 
-            self.call_from_thread(show_error)
+        except Exception as e:
+            error_msg = str(e)
+            tb = traceback.format_exc()
+            debug_log.error(f"Analysis EXCEPTION: {error_msg}")
+            debug_log.error(f"Full traceback:\n{tb}")
+            # Stop braille loader (exception case)
+            self._analysis_running = False
+            if hasattr(self, '_analysis_loader'):
+                try:
+                    self._analysis_loader.stop()
+                    self._analysis_loader.remove()
+                except Exception:
+                    pass
+            self.status_text = "Ready"
+
+            self.print(f"\n[#ff006e]Error:[/] {error_msg}")
+            self.print("[#b8a0cc]  See logs/tui_debug.log for full traceback[/]")
+            self._show_api_key_help(error_msg)
+            self.print("")
+            self._show_transform_menu()
 
     def _show_api_key_help(self, error_msg: str) -> None:
         """Show helpful message if error is about missing API keys."""
@@ -1149,27 +1200,71 @@ class RegenderTUI(App):
         }
 
         # Run processing in background worker
-        if self._process_callback:
-            self._run_processing()
+        self._run_processing()
 
-    @work(exclusive=True, thread=True)
-    def _run_processing(self) -> None:
-        """Run processing in background thread."""
+    @work(exclusive=True)
+    async def _run_processing(self) -> None:
+        """Run processing as async worker on Textual's event loop."""
+        import logging
+        import traceback
+
+        # Set up file-based debug logging
+        debug_log = logging.getLogger("tui_debug")
+        debug_log.setLevel(logging.DEBUG)
+        if not debug_log.handlers:
+            from pathlib import Path as _P
+
+            _P("logs").mkdir(exist_ok=True)
+            _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
+            _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+            debug_log.addHandler(_fh)
+
+        # Undo global logging.disable(CRITICAL) set by _launch_tui()
+        logging.disable(logging.NOTSET)
+
+        debug_log.info("=" * 60)
+        debug_log.info("TRANSFORMATION START")
+        debug_log.info(f"Input: {self._result.get('input')}")
+        debug_log.info(f"Transform: {self._result.get('transform_type')}")
+        debug_log.info(f"Output: {self._result.get('output_path')}")
+
+        # Patch tqdm: its multiprocessing lock triggers fds_to_keep
+        # on macOS Python 3.9 inside Textual. Replace with threading lock.
+        import threading
+        import tqdm.std
+        tqdm.std.TqdmDefaultWriteLock.create_mp_lock = classmethod(
+            lambda cls: setattr(cls, "mp_lock", threading.RLock())
+        )
+
+        # Suppress noisy library logs but keep our debug logger
+        logging.getLogger("anthropic").setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+
         try:
-            result = self._process_callback(
-                input_path=self._result["input"],
-                transform_type=self._result["transform_type"],
-                no_qc=self._result["no_qc"],
-                output_path=self._result.get("output_path"),
-                progress_callback=self._on_progress,
-                stage_callback=self._on_stage_complete,
-            )
+            debug_log.info("Creating Application...")
+            from src.app import Application
 
-            # Show completion on main thread
-            self.call_from_thread(self._show_complete, result)
+            app = Application("src/config.json")
+            debug_log.info("Application created OK")
+
+            debug_log.info("Calling process_book (await)...")
+            result = await app.process_book(
+                file_path=self._result["input"],
+                transform_type=self._result["transform_type"],
+                output_path=self._result.get("output_path"),
+            )
+            debug_log.info(f"process_book returned: success={result.get('success')}")
+
+            app.shutdown()
+            debug_log.info("App shutdown OK")
+            self._show_complete(result)
 
         except Exception as e:
-            self.call_from_thread(self._show_error, str(e))
+            tb = traceback.format_exc()
+            debug_log.error(f"Transformation EXCEPTION: {e}")
+            debug_log.error(f"Full traceback:\n{tb}")
+            self._show_error(f"{e}\n  See logs/tui_debug.log for full traceback")
 
     def _on_progress(self, event: ProgressEvent) -> None:
         """Handle progress update with gradient progress bars."""
