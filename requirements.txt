@@ -22,3 +22,7 @@ pytest-asyncio==1.0.0
 
 # String matching
 rapidfuzz==3.14.1
+
+# Terminal UI
+textual==7.5.0
+rich==14.3.2

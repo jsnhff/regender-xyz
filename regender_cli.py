@@ -129,17 +129,45 @@ async def process_book(args):
     app.shutdown()
 
 
+
+def _calc_output_path(input_path: str, transform_type: str) -> Path:
+    """Calculate output path from input path and transform type."""
+    input_file = Path(input_path)
+    book_name = input_file.stem
+    if book_name.startswith("pg") and "-" in book_name:
+        book_name = book_name.split("-", 1)[1]
+    book_base = book_name.lower().replace("_", "-").replace(" ", "-")
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    book_folder = f"{book_base}-{timestamp}"
+
+    if transform_type == "parse_only":
+        if "texts" in str(input_file.parent):
+            output_dir = Path(str(input_file.parent).replace("texts", "json"))
+        else:
+            output_dir = input_file.parent
+        return output_dir / f"{input_file.stem}.json"
+    elif transform_type == "character_analysis":
+        output_dir = Path("books/output") / book_folder
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir / "characters.json"
+    else:
+        output_dir = Path("books/output") / book_folder
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return output_dir / f"{transform_type}.json"
+
+
 async def async_main():
     """Async main entry point."""
     parser = argparse.ArgumentParser(
         description="Regender-XYZ CLI - Transform gender representation in literature"
     )
 
-    # Main arguments
-    parser.add_argument("input", help="Input file path (text or JSON)")
+    # Main arguments (optional — when omitted, launches interactive TUI)
+    parser.add_argument("input", nargs="?", help="Input file path (text or JSON)")
 
     parser.add_argument(
         "transform_type",
+        nargs="?",
         choices=[
             "all_male",
             "all_female",
@@ -158,7 +186,6 @@ async def async_main():
     # Configuration options
     parser.add_argument("--config", help="Path to configuration file (default: src/config.json)")
 
-
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
 
     # Selective transformation options
@@ -175,15 +202,61 @@ async def async_main():
     # Parse arguments
     args = parser.parse_args()
 
+    # Validate that transform_type is provided with input
+    if args.input is not None and args.transform_type is None:
+        parser.error("transform_type is required when input is provided")
+
     # Set up logging
     setup_logging(args.verbose)
 
-    # Process the book
+    # Process the book (Bill's original path)
     await process_book(args)
+
+
+def _launch_tui():
+    """Launch the interactive TUI (must run outside asyncio event loop)."""
+    logging.disable(logging.CRITICAL)
+
+    from src.cli.tui import run_tui
+
+    def process_callback(
+        input_path,
+        transform_type,
+        no_qc,
+        output_path=None,
+        progress_callback=None,
+        stage_callback=None,
+    ):
+        """Bridge between TUI and Application for book processing."""
+        app = Application("src/config.json")
+
+        if output_path:
+            final_path = Path(output_path)
+        else:
+            final_path = _calc_output_path(input_path, transform_type)
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+
+        result = app.process_book_sync(
+            file_path=input_path,
+            transform_type=transform_type,
+            output_path=str(final_path),
+        )
+
+        app.shutdown()
+        return result
+
+    run_tui(process_callback=process_callback)
 
 
 def main():
     """Main CLI entry point."""
+    # Quick check: no args (or just flags) means TUI mode.
+    # We must launch TUI before entering asyncio.run() because
+    # Textual needs its own event loop.
+    if len(sys.argv) == 1:
+        _launch_tui()
+        return
+
     try:
         asyncio.run(async_main())
     except KeyboardInterrupt:
