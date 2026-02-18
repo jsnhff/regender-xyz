@@ -782,17 +782,11 @@ class RegenderTUI(App):
         self.print(f"  [#00f5ff]{self._output_path}[/]")
         self.print("")
 
-        if self._selected_transform in ["parse_only", "character_analysis"]:
-            self._start_processing()
-            return
-
-        self._stage = "options"
-        self.print("[#8338ec]?[/] [bold #ff006e]Run quality control?[/]")
-        self.print("")
-        self.print("  [bold #00f5ff]Y[/]  Yes [#b8a0cc](recommended)[/]")
-        self.print("  [bold #00f5ff]n[/]  No [#b8a0cc](faster)[/]")
-        self.print("")
-        self.set_prompt(">  ")
+        # TODO: Re-enable QC prompt once app.process_book() supports
+        # a quality_control parameter. Currently QC is commented out
+        # in app.py (line 323), so the prompt was cosmetic.
+        self._no_qc = True
+        self._start_processing()
 
     def _get_book_title(self, path: Path) -> str:
         """Extract book title from path."""
@@ -1189,6 +1183,14 @@ class RegenderTUI(App):
             pass
 
         self.print(f"{gradient_text('Starting transformation', FIRE_GLOW)}...")
+
+        # Show braille loader with elapsed timer
+        self._transform_loader = BrailleLoader("Transforming", self._process_start)
+        try:
+            self.query_one("#content", ContentArea).add_widget(self._transform_loader)
+        except Exception:
+            pass
+
         self.print("")
 
         # Build result for callback
@@ -1411,6 +1413,15 @@ class RegenderTUI(App):
             self._show_final()
             return
 
+        # Stop transform loader
+        if hasattr(self, '_transform_loader') and self._transform_loader:
+            try:
+                self._transform_loader.stop()
+                self._transform_loader.remove()
+                self._transform_loader = None
+            except Exception:
+                pass
+
         self.print("")
         self.print(f"[#00f5ff]✓[/] {gradient_text('Transformation complete!', FIRE_GLOW)}")
         self.print(f"  [#b8a0cc]Time:[/] [#ffbe0b]{elapsed:.1f}s[/]")
@@ -1491,6 +1502,18 @@ class RegenderTUI(App):
     def _show_error(self, error: str) -> None:
         """Show error (called on main thread)."""
         self._stage = "done"
+
+        # Stop any active loaders
+        for attr in ('_transform_loader', '_stage_loader', '_analysis_loader'):
+            loader = getattr(self, attr, None)
+            if loader:
+                try:
+                    loader.stop()
+                    loader.remove()
+                except Exception:
+                    pass
+                setattr(self, attr, None)
+
         self.print("")
         self.print(f"[bold #ff0000]✗ Error:[/bold #ff0000] {error}")
         self.print("")
