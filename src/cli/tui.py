@@ -104,6 +104,30 @@ def _lookup_model_cost(model: str) -> tuple[float, float]:
     return (3.00, 15.00)
 
 
+AVAILABLE_MODELS = {
+    "anthropic": [
+        ("claude-sonnet-4-20250514", "Claude Sonnet 4", "$3 / $15 per 1M tokens"),
+        ("claude-opus-4-5-20251101", "Claude Opus 4.5", "$5 / $25 per 1M tokens"),
+    ],
+    "openai": [
+        ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
+        ("gpt-4o-mini", "GPT-4o Mini", "$0.15 / $0.60 per 1M tokens"),
+    ],
+}
+
+
+def _friendly_model_name(model: str) -> str:
+    """Convert API model ID to a short display name."""
+    all_models = [m for models in AVAILABLE_MODELS.values() for m in models]
+    for model_id, display_name, _ in all_models:
+        if model == model_id:
+            return display_name
+    for model_id, display_name, _ in sorted(all_models, key=lambda m: -len(m[0])):
+        if model.startswith(model_id):
+            return display_name
+    return model
+
+
 def analyze_book_file(path: Path) -> dict:
     """
     Quick analysis of a book file to estimate processing stats.
@@ -293,6 +317,10 @@ class HeaderBar(Container):
     HeaderBar #stats-row1 > Label, HeaderBar #stats-row2 > Label {
         width: 1fr;
     }
+
+    HeaderBar #stats-row1 > Label:first-child, HeaderBar #stats-row2 > Label:first-child {
+        width: 2fr;
+    }
     """
 
     def __init__(self, **kwargs):
@@ -346,7 +374,8 @@ class HeaderBar(Container):
             self._pages = str(stats.get('pages', '—'))
             self._chapters = str(stats.get('chapters', '—'))
             self._cost = f"${stats.get('estimated_cost', 0):.2f}"
-            self._model = stats.get('model', '—')
+            raw_model = stats.get('model', '—')
+            self._model = _friendly_model_name(raw_model) if raw_model != '—' else '—'
 
         if char_count is not None:
             self._characters = str(char_count)
@@ -771,7 +800,7 @@ class RegenderTUI(App):
         self.print("[#8338ec]?[/] [bold #ff006e]Select a book[/]")
         self.print("")
         self.print("  [bold #00f5ff]1[/]  Pride and Prejudice [#b8a0cc](sample)[/]")
-        self.print("  [bold #00f5ff]2[/]  Enter file path...")
+        self.print("  [bold #00f5ff]2[/]  Enter or drag file path...")
         self.print("")
         self.set_prompt(">  ")
 
@@ -847,6 +876,8 @@ class RegenderTUI(App):
 
         if self._stage == "book":
             self._handle_book_input(value)
+        elif self._stage == "model":
+            self._handle_model_input(value)
         elif self._stage == "analyze_prompt":
             self._handle_analyze_prompt_input(value)
         elif self._stage == "transform":
@@ -866,6 +897,7 @@ class RegenderTUI(App):
             else:
                 self.print("[#ff0000]Sample not found[/#ff0000]")
         elif value == "2":
+            self.print("[#b8a0cc]  Drag a .txt file into this window, or paste the full path[/]")
             self.set_prompt("path>  ")
         elif value.lower() in ("q", "quit"):
             self.exit()
@@ -895,7 +927,98 @@ class RegenderTUI(App):
                 pass
 
         self.print("")
-        self._show_character_analysis_prompt()
+        self._show_model_menu()
+
+    def _show_model_menu(self) -> None:
+        """Show available models based on configured API keys."""
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        has_openai = bool(openai_key and not openai_key.startswith("your-"))
+        has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
+
+        self._model_choices: list[tuple[str, str, str]] = []
+        for provider, models in AVAILABLE_MODELS.items():
+            if provider == "openai" and not has_openai:
+                continue
+            if provider == "anthropic" and not has_anthropic:
+                continue
+            for model_id, display_name, pricing in models:
+                self._model_choices.append((model_id, display_name, pricing))
+
+        if not self._model_choices:
+            self.print("[#ffbe0b]⚠ No API keys configured — skipping model selection[/]")
+            self._show_character_analysis_prompt()
+            return
+
+        if len(self._model_choices) == 1:
+            model_id, display_name, _ = self._model_choices[0]
+            os.environ["DEFAULT_MODEL"] = model_id
+            self.print(f"[#00f5ff]✓[/] Using [bold #ffbe0b]{display_name}[/]")
+            self._recalculate_cost(model_id)
+            self.print("")
+            self._show_character_analysis_prompt()
+            return
+
+        self._stage = "model"
+        current = _get_resolved_model()
+        self.print("[#8338ec]?[/] [bold #ff006e]Select a model[/]")
+        self.print("")
+        for i, (model_id, display_name, pricing) in enumerate(self._model_choices, 1):
+            marker = " [#00f5ff]◄[/]" if model_id == current or current.startswith(model_id) else ""
+            self.print(
+                f"  [bold #00f5ff]{i}[/]  {display_name:<22} [#b8a0cc]{pricing}[/]{marker}"
+            )
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_model_input(self, value: str) -> None:
+        """Handle model selection."""
+        choices = getattr(self, "_model_choices", [])
+        if not choices:
+            self._show_character_analysis_prompt()
+            return
+
+        try:
+            idx = int(value) - 1
+            if 0 <= idx < len(choices):
+                model_id, display_name, _ = choices[idx]
+                os.environ["DEFAULT_MODEL"] = model_id
+                self.print(f"[#00f5ff]✓[/] {display_name}")
+                self._recalculate_cost(model_id)
+                self.print("")
+                self._show_character_analysis_prompt()
+                return
+        except ValueError:
+            pass
+
+        for model_id, display_name, _ in choices:
+            if value.lower() in (model_id.lower(), display_name.lower()):
+                os.environ["DEFAULT_MODEL"] = model_id
+                self.print(f"[#00f5ff]✓[/] {display_name}")
+                self._recalculate_cost(model_id)
+                self.print("")
+                self._show_character_analysis_prompt()
+                return
+
+        self.print(f"[#ff006e]Enter 1-{len(choices)}[/]")
+
+    def _recalculate_cost(self, model: str) -> None:
+        """Recalculate cost estimate for the selected model and update header."""
+        if not self._book_stats:
+            return
+        tokens = self._book_stats.get("tokens", 0)
+        input_cost, output_cost = _lookup_model_cost(model)
+        estimated_cost = (tokens / 1_000_000 * input_cost) + (tokens / 1_000_000 * output_cost)
+        self._book_stats["estimated_cost"] = estimated_cost
+        self._book_stats["model"] = model
+        try:
+            self.query_one(HeaderBar).update_meta(self._book_stats)
+        except Exception:
+            pass
 
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
