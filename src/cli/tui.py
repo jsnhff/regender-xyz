@@ -5,6 +5,7 @@ A polished terminal user interface with fixed header, scrollable content,
 and input footer.
 """
 
+import contextlib
 import math
 import os
 import re
@@ -51,17 +52,54 @@ def gradient_text(text: str, colors: list[str]) -> str:
 
 
 # Smooth 2-color gradient palettes
-MAGENTA_PINK = ["#ff006e", "#ff0080", "#ff1a8c", "#ff3399", "#ff4da6", "#ff66b3", "#ff80c0", "#ff99cc"]
+MAGENTA_PINK = [
+    "#ff006e",
+    "#ff0080",
+    "#ff1a8c",
+    "#ff3399",
+    "#ff4da6",
+    "#ff66b3",
+    "#ff80c0",
+    "#ff99cc",
+]
 CYAN_BLUE = ["#00f5ff", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff", "#004dff", "#0033ff"]
-YELLOW_ORANGE = ["#ffbe0b", "#ffb00a", "#ffa209", "#ff9408", "#ff8607", "#ff7806", "#ff6a05", "#ff5c04"]
-VIOLET_MAGENTA = ["#8338ec", "#9033e8", "#9d2ee4", "#aa29e0", "#b724dc", "#c41fd8", "#d11ad4", "#de15d0"]
-PINK_VIOLET = ["#ff006e", "#f01a82", "#e13396", "#d24daa", "#c366be", "#b480d2", "#a599e6", "#96b3fa"]
+YELLOW_ORANGE = [
+    "#ffbe0b",
+    "#ffb00a",
+    "#ffa209",
+    "#ff9408",
+    "#ff8607",
+    "#ff7806",
+    "#ff6a05",
+    "#ff5c04",
+]
+VIOLET_MAGENTA = [
+    "#8338ec",
+    "#9033e8",
+    "#9d2ee4",
+    "#aa29e0",
+    "#b724dc",
+    "#c41fd8",
+    "#d11ad4",
+    "#de15d0",
+]
+PINK_VIOLET = [
+    "#ff006e",
+    "#f01a82",
+    "#e13396",
+    "#d24daa",
+    "#c366be",
+    "#b480d2",
+    "#a599e6",
+    "#96b3fa",
+]
 FIRE_GLOW = ["#ff006e", "#ff3355", "#ff5c3d", "#ff8526", "#ffae0f"]
 
 
 # =============================================================================
 # Book Analysis
 # =============================================================================
+
 
 # Cost per 1K tokens (input/output) by model
 def _get_resolved_model() -> str:
@@ -184,7 +222,6 @@ $error: #ff006e;          /* Magenta */
 
 # Logo with smooth magenta→pink gradient
 LOGO_ART = gradient_text("regender", MAGENTA_PINK) + "[#8338ec].xyz[/]"
-
 
 
 class SineWaveLoader(Static):
@@ -343,10 +380,10 @@ class HeaderBar(Container):
     def update_meta(self, stats: Optional[dict], char_count: Optional[int] = None) -> None:
         """Update all metadata fields."""
         if stats:
-            self._pages = str(stats.get('pages', '—'))
-            self._chapters = str(stats.get('chapters', '—'))
+            self._pages = str(stats.get("pages", "—"))
+            self._chapters = str(stats.get("chapters", "—"))
             self._cost = f"${stats.get('estimated_cost', 0):.2f}"
-            self._model = stats.get('model', '—')
+            self._model = stats.get("model", "—")
 
         if char_count is not None:
             self._characters = str(char_count)
@@ -360,14 +397,22 @@ class HeaderBar(Container):
             if len(labels) >= 4:
                 labels[0].update(Text.from_markup(f"[#b8a0cc]book:[/] [#00f5ff]{self._book}[/]"))
                 labels[1].update(Text.from_markup(f"[#b8a0cc]pages:[/] [#ffbe0b]{self._pages}[/]"))
-                labels[2].update(Text.from_markup(f"[#b8a0cc]chapters:[/] [#ff006e]{self._chapters}[/]"))
-                labels[3].update(Text.from_markup(f"[#b8a0cc]characters:[/] [#8338ec]{self._characters}[/]"))
+                labels[2].update(
+                    Text.from_markup(f"[#b8a0cc]chapters:[/] [#ff006e]{self._chapters}[/]")
+                )
+                labels[3].update(
+                    Text.from_markup(f"[#b8a0cc]characters:[/] [#8338ec]{self._characters}[/]")
+                )
 
             labels = self.query("#stats-row2 > Label")
             if len(labels) >= 3:
-                labels[0].update(Text.from_markup(f"[#b8a0cc]transformation:[/] [#00f5ff]{self._transform}[/]"))
+                labels[0].update(
+                    Text.from_markup(f"[#b8a0cc]transformation:[/] [#00f5ff]{self._transform}[/]")
+                )
                 labels[1].update(Text.from_markup(f"[#b8a0cc]model:[/] [#ffbe0b]{self._model}[/]"))
-                labels[2].update(Text.from_markup(f"[#b8a0cc]total cost:[/] [#ff006e]{self._cost}[/]"))
+                labels[2].update(
+                    Text.from_markup(f"[#b8a0cc]total cost:[/] [#ff006e]{self._cost}[/]")
+                )
         except Exception:
             pass
 
@@ -461,10 +506,7 @@ class BrailleLoader(Static):
             elapsed = int(time.time() - self._start_time)
             mins = elapsed // 60
             secs = elapsed % 60
-            if mins > 0:
-                time_str = f"{mins}m {secs}s"
-            else:
-                time_str = f"{secs}s"
+            time_str = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
 
             frame_char = BRAILLE_LOADING_FRAMES[self._frame % len(BRAILLE_LOADING_FRAMES)]
             msg = f"[#00f5ff]{frame_char}[/] [#b8a0cc]{self._activity}[/] [#ffbe0b]({time_str})[/]"
@@ -522,17 +564,13 @@ class InputBar(Static):
 
     def set_prompt(self, prompt: str) -> None:
         """Set the prompt text."""
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#prompt", Label).update(prompt)
-        except Exception:
-            pass
 
     def set_placeholder(self, text: str) -> None:
         """Set input placeholder."""
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#input", Input).placeholder = text
-        except Exception:
-            pass
 
     def disable(self) -> None:
         """Disable input."""
@@ -589,10 +627,8 @@ class StatusBar(Static):
 
     def update(self, message: str) -> None:
         """Update status message."""
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#message", Label).update(message)
-        except Exception:
-            pass
 
 
 # =============================================================================
@@ -749,17 +785,13 @@ class RegenderTUI(App):
 
     def print(self, message: str) -> None:
         """Add a log line to the content area."""
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#content", ContentArea).add_line(message)
-        except Exception:
-            pass
 
     def set_prompt(self, prompt: str) -> None:
         """Set the input prompt."""
-        try:
+        with contextlib.suppress(Exception):
             self.query_one(InputBar).set_prompt(prompt)
-        except Exception:
-            pass
 
     # -------------------------------------------------------------------------
     # Selection Flow
@@ -891,10 +923,8 @@ class RegenderTUI(App):
         if stats:
             self._book_stats = stats
             # Update header metadata row
-            try:
+            with contextlib.suppress(Exception):
                 self.query_one(HeaderBar).update_meta(stats)
-            except Exception:
-                pass
 
         self.print("")
         self._show_character_analysis_prompt()
@@ -904,9 +934,7 @@ class RegenderTUI(App):
         self._stage = "analyze_prompt"
         self.print("[#8338ec]?[/] [bold #ff006e]Analyze characters first?[/]")
         self.print("")
-        self.print(
-            "  [bold #00f5ff]Y[/]  Yes [#b8a0cc](identifies characters, costs ~$0.02)[/]"
-        )
+        self.print("  [bold #00f5ff]Y[/]  Yes [#b8a0cc](identifies characters, costs ~$0.02)[/]")
         self.print("  [bold #00f5ff]n[/]  No  [#b8a0cc](skip to transformation)[/]")
         self.print("")
         self.set_prompt(">  ")
@@ -920,10 +948,8 @@ class RegenderTUI(App):
 
             # Add braille loader with elapsed time
             self._analysis_loader = BrailleLoader("Analyzing characters", self._analysis_start_time)
-            try:
+            with contextlib.suppress(Exception):
                 self.query_one("#content", ContentArea).add_widget(self._analysis_loader)
-            except Exception:
-                pass
 
             self._run_character_analysis()
         else:
@@ -944,9 +970,8 @@ class RegenderTUI(App):
         debug_log = logging.getLogger("tui_debug")
         debug_log.setLevel(logging.DEBUG)
         debug_log.handlers.clear()
-        from pathlib import Path as _P
 
-        _P("logs").mkdir(exist_ok=True)
+        Path("logs").mkdir(exist_ok=True)
         _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
         _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
         debug_log.addHandler(_fh)
@@ -967,7 +992,9 @@ class RegenderTUI(App):
         # Patch tqdm: its multiprocessing lock triggers fds_to_keep
         # on macOS Python 3.9 inside Textual. Replace with threading lock.
         import threading
+
         import tqdm.std
+
         tqdm.std.TqdmDefaultWriteLock.create_mp_lock = classmethod(
             lambda cls: setattr(cls, "mp_lock", threading.RLock())
         )
@@ -1024,7 +1051,7 @@ class RegenderTUI(App):
                 def show_results():
                     # Stop braille loader
                     self._analysis_running = False
-                    if hasattr(self, '_analysis_loader'):
+                    if hasattr(self, "_analysis_loader"):
                         try:
                             self._analysis_loader.stop()
                             self._analysis_loader.remove()
@@ -1033,15 +1060,19 @@ class RegenderTUI(App):
                     self.status_text = "Ready"
 
                     # Calculate elapsed time
-                    elapsed = time.time() - self._analysis_start_time if hasattr(self, '_analysis_start_time') else 0
+                    elapsed = (
+                        time.time() - self._analysis_start_time
+                        if hasattr(self, "_analysis_start_time")
+                        else 0
+                    )
 
                     # Update header with character count
-                    try:
+                    with contextlib.suppress(Exception):
                         self.query_one(HeaderBar).update_meta(self._book_stats, char_count)
-                    except Exception:
-                        pass
 
-                    self.print(f"[#00f5ff]✓[/] Found [bold #00f5ff]{char_count}[/] characters [#b8a0cc]({elapsed:.1f}s)[/]")
+                    self.print(
+                        f"[#00f5ff]✓[/] Found [bold #00f5ff]{char_count}[/] characters [#b8a0cc]({elapsed:.1f}s)[/]"
+                    )
 
                     # Show gender breakdown
                     gender_parts = []
@@ -1068,7 +1099,7 @@ class RegenderTUI(App):
                 debug_log.error(f"Analysis returned failure: {error_msg}")
                 # Stop braille loader
                 self._analysis_running = False
-                if hasattr(self, '_analysis_loader'):
+                if hasattr(self, "_analysis_loader"):
                     try:
                         self._analysis_loader.stop()
                         self._analysis_loader.remove()
@@ -1089,7 +1120,7 @@ class RegenderTUI(App):
             debug_log.error(f"Full traceback:\n{tb}")
             # Stop braille loader (exception case)
             self._analysis_running = False
-            if hasattr(self, '_analysis_loader'):
+            if hasattr(self, "_analysis_loader"):
                 try:
                     self._analysis_loader.stop()
                     self._analysis_loader.remove()
@@ -1163,9 +1194,10 @@ class RegenderTUI(App):
 
     def _show_stage_loader(self, stage_name: str, start_time: float) -> None:
         """Show braille loader for a stage."""
+
         def show_loader():
             # Stop any existing loader
-            if hasattr(self, '_stage_loader') and self._stage_loader:
+            if hasattr(self, "_stage_loader") and self._stage_loader:
                 try:
                     self._stage_loader.stop()
                     self._stage_loader.remove()
@@ -1174,10 +1206,8 @@ class RegenderTUI(App):
 
             # Show new braille loader
             self._stage_loader = BrailleLoader(stage_name, start_time)
-            try:
+            with contextlib.suppress(Exception):
                 self.query_one("#content", ContentArea).add_widget(self._stage_loader)
-            except Exception:
-                pass
 
         # Delay slightly so if progress bars appear quickly, we don't show the loader
         self.call_later(0.3, show_loader)
@@ -1200,10 +1230,8 @@ class RegenderTUI(App):
 
         # Show braille loader with elapsed timer
         self._transform_loader = BrailleLoader("Transforming", self._process_start)
-        try:
+        with contextlib.suppress(Exception):
             self.query_one("#content", ContentArea).add_widget(self._transform_loader)
-        except Exception:
-            pass
 
         self.print("")
 
@@ -1228,9 +1256,7 @@ class RegenderTUI(App):
         debug_log = logging.getLogger("tui_debug")
         debug_log.setLevel(logging.DEBUG)
         if not debug_log.handlers:
-            from pathlib import Path as _P
-
-            _P("logs").mkdir(exist_ok=True)
+            Path("logs").mkdir(exist_ok=True)
             _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
             _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
             debug_log.addHandler(_fh)
@@ -1247,7 +1273,9 @@ class RegenderTUI(App):
         # Patch tqdm: its multiprocessing lock triggers fds_to_keep
         # on macOS Python 3.9 inside Textual. Replace with threading lock.
         import threading
+
         import tqdm.std
+
         tqdm.std.TqdmDefaultWriteLock.create_mp_lock = classmethod(
             lambda cls: setattr(cls, "mp_lock", threading.RLock())
         )
@@ -1285,7 +1313,7 @@ class RegenderTUI(App):
     def _on_progress(self, event: ProgressEvent) -> None:
         """Handle progress update with gradient progress bars."""
         # Stop any active stage loader when we get progress
-        if hasattr(self, '_stage_loader') and self._stage_loader:
+        if hasattr(self, "_stage_loader") and self._stage_loader:
             try:
                 self._stage_loader.stop()
                 self._stage_loader.remove()
@@ -1331,7 +1359,15 @@ class RegenderTUI(App):
         empty = bar_width - filled
 
         # Gradient colors for filled portion
-        gradient_colors = ["#ff006e", "#ff1a8c", "#ff3399", "#ff4da6", "#ff66b3", "#ff80c0", "#ff99cc"]
+        gradient_colors = [
+            "#ff006e",
+            "#ff1a8c",
+            "#ff3399",
+            "#ff4da6",
+            "#ff66b3",
+            "#ff80c0",
+            "#ff99cc",
+        ]
         filled_chars = []
         for i in range(filled):
             progress_in_fill = i / max(1, filled - 1) if filled > 1 else 0
@@ -1358,10 +1394,8 @@ class RegenderTUI(App):
             self.status_text = f"{stage_name} {pct_int}%"
             # Update progress line in place
             progress_line = f"  {stage_gradient:<25} {bar} [{pct_color}]{pct_int:>3}%[/]{eta_str}"
-            try:
+            with contextlib.suppress(Exception):
                 self.query_one("#content", ContentArea).update_progress(progress_line)
-            except Exception:
-                pass
 
         self.call_from_thread(update)
 
@@ -1378,7 +1412,7 @@ class RegenderTUI(App):
 
         def update():
             # Stop any active stage loader
-            if hasattr(self, '_stage_loader') and self._stage_loader:
+            if hasattr(self, "_stage_loader") and self._stage_loader:
                 try:
                     self._stage_loader.stop()
                     self._stage_loader.remove()
@@ -1387,10 +1421,8 @@ class RegenderTUI(App):
                     pass
 
             # Clear the in-place progress line
-            try:
+            with contextlib.suppress(Exception):
                 self.query_one("#content", ContentArea).clear_progress()
-            except Exception:
-                pass
 
             # Add completion message with gradient
             stage_gradient = gradient_text(stage_name, CYAN_BLUE)
@@ -1428,7 +1460,7 @@ class RegenderTUI(App):
             return
 
         # Stop transform loader
-        if hasattr(self, '_transform_loader') and self._transform_loader:
+        if hasattr(self, "_transform_loader") and self._transform_loader:
             try:
                 self._transform_loader.stop()
                 self._transform_loader.remove()
@@ -1483,7 +1515,9 @@ class RegenderTUI(App):
             return
 
         if not self._json_output_path:
-            self.print("[#ffbe0b]⚠[/] [#b8a0cc]No JSON output path available. Transformation may have saved to a different location.[/]")
+            self.print(
+                "[#ffbe0b]⚠[/] [#b8a0cc]No JSON output path available. Transformation may have saved to a different location.[/]"
+            )
             self._show_final()
             return
 
