@@ -78,16 +78,30 @@ def _get_resolved_model() -> str:
     return os.environ.get("OPENAI_MODEL", "gpt-5")
 
 
+# (input, output) cost per 1M tokens — updated Feb 2026
 MODEL_COSTS = {
-    "gpt-4": (0.03, 0.06),
-    "gpt-4-turbo": (0.01, 0.03),
-    "gpt-4o": (0.005, 0.015),
-    "gpt-3.5-turbo": (0.001, 0.002),
-    "claude-3-sonnet": (0.003, 0.015),
-    "claude-3-haiku": (0.00025, 0.00125),
-    "claude-3-opus": (0.015, 0.075),
-    "claude-sonnet-4-20250514": (0.003, 0.015),
+    "gpt-4o": (2.50, 10.00),
+    "gpt-4o-mini": (0.15, 0.60),
+    "gpt-4.1": (3.00, 12.00),
+    "gpt-4-turbo": (10.00, 30.00),
+    "gpt-4": (30.00, 60.00),
+    "gpt-3.5-turbo": (1.00, 2.00),
+    "claude-sonnet-4": (3.00, 15.00),
+    "claude-opus-4-5": (5.00, 25.00),
+    "claude-3-opus": (15.00, 75.00),
+    "claude-3-sonnet": (3.00, 15.00),
+    "claude-3-haiku": (0.25, 1.25),
 }
+
+
+def _lookup_model_cost(model: str) -> tuple[float, float]:
+    """Match model string to cost table, using prefix matching for dated variants."""
+    if model in MODEL_COSTS:
+        return MODEL_COSTS[model]
+    for key in MODEL_COSTS:
+        if model.startswith(key):
+            return MODEL_COSTS[key]
+    return (3.00, 15.00)
 
 
 def analyze_book_file(path: Path) -> dict:
@@ -128,13 +142,11 @@ def analyze_book_file(path: Path) -> dict:
     # Estimate tokens (roughly 4 chars per token)
     tokens = char_count // 4
 
-    # Estimate cost - assume ~2x tokens for output (transformation is verbose)
-    # Resolve actual model from provider config (same logic as unified_provider)
     model = _get_resolved_model()
-    input_cost, output_cost = MODEL_COSTS.get(model, (0.005, 0.015))
+    input_cost, output_cost = _lookup_model_cost(model)
 
-    # For transformation: input is the book, output is roughly same size
-    estimated_cost = (tokens / 1000 * input_cost) + (tokens / 1000 * output_cost)
+    # Input = book text + prompts, output ~ same size as book
+    estimated_cost = (tokens / 1_000_000 * input_cost) + (tokens / 1_000_000 * output_cost)
 
     return {
         "chapters": chapters,
