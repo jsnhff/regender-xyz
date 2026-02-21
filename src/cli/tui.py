@@ -886,6 +886,8 @@ class RegenderTUI(App):
             self._handle_options_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
+        elif self._stage == "done":
+            self._handle_done_input(value)
 
     def _handle_book_input(self, value: str) -> None:
         """Handle book selection."""
@@ -1621,25 +1623,65 @@ class RegenderTUI(App):
         self._show_final()
 
     def _show_final(self) -> None:
-        """Show final message and disable input."""
+        """Offer to transform another book or quit."""
         self._stage = "done"
         self.print("")
-        self.print("[#b8a0cc]Press Ctrl+C to exit[/]")
+        self.print("[#8338ec]?[/] [bold #ff006e]What next?[/]")
+        self.print("")
+        self.print("  [bold #00f5ff]1[/]  Transform another book")
+        self.print("  [bold #00f5ff]2[/]  Quit")
+        self.print("")
         self.status_text = "Complete ✓"
 
         try:
             input_bar = self.query_one(InputBar)
             input_bar.stop_loading_animation(restore="[#00f5ff]✓[/]  ")
-            input_bar.disable()
+            input_bar.enable()
         except Exception:
             pass
 
-    def _show_error(self, error: str) -> None:
-        """Show error (called on main thread)."""
-        self._stage = "done"
+    def _handle_done_input(self, value: str) -> None:
+        """Handle post-completion menu: restart or quit."""
+        if value in ("1", "again", "a", "y", "yes"):
+            self._restart_flow()
+        elif value in ("2", "q", "quit", "exit", ""):
+            self.exit()
+        else:
+            self.print("[#ff006e]Enter 1 or 2[/]")
 
+    def _restart_flow(self) -> None:
+        """Reset state and start a new transformation."""
+        self._selected_book = None
+        self._selected_transform = None
+        self._no_qc = False
+        self._result = None
+        self._process_start = None
+        self._json_output_path = None
+        self._output_path = None
+        self._stage_start = None
+        self._current_stage = None
+        self._last_progress_line_id = None
+        self._book_stats = None
+        self._analysis_running = False
+        self._transform_loader = None
+        self._stage_loader = None
+        self._analysis_loader = None
+        self._model_choices = []
+        os.environ.pop("DEFAULT_MODEL", None)
+
+        self.book_title = "—"
+        self.transform_type = "—"
+        self.status_text = "Ready"
+
+        self.print("")
+        self.print("[#00f5ff]─[/]" * 50)
+        self.print("")
+        self._show_book_menu()
+
+    def _show_error(self, error: str) -> None:
+        """Show error and offer to try again or quit."""
         # Stop any active loaders
-        for attr in ('_transform_loader', '_stage_loader', '_analysis_loader'):
+        for attr in ("_transform_loader", "_stage_loader", "_analysis_loader"):
             loader = getattr(self, attr, None)
             if loader:
                 try:
@@ -1653,9 +1695,17 @@ class RegenderTUI(App):
         self.print(f"[bold #ff0000]✗ Error:[/bold #ff0000] {error}")
         self.print("")
         self.status_text = "Error"
+
+        self._stage = "done"
+        self.print("[#8338ec]?[/] [bold #ff006e]What next?[/]")
+        self.print("")
+        self.print("  [bold #00f5ff]1[/]  Try another book")
+        self.print("  [bold #00f5ff]2[/]  Quit")
+        self.print("")
         try:
             input_bar = self.query_one(InputBar)
             input_bar.stop_loading_animation(restore="[#ff006e]✗[/]  ")
+            input_bar.enable()
         except Exception:
             pass
 
