@@ -515,6 +515,8 @@ class GutenbergParser:
                     cleaned.append(line)
             else:
                 blank_count = 0
+                # Normalize ASCII double-dash to proper em dash
+                line = line.replace("--", "\u2014")
                 cleaned.append(line)
 
         return cleaned
