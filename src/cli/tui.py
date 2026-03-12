@@ -867,8 +867,10 @@ class RegenderTUI(App):
         self._stage = "options"
         self.print("[#00ff00]?[/] [bold #00ff00]Apply quality control?[/]")
         self.print("")
+        cost = self._estimate_cost_str(1.0)
+        cost_hint = f", costs {cost}" if cost else ""
         self.print(
-            "  [bold #00ff00]Y[/]  Yes [#00aa00](second LLM pass — catches missed transformations)[/]"
+            f"  [bold #00ff00]Y[/]  Yes [#00aa00](second LLM pass — catches missed transformations{cost_hint})[/]"
         )
         self.print("  [bold #00ff00]n[/]  No  [#00aa00](faster, skip QC)[/]")
         self.print("")
@@ -1072,12 +1074,24 @@ class RegenderTUI(App):
         with contextlib.suppress(Exception):
             self.query_one(HeaderBar).update_meta(self._book_stats)
 
+    def _estimate_cost_str(self, token_fraction: float = 1.0) -> str:
+        """Return a formatted cost estimate string for a fraction of the book's tokens."""
+        if not self._book_stats:
+            return ""
+        tokens = self._book_stats.get("tokens", 0)
+        model = os.environ.get("DEFAULT_MODEL", "")
+        input_cost, output_cost = _lookup_model_cost(model)
+        cost = tokens * token_fraction / 1_000_000 * (input_cost + output_cost)
+        return f"~${cost:.2f}"
+
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
         self._stage = "analyze_prompt"
         self.print("[#00ff00]?[/] [bold #00ff00]Analyze characters first?[/]")
         self.print("")
-        self.print("  [bold #00ff00]Y[/]  Yes [#00aa00](identifies characters, costs ~$0.02)[/]")
+        cost = self._estimate_cost_str(0.2)
+        cost_hint = f", costs {cost}" if cost else ""
+        self.print(f"  [bold #00ff00]Y[/]  Yes [#00aa00](identifies characters{cost_hint})[/]")
         self.print("  [bold #00ff00]n[/]  No  [#00aa00](skip to transformation)[/]")
         self.print("")
         self.set_prompt(">  ")
