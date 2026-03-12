@@ -5,7 +5,6 @@ These prompts are designed to be explicit about JSON structure
 and prevent common parsing issues.
 """
 
-
 EXTRACTION_PROMPT_TEMPLATE = """Extract ALL characters from this text. Return ONLY valid JSON, no markdown or explanation.
 
 Find ALL: protagonists, main characters, family members (all siblings!), supporting roles, minor characters, unnamed roles.
@@ -108,3 +107,22 @@ TRANSFORMATION TYPE: {transform_type}
 {character_instructions}
 
 Return ONLY the transformed text with NO explanations or metadata."""
+
+
+QC_REVIEW_PROMPT_TEMPLATE = """You are a quality reviewer for gender-transformed literature.
+
+TRANSFORMATION: {transform_type}
+RULES: {rules_summary}
+
+CHARACTERS (name: original→target):
+{character_list}
+
+Review these {batch_size} transformed paragraphs. Silently correct any errors you find.
+Common errors: missed pronouns, wrong honorifics, inconsistent character treatment.
+
+Return ONLY the {batch_size} corrected paragraphs, separated by blank lines.
+If a paragraph needs no changes, return it exactly as given.
+Do NOT add explanations, labels, or metadata.
+
+PARAGRAPHS:
+{paragraphs}"""

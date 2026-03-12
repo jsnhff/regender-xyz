@@ -858,11 +858,30 @@ class RegenderTUI(App):
         self.set_prompt(">  ")
 
     def _show_options_menu(self) -> None:
-        """Show output path and start processing."""
+        """Show output path and quality control option."""
         self._calculate_output_path()
         self.print("")
         self.print("[#00aa00]Output will be saved to:[/]")
         self.print(f"  [#00ff00]{self._output_path}[/]")
+        self.print("")
+        self._stage = "options"
+        self.print("[#00ff00]?[/] [bold #00ff00]Apply quality control?[/]")
+        self.print("")
+        self.print(
+            "  [bold #00ff00]Y[/]  Yes [#00aa00](second LLM pass — catches missed transformations)[/]"
+        )
+        self.print("  [bold #00ff00]n[/]  No  [#00aa00](faster, skip QC)[/]")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_options_input(self, value: str) -> None:
+        """Handle quality control selection."""
+        if value.lower() in ("n", "no"):
+            self._no_qc = True
+            self.print("[#00ff00]✓[/] Skipping QC")
+        else:
+            self._no_qc = False
+            self.print("[#00ff00]✓[/] QC enabled")
         self.print("")
         self._start_processing()
 
@@ -919,6 +938,8 @@ class RegenderTUI(App):
             self._handle_analyze_prompt_input(value)
         elif self._stage == "transform":
             self._handle_transform_input(value)
+        elif self._stage == "options":
+            self._handle_options_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -1434,6 +1455,7 @@ class RegenderTUI(App):
                 file_path=self._result["input"],
                 transform_type=transform_type,
                 output_path=self._result.get("output_path"),
+                quality_control=not self._result.get("no_qc", True),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -1610,6 +1632,12 @@ class RegenderTUI(App):
         self.print(f"[#00ff00]✓[/] {gradient_text(label, ['#00ff00', '#00aa00'])}")
         self.print(f"  [#00aa00]Time:[/] [#00ff00]{elapsed:.1f}s[/]")
         self.print(f"  [#00aa00]Saved:[/] [#00ff00]{self._json_output_path}[/]")
+        qc_score = result.get("quality_score")
+        qc_corrections = result.get("qc_corrections")
+        if qc_score is not None:
+            self.print(
+                f"  [#00aa00]QC score:[/] [#00ff00]{qc_score}%[/] [#00aa00]({qc_corrections} corrections)[/]"
+            )
 
         # Show export options from FORMATS
         self._stage = "export"

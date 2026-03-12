@@ -17,6 +17,7 @@ from src.models.character import CharacterAnalysis
 from src.models.transformation import TransformType
 from src.parsers.book_converter import BookConverter
 from src.plugins.base import PluginManager
+from src.services.quality_service import QualityService
 
 
 class Application:
@@ -273,12 +274,17 @@ class Application:
         if not book.author or book.author == "Unknown Author":
             book.author = None  # Cleaner than "Unknown Author" in output
 
+    def _get_provider(self):
+        """Get the configured LLM provider."""
+        return self.context.get_service("llm_provider")
+
     async def process_book(
         self,
         file_path: str,
         transform_type: str,
         output_path: Optional[str] = None,
         selected_characters: Optional[list[str]] = None,
+        quality_control: bool = False,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -332,7 +338,28 @@ class Application:
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
-            # Quality control removed - transformations are applied directly
+            # Apply quality control if requested
+            qc_score = None
+            qc_corrections = None
+            if quality_control:
+                self.logger.info("Applying quality control pass...")
+                try:
+                    provider = self._get_provider()
+                    qc_service = QualityService(provider=provider)
+                    qc_result = await qc_service.review_book(
+                        transformation.get_transformed_book(),
+                        characters,
+                        TransformType(transform_type),
+                    )
+                    qc_score = qc_result["quality_score"]
+                    qc_corrections = qc_result["corrections_made"]
+                    # Replace the transformed book in the transformation with the corrected version
+                    transformation._corrected_book = qc_result["corrected_book"]
+                    self.logger.info(
+                        f"QC complete: score={qc_score}%, corrections={qc_corrections}"
+                    )
+                except Exception as e:
+                    self.logger.warning(f"QC pass failed (continuing without): {e}")
 
             # Save output if requested
             if output_path:
@@ -355,6 +382,8 @@ class Application:
                 "characters": len(characters.characters),
                 "changes": len(transformation.changes),
                 "output_path": output_path,
+                "quality_score": qc_score,
+                "qc_corrections": qc_corrections,
             }
 
         except Exception as e:
