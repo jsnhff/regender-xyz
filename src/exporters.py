@@ -131,7 +131,10 @@ def _export_plain_impl(
         for para in chapter.get("paragraphs", []):
             text = _paragraph_text(para)
             if text.strip():
-                if use_italics_markup:
+                # Normalize scene break markers
+                if re.match(r"^\s*(\*\s*){2,}\s*$", text):
+                    text = "* * *"
+                elif use_italics_markup:
                     text = _italicize_markup(text)
                 else:
                     # Strip Gutenberg _word_ underscore markup for clean plain text
@@ -226,7 +229,13 @@ def export_rtf(json_path: str, output_path: Optional[str] = None) -> str:
             rtf_lines.append("\\pard\\ql\\fs24\\par")
         for para in chapter.get("paragraphs", []):
             text = _paragraph_text(para)
-            if text.strip():
+            if not text.strip():
+                continue
+            # Scene break markers (* * * or * * * * *) → centered ornamental break
+            if re.match(r"^\s*(\*\s*){2,}\s*$", text):
+                rtf_lines.append("\\pard\\qc\\fs24 * * *\\par")
+                rtf_lines.append("\\pard\\ql\\fs24")
+            else:
                 rtf_lines.append(f"\\fi720 {_apply_rtf_italics(text)}\\par")
 
         # Page break between chapters (except last)
