@@ -53,7 +53,7 @@ def gradient_text(text: str, colors: list[str]) -> str:
 
 # Smooth 2-color gradient palettes
 MAGENTA_PINK = [
-    "#ff006e",
+    "#00ff00",
     "#ff0080",
     "#ff1a8c",
     "#ff3399",
@@ -62,9 +62,9 @@ MAGENTA_PINK = [
     "#ff80c0",
     "#ff99cc",
 ]
-CYAN_BLUE = ["#00f5ff", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff", "#004dff", "#0033ff"]
+CYAN_BLUE = ["#00ff00", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff", "#004dff", "#0033ff"]
 YELLOW_ORANGE = [
-    "#ffbe0b",
+    "#00ff00",
     "#ffb00a",
     "#ffa209",
     "#ff9408",
@@ -74,7 +74,7 @@ YELLOW_ORANGE = [
     "#ff5c04",
 ]
 VIOLET_MAGENTA = [
-    "#8338ec",
+    "#00ff00",
     "#9033e8",
     "#9d2ee4",
     "#aa29e0",
@@ -84,7 +84,7 @@ VIOLET_MAGENTA = [
     "#de15d0",
 ]
 PINK_VIOLET = [
-    "#ff006e",
+    "#00ff00",
     "#f01a82",
     "#e13396",
     "#d24daa",
@@ -93,7 +93,7 @@ PINK_VIOLET = [
     "#a599e6",
     "#96b3fa",
 ]
-FIRE_GLOW = ["#ff006e", "#ff3355", "#ff5c3d", "#ff8526", "#ffae0f"]
+FIRE_GLOW = ["#00ff00", "#ff3355", "#ff5c3d", "#ff8526", "#ffae0f"]
 
 
 # =============================================================================
@@ -226,16 +226,16 @@ def analyze_book_file(path: Path) -> dict:
 # =============================================================================
 
 THEME_CSS = """
-$primary: #ff006e;        /* Hot magenta */
-$secondary: #00f5ff;      /* Electric cyan */
-$accent: #ffbe0b;         /* Bold yellow */
-$violet: #8338ec;         /* Deep violet */
-$background: #0a0014;     /* Deep purple-black */
-$surface: #1a0028;        /* Slightly lighter purple */
-$text: #ffffff;           /* Pure white */
-$text-dim: #b8a0cc;       /* Lavender dim */
-$success: #00f5ff;        /* Cyan */
-$error: #ff006e;          /* Magenta */
+$primary: #00ff00;        /* Hot magenta */
+$secondary: #00ff00;      /* Electric cyan */
+$accent: #00ff00;         /* Bold yellow */
+$violet: #00ff00;         /* Deep violet */
+$background: #000000;     /* Black */
+$surface: #000000;        /* Black */
+$text: #00ff00;           /* Green */
+$text-dim: #00aa00;       /* Lavender dim */
+$success: #00ff00;        /* Cyan */
+$error: #00ff00;          /* Magenta */
 """
 
 
@@ -244,8 +244,11 @@ $error: #ff006e;          /* Magenta */
 # =============================================================================
 
 
-# Logo with smooth magenta→pink gradient
-LOGO_ART = gradient_text("regender", MAGENTA_PINK) + "[#8338ec].xyz[/]"
+# Green gradient palette for header
+GREEN_GRADIENT = ["#00ff00", "#00dd00", "#00bb00", "#00aa00", "#008800"]
+
+# Logo - green gradient on black
+LOGO_ART = gradient_text("regender", GREEN_GRADIENT) + gradient_text(".xyz", ["#00aa00", "#00ff00"])
 
 
 class SineWaveLoader(Static):
@@ -281,8 +284,8 @@ class SineWaveLoader(Static):
         try:
             width = 60
             height_chars = "▁▂▃▄▅▆▇█"
-            # Smooth cyan→blue gradient for the wave
-            wave_colors = ["#00f5ff", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff"]
+            # Green gradient for the wave
+            wave_colors = ["#00ff00", "#00dd00", "#00bb00", "#009900", "#007700", "#005500"]
 
             # Generate sine wave
             wave = []
@@ -302,8 +305,8 @@ class SineWaveLoader(Static):
 
                 wave.append(f"[{color}]{height_chars[char_idx]}[/]")
 
-            # Message with gradient
-            msg = gradient_text(self._message, VIOLET_MAGENTA)
+            # Message with green
+            msg = gradient_text(self._message, ["#00ff00", "#00aa00"])
 
             # Compose output
             wave_str = "".join(wave)
@@ -324,15 +327,22 @@ class HeaderBar(Container):
     DEFAULT_CSS = """
     HeaderBar {
         dock: top;
-        height: 6;
-        background: #1a0028;
-        padding: 0 1;
-        border-bottom: heavy #00f5ff;
+        height: 8;
+        background: #000000;
+        border-bottom: heavy #00ff00;
+        padding: 0;
     }
 
     HeaderBar #top-bar {
+        width: 100vw;
+        height: 3;
+        background: #000000;
+    }
+
+    HeaderBar #top-bar-content {
         width: 100%;
-        height: 1;
+        height: auto;
+        padding: 1 1;
     }
 
     HeaderBar #version {
@@ -343,12 +353,13 @@ class HeaderBar(Container):
     HeaderBar #border1, HeaderBar #border2 {
         width: 100%;
         height: 1;
-        color: #00f5ff;
+        color: #00ff00;
     }
 
     HeaderBar #stats-row1, HeaderBar #stats-row2 {
         width: 100%;
         height: 1;
+        padding: 0 1;
     }
 
     HeaderBar #stats-row1 > Label, HeaderBar #stats-row2 > Label {
@@ -371,31 +382,30 @@ class HeaderBar(Container):
         self._cost = "—"
 
     def compose(self) -> ComposeResult:
-        # Top bar: logo, tagline, version
-        with Horizontal(id="top-bar"):
-            tagline_text = "transform characters' gender in books"
-            tagline_gradient = gradient_text(tagline_text, CYAN_BLUE)
-            yield Label(f"{LOGO_ART}  {tagline_gradient}")
-            yield Label("[#b8a0cc]v1.0[/]", id="version")
+        # Top bar: black background, green gradient text
+        with Horizontal(id="top-bar"), Horizontal(id="top-bar-content"):
+            tagline = gradient_text("transform characters' gender in books", GREEN_GRADIENT)
+            yield Label(f"{LOGO_ART}  {tagline}")
+            yield Label(gradient_text("v1.0", ["#00aa00", "#00ff00"]), id="version")
 
-        # Border
-        yield Label("─" * 100, id="border1")
+        # Border (wide enough for large terminals)
+        yield Label("─" * 200, id="border1")
 
         # Row 1: book stats
         with Horizontal(id="stats-row1"):
-            yield Label(f"[#b8a0cc]book:[/] [#00f5ff]{self._book}[/]")
-            yield Label(f"[#b8a0cc]pages:[/] [#ffbe0b]{self._pages}[/]")
-            yield Label(f"[#b8a0cc]chapters:[/] [#ff006e]{self._chapters}[/]")
-            yield Label(f"[#b8a0cc]characters:[/] [#8338ec]{self._characters}[/]")
+            yield Label(f"[#00aa00]book:[/] [#00ff00]{self._book}[/]")
+            yield Label(f"[#00aa00]pages:[/] [#00ff00]{self._pages}[/]")
+            yield Label(f"[#00aa00]chapters:[/] [#00ff00]{self._chapters}[/]")
+            yield Label(f"[#00aa00]characters:[/] [#00ff00]{self._characters}[/]")
 
-        # Border
-        yield Label("─" * 100, id="border2")
+        # Border (wide enough for large terminals)
+        yield Label("─" * 200, id="border2")
 
         # Row 2: processing info
         with Horizontal(id="stats-row2"):
-            yield Label(f"[#b8a0cc]transformation:[/] [#00f5ff]{self._transform}[/]")
-            yield Label(f"[#b8a0cc]model:[/] [#ffbe0b]{self._model}[/]")
-            yield Label(f"[#b8a0cc]total cost:[/] [#ff006e]{self._cost}[/]")
+            yield Label(f"[#00aa00]transformation:[/] [#00ff00]{self._transform}[/]")
+            yield Label(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]")
+            yield Label(f"[#00aa00]total cost:[/] [#00ff00]{self._cost}[/]")
 
     def update_status(self, book: str = None, transform: str = None, status: str = None) -> None:
         """Update book and transform fields."""
@@ -424,23 +434,23 @@ class HeaderBar(Container):
         try:
             labels = self.query("#stats-row1 > Label")
             if len(labels) >= 4:
-                labels[0].update(Text.from_markup(f"[#b8a0cc]book:[/] [#00f5ff]{self._book}[/]"))
-                labels[1].update(Text.from_markup(f"[#b8a0cc]pages:[/] [#ffbe0b]{self._pages}[/]"))
+                labels[0].update(Text.from_markup(f"[#00aa00]book:[/] [#00ff00]{self._book}[/]"))
+                labels[1].update(Text.from_markup(f"[#00aa00]pages:[/] [#00ff00]{self._pages}[/]"))
                 labels[2].update(
-                    Text.from_markup(f"[#b8a0cc]chapters:[/] [#ff006e]{self._chapters}[/]")
+                    Text.from_markup(f"[#00aa00]chapters:[/] [#00ff00]{self._chapters}[/]")
                 )
                 labels[3].update(
-                    Text.from_markup(f"[#b8a0cc]characters:[/] [#8338ec]{self._characters}[/]")
+                    Text.from_markup(f"[#00aa00]characters:[/] [#00ff00]{self._characters}[/]")
                 )
 
             labels = self.query("#stats-row2 > Label")
             if len(labels) >= 3:
                 labels[0].update(
-                    Text.from_markup(f"[#b8a0cc]transformation:[/] [#00f5ff]{self._transform}[/]")
+                    Text.from_markup(f"[#00aa00]transformation:[/] [#00ff00]{self._transform}[/]")
                 )
-                labels[1].update(Text.from_markup(f"[#b8a0cc]model:[/] [#ffbe0b]{self._model}[/]"))
+                labels[1].update(Text.from_markup(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]"))
                 labels[2].update(
-                    Text.from_markup(f"[#b8a0cc]total cost:[/] [#ff006e]{self._cost}[/]")
+                    Text.from_markup(f"[#00aa00]total cost:[/] [#00ff00]{self._cost}[/]")
                 )
         except Exception:
             pass
@@ -453,24 +463,24 @@ class ContentArea(ScrollableContainer):
     ContentArea {
         height: 1fr;
         padding: 1 1;
-        background: #0a0014;
-        scrollbar-color: #8338ec;
-        scrollbar-color-hover: #ff006e;
-        scrollbar-color-active: #00f5ff;
+        background: #000000;
+        scrollbar-color: #00aa00;
+        scrollbar-color-hover: #00ff00;
+        scrollbar-color-active: #00ff00;
     }
 
     ContentArea .log-line {
         height: auto;
         margin: 0;
         padding: 0;
-        color: #ffffff;
+        color: #00ff00;
     }
 
     ContentArea .progress-line {
         height: auto;
         margin: 0;
         padding: 0;
-        color: #ffffff;
+        color: #00ff00;
     }
     """
 
@@ -538,7 +548,7 @@ class BrailleLoader(Static):
             time_str = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
 
             frame_char = BRAILLE_LOADING_FRAMES[self._frame % len(BRAILLE_LOADING_FRAMES)]
-            msg = f"[#00f5ff]{frame_char}[/] [#b8a0cc]{self._activity}[/] [#ffbe0b]({time_str})[/]"
+            msg = f"[#00ff00]{frame_char}[/] [#00aa00]{self._activity}[/] [#00ff00]({time_str})[/]"
             self.update(Text.from_markup(msg))
 
     def stop(self) -> None:
@@ -553,8 +563,8 @@ class InputBar(Static):
     InputBar {
         dock: bottom;
         height: 2;
-        background: #1a0028;
-        border-top: heavy #00f5ff;
+        background: #000000;
+        border-top: heavy #00ff00;
         padding: 0 1;
     }
 
@@ -565,24 +575,24 @@ class InputBar(Static):
 
     InputBar #prompt {
         width: auto;
-        color: #00f5ff;
+        color: #00ff00;
     }
 
     InputBar #input {
         width: 1fr;
         border: none;
-        background: #1a0028;
-        color: #00f5ff;
+        background: #000000;
+        color: #00ff00;
         padding: 0;
     }
 
     InputBar #input:focus {
         border: none;
-        color: #ffbe0b;
+        color: #00ff00;
     }
 
     InputBar #input.-disabled {
-        color: #b8a0cc;
+        color: #00aa00;
     }
     """
 
@@ -624,7 +634,7 @@ class InputBar(Static):
 
         def tick() -> None:
             frame = BRAILLE_LOADING_FRAMES[self._loading_frame % len(BRAILLE_LOADING_FRAMES)]
-            self.set_prompt(f"[#00f5ff]{frame}[/] ")
+            self.set_prompt(f"[#00ff00]{frame}[/] ")
             self._loading_frame += 1
 
         self._loading_interval = self.set_interval(0.12, tick)
@@ -644,10 +654,10 @@ class StatusBar(Static):
     StatusBar {
         dock: bottom;
         height: 1;
-        background: #0a0a0a;
-        border-top: solid #003300;
+        background: #000000;
+        border-top: solid #00ff00;
         padding: 0 2;
-        color: #00aa00;
+        color: #00ff00;
     }
     """
 
@@ -676,6 +686,7 @@ class RegenderTUI(App):
     CSS = """
     Screen {
         background: #000000;
+        padding: 0;
     }
     """
 
@@ -724,7 +735,7 @@ class RegenderTUI(App):
         self._update_header()
 
         # Simple welcome message
-        self.print("[#00f5ff]◆[/] [#b8a0cc]Welcome to regender.xyz[/]")
+        self.print("[#00ff00]◆[/] [#00aa00]Welcome to regender.xyz[/]")
         self.print("")
 
         # Check LLM setup
@@ -749,22 +760,22 @@ class RegenderTUI(App):
 
         if not has_openai and not has_anthropic:
             # No API keys configured
-            self.print("[bold #ffbe0b]⚠ No API keys detected[/]")
+            self.print("[bold #00ff00]⚠ No API keys detected[/]")
             self.print("")
             self.print(
-                "[#b8a0cc]Add these to[/] [bold #00f5ff].env[/] [#b8a0cc]in the project folder:[/]"
+                "[#00aa00]Add these to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
             )
             self.print("")
-            self.print("  [#8338ec]# For OpenAI:[/]")
-            self.print("  [#00f5ff]OPENAI_API_KEY=sk-...[/]")
-            self.print("  [#00f5ff]DEFAULT_PROVIDER=openai[/]")
+            self.print("  [#00ff00]# For OpenAI:[/]")
+            self.print("  [#00ff00]OPENAI_API_KEY=sk-...[/]")
+            self.print("  [#00ff00]DEFAULT_PROVIDER=openai[/]")
             self.print("")
-            self.print("  [#8338ec]# Or for Anthropic:[/]")
-            self.print("  [#00f5ff]ANTHROPIC_API_KEY=sk-ant-...[/]")
-            self.print("  [#00f5ff]DEFAULT_PROVIDER=anthropic[/]")
+            self.print("  [#00ff00]# Or for Anthropic:[/]")
+            self.print("  [#00ff00]ANTHROPIC_API_KEY=sk-ant-...[/]")
+            self.print("  [#00ff00]DEFAULT_PROVIDER=anthropic[/]")
             self.print("")
             self.print(
-                "[#b8a0cc]Then restart the app. You can still use 'parse_only' without keys.[/]"
+                "[#00aa00]Then restart the app. You can still use 'parse_only' without keys.[/]"
             )
             self.print("")
         elif not provider:
@@ -774,17 +785,17 @@ class RegenderTUI(App):
                 available.append("openai")
             if has_anthropic:
                 available.append("anthropic")
-            self.print("[bold #ffbe0b]⚠ DEFAULT_PROVIDER not set[/]")
+            self.print("[bold #00ff00]⚠ DEFAULT_PROVIDER not set[/]")
             self.print("")
-            self.print(f"[#b8a0cc]You have API keys for: {', '.join(available)}[/]")
+            self.print(f"[#00aa00]You have API keys for: {', '.join(available)}[/]")
             self.print(
-                "[#b8a0cc]Add this to[/] [bold #00f5ff].env[/] [#b8a0cc]in the project folder:[/]"
+                "[#00aa00]Add this to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
             )
-            self.print(f"  [#00f5ff]DEFAULT_PROVIDER={available[0]}[/]")
+            self.print(f"  [#00ff00]DEFAULT_PROVIDER={available[0]}[/]")
             self.print("")
         else:
             # All good - show which provider is active
-            self.print(f"[#00f5ff]◆[/] [#b8a0cc]Using {provider} for LLM calls[/]")
+            self.print(f"[#00ff00]◆[/] [#00aa00]Using {provider} for LLM calls[/]")
             self.print("")
 
     # -------------------------------------------------------------------------
@@ -829,20 +840,20 @@ class RegenderTUI(App):
     def _show_book_menu(self) -> None:
         """Show book selection with colorful styling."""
         self._stage = "book"
-        self.print("[#8338ec]?[/] [bold #ff006e]Select a book[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]Select a book[/]")
         self.print("")
-        self.print("  [bold #00f5ff]1[/]  Pride and Prejudice [#b8a0cc](sample)[/]")
-        self.print("  [bold #00f5ff]2[/]  Enter or drag file path...")
+        self.print("  [bold #00ff00]1[/]  Pride and Prejudice [#00aa00](sample)[/]")
+        self.print("  [bold #00ff00]2[/]  Enter or drag file path...")
         self.print("")
         self.set_prompt(">  ")
 
     def _show_transform_menu(self) -> None:
         """Show transform selection with colorful styling."""
         self._stage = "transform"
-        self.print("[#8338ec]?[/] [bold #ff006e]Select transformation[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]Select transformation[/]")
         self.print("")
         for i, (name, desc) in enumerate(self.TRANSFORM_TYPES, 1):
-            self.print(f"  [bold #00f5ff]{i}[/]  {name:<18} [#b8a0cc]{desc}[/]")
+            self.print(f"  [bold #00ff00]{i}[/]  {name:<18} [#00aa00]{desc}[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -851,8 +862,8 @@ class RegenderTUI(App):
         # Calculate and show output path
         self._calculate_output_path()
         self.print("")
-        self.print("[#b8a0cc]Output will be saved to:[/]")
-        self.print(f"  [#00f5ff]{self._output_path}[/]")
+        self.print("[#00aa00]Output will be saved to:[/]")
+        self.print(f"  [#00ff00]{self._output_path}[/]")
         self.print("")
 
         # TODO: Re-enable QC prompt once app.process_book() supports
@@ -929,9 +940,9 @@ class RegenderTUI(App):
             if sample.exists():
                 self._select_book(sample)
             else:
-                self.print("[#ff0000]Sample not found[/#ff0000]")
+                self.print("[#00ff00]Sample not found[/]")
         elif value == "2":
-            self.print("[#b8a0cc]  Drag a .txt file into this window, or paste the full path[/]")
+            self.print("[#00aa00]  Drag a .txt file into this window, or paste the full path[/]")
             self.set_prompt("path>  ")
         elif value.lower() in ("q", "quit"):
             self.exit()
@@ -940,15 +951,15 @@ class RegenderTUI(App):
             if path.exists() and path.is_file():
                 self._select_book(path)
             elif path.exists():
-                self.print("[#ff0000]That's a directory[/#ff0000]")
+                self.print("[#00ff00]That's a directory[/]")
             else:
-                self.print("[#ff0000]File not found[/#ff0000]")
+                self.print("[#00ff00]File not found[/]")
 
     def _select_book(self, path: Path) -> None:
         """Select a book and show analysis."""
         self._selected_book = path
         self.book_title = self._get_book_title(path)
-        self.print(f"[#00f5ff]✓[/] {self.book_title}")
+        self.print(f"[#00ff00]✓[/] {self.book_title}")
 
         # Analyze the book and update header
         stats = analyze_book_file(path)
@@ -982,14 +993,14 @@ class RegenderTUI(App):
                 self._model_choices.append((model_id, display_name, pricing))
 
         if not self._model_choices:
-            self.print("[#ffbe0b]⚠ No API keys configured — skipping model selection[/]")
+            self.print("[#00ff00]⚠ No API keys configured — skipping model selection[/]")
             self._show_character_analysis_prompt()
             return
 
         if len(self._model_choices) == 1:
             model_id, display_name, _ = self._model_choices[0]
             os.environ["DEFAULT_MODEL"] = model_id
-            self.print(f"[#00f5ff]✓[/] Using [bold #ffbe0b]{display_name}[/]")
+            self.print(f"[#00ff00]✓[/] Using [bold #00ff00]{display_name}[/]")
             self._recalculate_cost(model_id)
             self.print("")
             self._show_character_analysis_prompt()
@@ -997,11 +1008,11 @@ class RegenderTUI(App):
 
         self._stage = "model"
         current = _get_resolved_model()
-        self.print("[#8338ec]?[/] [bold #ff006e]Select a model[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]Select a model[/]")
         self.print("")
         for i, (model_id, display_name, pricing) in enumerate(self._model_choices, 1):
-            marker = " [#00f5ff]◄[/]" if model_id == current or current.startswith(model_id) else ""
-            self.print(f"  [bold #00f5ff]{i}[/]  {display_name:<22} [#b8a0cc]{pricing}[/]{marker}")
+            marker = " [#00ff00]◄[/]" if model_id == current or current.startswith(model_id) else ""
+            self.print(f"  [bold #00ff00]{i}[/]  {display_name:<22} [#00aa00]{pricing}[/]{marker}")
         self.print("")
         self.set_prompt(">  ")
 
@@ -1017,7 +1028,7 @@ class RegenderTUI(App):
             if 0 <= idx < len(choices):
                 model_id, display_name, _ = choices[idx]
                 os.environ["DEFAULT_MODEL"] = model_id
-                self.print(f"[#00f5ff]✓[/] {display_name}")
+                self.print(f"[#00ff00]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
                 self._show_character_analysis_prompt()
@@ -1028,13 +1039,13 @@ class RegenderTUI(App):
         for model_id, display_name, _ in choices:
             if value.lower() in (model_id.lower(), display_name.lower()):
                 os.environ["DEFAULT_MODEL"] = model_id
-                self.print(f"[#00f5ff]✓[/] {display_name}")
+                self.print(f"[#00ff00]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
                 self._show_character_analysis_prompt()
                 return
 
-        self.print(f"[#ff006e]Enter 1-{len(choices)}[/]")
+        self.print(f"[#00ff00]Enter 1-{len(choices)}[/]")
 
     def _recalculate_cost(self, model: str) -> None:
         """Recalculate cost estimate for the selected model and update header."""
@@ -1051,10 +1062,10 @@ class RegenderTUI(App):
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
         self._stage = "analyze_prompt"
-        self.print("[#8338ec]?[/] [bold #ff006e]Analyze characters first?[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]Analyze characters first?[/]")
         self.print("")
-        self.print("  [bold #00f5ff]Y[/]  Yes [#b8a0cc](identifies characters, costs ~$0.02)[/]")
-        self.print("  [bold #00f5ff]n[/]  No  [#b8a0cc](skip to transformation)[/]")
+        self.print("  [bold #00ff00]Y[/]  Yes [#00aa00](identifies characters, costs ~$0.02)[/]")
+        self.print("  [bold #00ff00]n[/]  No  [#00aa00](skip to transformation)[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -1072,7 +1083,7 @@ class RegenderTUI(App):
 
             self._run_character_analysis()
         else:
-            self.print("[#00f5ff]✓[/] Skipped")
+            self.print("[#00ff00]✓[/] Skipped")
             self.print("")
             self._show_transform_menu()
 
@@ -1190,7 +1201,7 @@ class RegenderTUI(App):
                         self.query_one(HeaderBar).update_meta(self._book_stats, char_count)
 
                     self.print(
-                        f"[#00f5ff]✓[/] Found [bold #00f5ff]{char_count}[/] characters [#b8a0cc]({elapsed:.1f}s)[/]"
+                        f"[#00ff00]✓[/] Found [bold #00ff00]{char_count}[/] characters [#00aa00]({elapsed:.1f}s)[/]"
                     )
 
                     # Show gender breakdown
@@ -1198,16 +1209,16 @@ class RegenderTUI(App):
                     for gender, count in by_gender.items():
                         gender_parts.append(f"{count} {gender}")
                     if gender_parts:
-                        self.print(f"  [#b8a0cc]Genders:[/] {', '.join(gender_parts)}")
+                        self.print(f"  [#00aa00]Genders:[/] {', '.join(gender_parts)}")
 
                     # Show top characters
                     if main_chars:
                         self.print("")
-                        self.print("  [#b8a0cc]Main characters:[/]")
+                        self.print("  [#00aa00]Main characters:[/]")
                         for name in main_chars[:5]:
-                            self.print(f"    [#00f5ff]•[/] {name}")
+                            self.print(f"    [#00ff00]•[/] {name}")
                         if len(main_chars) > 5:
-                            self.print(f"    [#b8a0cc]... and {len(main_chars) - 5} more[/]")
+                            self.print(f"    [#00aa00]... and {len(main_chars) - 5} more[/]")
 
                     self.print("")
                     self._show_transform_menu()
@@ -1226,8 +1237,8 @@ class RegenderTUI(App):
                         pass
                 self.status_text = "Ready"
 
-                self.print(f"\n[#ff006e]Analysis failed:[/] {error_msg}")
-                self.print("[#b8a0cc]  See logs/tui_debug.log for details[/]")
+                self.print(f"\n[#00ff00]Analysis failed:[/] {error_msg}")
+                self.print("[#00aa00]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
                 self._show_transform_menu()
@@ -1247,8 +1258,8 @@ class RegenderTUI(App):
                     pass
             self.status_text = "Ready"
 
-            self.print(f"\n[#ff006e]Error:[/] {error_msg}")
-            self.print("[#b8a0cc]  See logs/tui_debug.log for full traceback[/]")
+            self.print(f"\n[#00ff00]Error:[/] {error_msg}")
+            self.print("[#00aa00]  See logs/tui_debug.log for full traceback[/]")
             self._show_api_key_help(error_msg)
             self.print("")
             self._show_transform_menu()
@@ -1262,11 +1273,11 @@ class RegenderTUI(App):
         ):
             self.print("")
             self.print(
-                "[#b8a0cc]Add your API keys to[/] [bold #00f5ff].env[/] [#b8a0cc]in the project folder:[/]"
+                "[#00aa00]Add your API keys to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
             )
-            self.print("[#b8a0cc]  OPENAI_API_KEY=sk-...[/]")
-            self.print("[#b8a0cc]  DEFAULT_PROVIDER=openai[/]")
-            self.print("[#b8a0cc]Then restart the app.[/]")
+            self.print("[#00aa00]  OPENAI_API_KEY=sk-...[/]")
+            self.print("[#00aa00]  DEFAULT_PROVIDER=openai[/]")
+            self.print("[#00aa00]Then restart the app.[/]")
 
     def _handle_transform_input(self, value: str) -> None:
         """Handle transform selection."""
@@ -1279,7 +1290,7 @@ class RegenderTUI(App):
             if 0 <= idx < len(self.TRANSFORM_TYPES):
                 self._selected_transform = self.TRANSFORM_TYPES[idx][0]
                 self.transform_type = self._selected_transform
-                self.print(f"[#00ff00]✓[/#00ff00] {self._selected_transform}")
+                self.print(f"[#00ff00]✓[/] {self._selected_transform}")
                 self.print("")
                 self._show_options_menu()
                 return
@@ -1288,21 +1299,21 @@ class RegenderTUI(App):
                 if value.lower() == name.lower():
                     self._selected_transform = name
                     self.transform_type = name
-                    self.print(f"[#00ff00]✓[/#00ff00] {name}")
+                    self.print(f"[#00ff00]✓[/] {name}")
                     self.print("")
                     self._show_options_menu()
                     return
 
-        self.print(f"[#ff0000]Enter 1-{len(self.TRANSFORM_TYPES)}[/#ff0000]")
+        self.print(f"[#00ff00]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
 
     def _handle_options_input(self, value: str) -> None:
         """Handle options."""
         if value.lower() in ("n", "no"):
             self._no_qc = True
-            self.print("[#00ff00]✓[/#00ff00] QC disabled")
+            self.print("[#00ff00]✓[/] QC disabled")
         else:
             self._no_qc = False
-            self.print("[#00ff00]✓[/#00ff00] QC enabled")
+            self.print("[#00ff00]✓[/] QC enabled")
 
         self.print("")
         self._start_processing()
@@ -1345,7 +1356,7 @@ class RegenderTUI(App):
         except Exception:
             pass
 
-        self.print(f"{gradient_text('Starting transformation', FIRE_GLOW)}...")
+        self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
 
         # Show braille loader with elapsed timer
         self._transform_loader = BrailleLoader("Transforming", self._process_start)
@@ -1466,26 +1477,25 @@ class RegenderTUI(App):
             if rate > 0:
                 remaining = (event.total - event.current) / rate
                 if remaining < 60:
-                    eta_str = f" [#b8a0cc]~{int(remaining)}s left[/]"
+                    eta_str = f" [#00aa00]~{int(remaining)}s left[/]"
                 else:
                     mins = int(remaining // 60)
                     secs = int(remaining % 60)
-                    eta_str = f" [#b8a0cc]~{mins}m {secs}s left[/]"
+                    eta_str = f" [#00aa00]~{mins}m {secs}s left[/]"
 
-        # Build gradient progress bar (magenta→pink)
+        # Build gradient progress bar (green)
         bar_width = 50
         filled = int(bar_width * pct)
         empty = bar_width - filled
 
         # Gradient colors for filled portion
         gradient_colors = [
-            "#ff006e",
-            "#ff1a8c",
-            "#ff3399",
-            "#ff4da6",
-            "#ff66b3",
-            "#ff80c0",
-            "#ff99cc",
+            "#00ff00",
+            "#00dd00",
+            "#00bb00",
+            "#009900",
+            "#007700",
+            "#005500",
         ]
         filled_chars = []
         for i in range(filled):
@@ -1495,19 +1505,14 @@ class RegenderTUI(App):
             filled_chars.append(f"[{color}]━[/]")
 
         filled_str = "".join(filled_chars)
-        empty_str = f"[#8338ec]{'━' * empty}[/]"
+        empty_str = f"[#00ff00]{'━' * empty}[/]"
         bar = filled_str + empty_str
 
-        # Percentage color based on completion
-        if pct < 0.3:
-            pct_color = "#ff006e"
-        elif pct < 0.7:
-            pct_color = "#ffbe0b"
-        else:
-            pct_color = "#00f5ff"
+        # Percentage color
+        pct_color = "#00ff00"
 
-        # Stage name with gradient
-        stage_gradient = gradient_text(stage_name, CYAN_BLUE)
+        # Stage name with green gradient
+        stage_gradient = gradient_text(stage_name, ["#00ff00", "#00aa00"])
 
         def update():
             self.status_text = f"{stage_name} {pct_int}%"
@@ -1544,10 +1549,10 @@ class RegenderTUI(App):
                 self.query_one("#content", ContentArea).clear_progress()
 
             # Add completion message with gradient
-            stage_gradient = gradient_text(stage_name, CYAN_BLUE)
-            msg = f"[#00f5ff]✓[/] {stage_gradient} [#b8a0cc]({event.elapsed_seconds:.1f}s)[/]"
+            stage_gradient = gradient_text(stage_name, ["#00ff00", "#00aa00"])
+            msg = f"[#00ff00]✓[/] {stage_gradient} [#00aa00]({event.elapsed_seconds:.1f}s)[/]"
             if stats:
-                msg += f" [#b8a0cc]— {stats}[/]"
+                msg += f" [#00aa00]— {stats}[/]"
             self.print(msg)
             self.status_text = f"{stage_name} ✓"
 
@@ -1570,9 +1575,9 @@ class RegenderTUI(App):
         else:
             # Transformation said it succeeded but no file exists
             self.print("")
-            self.print("[#ffbe0b]⚠ Transformation completed but output file not found[/]")
-            self.print(f"  [#b8a0cc]Expected:[/] {output_path}")
-            self.print(f"  [#b8a0cc]Time:[/] {elapsed:.1f}s (suspicious if < 5s)")
+            self.print("[#00ff00]⚠ Transformation completed but output file not found[/]")
+            self.print(f"  [#00aa00]Expected:[/] {output_path}")
+            self.print(f"  [#00aa00]Time:[/] {elapsed:.1f}s (suspicious if < 5s)")
             self.print("")
             self._json_output_path = None
             self._show_final()
@@ -1588,21 +1593,21 @@ class RegenderTUI(App):
                 pass
 
         self.print("")
-        self.print(f"[#00f5ff]✓[/] {gradient_text('Transformation complete!', FIRE_GLOW)}")
-        self.print(f"  [#b8a0cc]Time:[/] [#ffbe0b]{elapsed:.1f}s[/]")
-        self.print(f"  [#b8a0cc]Saved:[/] [#00f5ff]{self._json_output_path}[/]")
+        self.print(f"[#00ff00]✓[/] {gradient_text('Transformation complete!', ['#00ff00', '#00aa00'])}")
+        self.print(f"  [#00aa00]Time:[/] [#00ff00]{elapsed:.1f}s[/]")
+        self.print(f"  [#00aa00]Saved:[/] [#00ff00]{self._json_output_path}[/]")
 
         # Show export options from FORMATS
         self._stage = "export"
         self._export_format_list = list(FORMATS.keys())
         self.print("")
-        self.print("[#8338ec]?[/] [bold #ff006e]Export format[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]Export format[/]")
         self.print("")
         for i, key in enumerate(self._export_format_list, 1):
             info = FORMATS[key]
-            self.print(f"  [bold #00f5ff]{i}[/]  {key:<15} [#b8a0cc]{info['description']}[/]")
+            self.print(f"  [bold #00ff00]{i}[/]  {key:<15} [#00aa00]{info['description']}[/]")
         skip_num = len(self._export_format_list) + 1
-        self.print(f"  [bold #00f5ff]{skip_num}[/]  skip [#b8a0cc](JSON only)[/]")
+        self.print(f"  [bold #00ff00]{skip_num}[/]  skip [#00aa00](JSON only)[/]")
         self.print("")
 
         self.status_text = "Export?"
@@ -1621,7 +1626,7 @@ class RegenderTUI(App):
         format_list = getattr(self, "_export_format_list", None) or list(FORMATS.keys())
         skip_num = len(format_list) + 1
         if value in (str(skip_num), "skip", "s", ""):
-            self.print("[#00f5ff]✓[/] Skipped export")
+            self.print("[#00ff00]✓[/] Skipped export")
             self._show_final()
             return
 
@@ -1630,12 +1635,12 @@ class RegenderTUI(App):
         format_map["text"] = "txt"
         format_key = format_map.get(value.lower() if value else "")
         if not format_key:
-            self.print(f"[#ff006e]Enter 1-{skip_num} or format key[/]")
+            self.print(f"[#00ff00]Enter 1-{skip_num} or format key[/]")
             return
 
         if not self._json_output_path:
             self.print(
-                "[#ffbe0b]⚠[/] [#b8a0cc]No JSON output path available. Transformation may have saved to a different location.[/]"
+                "[#00ff00]⚠[/] [#00aa00]No JSON output path available. Transformation may have saved to a different location.[/]"
             )
             self._show_final()
             return
@@ -1646,9 +1651,9 @@ class RegenderTUI(App):
 
             json_path = Path(self._json_output_path)
             output_path = export_book(str(json_path), format_key)
-            self.print(f"[#00f5ff]✓[/] Exported to [#00f5ff]{output_path}[/]")
+            self.print(f"[#00ff00]✓[/] Exported to [#00ff00]{output_path}[/]")
         except Exception as e:
-            self.print(f"[#ff006e]Export error:[/] {e}")
+            self.print(f"[#00ff00]Export error:[/] {e}")
 
         self._show_final()
 
@@ -1656,16 +1661,16 @@ class RegenderTUI(App):
         """Offer to transform another book or quit."""
         self._stage = "done"
         self.print("")
-        self.print("[#8338ec]?[/] [bold #ff006e]What next?[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]What next?[/]")
         self.print("")
-        self.print("  [bold #00f5ff]1[/]  Transform another book")
-        self.print("  [bold #00f5ff]2[/]  Quit")
+        self.print("  [bold #00ff00]1[/]  Transform another book")
+        self.print("  [bold #00ff00]2[/]  Quit")
         self.print("")
         self.status_text = "Complete ✓"
 
         try:
             input_bar = self.query_one(InputBar)
-            input_bar.stop_loading_animation(restore="[#00f5ff]✓[/]  ")
+            input_bar.stop_loading_animation(restore="[#00ff00]✓[/]  ")
             input_bar.enable()
         except Exception:
             pass
@@ -1677,7 +1682,7 @@ class RegenderTUI(App):
         elif value in ("2", "q", "quit", "exit", ""):
             self.exit()
         else:
-            self.print("[#ff006e]Enter 1 or 2[/]")
+            self.print("[#00ff00]Enter 1 or 2[/]")
 
     def _restart_flow(self) -> None:
         """Reset state and start a new transformation."""
@@ -1704,7 +1709,7 @@ class RegenderTUI(App):
         self.status_text = "Ready"
 
         self.print("")
-        self.print("[#00f5ff]─[/]" * 50)
+        self.print("[#00ff00]─[/]" * 50)
         self.print("")
         self._show_book_menu()
 
@@ -1722,19 +1727,19 @@ class RegenderTUI(App):
                 setattr(self, attr, None)
 
         self.print("")
-        self.print(f"[bold #ff0000]✗ Error:[/bold #ff0000] {error}")
+        self.print(f"[bold #00ff00]✗ Error:[/bold #00ff00] {error}")
         self.print("")
         self.status_text = "Error"
 
         self._stage = "done"
-        self.print("[#8338ec]?[/] [bold #ff006e]What next?[/]")
+        self.print("[#00ff00]?[/] [bold #00ff00]What next?[/]")
         self.print("")
-        self.print("  [bold #00f5ff]1[/]  Try another book")
-        self.print("  [bold #00f5ff]2[/]  Quit")
+        self.print("  [bold #00ff00]1[/]  Try another book")
+        self.print("  [bold #00ff00]2[/]  Quit")
         self.print("")
         try:
             input_bar = self.query_one(InputBar)
-            input_bar.stop_loading_animation(restore="[#ff006e]✗[/]  ")
+            input_bar.stop_loading_animation(restore="[#00ff00]✗[/]  ")
             input_bar.enable()
         except Exception:
             pass
