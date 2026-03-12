@@ -247,8 +247,10 @@ class GutenbergParser:
             if line_stripped.startswith("Author:"):
                 metadata.author = line_stripped[7:].strip()
             elif line_stripped.lower().startswith("by ") and not metadata.author:
-                # Line starts with "by Author Name"
-                metadata.author = line_stripped[3:].strip()
+                # Only use short "by Author Name" lines — prose sentences are longer and contain commas
+                candidate = line_stripped[3:].strip()
+                if len(candidate) < 60 and "," not in candidate:
+                    metadata.author = candidate
 
             # Language
             if line_stripped.startswith("Language:"):
@@ -312,12 +314,7 @@ class GutenbergParser:
                         # This looks like a title
                         metadata.title = current
                     if not metadata.author:
-                        # Extract author, handling case variations
-                        if next_line.lower().startswith("by "):
-                            author_start = 3
-                        else:  # "BY " case
-                            author_start = 3
-                        metadata.author = next_line[author_start:].strip()
+                        metadata.author = next_line[3:].strip()
                     break
 
         return metadata
@@ -326,34 +323,53 @@ class GutenbergParser:
         """
         Try to extract title from the beginning of content.
 
-        Often the title appears as the first non-blank line.
+        Only considers standalone lines (preceded by a blank line or at the start),
+        which filters out line-wrapped prose continuations.
         """
+        prev_was_blank = True  # Treat start of file as preceded by blank
+
         for line in lines:
             line_stripped = line.strip()
 
-            # Skip blank lines
             if not line_stripped:
+                prev_was_blank = True
                 continue
 
-            # Skip if it's a chapter/part marker
+            # Only consider standalone lines — continuations of wrapped prose are not titles
+            if not prev_was_blank:
+                prev_was_blank = False
+                continue
+
+            prev_was_blank = False
+
+            # Skip chapter/part/act markers
             skip_markers = ["CHAPTER", "Chapter", "PART", "Part", "ACT", "Act", "BOOK", "Book"]
             if any(line_stripped.startswith(marker) for marker in skip_markers):
                 continue
 
-            # Skip if too short or too long to be a title
-            if len(line_stripped) < 3 or len(line_stripped) > 100:
+            # Titles are short and clean — prose sentences are longer and contain commas
+            if len(line_stripped) < 3 or len(line_stripped) > 60:
                 continue
 
-            # Skip lines that look like metadata
-            if ":" in line_stripped[:20]:  # Colon near beginning suggests "Field: Value"
+            if "," in line_stripped:
                 continue
 
-            # This might be the title
+            # Skip metadata-style lines (colon near beginning)
+            if ":" in line_stripped[:20]:
+                continue
+
+            # Skip sentence-like lines — prose ends with terminal punctuation, titles don't
+            if line_stripped[-1] in ".!?":
+                continue
+
+            # Skip lines that start with a quote character (dialogue, not a title)
+            if line_stripped[0] in '"\'_':
+                continue
+
+            # Accept all-caps titles (convert to title case) or naturally-cased titles
             if line_stripped.isupper():
-                # Convert from all caps
                 return line_stripped.title()
             elif line_stripped[0].isupper():
-                # Already in good format
                 return line_stripped.rstrip(".,;:")
 
         return None
@@ -465,20 +481,31 @@ class GutenbergParser:
         Removes:
         - Multiple consecutive blank lines (keep max 2)
         - Page numbers (lines with just numbers)
-        - Illustration markers
+        - Illustration blocks (including multi-line blocks with captions/copyrights)
         """
         cleaned = []
         blank_count = 0
+        in_illustration = False  # Track multi-line illustration blocks
 
         for line in lines:
             line_stripped = line.strip()
 
-            # Skip page numbers (just digits possibly with spaces)
-            if line_stripped and all(c.isdigit() or c.isspace() for c in line_stripped):
+            # Track illustration blocks — they can span multiple lines
+            # Block opens with [Illustration and closes when line ends with ]
+            if line_stripped.startswith("[Illustration"):
+                in_illustration = True
+                if line_stripped.endswith("]"):
+                    # Single-line illustration — opens and closes on same line
+                    in_illustration = False
                 continue
 
-            # Skip illustration markers
-            if line_stripped.startswith("[Illustration"):
+            if in_illustration:
+                if line_stripped.endswith("]"):
+                    in_illustration = False
+                continue
+
+            # Skip page numbers (lines that are purely digits/spaces)
+            if line_stripped and all(c.isdigit() or c.isspace() for c in line_stripped):
                 continue
 
             # Handle blank lines (keep max 2 consecutive)

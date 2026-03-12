@@ -298,6 +298,11 @@ class HierarchyBuilder:
                     result = extractor(match)
                     if isinstance(result, tuple):
                         number, title = result
+                        # Strip stray brackets/punctuation that leak in from chapter header formatting
+                        if title:
+                            title = title.strip("[]().,;: ")
+                            if not title:
+                                title = None
                     else:
                         number = result
                         title = None
