@@ -858,18 +858,12 @@ class RegenderTUI(App):
         self.set_prompt(">  ")
 
     def _show_options_menu(self) -> None:
-        """Show options with colorful styling."""
-        # Calculate and show output path
+        """Show output path and start processing."""
         self._calculate_output_path()
         self.print("")
         self.print("[#00aa00]Output will be saved to:[/]")
         self.print(f"  [#00ff00]{self._output_path}[/]")
         self.print("")
-
-        # TODO: Re-enable QC prompt once app.process_book() supports
-        # a quality_control parameter. Currently QC is commented out
-        # in app.py (line 323), so the prompt was cosmetic.
-        self._no_qc = True
         self._start_processing()
 
     def _get_book_title(self, path: Path) -> str:
@@ -925,8 +919,6 @@ class RegenderTUI(App):
             self._handle_analyze_prompt_input(value)
         elif self._stage == "transform":
             self._handle_transform_input(value)
-        elif self._stage == "options":
-            self._handle_options_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -1306,18 +1298,6 @@ class RegenderTUI(App):
 
         self.print(f"[#00ff00]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
 
-    def _handle_options_input(self, value: str) -> None:
-        """Handle options."""
-        if value.lower() in ("n", "no"):
-            self._no_qc = True
-            self.print("[#00ff00]✓[/] QC disabled")
-        else:
-            self._no_qc = False
-            self.print("[#00ff00]✓[/] QC enabled")
-
-        self.print("")
-        self._start_processing()
-
     # -------------------------------------------------------------------------
     # Processing
     # -------------------------------------------------------------------------
@@ -1422,10 +1402,37 @@ class RegenderTUI(App):
             app = Application("src/config.json")
             debug_log.info("Application created OK")
 
+            transform_type = self._result.get("transform_type")
+
+            # Route special transform types to dedicated app methods
+            if transform_type == "parse_only":
+                debug_log.info("Calling parse_book (await)...")
+                result = await app.parse_book(
+                    file_path=self._result["input"],
+                    output_path=self._result.get("output_path"),
+                )
+                debug_log.info(f"parse_book returned: success={result.get('success')}")
+                app.shutdown()
+                debug_log.info("App shutdown OK")
+                self._show_complete(result)
+                return
+
+            if transform_type == "character_analysis":
+                debug_log.info("Calling analyze_characters (await)...")
+                result = await app.analyze_characters(
+                    file_path=self._result["input"],
+                    output_path=self._result.get("output_path"),
+                )
+                debug_log.info(f"analyze_characters returned: success={result.get('success')}")
+                app.shutdown()
+                debug_log.info("App shutdown OK")
+                self._show_complete(result)
+                return
+
             debug_log.info("Calling process_book (await)...")
             result = await app.process_book(
                 file_path=self._result["input"],
-                transform_type=self._result["transform_type"],
+                transform_type=transform_type,
                 output_path=self._result.get("output_path"),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
@@ -1592,8 +1599,15 @@ class RegenderTUI(App):
             except Exception:
                 pass
 
+        transform = self._selected_transform or ""
+        if transform == "parse_only":
+            label = "Parsing complete!"
+        elif transform == "character_analysis":
+            label = "Character analysis complete!"
+        else:
+            label = "Transformation complete!"
         self.print("")
-        self.print(f"[#00ff00]✓[/] {gradient_text('Transformation complete!', ['#00ff00', '#00aa00'])}")
+        self.print(f"[#00ff00]✓[/] {gradient_text(label, ['#00ff00', '#00aa00'])}")
         self.print(f"  [#00aa00]Time:[/] [#00ff00]{elapsed:.1f}s[/]")
         self.print(f"  [#00aa00]Saved:[/] [#00ff00]{self._json_output_path}[/]")
 

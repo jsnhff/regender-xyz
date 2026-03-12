@@ -142,7 +142,7 @@ class Application:
         # List of provider files to try loading (excluding base classes)
         provider_modules = {
             "openai": "src.providers.openai",
-            "anthropic": "src.providers.anthropic"
+            "anthropic": "src.providers.anthropic",
         }
 
         # Load all available provider plugins
@@ -262,6 +262,17 @@ class Application:
         # Note: Character analysis will be saved by the CLI with a timestamp
         return characters
 
+    def _apply_title_fallback(self, book, file_path: str) -> None:
+        """If parser couldn't extract title/author, derive from filename."""
+        if not book.title or book.title == "Unknown Title":
+            stem = Path(file_path).stem
+            # Strip Gutenberg number prefix like "pg1342-"
+            if stem.startswith("pg") and "-" in stem:
+                stem = stem.split("-", 1)[1]
+            book.title = stem.replace("_", " ").replace("-", " ").title()
+        if not book.author or book.author == "Unknown Author":
+            book.author = None  # Cleaner than "Unknown Author" in output
+
     async def process_book(
         self,
         file_path: str,
@@ -288,6 +299,7 @@ class Application:
             # Parse the book
             parser = self.get_service("parser")
             book = await parser.process(file_path)
+            self._apply_title_fallback(book, file_path)
             self.logger.info(f"Parsed book: {book.title}")
 
             # Determine output directory early if we have an output path
@@ -304,7 +316,7 @@ class Application:
             if output_dir:
                 char_file = output_dir / "characters.json"
                 if not char_file.exists():
-                    with open(char_file, 'w') as f:
+                    with open(char_file, "w") as f:
                         json.dump(characters.to_dict(), f, indent=2, default=str)
                     self.logger.info(f"Saved character analysis to {char_file}")
 
@@ -370,7 +382,7 @@ class Application:
             config = ServiceConfig(
                 extra_config={
                     "preserve_unicode": False,
-                    "normalize_method": "unidecode"  # Use unidecode for clean ASCII
+                    "normalize_method": "unidecode",  # Use unidecode for clean ASCII
                 }
             )
 
@@ -414,7 +426,7 @@ class Application:
             converter = BookConverter()
             book = converter.convert(parsed_book)
             book.source_file = str(input_path)
-
+            self._apply_title_fallback(book, file_path)
             self.logger.info(f"Parsed book: {book.title}")
 
             # Calculate statistics
