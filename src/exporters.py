@@ -42,6 +42,24 @@ def _italicize_markup(text: str) -> str:
     return re.sub(r"_([^_]+)_", r"<i>\1</i>", text)
 
 
+def _apply_rtf_italics(text: str) -> str:
+    """
+    Convert _word_ markup to RTF italic runs, escaping each segment properly.
+
+    Splits on _word_ boundaries so RTF special chars inside italic spans
+    are still escaped correctly.
+    """
+    parts = re.split(r"_([^_]+)_", text)
+    result = []
+    for i, part in enumerate(parts):
+        escaped = _escape_rtf(part)
+        if i % 2 == 1:  # Odd indices are the captured italic groups
+            result.append(f"{{\\i {escaped}}}")
+        else:
+            result.append(escaped)
+    return "".join(result)
+
+
 def export_plain_text(json_path: str, output_path: Optional[str] = None) -> str:
     """
     Export transformed book to plain text (UTF-8).
@@ -115,6 +133,9 @@ def _export_plain_impl(
             if text.strip():
                 if use_italics_markup:
                     text = _italicize_markup(text)
+                else:
+                    # Strip Gutenberg _word_ underscore markup for clean plain text
+                    text = re.sub(r"_([^_]+)_", r"\1", text)
                 lines.append(text)
                 lines.append("")
 
@@ -206,7 +227,7 @@ def export_rtf(json_path: str, output_path: Optional[str] = None) -> str:
         for para in chapter.get("paragraphs", []):
             text = _paragraph_text(para)
             if text.strip():
-                rtf_lines.append(f"\\fi720 {_escape_rtf(text)}\\par")
+                rtf_lines.append(f"\\fi720 {_apply_rtf_italics(text)}\\par")
 
         # Page break between chapters (except last)
         if i < len(chapters) - 1:
