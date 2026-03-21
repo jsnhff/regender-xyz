@@ -113,7 +113,7 @@ def _get_resolved_model() -> str:
     provider = os.environ.get("DEFAULT_PROVIDER", "openai")
     if provider == "anthropic":
         return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
-    return os.environ.get("OPENAI_MODEL", "gpt-5")
+    return os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
 # (input, output) cost per 1M tokens — updated Feb 2026
@@ -327,7 +327,7 @@ class HeaderBar(Container):
     DEFAULT_CSS = """
     HeaderBar {
         dock: top;
-        height: 8;
+        height: 6;
         background: #000000;
         border-bottom: heavy #00ff00;
         padding: 0;
@@ -335,14 +335,21 @@ class HeaderBar(Container):
 
     HeaderBar #top-bar {
         width: 100vw;
-        height: 3;
+        height: 1;
         background: #000000;
     }
 
     HeaderBar #top-bar-content {
         width: 100%;
         height: auto;
-        padding: 1 1;
+        padding: 0 1;
+    }
+
+    HeaderBar #stats-row1,
+    HeaderBar #stats-row2 {
+        width: 100%;
+        height: 1;
+        padding: 0 1;
     }
 
     HeaderBar #version {
@@ -354,12 +361,6 @@ class HeaderBar(Container):
         width: 100%;
         height: 1;
         color: #00ff00;
-    }
-
-    HeaderBar #stats-row1, HeaderBar #stats-row2 {
-        width: 100%;
-        height: 1;
-        padding: 0 1;
     }
 
     HeaderBar #stats-row1 > Label, HeaderBar #stats-row2 > Label {
