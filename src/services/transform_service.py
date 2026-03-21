@@ -21,10 +21,10 @@ from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import TRANSFORM_BATCH_PROMPT_TEMPLATE, TRANSFORM_SIMPLE_PROMPT_TEMPLATE
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
 from src.utils.errors import (
-    ValidationError,
-    TransformationError,
     ConfigurationError,
     ErrorHandler,
+    TransformationError,
+    ValidationError,
 )
 from src.utils.token_manager import TokenManager
 
@@ -466,6 +466,35 @@ class TransformService(BaseService):
                     "queen": "king",
                     "lord": "lady",
                     "lady": "lord",
+                },
+            }
+        elif transform_type == TransformType.NONBINARY:
+            return {
+                "target_gender": "nonbinary",
+                "pronouns": {
+                    "he": "they",
+                    "she": "they",
+                    "him": "them",
+                    "her": "them",
+                    "his": "their",
+                    "hers": "their",
+                    "himself": "themselves",
+                    "herself": "themselves",
+                },
+                "titles": {"Mr.": "Mx.", "Mrs.": "Mx.", "Ms.": "Mx.", "Miss": "Mx."},
+                "terms": {
+                    "mother": "parent",
+                    "father": "parent",
+                    "daughter": "child",
+                    "son": "child",
+                    "brother": "sibling",
+                    "sister": "sibling",
+                    "wife": "spouse",
+                    "husband": "spouse",
+                    "king": "monarch",
+                    "queen": "monarch",
+                    "lord": "noble",
+                    "lady": "noble",
                 },
             }
         else:
