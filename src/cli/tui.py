@@ -142,10 +142,11 @@ def _lookup_model_cost(model: str) -> tuple[float, float]:
     return (3.00, 15.00)
 
 
-AVAILABLE_MODELS = {
+# Fallback model list — used when live API fetch fails
+_FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
-        ("claude-sonnet-4-20250514", "Claude Sonnet 4", "$3 / $15 per 1M tokens"),
         ("claude-opus-4-5-20251101", "Claude Opus 4.5", "$5 / $25 per 1M tokens"),
+        ("claude-sonnet-4-20250514", "Claude Sonnet 4", "$3 / $15 per 1M tokens"),
     ],
     "openai": [
         ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
@@ -153,10 +154,39 @@ AVAILABLE_MODELS = {
     ],
 }
 
+# Keep AVAILABLE_MODELS as alias for backwards compat
+AVAILABLE_MODELS = _FALLBACK_MODELS
+
+# OpenAI model ID prefixes suitable for text generation
+_OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
+# Sub-patterns that indicate embedding / audio / image / fine-tuning models
+_OPENAI_SKIP_PATTERNS = ("instruct", "realtime", "audio", "tts", "whisper", "dall-e", "embedding", "search")
+
+
+def _should_show_openai_model(model_id: str) -> bool:
+    """Return True if this OpenAI model is suitable for text generation."""
+    if any(s in model_id for s in _OPENAI_SKIP_PATTERNS):
+        return False
+    return any(model_id.startswith(p) for p in _OPENAI_SHOW_PREFIXES)
+
+
+def _openai_display_name(model_id: str) -> str:
+    """Convert an OpenAI model ID to a short display name."""
+    for mid, name, _ in _FALLBACK_MODELS.get("openai", []):
+        if mid == model_id:
+            return name
+    # Generic: gpt-4o-mini → GPT-4o Mini, o3-mini → O3 Mini
+    name = model_id
+    for prefix, replacement in (("gpt-", "GPT-"), ("o1", "O1"), ("o3", "O3"), ("o4", "O4")):
+        if name.startswith(prefix):
+            name = replacement + name[len(prefix):]
+            break
+    return name.replace("-", " ")
+
 
 def _friendly_model_name(model: str) -> str:
     """Convert API model ID to a short display name."""
-    all_models = [m for models in AVAILABLE_MODELS.values() for m in models]
+    all_models = [m for models in _FALLBACK_MODELS.values() for m in models]
     for model_id, display_name, _ in all_models:
         if model == model_id:
             return display_name
@@ -989,7 +1019,7 @@ class RegenderTUI(App):
         self._show_model_menu()
 
     def _show_model_menu(self) -> None:
-        """Show available models based on configured API keys."""
+        """Kick off async model detection then render the selection menu."""
         from dotenv import load_dotenv
 
         load_dotenv()
@@ -999,17 +1029,60 @@ class RegenderTUI(App):
         has_openai = bool(openai_key and not openai_key.startswith("your-"))
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
 
-        self._model_choices: list[tuple[str, str, str]] = []
-        for provider, models in AVAILABLE_MODELS.items():
-            if provider == "openai" and not has_openai:
-                continue
-            if provider == "anthropic" and not has_anthropic:
-                continue
-            for model_id, display_name, pricing in models:
-                self._model_choices.append((model_id, display_name, pricing))
-
-        if not self._model_choices:
+        if not has_openai and not has_anthropic:
             self.print("[#00ff00]⚠ No API keys configured — skipping model selection[/]")
+            self._model_choices = []
+            self._show_character_analysis_prompt()
+            return
+
+        self.print("[#00aa00]Detecting available models...[/]")
+        self._fetch_and_show_models(has_openai, has_anthropic)
+
+    @work(exclusive=True)
+    async def _fetch_and_show_models(self, has_openai: bool, has_anthropic: bool) -> None:
+        """Fetch live model lists from APIs, fall back to hardcoded list on error."""
+        choices: list[tuple[str, str, str]] = []
+
+        if has_anthropic:
+            try:
+                from anthropic import AsyncAnthropic
+
+                client = AsyncAnthropic()
+                page = await client.models.list(limit=50)
+                for m in page.data:
+                    if m.id.startswith("claude-"):
+                        input_c, output_c = _lookup_model_cost(m.id)
+                        pricing = f"${input_c:.2f} / ${output_c:.2f} per 1M tokens"
+                        display = getattr(m, "display_name", m.id)
+                        choices.append((m.id, display, pricing))
+            except Exception:
+                choices.extend(_FALLBACK_MODELS.get("anthropic", []))
+
+        if has_openai:
+            try:
+                from openai import AsyncOpenAI
+
+                client = AsyncOpenAI()
+                models_page = await client.models.list()
+                openai_models: list[tuple[str, str, str]] = []
+                seen: set[str] = set()
+                for m in sorted(models_page.data, key=lambda x: x.id):
+                    if m.id in seen or not _should_show_openai_model(m.id):
+                        continue
+                    seen.add(m.id)
+                    input_c, output_c = _lookup_model_cost(m.id)
+                    pricing = f"${input_c:.2f} / ${output_c:.2f} per 1M tokens"
+                    openai_models.append((m.id, _openai_display_name(m.id), pricing))
+                choices.extend(openai_models if openai_models else _FALLBACK_MODELS.get("openai", []))
+            except Exception:
+                choices.extend(_FALLBACK_MODELS.get("openai", []))
+
+        self._model_choices = choices
+        self._render_model_menu()
+
+    def _render_model_menu(self) -> None:
+        """Display model selection menu after model list has been fetched."""
+        if not self._model_choices:
             self._show_character_analysis_prompt()
             return
 
