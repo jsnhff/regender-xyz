@@ -768,6 +768,12 @@ class TransformService(BaseService):
                     if name_map:
                         transformed_text = self._apply_name_map(transformed_text, name_map)
 
+                    # Apply phrase substitutions deterministically
+                    _rules = context.get("rules", {})
+                    phrases = _rules.get("phrases", {}) if isinstance(_rules, dict) else {}
+                    if phrases:
+                        transformed_text = self._apply_phrases(transformed_text, phrases)
+
                     # Debug logging for first paragraph
                     if para_idx == 0:
                         self.logger.debug(f"Original text: {repr(original_text[:100])}")
@@ -1043,6 +1049,15 @@ TRANSFORMED TEXT:"""
             pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
             text = pattern.sub(make_replacement(new_name), text)
 
+        return text
+
+    def _apply_phrases(self, text: str, phrases: dict[str, str]) -> str:
+        """Apply deterministic phrase substitutions (case-insensitive, whole-phrase match)."""
+        for original, replacement in phrases.items():
+            if not original or not replacement:
+                continue
+            pattern = re.compile(re.escape(original), re.IGNORECASE)
+            text = pattern.sub(replacement, text)
         return text
 
     def get_metrics(self) -> dict[str, Any]:
