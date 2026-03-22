@@ -723,6 +723,9 @@ class TransformService(BaseService):
         except ImportError:
             progress_bar = None
 
+        # Output token budget per paragraph (generous estimate for safety)
+        _output_tokens_per_para = 500
+
         batch_start = 0
         for batch_num, batch_paragraphs in enumerate(batches, 1):
             batch_end = batch_start + len(batch_paragraphs)
@@ -739,74 +742,95 @@ class TransformService(BaseService):
                 batch_paragraphs, context, len(batch_paragraphs)
             )
 
-            try:
-                # Call LLM for batch
-                messages = [
-                    {"role": "system", "content": prompt["system"]},
-                    {"role": "user", "content": prompt["user"]},
-                ]
+            # Set max_tokens to comfortably cover the expected output size
+            batch_max_tokens = max(4096, len(batch_paragraphs) * _output_tokens_per_para)
 
-                response = await self.provider.complete(
-                    messages=messages,
-                    temperature=self.config.llm_temperature,
+            # Retry loop — up to 3 attempts with backoff
+            last_exc: Optional[Exception] = None
+            for attempt in range(3):
+                try:
+                    messages = [
+                        {"role": "system", "content": prompt["system"]},
+                        {"role": "user", "content": prompt["user"]},
+                    ]
+                    response = await self.provider.complete(
+                        messages=messages,
+                        temperature=self.config.llm_temperature,
+                        max_tokens=batch_max_tokens,
+                    )
+                    last_exc = None
+                    break  # success
+                except Exception as e:
+                    last_exc = e
+                    wait = 5 * (2**attempt)  # 5s, 10s
+                    self.logger.warning(
+                        f"Batch {batch_num} attempt {attempt + 1}/3 failed: {e} — retrying in {wait}s"
+                    )
+                    await asyncio.sleep(wait)
+
+            if last_exc is not None:
+                self.logger.error(
+                    f"Batch {batch_num} failed after 3 attempts — keeping originals: {last_exc}"
                 )
-
-                # Split response by paragraph markers
-                transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
-
-                # Apply name_map post-processing for any names the LLM missed
-                name_map = context.get("name_map", {})
-
-                # Process each paragraph in the batch
-                for i, (paragraph, transformed_text) in enumerate(
-                    zip(batch_paragraphs, transformed_texts)
-                ):
-                    para_idx = batch_start + i
-                    original_text = paragraph.get_text()
-
-                    # Apply name_map as a find/replace pass to catch any LLM misses
-                    if name_map:
-                        transformed_text = self._apply_name_map(transformed_text, name_map)
-
-                    # Apply phrase substitutions deterministically
-                    _rules = context.get("rules", {})
-                    phrases = _rules.get("phrases", {}) if isinstance(_rules, dict) else {}
-                    if phrases:
-                        transformed_text = self._apply_phrases(transformed_text, phrases)
-
-                    # Debug logging for first paragraph
-                    if para_idx == 0:
-                        self.logger.debug(f"Original text: {repr(original_text[:100])}")
-                        self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
-
-                    # Track changes
-                    if transformed_text != original_text:
-                        changes.append(
-                            TransformationChange(
-                                chapter_index=chapter_index,
-                                paragraph_index=para_idx,
-                                sentence_index=0,
-                                original=original_text,
-                                transformed=transformed_text,
-                                change_type="gender_swap",
-                            )
-                        )
-
-                    # Create transformed paragraph
-                    transformed_paragraphs.append(Paragraph(sentences=[transformed_text]))
-
-                # Update batch_start for next iteration
-                batch_start = batch_end
-
-                # Update progress
-                if progress_bar:
-                    progress_bar.update(1)
-
-            except Exception as e:
-                self.logger.warning(f"Failed to transform batch {batch_start}-{batch_end}: {e}")
-                # Keep originals on error
                 for paragraph in batch_paragraphs:
                     transformed_paragraphs.append(paragraph)
+                batch_start = batch_end
+                if progress_bar:
+                    progress_bar.update(1)
+                continue
+
+            # Parse response — pass originals so truncation falls back to original text
+            transformed_texts = self._parse_batch_response(
+                response, batch_paragraphs
+            )
+
+            # Apply name_map post-processing for any names the LLM missed
+            name_map = context.get("name_map", {})
+            _rules = context.get("rules", {})
+            phrases = _rules.get("phrases", {}) if isinstance(_rules, dict) else {}
+
+            # Process each paragraph in the batch
+            for i, (paragraph, transformed_text) in enumerate(
+                zip(batch_paragraphs, transformed_texts)
+            ):
+                para_idx = batch_start + i
+                original_text = paragraph.get_text()
+
+                # Apply name_map as a find/replace pass to catch any LLM misses
+                if name_map:
+                    transformed_text = self._apply_name_map(transformed_text, name_map)
+
+                # Apply phrase substitutions deterministically
+                if phrases:
+                    transformed_text = self._apply_phrases(transformed_text, phrases)
+
+                # Debug logging for first paragraph
+                if para_idx == 0:
+                    self.logger.debug(f"Original text: {repr(original_text[:100])}")
+                    self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
+
+                # Track changes
+                if transformed_text != original_text:
+                    changes.append(
+                        TransformationChange(
+                            chapter_index=chapter_index,
+                            paragraph_index=para_idx,
+                            sentence_index=0,
+                            original=original_text,
+                            transformed=transformed_text,
+                            change_type="gender_swap",
+                        )
+                    )
+
+                # Create transformed paragraph
+                transformed_paragraphs.append(Paragraph(sentences=[transformed_text]))
+
+            # Update batch_start for next iteration
+            batch_start = batch_end
+
+            # Update progress
+            if progress_bar:
+                progress_bar.update(1)
 
         # Close progress bar
         if progress_bar:
@@ -819,25 +843,27 @@ class TransformService(BaseService):
 
         return transformed_chapter, changes
 
-    def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
-        """Parse batch response into individual paragraph texts."""
-        # Simple approach: split by double newlines
-        # The LLM should return paragraphs separated by blank lines
+    def _parse_batch_response(
+        self, response: str, batch_paragraphs: list
+    ) -> list[str]:
+        """Parse batch response into individual paragraph texts.
+
+        Falls back to the original paragraph text (not empty string) for any
+        paragraphs the model truncated, so content is never silently erased.
+        """
+        expected_count = len(batch_paragraphs)
         paragraphs = response.strip().split("\n\n")
 
-        # If we got the expected number, great!
         if len(paragraphs) == expected_count:
             return paragraphs
 
-        # Otherwise, try to be smart about it
         self.logger.warning(f"Expected {expected_count} paragraphs, got {len(paragraphs)}")
 
-        # Pad or truncate as needed
         if len(paragraphs) < expected_count:
-            # Pad with empty strings
-            paragraphs.extend([""] * (expected_count - len(paragraphs)))
+            # Fall back to original text for any truncated paragraphs
+            originals = [p.get_text() for p in batch_paragraphs[len(paragraphs):]]
+            paragraphs.extend(originals)
         else:
-            # Truncate
             paragraphs = paragraphs[:expected_count]
 
         return paragraphs
@@ -861,6 +887,12 @@ class TransformService(BaseService):
         )
         max_request_tokens = app_config._config.get("transformation", {}).get(
             "max_tokens_per_request", 120000
+        )
+        # Hard cap: keep batches small enough that output tokens never exceed model limits.
+        # At 500 output tokens/paragraph, 25 paragraphs = 12,500 output tokens — safe for
+        # all current models. Input tokens for 25 paras (~7,500) are well within context.
+        max_paragraphs_per_batch = app_config._config.get("transformation", {}).get(
+            "max_paragraphs_per_batch", 25
         )
 
         # Get max tokens for this model
@@ -891,8 +923,11 @@ class TransformService(BaseService):
             para_text = para.get_text()
             para_tokens = self.token_manager.estimate_tokens(para_text)
 
-            # Start new batch if adding this paragraph would exceed limit
-            if current_tokens + para_tokens > available_tokens and current_batch:
+            # Start new batch if token limit OR paragraph cap is reached
+            if current_batch and (
+                current_tokens + para_tokens > available_tokens
+                or len(current_batch) >= max_paragraphs_per_batch
+            ):
                 batches.append(current_batch)
                 current_batch = []
                 current_tokens = 0
