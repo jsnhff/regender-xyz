@@ -756,6 +756,7 @@ class RegenderTUI(App):
         super().__init__(**kwargs)
         self._process_callback = process_callback
         self._stage = "book"  # book, transform, options, processing, done
+        self._onboarding_provider: Optional[str] = None  # provider chosen during onboarding
         self._selected_book: Optional[Path] = None
         self._selected_transform: Optional[str] = None
         self._no_qc = False
@@ -787,70 +788,185 @@ class RegenderTUI(App):
     def on_mount(self) -> None:
         """Initialize the app."""
         self._update_header()
-
-        # Simple welcome message
-        self.print("[#00ff00]◆[/] [#00aa00]Welcome to regender.xyz[/]")
-        self.print("")
-
-        # Check LLM setup
-        self._check_llm_setup()
-
-        self._show_book_menu()
-        self.query_one("#input", Input).focus()
-
-    def _check_llm_setup(self) -> None:
-        """Check if LLM provider is properly configured."""
-        # Ensure .env is loaded
         from dotenv import load_dotenv
 
         load_dotenv()
 
+        self.print("[#00ff00]◆[/] [#00aa00]Welcome to regender.xyz[/]")
+        self.print("")
+
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
-        provider = os.environ.get("DEFAULT_PROVIDER", "")
-
         has_openai = bool(openai_key and not openai_key.startswith("your-"))
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
 
         if not has_openai and not has_anthropic:
-            # No API keys configured
-            self.print("[bold #00ff00]⚠ No API keys detected[/]")
-            self.print("")
-            self.print(
-                "[#00aa00]Add these to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
-            )
-            self.print("")
-            self.print("  [#00ff00]# For OpenAI:[/]")
-            self.print("  [#00ff00]OPENAI_API_KEY=sk-...[/]")
-            self.print("  [#00ff00]DEFAULT_PROVIDER=openai[/]")
-            self.print("")
-            self.print("  [#00ff00]# Or for Anthropic:[/]")
-            self.print("  [#00ff00]ANTHROPIC_API_KEY=sk-ant-...[/]")
-            self.print("  [#00ff00]DEFAULT_PROVIDER=anthropic[/]")
-            self.print("")
-            self.print(
-                "[#00aa00]Then restart the app. You can still use 'parse_only' without keys.[/]"
-            )
-            self.print("")
-        elif not provider:
-            # Has keys but no provider set
-            available = []
-            if has_openai:
-                available.append("openai")
-            if has_anthropic:
-                available.append("anthropic")
-            self.print("[bold #00ff00]⚠ DEFAULT_PROVIDER not set[/]")
-            self.print("")
-            self.print(f"[#00aa00]You have API keys for: {', '.join(available)}[/]")
-            self.print(
-                "[#00aa00]Add this to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
-            )
-            self.print(f"  [#00ff00]DEFAULT_PROVIDER={available[0]}[/]")
-            self.print("")
+            self._show_onboarding_provider()
         else:
-            # All good - show which provider is active
-            self.print(f"[#00ff00]◆[/] [#00aa00]Using {provider} for LLM calls[/]")
+            self._show_book_menu()
+
+        self.query_one("#input", Input).focus()
+
+    # -------------------------------------------------------------------------
+    # Onboarding
+    # -------------------------------------------------------------------------
+
+    def _show_onboarding_provider(self) -> None:
+        """First-run: ask which provider to use."""
+        self._stage = "onboarding_provider"
+        self.print("[bold #00ff00]No API key found — let's get you set up.[/]")
+        self.print("")
+        self.print("[#00ff00]?[/] [bold #00ff00]Which AI provider do you want to use?[/]")
+        self.print("")
+        self.print("  [bold #00ff00]1[/]  Anthropic [#00aa00](Claude — recommended)[/]")
+        self.print("  [bold #00ff00]2[/]  OpenAI [#00aa00](GPT-4o)[/]")
+        self.print("")
+
+    def _show_onboarding_key(self, provider: str) -> None:
+        """First-run: ask for the API key."""
+        self._stage = "onboarding_key"
+        self._onboarding_provider = provider
+
+        if provider == "anthropic":
+            self.print("[#00ff00]✓[/] Anthropic selected.")
             self.print("")
+            self.print(
+                "[#00aa00]Get your key at[/] [bold #00ff00]console.anthropic.com/keys[/]"
+            )
+            self.print("")
+            self.print("[#00ff00]?[/] [bold #00ff00]Paste your Anthropic API key[/]")
+        else:
+            self.print("[#00ff00]✓[/] OpenAI selected.")
+            self.print("")
+            self.print(
+                "[#00aa00]Get your key at[/] [bold #00ff00]platform.openai.com/api-keys[/]"
+            )
+            self.print("")
+            self.print("[#00ff00]?[/] [bold #00ff00]Paste your OpenAI API key[/]")
+        self.print("")
+
+    def _handle_onboarding_provider_input(self, value: str) -> None:
+        if value == "1":
+            self._show_onboarding_key("anthropic")
+        elif value == "2":
+            self._show_onboarding_key("openai")
+        else:
+            self.print("[#00aa00]  Type 1 for Anthropic or 2 for OpenAI[/]")
+
+    def _handle_onboarding_key_input(self, value: str) -> None:
+        provider = self._onboarding_provider or "anthropic"
+
+        # Basic format validation
+        if provider == "anthropic" and not value.startswith("sk-ant-"):
+            self.print("[#00ff00]⚠[/] [#00aa00]Anthropic keys start with[/] [bold #00ff00]sk-ant-[/]")
+            self.print("[#00aa00]  Try again:[/]")
+            return
+        if provider == "openai" and not value.startswith("sk-"):
+            self.print("[#00ff00]⚠[/] [#00aa00]OpenAI keys start with[/] [bold #00ff00]sk-[/]")
+            self.print("[#00aa00]  Try again:[/]")
+            return
+
+        masked = value[:8] + "..." + value[-4:]
+        self.print(f"[#00ff00]✓[/] Key received: [#00aa00]{masked}[/]")
+        self.print("")
+        self.print("[#00aa00].: Validating key...[/]")
+        self.print("")
+
+        try:
+            input_bar = self.query_one(InputBar)
+            input_bar.disable()
+        except Exception:
+            pass
+
+        self._validate_and_save_key(provider, value)
+
+    @work(exclusive=True)
+    async def _validate_and_save_key(self, provider: str, key: str) -> None:
+        """Validate the API key with a minimal test call, then save to .env."""
+        import traceback
+
+        def finish(success: bool, message: str) -> None:
+            self.print(message)
+            self.print("")
+            try:
+                input_bar = self.query_one(InputBar)
+                input_bar.stop_loading_animation()
+                input_bar.enable()
+            except Exception:
+                pass
+            if success:
+                self._show_book_menu()
+
+        try:
+            if provider == "anthropic":
+                import anthropic as anthropic_sdk
+
+                client = anthropic_sdk.AsyncAnthropic(api_key=key)
+                await client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=8,
+                    messages=[{"role": "user", "content": "Hi"}],
+                )
+            else:
+                import openai as openai_sdk
+
+                client = openai_sdk.AsyncOpenAI(api_key=key)
+                await client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    max_tokens=8,
+                    messages=[{"role": "user", "content": "Hi"}],
+                )
+        except Exception as e:
+            err = str(e)
+            if "auth" in err.lower() or "invalid" in err.lower() or "api_key" in err.lower():
+                msg = "[#00ff00]✗[/] [#00aa00]Invalid key — please check and try again.[/]"
+            else:
+                msg = f"[#00ff00]✗[/] [#00aa00]Validation failed: {err[:80]}[/]"
+            self.call_from_thread(finish, False, msg)
+            self.call_from_thread(self._show_onboarding_key, provider)
+            return
+
+        # Key is valid — save to .env
+        try:
+            self._save_key_to_env(provider, key)
+            os.environ["DEFAULT_PROVIDER"] = provider
+            if provider == "anthropic":
+                os.environ["ANTHROPIC_API_KEY"] = key
+            else:
+                os.environ["OPENAI_API_KEY"] = key
+            success_msg = (
+                f"[#00ff00]✓[/] [bold #00ff00]Key saved to .env[/] "
+                f"[#00aa00]— {provider} is ready.[/]"
+            )
+            self.call_from_thread(finish, True, success_msg)
+        except Exception:
+            tb = traceback.format_exc()
+            self.call_from_thread(
+                finish, False, f"[#00ff00]✗[/] [#00aa00]Could not save .env: {tb[:80]}[/]"
+            )
+
+    def _save_key_to_env(self, provider: str, key: str) -> None:
+        """Write or update API key and DEFAULT_PROVIDER in .env file."""
+        env_path = Path(".env")
+        env_key = "ANTHROPIC_API_KEY" if provider == "anthropic" else "OPENAI_API_KEY"
+
+        lines: list[str] = []
+        if env_path.exists():
+            lines = env_path.read_text().splitlines()
+
+        # Update or append each setting
+        def upsert(setting_lines: list[str], var: str, val: str) -> list[str]:
+            for i, line in enumerate(setting_lines):
+                if line.startswith(f"{var}=") or line.startswith(f"{var} ="):
+                    setting_lines[i] = f"{var}={val}"
+                    return setting_lines
+            setting_lines.append(f"{var}={val}")
+            return setting_lines
+
+        lines = upsert(lines, env_key, key)
+        lines = upsert(lines, "DEFAULT_PROVIDER", provider)
+
+        env_path.write_text("\n".join(lines) + "\n")
 
     # -------------------------------------------------------------------------
     # Header Updates
@@ -1005,7 +1121,11 @@ class RegenderTUI(App):
         value = event.value.strip()
         event.input.value = ""
 
-        if self._stage == "book":
+        if self._stage == "onboarding_provider":
+            self._handle_onboarding_provider_input(value)
+        elif self._stage == "onboarding_key":
+            self._handle_onboarding_key_input(value)
+        elif self._stage == "book":
             self._handle_book_input(value)
         elif self._stage == "model":
             self._handle_model_input(value)
