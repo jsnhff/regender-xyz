@@ -1136,12 +1136,22 @@ class RegenderTUI(App):
             return
 
         self._stage = "model"
+        self._model_showing_all = False
+        self._render_model_list(show_all=False)
+
+    def _render_model_list(self, show_all: bool = False) -> None:
+        """Print the model list, capped at 5 unless show_all is True."""
+        max_visible = 5
+        choices = self._model_choices
         current = _get_resolved_model()
+        visible = choices if show_all else choices[:max_visible]
         self.print("[#00ff00]?[/] [bold #00ff00]Select a model[/]")
         self.print("")
-        for i, (model_id, display_name, pricing) in enumerate(self._model_choices, 1):
+        for i, (model_id, display_name, pricing) in enumerate(visible, 1):
             marker = " [#00ff00]◄[/]" if model_id == current or current.startswith(model_id) else ""
-            self.print(f"  [bold #00ff00]{i}[/]  {display_name:<22} [#00aa00]{pricing}[/]{marker}")
+            self.print(f"  [bold #00ff00]{i}[/]  {display_name:<26} [#00aa00]{pricing}[/]{marker}")
+        if not show_all and len(choices) > max_visible:
+            self.print(f"  [bold #00ff00]M[/]  [#00aa00]More models ({len(choices) - max_visible} additional)...[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -1152,10 +1162,18 @@ class RegenderTUI(App):
             self._show_character_analysis_prompt()
             return
 
+        # Show all models
+        if value.lower() == "m":
+            self._model_showing_all = True
+            self._render_model_list(show_all=True)
+            return
+
+        visible = choices if getattr(self, "_model_showing_all", False) else choices[:5]
+
         try:
             idx = int(value) - 1
-            if 0 <= idx < len(choices):
-                model_id, display_name, _ = choices[idx]
+            if 0 <= idx < len(visible):
+                model_id, display_name, _ = visible[idx]
                 os.environ["DEFAULT_MODEL"] = model_id
                 self.print(f"[#00ff00]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
@@ -1174,7 +1192,8 @@ class RegenderTUI(App):
                 self._show_character_analysis_prompt()
                 return
 
-        self.print(f"[#00ff00]Enter 1-{len(choices)}[/]")
+        limit = len(choices) if getattr(self, "_model_showing_all", False) else min(5, len(choices))
+        self.print(f"[#00ff00]Enter 1-{limit}[/]")
 
     def _recalculate_cost(self, model: str) -> None:
         """Recalculate cost estimate for the selected model and update header."""
@@ -1184,7 +1203,12 @@ class RegenderTUI(App):
         input_cost, output_cost = _lookup_model_cost(model)
         estimated_cost = (tokens / 1_000_000 * input_cost) + (tokens / 1_000_000 * output_cost)
         self._book_stats["estimated_cost"] = estimated_cost
-        self._book_stats["model"] = model
+        # Use display name from the fetched model list if available, else friendly fallback
+        display = next(
+            (name for mid, name, _ in getattr(self, "_model_choices", []) if mid == model),
+            _friendly_model_name(model),
+        )
+        self._book_stats["model"] = display
         with contextlib.suppress(Exception):
             self.query_one(HeaderBar).update_meta(self._book_stats)
 
@@ -1477,13 +1501,9 @@ class RegenderTUI(App):
         self._process_start = time.time()
         self.status_text = "Starting..."
 
-        # Disable input during processing
-        try:
-            input_bar = self.query_one(InputBar)
-            input_bar.start_loading_animation()
-            input_bar.disable()
-        except Exception:
-            pass
+        # Disable input during processing (no animation — BrailleLoader in content area handles that)
+        with contextlib.suppress(Exception):
+            self.query_one(InputBar).disable()
 
         self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
 
