@@ -937,22 +937,10 @@ class RegenderTUI(App):
         self.print("")
         self.print("  [bold #00ff00]n[/]  No  [#00aa00]— skip QC (faster, cheaper)[/]")
         self.print("")
-        lit_marker = " [#00ff00]◄ on[/]" if self._run_literary else ""
-        self.print(
-            f"  [bold #00ff00]L[/]  Literary pass  [#00aa00]— style, rhythm, ambiguity review (review or auto-apply after)[/]{lit_marker}"
-        )
-        self.print("")
         self.set_prompt(">  ")
 
     def _handle_options_input(self, value: str) -> None:
-        """Handle quality control and literary pass selection."""
-        if value.lower() in ("l",):
-            self._run_literary = not self._run_literary
-            state = "on" if self._run_literary else "off"
-            self.print(f"[#00ff00]✓[/] Literary pass {state}")
-            self.print("")
-            self._show_options_menu()
-            return
+        """Handle quality control selection."""
         if value.lower() in ("n", "no"):
             self._no_qc = True
             self.print("[#00ff00]✓[/] Skipping QC")
@@ -1019,6 +1007,8 @@ class RegenderTUI(App):
             self._handle_options_input(value)
         elif self._stage == "literary_menu":
             self._handle_literary_menu_input(value)
+        elif self._stage == "literary_results":
+            self._handle_literary_results_input(value)
         elif self._stage == "literary_review":
             self._handle_literary_review_input(value)
         elif self._stage == "export":
@@ -1509,7 +1499,6 @@ class RegenderTUI(App):
             "input": str(self._selected_book),
             "transform_type": self._selected_transform,
             "no_qc": self._no_qc,
-            "run_literary": self._run_literary,
             "output_path": str(self._output_path) if self._output_path else None,
         }
 
@@ -1595,7 +1584,6 @@ class RegenderTUI(App):
                 transform_type=transform_type,
                 output_path=self._result.get("output_path"),
                 quality_control=not self._result.get("no_qc", True),
-                literary_pass=self._result.get("run_literary", False),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -1779,19 +1767,12 @@ class RegenderTUI(App):
                 f"  [#00aa00]QC score:[/] [#00ff00]{qc_score}%[/] [#00aa00]({qc_corrections} corrections)[/]"
             )
 
-        # Check for literary suggestions
-        literary_suggestions = result.get("literary_suggestions") or []
-        if literary_suggestions:
-            self._literary_suggestions = literary_suggestions
+        # Offer literary pass for full transformations (not parse/analysis only)
+        transform = self._selected_transform or ""
+        if transform not in ("parse_only", "character_analysis"):
+            self._literary_suggestions = []
             self._literary_accepted = []
             self._literary_idx = 0
-            # Re-enable input before showing the literary menu
-            try:
-                input_bar = self.query_one(InputBar)
-                input_bar.stop_loading_animation()
-                input_bar.enable()
-            except Exception:
-                pass
             self._show_literary_menu()
             return
 
@@ -1839,14 +1820,31 @@ class RegenderTUI(App):
     # -------------------------------------------------------------------------
 
     def _show_literary_menu(self) -> None:
-        """Show the literary pass menu after QC completes."""
+        """Offer the literary quality pass after QC completes."""
+        self.print("")
+        self.print("[#00ff00]─[/]" * 50)
+        self.print("")
+        self.print("[#00ff00]?[/] [bold #00ff00]Literary quality pass?[/]")
+        self.print("")
+        self.print(
+            "  [#00aa00]Compares original and transformed text — flags pronoun ambiguity,[/]"
+        )
+        self.print("  [#00aa00]rhythm problems, and lost wit. Editorial changes only.[/]")
+        cost = self._estimate_cost_str(0.6)
+        cost_hint = f" [#00aa00]({cost})[/]" if cost else ""
+        self.print("")
+        self.print(f"  [bold #00ff00]Y[/]  Yes — review each suggestion{cost_hint}")
+        self.print(f"  [bold #00ff00]A[/]  Auto-apply all suggestions{cost_hint}")
+        self.print("  [bold #00ff00]n[/]  Skip")
+        self.print("")
+        self._stage = "literary_menu"
+
+    def _show_literary_results_menu(self) -> None:
+        """Show the literary results menu after suggestions have been fetched."""
         suggestions = self._literary_suggestions
         n = len(suggestions)
-        # Count unique chapters
         chapters_seen = {s["chapter_title"] for s in suggestions}
         n_chapters = len(chapters_seen)
-
-        # Breakdown by reason keyword
         ambiguity_count = sum(
             1
             for s in suggestions
@@ -1855,18 +1853,15 @@ class RegenderTUI(App):
         rhythm_count = sum(
             1
             for s in suggestions
-            if "rhythm" in s.get("reason", "").lower()
-            or "register" in s.get("reason", "").lower()
-            or "mechanical" in s.get("reason", "").lower()
+            if any(
+                k in s.get("reason", "").lower()
+                for k in ("rhythm", "register", "mechanical", "wit", "irony")
+            )
         )
-
-        self.print("")
-        self.print("[#00ff00]─[/]" * 50)
-        self.print("")
-        self.print("[#00ff00]?[/] [bold #00ff00]Literary quality pass[/]")
         self.print("")
         self.print(
-            f"  Found [bold #00ff00]{n}[/] suggested refinements across {n_chapters} chapter(s)."
+            f"  Found [bold #00ff00]{n}[/] suggested refinement{'s' if n != 1 else ''}"
+            f" across {n_chapters} chapter{'s' if n_chapters != 1 else ''}."
         )
         if ambiguity_count or rhythm_count:
             parts = []
@@ -1875,14 +1870,53 @@ class RegenderTUI(App):
                     f"{ambiguity_count} pronoun ambiguit{'y' if ambiguity_count == 1 else 'ies'}"
                 )
             if rhythm_count:
-                parts.append(f"{rhythm_count} rhythm adjustment{'s' if rhythm_count != 1 else ''}")
-            self.print(f"  [#00aa00]{'  ·  '.join(parts)}[/]")
-        self.print("  [#00aa00](These are editorial changes to prose, not accuracy fixes.)[/]")
+                parts.append(f"{rhythm_count} rhythm/wit adjustment{'s' if rhythm_count != 1 else ''}")
+            self.print(f"  [#00aa00]{' · '.join(parts)}[/]")
         self.print("")
         self.print("  [bold #00ff00]Y[/]  Review each suggestion")
         self.print("  [bold #00ff00]A[/]  Auto-apply all")
         self.print("  [bold #00ff00]n[/]  Skip")
-        self._stage = "literary_menu"
+        self.print("")
+        self._stage = "literary_results"
+
+    @work(exclusive=True)
+    async def _run_literary_pass(self, auto_apply: bool = False) -> None:
+        """Fetch literary suggestions from the API then show results."""
+        from src.app import Application
+
+        self.print("[#00aa00]Analyzing prose for literary refinements...[/]")
+        self.print("")
+
+        try:
+            app = Application("src/config.json")
+            json_path = self._json_output_path or ""
+            original_file = self._result.get("input", "") if self._result else ""
+            transform_type = self._selected_transform or "gender_swap"
+
+            lit_result = await app.get_literary_suggestions(json_path, original_file, transform_type)
+            app.shutdown()
+
+            suggestions = lit_result.get("suggestions", [])
+            self._literary_suggestions = suggestions
+            self._literary_accepted = []
+            self._literary_idx = 0
+
+            if not suggestions:
+                self.print("[#00ff00]✓[/] [#00aa00]No literary refinements needed — prose is clean.[/]")
+                self.print("")
+                self._show_export_menu()
+                return
+
+            if auto_apply:
+                self._literary_accepted = list(suggestions)
+                self._apply_literary_and_finish()
+            else:
+                self._show_literary_results_menu()
+
+        except Exception as e:
+            self.print(f"[#00ff00]⚠[/] [#00aa00]Literary pass failed: {e}[/]")
+            self.print("")
+            self._show_export_menu()
 
     def _show_literary_suggestion(self) -> None:
         """Show the current literary suggestion for review."""
@@ -1907,19 +1941,34 @@ class RegenderTUI(App):
         self._stage = "literary_review"
 
     def _handle_literary_menu_input(self, value: str) -> None:
-        """Handle literary menu selection: Y=review, A=auto-apply all, n=skip."""
+        """Handle literary offer: Y=run then review, A=run then auto-apply, n=skip."""
+        v = value.lower().strip()
+        if v == "n":
+            self.print("[#00ff00]✓[/] Skipping literary pass")
+            self.print("")
+            self._show_export_menu()
+        elif v == "a":
+            self.print("[#00ff00]✓[/] Running literary pass (auto-apply)...")
+            self.print("")
+            self._run_literary_pass(auto_apply=True)
+        else:
+            # Y or enter → run then review
+            self.print("[#00ff00]✓[/] Running literary pass...")
+            self.print("")
+            self._run_literary_pass(auto_apply=False)
+
+    def _handle_literary_results_input(self, value: str) -> None:
+        """Handle results menu after suggestions are fetched: Y=review, A=auto-apply, n=skip."""
         v = value.lower().strip()
         if v == "a":
             self._literary_accepted = list(self._literary_suggestions)
             self._apply_literary_and_finish()
         elif v == "n":
-            self._literary_accepted = []
             total = len(self._literary_suggestions)
             self.print(f"[#00ff00]✓[/] Literary pass: 0 of {total} refinements accepted (skipped)")
             self.print("")
             self._show_export_menu()
         else:
-            # Y or anything else → start review
             self._literary_idx = 0
             self._show_literary_suggestion()
 

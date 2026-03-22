@@ -459,6 +459,63 @@ class Application:
 
         self.logger.info(f"Saved output to {output_path}")
 
+    async def get_literary_suggestions(
+        self, json_path: str, original_file_path: str, transform_type: str
+    ) -> dict:
+        """
+        Get literary quality suggestions for a completed transformation.
+
+        Parses the original file fresh, loads the transformed JSON as a Book,
+        then runs the style fingerprint + literary refinement pass.
+
+        Returns dict with 'suggestions' (list[dict]) and 'style_fingerprint' (str).
+        """
+        try:
+            # Load transformed book from saved JSON
+            with open(json_path, encoding="utf-8") as f:
+                data = json.load(f)
+            transformed_book = self._book_from_dict(data)
+
+            # Re-parse original for side-by-side comparison
+            parser = self.get_service("parser")
+            original_book = await parser.process(original_file_path)
+            self._apply_title_fallback(original_book, original_file_path)
+
+            provider = self._get_provider()
+            lit_service = QualityService(provider=provider)
+            style_fingerprint = await lit_service.get_style_fingerprint(original_book)
+            suggestions = await lit_service.suggest_literary_refinements(
+                original_book,
+                transformed_book,
+                None,
+                TransformType(transform_type),
+                style_fingerprint,
+            )
+            return {"suggestions": suggestions, "style_fingerprint": style_fingerprint}
+        except Exception as e:
+            self.logger.warning(f"Literary suggestions failed: {e}")
+            return {"suggestions": [], "style_fingerprint": ""}
+
+    def _book_from_dict(self, data: dict) -> Book:
+        """Rebuild a Book object from a transformed JSON dict."""
+        from src.models.book import Chapter, Paragraph
+
+        chapters = []
+        for ch_data in data.get("chapters", []):
+            paragraphs = []
+            for p_data in ch_data.get("paragraphs", []):
+                sentences = p_data.get("sentences") or []
+                if not sentences:
+                    text = p_data.get("transformed_text") or p_data.get("text", "")
+                    sentences = [text] if text else []
+                paragraphs.append(Paragraph(sentences=sentences))
+            chapters.append(Chapter(title=ch_data.get("title", ""), paragraphs=paragraphs))
+        return Book(
+            title=data.get("title", ""),
+            author=data.get("author") or "",
+            chapters=chapters,
+        )
+
     def apply_literary_suggestions(self, json_path: str, accepted_suggestions: list[dict]) -> str:
         """
         Apply accepted literary suggestions to the saved JSON file.
