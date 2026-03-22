@@ -6,8 +6,9 @@ This service handles gender transformation of books.
 
 import asyncio
 import os
+import re
 import time
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from src.models.book import Book, Chapter
 from src.models.character import CharacterAnalysis
@@ -115,8 +116,7 @@ class TransformService(BaseService):
             raise ValidationError("'book' is required", field="book")
         if not isinstance(book, Book):
             raise ValidationError(
-                f"'book' must be a Book object, got {type(book).__name__}",
-                field="book"
+                f"'book' must be a Book object, got {type(book).__name__}", field="book"
             )
 
         # Extract and validate transform type
@@ -131,12 +131,12 @@ class TransformService(BaseService):
                 raise ValidationError(
                     f"Invalid transform type: {transform_type}",
                     field="transform_type",
-                    details={"valid_types": [t.value for t in TransformType]}
+                    details={"valid_types": [t.value for t in TransformType]},
                 ) from e
         elif not isinstance(transform_type, TransformType):
             raise ValidationError(
                 f"'transform_type' must be a TransformType or string, got {type(transform_type).__name__}",
-                field="transform_type"
+                field="transform_type",
             )
 
         # Optional characters validation
@@ -144,7 +144,7 @@ class TransformService(BaseService):
         if characters and not isinstance(characters, CharacterAnalysis):
             raise ValidationError(
                 f"'characters' must be a CharacterAnalysis object if provided, got {type(characters).__name__}",
-                field="characters"
+                field="characters",
             )
 
         return await self.transform_book(book, transform_type, characters)
@@ -155,6 +155,7 @@ class TransformService(BaseService):
         transform_type: TransformType,
         characters: Optional[CharacterAnalysis] = None,
         selected_characters: Optional[list[str]] = None,
+        name_map: Optional[dict[str, str]] = None,
     ) -> Transformation:
         """
         Transform a book with the specified transformation type.
@@ -178,8 +179,7 @@ class TransformService(BaseService):
 
         if not isinstance(book, Book):
             raise ValidationError(
-                f"Expected Book instance, got {type(book).__name__}",
-                field="book"
+                f"Expected Book instance, got {type(book).__name__}", field="book"
             )
 
         # Validate book has content
@@ -187,7 +187,7 @@ class TransformService(BaseService):
             raise ValidationError(
                 "Book has no chapters to transform",
                 field="book.chapters",
-                details={"book_title": book.title or "Unknown"}
+                details={"book_title": book.title or "Unknown"},
             )
 
         # Validate provider
@@ -195,14 +195,13 @@ class TransformService(BaseService):
             raise ConfigurationError(
                 "LLM provider not initialized",
                 config_key="provider",
-                details={"service": "TransformService"}
+                details={"service": "TransformService"},
             )
 
         # Validate transform type
         if not isinstance(transform_type, TransformType):
             raise ValidationError(
-                f"Invalid transform type: {transform_type}",
-                field="transform_type"
+                f"Invalid transform type: {transform_type}", field="transform_type"
             )
 
         # Validate selected characters if provided
@@ -210,12 +209,11 @@ class TransformService(BaseService):
             if not isinstance(selected_characters, list):
                 raise ValidationError(
                     f"selected_characters must be a list, got {type(selected_characters).__name__}",
-                    field="selected_characters"
+                    field="selected_characters",
                 )
             if not all(isinstance(char, str) for char in selected_characters):
                 raise ValidationError(
-                    "All selected characters must be strings",
-                    field="selected_characters"
+                    "All selected characters must be strings", field="selected_characters"
                 )
 
         start_time = time.time()
@@ -226,14 +224,16 @@ class TransformService(BaseService):
                 if not self.character_service:
                     raise ConfigurationError(
                         "Character service required when characters not provided",
-                        config_key="character_service"
+                        config_key="character_service",
                     )
 
                 self.logger.info("Analyzing characters...")
                 characters = await self.character_service.process(book)
 
             # Create transformation context
-            context = self._create_context(characters, transform_type, selected_characters)
+            context = self._create_context(
+                characters, transform_type, selected_characters, name_map
+            )
 
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
@@ -274,8 +274,8 @@ class TransformService(BaseService):
                 transform_type=transform_type.value,
                 details={
                     "book_title": book.title or "Unknown",
-                    "processing_time": time.time() - start_time
-                }
+                    "processing_time": time.time() - start_time,
+                },
             ) from e
 
     def _create_context(
@@ -283,6 +283,7 @@ class TransformService(BaseService):
         characters: CharacterAnalysis,
         transform_type: TransformType,
         selected_characters: Optional[list[str]] = None,
+        name_map: Optional[dict[str, str]] = None,
     ) -> dict[str, Any]:
         """
         Create transformation context.
@@ -338,10 +339,14 @@ class TransformService(BaseService):
             "character_context": character_context,
             "characters_to_transform": characters_to_transform,
             "characters_to_preserve": characters_to_preserve,
+            "name_map": name_map or {},
         }
 
     def _build_character_instructions(
-        self, characters: Optional[CharacterAnalysis], transform_type: TransformType, character_mappings: dict
+        self,
+        characters: Optional[CharacterAnalysis],
+        transform_type: TransformType,
+        character_mappings: dict,
     ) -> str:
         """Build character context for LLM transformation."""
         if not characters:
@@ -355,7 +360,9 @@ class TransformService(BaseService):
                 continue
 
             mapping = character_mappings[char.name]
-            current_gender = char.gender.value if hasattr(char.gender, 'value') else str(char.gender)
+            current_gender = (
+                char.gender.value if hasattr(char.gender, "value") else str(char.gender)
+            )
 
             # Determine target gender based on transform type
             if mapping.get("preserve", False):
@@ -382,7 +389,9 @@ class TransformService(BaseService):
                 name_str += f" (aka {', '.join(char.aliases[:3])})"  # Limit to 3 aliases
             lines.append(f"- {name_str}: {current_gender}{target}")
 
-        lines.append("\nApply these specific character transformations consistently throughout the text.")
+        lines.append(
+            "\nApply these specific character transformations consistently throughout the text."
+        )
 
         return "\n".join(lines)
 
@@ -417,7 +426,13 @@ class TransformService(BaseService):
             return {
                 "target_gender": "male",
                 "pronouns": {"she": "he", "her": "him", "hers": "his"},
-                "titles": {"Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr.", "Dame": "Sir", "Lady": "Lord"},
+                "titles": {
+                    "Mrs.": "Mr.",
+                    "Ms.": "Mr.",
+                    "Miss": "Mr.",
+                    "Dame": "Sir",
+                    "Lady": "Lord",
+                },
                 "terms": {
                     "mother": "father",
                     "daughter": "son",
@@ -514,16 +529,22 @@ class TransformService(BaseService):
         mappings = {
             "original_gender": character.gender,
             "name": character.name,
-            "aliases": character.aliases
+            "aliases": character.aliases,
         }
 
         # Just track whether to transform or preserve - let LLM handle the actual transformation
-        current_gender = character.gender.value if hasattr(character.gender, 'value') else str(character.gender)
+        current_gender = (
+            character.gender.value if hasattr(character.gender, "value") else str(character.gender)
+        )
 
         if transform_type == TransformType.GENDER_SWAP:
             # LLM will swap genders
             mappings["transform"] = True
-        elif transform_type in [TransformType.ALL_MALE, TransformType.ALL_FEMALE, TransformType.NONBINARY]:
+        elif transform_type in [
+            TransformType.ALL_MALE,
+            TransformType.ALL_FEMALE,
+            TransformType.NONBINARY,
+        ]:
             # LLM will apply the transformation type
             mappings["transform"] = True
         else:
@@ -650,7 +671,9 @@ class TransformService(BaseService):
 
         # Require LLM provider for transformation
         if not self.provider:
-            raise ValueError("LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic).")
+            raise ValueError(
+                "LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic)."
+            )
 
         # Use LLM for transformation
         changes = []
@@ -682,17 +705,20 @@ class TransformService(BaseService):
         total_batches = len(batches)
 
         avg_batch_size = sum(len(b) for b in batches) / len(batches) if batches else 0
-        self.logger.info(f"Processing {total_paragraphs} paragraphs in {total_batches} token-optimized batches (avg size: {avg_batch_size:.1f})")
+        self.logger.info(
+            f"Processing {total_paragraphs} paragraphs in {total_batches} token-optimized batches (avg size: {avg_batch_size:.1f})"
+        )
 
         # Setup progress bar
-        disable_progress = not os.isatty(1) if hasattr(os, 'isatty') else True
+        disable_progress = not os.isatty(1) if hasattr(os, "isatty") else True
         try:
             from tqdm import tqdm
+
             progress_bar = tqdm(
                 total=total_batches,
                 desc=f"Transforming {chapter.title or 'chapter'}",
                 disable=disable_progress,
-                unit="batch"
+                unit="batch",
             )
         except ImportError:
             progress_bar = None
@@ -702,12 +728,16 @@ class TransformService(BaseService):
             batch_end = batch_start + len(batch_paragraphs)
 
             if not progress_bar:
-                self.logger.info(f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start+1}-{batch_end}, ~{self._estimate_batch_tokens(batch_paragraphs, context)} tokens)")
+                self.logger.info(
+                    f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start + 1}-{batch_end}, ~{self._estimate_batch_tokens(batch_paragraphs, context)} tokens)"
+                )
             else:
-                progress_bar.set_postfix({"paragraphs": f"{batch_start+1}-{batch_end}"})
+                progress_bar.set_postfix({"paragraphs": f"{batch_start + 1}-{batch_end}"})
 
             # Create batch prompt with the actual paragraph objects
-            prompt = self._create_batch_transform_prompt(batch_paragraphs, context, len(batch_paragraphs))
+            prompt = self._create_batch_transform_prompt(
+                batch_paragraphs, context, len(batch_paragraphs)
+            )
 
             try:
                 # Call LLM for batch
@@ -724,10 +754,19 @@ class TransformService(BaseService):
                 # Split response by paragraph markers
                 transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
 
+                # Apply name_map post-processing for any names the LLM missed
+                name_map = context.get("name_map", {})
+
                 # Process each paragraph in the batch
-                for i, (paragraph, transformed_text) in enumerate(zip(batch_paragraphs, transformed_texts)):
+                for i, (paragraph, transformed_text) in enumerate(
+                    zip(batch_paragraphs, transformed_texts)
+                ):
                     para_idx = batch_start + i
                     original_text = paragraph.get_text()
+
+                    # Apply name_map as a find/replace pass to catch any LLM misses
+                    if name_map:
+                        transformed_text = self._apply_name_map(transformed_text, name_map)
 
                     # Debug logging for first paragraph
                     if para_idx == 0:
@@ -797,18 +836,26 @@ class TransformService(BaseService):
 
         return paragraphs
 
-    def _create_token_optimized_batches(self, paragraphs: list, context: dict[str, Any]) -> list[list]:
+    def _create_token_optimized_batches(
+        self, paragraphs: list, context: dict[str, Any]
+    ) -> list[list]:
         """Create batches of paragraphs optimized for token count."""
         if not self.token_manager:
             # Fallback to fixed batch size if no token manager
             from src.utils.config import config as app_config
+
             batch_size = app_config.transform_batch_size
-            return [paragraphs[i:i + batch_size] for i in range(0, len(paragraphs), batch_size)]
+            return [paragraphs[i : i + batch_size] for i in range(0, len(paragraphs), batch_size)]
 
         # Get configuration
         from src.utils.config import config as app_config
-        target_utilization = app_config._config.get("transformation", {}).get("target_token_utilization", 0.66)
-        max_request_tokens = app_config._config.get("transformation", {}).get("max_tokens_per_request", 120000)
+
+        target_utilization = app_config._config.get("transformation", {}).get(
+            "target_token_utilization", 0.66
+        )
+        max_request_tokens = app_config._config.get("transformation", {}).get(
+            "max_tokens_per_request", 120000
+        )
 
         # Get max tokens for this model
         max_context = self.token_manager.config.max_context_tokens
@@ -819,9 +866,16 @@ class TransformService(BaseService):
         response_overhead = 2000  # Reserve space for response
         char_context_tokens = self._estimate_character_context_tokens(context)
 
-        available_tokens = int((max_context * target_utilization) - prompt_overhead - response_overhead - char_context_tokens)
+        available_tokens = int(
+            (max_context * target_utilization)
+            - prompt_overhead
+            - response_overhead
+            - char_context_tokens
+        )
 
-        self.logger.debug(f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})")
+        self.logger.debug(
+            f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})"
+        )
 
         batches = []
         current_batch = []
@@ -843,7 +897,9 @@ class TransformService(BaseService):
 
             # If single paragraph exceeds limit, put it in its own batch
             if para_tokens > available_tokens:
-                self.logger.warning(f"Paragraph exceeds token limit ({para_tokens} > {available_tokens})")
+                self.logger.warning(
+                    f"Paragraph exceeds token limit ({para_tokens} > {available_tokens})"
+                )
                 if len(current_batch) > 1:
                     # Remove it and add to next batch
                     current_batch.pop()
@@ -881,7 +937,9 @@ class TransformService(BaseService):
         char_info = context.get("character_info", "")
         return self.token_manager.estimate_tokens(char_info) if char_info else 200
 
-    def _create_batch_transform_prompt(self, batch_paragraphs: list, context: dict[str, Any], batch_size: int) -> dict[str, str]:
+    def _create_batch_transform_prompt(
+        self, batch_paragraphs: list, context: dict[str, Any], batch_size: int
+    ) -> dict[str, str]:
         """Create prompt for batch transformation."""
         transform_type = context.get("transform_type", TransformType.GENDER_SWAP)
         rules = context.get("rules", self._get_transformation_rules(transform_type))
@@ -889,26 +947,32 @@ class TransformService(BaseService):
         characters = context.get("characters")
 
         # Build character-specific transformation instructions
-        character_instructions = self._build_character_instructions(characters, transform_type, character_mappings)
+        character_instructions = self._build_character_instructions(
+            characters, transform_type, character_mappings
+        )
+
+        # Build name substitution block if name_map is provided
+        name_map = context.get("name_map", {})
+        name_substitution_block = ""
+        if name_map:
+            lines = ["", "CHARACTER NAME SUBSTITUTIONS (apply these name changes consistently):"]
+            for original_name, new_name in name_map.items():
+                lines.append(f"  {original_name} -> {new_name}")
+            name_substitution_block = "\n".join(lines)
 
         system_prompt = f"""Gender transformation expert. Transform {batch_size} paragraphs.
 
 {rules}
-{character_instructions}
+{character_instructions}{name_substitution_block}
 
 Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
 
         # Simpler format without markers - just numbered paragraphs
-        paragraphs_text = "\n\n".join(
-            p.get_text() for p in batch_paragraphs
-        )
+        paragraphs_text = "\n\n".join(p.get_text() for p in batch_paragraphs)
 
         user_prompt = f"Transform these {batch_size} paragraphs (separated by blank lines):\n\n{paragraphs_text}"
 
-        return {
-            "system": system_prompt,
-            "user": user_prompt
-        }
+        return {"system": system_prompt, "user": user_prompt}
 
     def _create_transform_prompt(self, text: str, context: dict[str, Any]) -> dict[str, str]:
         """Create prompt for LLM transformation."""
@@ -930,7 +994,7 @@ Examples of transformations:
 
         system_prompt = f"""You are a precise text transformer. Apply gender swapping rules to the text.
 
-TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, 'value') else transform_type}
+TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, "value") else transform_type}
 
 {examples}
 
@@ -952,6 +1016,34 @@ INPUT TEXT:
 TRANSFORMED TEXT:"""
 
         return {"system": system_prompt, "user": user_prompt}
+
+    def _apply_name_map(self, text: str, name_map: dict[str, str]) -> str:
+        """Apply name substitutions with case-aware find/replace.
+
+        Handles "Elizabeth", "ELIZABETH", "elizabeth" etc.
+        Only replaces whole-word occurrences to avoid partial matches.
+        """
+        for original, new_name in name_map.items():
+            if not original or not new_name:
+                continue
+
+            # Build a case-aware replacement function using a closure to capture new_name
+            def make_replacement(new: str) -> Callable[[re.Match], str]:
+                def replace(m: re.Match) -> str:
+                    matched = m.group(0)
+                    if matched.isupper():
+                        return new.upper()
+                    if matched[0].isupper():
+                        # Capitalize first letter of new name, rest as-is
+                        return new[0].upper() + new[1:] if len(new) > 1 else new.upper()
+                    return new.lower()
+
+                return replace
+
+            pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
+            text = pattern.sub(make_replacement(new_name), text)
+
+        return text
 
     def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""

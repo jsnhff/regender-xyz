@@ -286,6 +286,7 @@ class Application:
         selected_characters: Optional[list[str]] = None,
         quality_control: bool = False,
         literary_pass: bool = False,
+        name_map: Optional[dict[str, str]] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -336,7 +337,11 @@ class Application:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
             transformation = await transformer.transform_book(
-                book, TransformType(transform_type), characters, selected_characters
+                book,
+                TransformType(transform_type),
+                characters,
+                selected_characters,
+                name_map=name_map,
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 

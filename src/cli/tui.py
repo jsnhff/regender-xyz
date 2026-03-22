@@ -11,7 +11,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from rich.text import Text
 from textual import work
@@ -772,6 +772,12 @@ class RegenderTUI(App):
         self._last_progress_line_id: Optional[str] = None
         self._book_stats: Optional[dict] = None
         self._analysis_running: bool = False
+        # Name review state
+        self._name_suggestions: list[dict] = []
+        self._name_map: dict[str, str] = {}
+        self._name_review_idx: int = 0
+        self._name_edit_mode: bool = False
+        self._pending_characters: Optional[Any] = None
 
     def compose(self) -> ComposeResult:
         yield HeaderBar(id="header")
@@ -1009,6 +1015,8 @@ class RegenderTUI(App):
             self._handle_transform_input(value)
         elif self._stage == "options":
             self._handle_options_input(value)
+        elif self._stage == "name_review":
+            self._handle_name_review_input(value)
         elif self._stage == "literary_menu":
             self._handle_literary_menu_input(value)
         elif self._stage == "literary_results":
@@ -1155,7 +1163,9 @@ class RegenderTUI(App):
             marker = " [#00ff00]◄[/]" if model_id == current or current.startswith(model_id) else ""
             self.print(f"  [bold #00ff00]{i}[/]  {display_name:<26} [#00aa00]{pricing}[/]{marker}")
         if not show_all and len(choices) > max_visible:
-            self.print(f"  [bold #00ff00]M[/]  [#00aa00]More models ({len(choices) - max_visible} additional)...[/]")
+            self.print(
+                f"  [bold #00ff00]M[/]  [#00aa00]More models ({len(choices) - max_visible} additional)...[/]"
+            )
         self.print("")
         self.set_prompt(">  ")
 
@@ -1500,23 +1510,18 @@ class RegenderTUI(App):
         self.call_later(0.3, show_loader)
 
     def _start_processing(self) -> None:
-        """Start the transformation process."""
+        """Start the transformation process.
+
+        For full transforms (not parse_only / character_analysis), runs a name review
+        stage between character analysis and transformation.
+        """
         self._stage = "processing"
         self._process_start = time.time()
         self.status_text = "Starting..."
 
-        # Disable input during processing (no animation — BrailleLoader in content area handles that)
+        # Disable input during processing
         with contextlib.suppress(Exception):
             self.query_one(InputBar).disable()
-
-        self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
-
-        # Show braille loader with elapsed timer
-        self._transform_loader = BrailleLoader("Transforming", self._process_start)
-        with contextlib.suppress(Exception):
-            self.query_one("#content", ContentArea).add_widget(self._transform_loader)
-
-        self.print("")
 
         # Build result for callback
         self._result = {
@@ -1526,8 +1531,316 @@ class RegenderTUI(App):
             "output_path": str(self._output_path) if self._output_path else None,
         }
 
-        # Run processing in background worker
-        self._run_processing()
+        transform_type = self._selected_transform or ""
+
+        if transform_type in ("parse_only", "character_analysis"):
+            # Skip name review — go straight to processing
+            self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
+            self._transform_loader = BrailleLoader("Transforming", self._process_start)
+            with contextlib.suppress(Exception):
+                self.query_one("#content", ContentArea).add_widget(self._transform_loader)
+            self.print("")
+            self._run_processing()
+        else:
+            # Full transform: run character analysis + name suggestions first
+            self.print(
+                f"{gradient_text('Analyzing characters for name review', ['#00ff00', '#00aa00'])}..."
+            )
+            self._analysis_start_time = time.time()
+            self._analysis_loader = BrailleLoader("Analyzing characters", self._analysis_start_time)
+            with contextlib.suppress(Exception):
+                self.query_one("#content", ContentArea).add_widget(self._analysis_loader)
+            self.print("")
+            self._run_name_review_analysis()
+
+    @work(exclusive=True)
+    async def _run_name_review_analysis(self) -> None:
+        """Worker: run character analysis, then name suggestions, then show review menu."""
+        import logging
+        import traceback
+
+        from dotenv import load_dotenv
+
+        debug_log = logging.getLogger("tui_debug")
+        debug_log.setLevel(logging.DEBUG)
+        if not debug_log.handlers:
+            Path("logs").mkdir(exist_ok=True)
+            _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
+            _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+            debug_log.addHandler(_fh)
+
+        logging.disable(logging.NOTSET)
+
+        import threading
+
+        import tqdm.std
+
+        tqdm.std.TqdmDefaultWriteLock.create_mp_lock = classmethod(
+            lambda cls: setattr(cls, "mp_lock", threading.RLock())
+        )
+
+        logging.getLogger("anthropic").setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+
+        load_dotenv()
+
+        try:
+            from src.app import Application
+
+            app = Application("src/config.json")
+
+            # Step 1: Parse and analyze characters
+            parser = app.get_service("parser")
+            book = await parser.process(str(self._selected_book))
+            character_service = app.get_service("character")
+            characters = await character_service.process(book)
+            self._pending_characters = characters
+
+            elapsed = time.time() - self._analysis_start_time
+            char_count = len(characters.characters)
+
+            # Stop analysis loader
+            if hasattr(self, "_analysis_loader") and self._analysis_loader:
+                try:
+                    self._analysis_loader.stop()
+                    self._analysis_loader.remove()
+                except Exception:
+                    pass
+                self._analysis_loader = None
+
+            self.print(
+                f"[#00ff00]✓[/] Found [bold #00ff00]{char_count}[/] characters "
+                f"[#00aa00]({elapsed:.1f}s)[/]"
+            )
+
+            # Step 2: Fetch name suggestions
+            transform_type = self._result.get("transform_type", "gender_swap")
+            self.status_text = "Suggesting names..."
+            self._suggestion_loader = BrailleLoader("Suggesting names", time.time())
+            with contextlib.suppress(Exception):
+                self.query_one("#content", ContentArea).add_widget(self._suggestion_loader)
+
+            suggestions = await character_service.suggest_name_alternatives(
+                characters, transform_type
+            )
+            self._name_suggestions = suggestions
+
+            # Stop suggestion loader
+            if hasattr(self, "_suggestion_loader") and self._suggestion_loader:
+                try:
+                    self._suggestion_loader.stop()
+                    self._suggestion_loader.remove()
+                except Exception:
+                    pass
+                self._suggestion_loader = None
+
+            app.shutdown()
+
+            # Step 3: Show review menu (re-enable input first)
+            with contextlib.suppress(Exception):
+                self.query_one(InputBar).enable()
+
+            self._show_name_review_menu()
+
+        except Exception as e:
+            tb = traceback.format_exc()
+            debug_log.error(f"Name review analysis EXCEPTION: {e}")
+            debug_log.error(f"Full traceback:\n{tb}")
+
+            for attr in ("_analysis_loader", "_suggestion_loader"):
+                loader = getattr(self, attr, None)
+                if loader:
+                    try:
+                        loader.stop()
+                        loader.remove()
+                    except Exception:
+                        pass
+                    setattr(self, attr, None)
+
+            self.print(f"[#00ff00]⚠[/] [#00aa00]Name review failed ({e}), proceeding without.[/]")
+            self.print("")
+            # Fall back to direct transform with no name_map
+            self._name_map = {}
+            with contextlib.suppress(Exception):
+                self.query_one(InputBar).enable()
+            self._start_transform_phase()
+
+    def _show_name_review_menu(self) -> None:
+        """Show the name review menu — let user approve or edit suggestions."""
+        suggestions = self._name_suggestions
+        self._stage = "name_review"
+        self._name_edit_mode = False
+        self._name_review_idx = 0
+
+        self.print("")
+        self.print("[#00ff00]?[/] [bold #00ff00]Character names[/]")
+        self.print("")
+
+        if not suggestions:
+            self.print("  [#00aa00]No name changes needed for this transform.[/]")
+            self.print("")
+            self.print("  [bold #00ff00]Enter[/]  Continue")
+            self.print("")
+            self.set_prompt(">  ")
+            return
+
+        self.print(f"  [#00aa00]{len(suggestions)} character(s) will get new names:[/]")
+        self.print("")
+        for i, item in enumerate(suggestions, 1):
+            orig = item["original"]
+            sugg = item["suggested"]
+            self.print(f"  [bold #00ff00]{i}[/]  {orig:<25} [#00aa00]→[/]  [#00ff00]{sugg}[/]")
+
+        self.print("")
+        self.print(
+            "  [bold #00ff00]A[/]  Accept all    "
+            "[bold #00ff00]K[/]  Keep originals    "
+            "[bold #00ff00]1-N[/]  Edit a name"
+        )
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_name_review_input(self, value: str) -> None:
+        """Handle name review menu input."""
+        suggestions = self._name_suggestions
+
+        # No suggestions — any input continues
+        if not suggestions:
+            self._name_map = {}
+            self._start_transform_phase()
+            return
+
+        # Edit mode: user is entering a new name for a specific suggestion
+        if self._name_edit_mode:
+            idx = self._name_review_idx
+            new_name = value.strip()
+            if new_name:
+                self._name_suggestions[idx]["suggested"] = new_name
+                self.print(
+                    f"[#00ff00]✓[/] Updated: [#00aa00]{suggestions[idx]['original']}[/] "
+                    f"→ [#00ff00]{new_name}[/]"
+                )
+            else:
+                self.print("[#00aa00]  (kept previous suggestion)[/]")
+            self._name_edit_mode = False
+            # Re-display the menu so user can continue
+            self._redisplay_name_review_menu()
+            return
+
+        v = value.strip().lower()
+
+        if v in ("a", "accept", ""):
+            # Accept all suggestions → build name_map
+            self._name_map = {item["original"]: item["suggested"] for item in suggestions}
+            self.print(f"[#00ff00]✓[/] Accepted {len(self._name_map)} name change(s)")
+            self.print("")
+            self._start_transform_phase()
+
+        elif v in ("k", "keep"):
+            # Keep originals → empty name_map
+            self._name_map = {}
+            self.print("[#00ff00]✓[/] Keeping original names")
+            self.print("")
+            self._start_transform_phase()
+
+        else:
+            # Check if it's a number to edit
+            try:
+                idx = int(value.strip()) - 1
+                if 0 <= idx < len(suggestions):
+                    self._name_review_idx = idx
+                    self._name_edit_mode = True
+                    item = suggestions[idx]
+                    self.print(
+                        f"  [#00aa00]Editing:[/] [#00ff00]{item['original']}[/] "
+                        f"[#00aa00](current suggestion: {item['suggested']})[/]"
+                    )
+                    self.print("  [#00aa00]Type new name (or press Enter to keep suggestion):[/]")
+                    self.set_prompt("name>  ")
+                else:
+                    limit = len(suggestions)
+                    self.print(f"[#00ff00]Enter A, K, or 1-{limit}[/]")
+            except ValueError:
+                limit = len(suggestions)
+                self.print(f"[#00ff00]Enter A, K, or 1-{limit}[/]")
+
+    def _redisplay_name_review_menu(self) -> None:
+        """Redisplay the current name suggestions after an edit."""
+        suggestions = self._name_suggestions
+        self.print("")
+        for i, item in enumerate(suggestions, 1):
+            orig = item["original"]
+            sugg = item["suggested"]
+            self.print(f"  [bold #00ff00]{i}[/]  {orig:<25} [#00aa00]→[/]  [#00ff00]{sugg}[/]")
+        self.print("")
+        self.print(
+            "  [bold #00ff00]A[/]  Accept all    "
+            "[bold #00ff00]K[/]  Keep originals    "
+            "[bold #00ff00]1-N[/]  Edit a name"
+        )
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _start_transform_phase(self) -> None:
+        """Begin the actual transformation after name review is complete."""
+        self._stage = "processing"
+        self.status_text = "Transforming..."
+
+        # Disable input again during transform
+        with contextlib.suppress(Exception):
+            self.query_one(InputBar).disable()
+
+        self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
+        self._transform_start = time.time()
+        self._transform_loader = BrailleLoader("Transforming", self._transform_start)
+        with contextlib.suppress(Exception):
+            self.query_one("#content", ContentArea).add_widget(self._transform_loader)
+        self.print("")
+
+        self._run_transform_with_name_map(self._name_map)
+
+    @work(exclusive=True)
+    async def _run_transform_with_name_map(self, name_map: dict[str, str]) -> None:
+        """Worker: run the full transformation with the approved name_map."""
+        import logging
+        import traceback
+
+        debug_log = logging.getLogger("tui_debug")
+        debug_log.setLevel(logging.DEBUG)
+        if not debug_log.handlers:
+            Path("logs").mkdir(exist_ok=True)
+            _fh = logging.FileHandler("logs/tui_debug.log", mode="a")
+            _fh.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+            debug_log.addHandler(_fh)
+
+        logging.disable(logging.NOTSET)
+        logging.getLogger("anthropic").setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+
+        try:
+            from src.app import Application
+
+            app = Application("src/config.json")
+
+            result = await app.process_book(
+                file_path=self._result["input"],
+                transform_type=self._result.get("transform_type"),
+                output_path=self._result.get("output_path"),
+                quality_control=not self._result.get("no_qc", True),
+                name_map=name_map if name_map else None,
+            )
+            debug_log.info(f"process_book returned: success={result.get('success')}")
+
+            app.shutdown()
+            self._show_complete(result)
+
+        except Exception as e:
+            tb = traceback.format_exc()
+            debug_log.error(f"Transform EXCEPTION: {e}")
+            debug_log.error(f"Full traceback:\n{tb}")
+            self._show_error(f"{e}\n  See logs/tui_debug.log for full traceback")
 
     @work(exclusive=True)
     async def _run_processing(self) -> None:
@@ -1900,7 +2213,9 @@ class RegenderTUI(App):
                     f"{ambiguity_count} pronoun ambiguit{'y' if ambiguity_count == 1 else 'ies'}"
                 )
             if rhythm_count:
-                parts.append(f"{rhythm_count} rhythm/wit adjustment{'s' if rhythm_count != 1 else ''}")
+                parts.append(
+                    f"{rhythm_count} rhythm/wit adjustment{'s' if rhythm_count != 1 else ''}"
+                )
             self.print(f"  [#00aa00]{' · '.join(parts)}[/]")
         self.print("")
         self.print("  [bold #00ff00]Y[/]  Review each suggestion")
@@ -1923,7 +2238,9 @@ class RegenderTUI(App):
             original_file = self._result.get("input", "") if self._result else ""
             transform_type = self._selected_transform or "gender_swap"
 
-            lit_result = await app.get_literary_suggestions(json_path, original_file, transform_type)
+            lit_result = await app.get_literary_suggestions(
+                json_path, original_file, transform_type
+            )
             app.shutdown()
 
             suggestions = lit_result.get("suggestions", [])
@@ -1932,7 +2249,9 @@ class RegenderTUI(App):
             self._literary_idx = 0
 
             if not suggestions:
-                self.print("[#00ff00]✓[/] [#00aa00]No literary refinements needed — prose is clean.[/]")
+                self.print(
+                    "[#00ff00]✓[/] [#00aa00]No literary refinements needed — prose is clean.[/]"
+                )
                 self.print("")
                 self._show_export_menu()
                 return
@@ -2112,6 +2431,12 @@ class RegenderTUI(App):
         self._stage_loader = None
         self._analysis_loader = None
         self._model_choices = []
+        # Name review state reset
+        self._name_suggestions = []
+        self._name_map = {}
+        self._name_review_idx = 0
+        self._name_edit_mode = False
+        self._pending_characters = None
         os.environ.pop("DEFAULT_MODEL", None)
 
         self.book_title = "—"
