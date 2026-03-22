@@ -32,7 +32,7 @@ class AnthropicProvider(BaseProviderPlugin):
     @property
     def default_model(self) -> str:
         """Default model."""
-        return "claude-opus-4-1-20250805"  # Claude Opus 4.1 (latest)
+        return "claude-sonnet-4-6"  # Claude Sonnet 4.6 (recommended)
 
     @property
     def supports_json(self) -> bool:
@@ -127,9 +127,9 @@ class AnthropicProvider(BaseProviderPlugin):
 
             return content
 
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as err:
             self.logger.error("Anthropic API call timed out after 60 seconds")
-            raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.")
+            raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.") from err
         except Exception as e:
             error_message = str(e)
 
@@ -150,7 +150,7 @@ class AnthropicProvider(BaseProviderPlugin):
             # Check for insufficient credits
             elif "credit" in error_message.lower() or "billing" in error_message.lower():
                 self.logger.error("Anthropic API credits/billing issue")
-                raise ValueError("Anthropic API billing issue. Please check your account.")
+                raise ValueError("Anthropic API billing issue. Please check your account.") from e
 
             # Log and re-raise other errors
             self.logger.error(f"Anthropic API error: {e}")

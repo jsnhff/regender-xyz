@@ -124,8 +124,11 @@ MODEL_COSTS = {
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (1.00, 2.00),
+    "claude-sonnet-4-6": (3.00, 15.00),
     "claude-sonnet-4": (3.00, 15.00),
+    "claude-opus-4-6": (15.00, 75.00),
     "claude-opus-4-5": (5.00, 25.00),
+    "claude-haiku-4-5": (0.80, 4.00),
     "claude-3-opus": (15.00, 75.00),
     "claude-3-sonnet": (3.00, 15.00),
     "claude-3-haiku": (0.25, 1.25),
@@ -145,8 +148,9 @@ def _lookup_model_cost(model: str) -> tuple[float, float]:
 # Fallback model list — used when live API fetch fails
 _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
-        ("claude-opus-4-5-20251101", "Claude Opus 4.5", "$5 / $25 per 1M tokens"),
-        ("claude-sonnet-4-20250514", "Claude Sonnet 4", "$3 / $15 per 1M tokens"),
+        ("claude-sonnet-4-6", "Claude Sonnet 4.6", "$3 / $15 per 1M tokens"),
+        ("claude-opus-4-6", "Claude Opus 4.6", "$15 / $75 per 1M tokens"),
+        ("claude-haiku-4-5-20251001", "Claude Haiku 4.5", "$0.80 / $4 per 1M tokens"),
     ],
     "openai": [
         ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
@@ -1793,6 +1797,12 @@ class RegenderTUI(App):
             self._literary_suggestions = []
             self._literary_accepted = []
             self._literary_idx = 0
+            try:
+                input_bar = self.query_one(InputBar)
+                input_bar.stop_loading_animation()
+                input_bar.enable()
+            except Exception:
+                pass
             self._show_literary_menu()
             return
 

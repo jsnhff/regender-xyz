@@ -364,6 +364,51 @@ class TokenManager:
             preferred_chunk_size=10000,
             overlap_tokens=500,
         ),
+        "claude-sonnet-4-6": ModelConfig(
+            name="claude-sonnet-4-6",
+            chars_per_token=3.8,
+            max_context_tokens=200000,
+            input_cost_per_1k=0.003,
+            output_cost_per_1k=0.015,
+            preferred_chunk_size=8000,
+            overlap_tokens=400,
+        ),
+        "claude-sonnet-4": ModelConfig(
+            name="claude-sonnet-4",
+            chars_per_token=3.8,
+            max_context_tokens=200000,
+            input_cost_per_1k=0.003,
+            output_cost_per_1k=0.015,
+            preferred_chunk_size=8000,
+            overlap_tokens=400,
+        ),
+        "claude-opus-4-6": ModelConfig(
+            name="claude-opus-4-6",
+            chars_per_token=3.5,
+            max_context_tokens=200000,
+            input_cost_per_1k=0.015,
+            output_cost_per_1k=0.075,
+            preferred_chunk_size=10000,
+            overlap_tokens=500,
+        ),
+        "claude-opus-4-5": ModelConfig(
+            name="claude-opus-4-5",
+            chars_per_token=3.5,
+            max_context_tokens=200000,
+            input_cost_per_1k=0.005,
+            output_cost_per_1k=0.025,
+            preferred_chunk_size=10000,
+            overlap_tokens=500,
+        ),
+        "claude-haiku-4-5": ModelConfig(
+            name="claude-haiku-4-5",
+            chars_per_token=4.0,
+            max_context_tokens=200000,
+            input_cost_per_1k=0.0008,
+            output_cost_per_1k=0.004,
+            preferred_chunk_size=6000,
+            overlap_tokens=300,
+        ),
     }
 
     def __init__(
@@ -385,8 +430,16 @@ class TokenManager:
         elif model_name in self.MODEL_CONFIGS:
             self.config = self.MODEL_CONFIGS[model_name]
         else:
-            logger.warning(f"Unknown model {model_name}, using gpt-4 config")
-            self.config = self.MODEL_CONFIGS["gpt-4"]
+            # Try prefix match for dated variants (e.g. claude-sonnet-4-6-20260301)
+            matched = next(
+                (cfg for key, cfg in self.MODEL_CONFIGS.items() if model_name.startswith(key)),
+                None,
+            )
+            if matched:
+                self.config = matched
+            else:
+                logger.warning(f"Unknown model {model_name}, using gpt-4 config")
+                self.config = self.MODEL_CONFIGS["gpt-4"]
 
         self.estimator = TokenEstimator(self.config)
         self.splitter = splitter or ParagraphSplitter()

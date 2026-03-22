@@ -56,7 +56,7 @@ async def run_transform(app: Application, transform_type: str, qc: bool) -> None
         print(f"  ✗ ERROR: {result['error']}")
         return
 
-    changes = result.get("changes_made", 0)
+    changes = result.get("changes", 0)
     qc_score = result.get("quality_score")
     qc_corr = result.get("qc_corrections", 0)
 

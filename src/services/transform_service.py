@@ -417,7 +417,7 @@ class TransformService(BaseService):
             return {
                 "target_gender": "male",
                 "pronouns": {"she": "he", "her": "him", "hers": "his"},
-                "titles": {"Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
+                "titles": {"Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr.", "Dame": "Sir", "Lady": "Lord"},
                 "terms": {
                     "mother": "father",
                     "daughter": "son",
@@ -425,13 +425,17 @@ class TransformService(BaseService):
                     "wife": "husband",
                     "queen": "king",
                     "lady": "lord",
+                    "ladies": "gentlemen",
+                },
+                "phrases": {
+                    "ladies and gentlemen": "gentlemen",
                 },
             }
         elif transform_type == TransformType.ALL_FEMALE:
             return {
                 "target_gender": "female",
                 "pronouns": {"he": "she", "him": "her", "his": "hers"},
-                "titles": {"Mr.": "Ms."},
+                "titles": {"Mr.": "Ms.", "Sir": "Dame", "Lord": "Lady"},
                 "terms": {
                     "father": "mother",
                     "son": "daughter",
@@ -439,6 +443,11 @@ class TransformService(BaseService):
                     "husband": "wife",
                     "king": "queen",
                     "lord": "lady",
+                    "gentleman": "lady",
+                    "gentlemen": "ladies",
+                },
+                "phrases": {
+                    "ladies and gentlemen": "ladies",
                 },
             }
         elif transform_type == TransformType.GENDER_SWAP:
