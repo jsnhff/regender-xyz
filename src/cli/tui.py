@@ -160,7 +160,16 @@ AVAILABLE_MODELS = _FALLBACK_MODELS
 # OpenAI model ID prefixes suitable for text generation
 _OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
 # Sub-patterns that indicate embedding / audio / image / fine-tuning models
-_OPENAI_SKIP_PATTERNS = ("instruct", "realtime", "audio", "tts", "whisper", "dall-e", "embedding", "search")
+_OPENAI_SKIP_PATTERNS = (
+    "instruct",
+    "realtime",
+    "audio",
+    "tts",
+    "whisper",
+    "dall-e",
+    "embedding",
+    "search",
+)
 
 
 def _should_show_openai_model(model_id: str) -> bool:
@@ -179,7 +188,7 @@ def _openai_display_name(model_id: str) -> str:
     name = model_id
     for prefix, replacement in (("gpt-", "GPT-"), ("o1", "O1"), ("o3", "O3"), ("o4", "O4")):
         if name.startswith(prefix):
-            name = replacement + name[len(prefix):]
+            name = replacement + name[len(prefix) :]
             break
     return name.replace("-", " ")
 
@@ -898,12 +907,31 @@ class RegenderTUI(App):
         self._stage = "options"
         self.print("[#00ff00]?[/] [bold #00ff00]Apply quality control?[/]")
         self.print("")
-        cost = self._estimate_cost_str(1.0)
-        cost_hint = f", costs {cost}" if cost else ""
+        pass1_cost = self._estimate_cost_str(0.8)
+        pass2_cost = self._estimate_cost_str(0.4)
+        # Compute combined total if both are available
+        if self._book_stats:
+            tokens = self._book_stats.get("tokens", 0)
+            model = os.environ.get("DEFAULT_MODEL", "")
+            input_cost, output_cost = _lookup_model_cost(model)
+            combined = tokens * 1.2 / 1_000_000 * (input_cost + output_cost)
+            total_cost_str = f"~${combined:.2f}"
+        else:
+            total_cost_str = ""
+        self.print("  [bold #00ff00]Y[/]  Yes [#00aa00]— two-pass review:[/]")
+        pass1_suffix = f" [#00aa00]({pass1_cost})[/]" if pass1_cost else ""
+        pass2_suffix = f" [#00aa00]({pass2_cost})[/]" if pass2_cost else ""
+        total_suffix = f" [#00aa00](~{total_cost_str} total)[/]" if total_cost_str else ""
         self.print(
-            f"  [bold #00ff00]Y[/]  Yes [#00aa00](second LLM pass — catches missed transformations{cost_hint})[/]"
+            f"       [#00aa00]Pass 1  paragraph scan — catches missed pronouns & honorifics[/]{pass1_suffix}"
         )
-        self.print("  [bold #00ff00]n[/]  No  [#00aa00](faster, skip QC)[/]")
+        self.print(
+            f"       [#00aa00]Pass 2  character audit — verifies each character throughout the full book[/]{pass2_suffix}"
+        )
+        if total_suffix:
+            self.print(f"       [#00aa00]Estimated cost:[/]{total_suffix}")
+        self.print("")
+        self.print("  [bold #00ff00]n[/]  No  [#00aa00]— skip QC (faster, cheaper)[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -1073,7 +1101,9 @@ class RegenderTUI(App):
                     input_c, output_c = _lookup_model_cost(m.id)
                     pricing = f"${input_c:.2f} / ${output_c:.2f} per 1M tokens"
                     openai_models.append((m.id, _openai_display_name(m.id), pricing))
-                choices.extend(openai_models if openai_models else _FALLBACK_MODELS.get("openai", []))
+                choices.extend(
+                    openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
+                )
             except Exception:
                 choices.extend(_FALLBACK_MODELS.get("openai", []))
 

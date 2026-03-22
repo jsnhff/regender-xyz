@@ -126,3 +126,15 @@ Do NOT add explanations, labels, or metadata.
 
 PARAGRAPHS:
 {paragraphs}"""
+
+
+CHARACTER_AUDIT_PROMPT_TEMPLATE = """Character: {name}{aliases_str}
+Required: {target_gender} — pronouns must be {target_pronouns}
+
+Review these {batch_size} paragraphs. Find any where this character's pronouns or honorifics are wrong.
+Return ONLY a JSON array (empty array [] if all correct):
+[{{"index": 0, "corrected": "full corrected paragraph text"}}]
+NO explanations, NO markdown fences.
+
+PARAGRAPHS:
+{paragraphs}"""
