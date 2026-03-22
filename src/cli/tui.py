@@ -755,6 +755,10 @@ class RegenderTUI(App):
         self._selected_book: Optional[Path] = None
         self._selected_transform: Optional[str] = None
         self._no_qc = False
+        self._run_literary: bool = False
+        self._literary_suggestions: list[dict] = []
+        self._literary_accepted: list[dict] = []
+        self._literary_idx: int = 0
         self._result: Optional[dict] = None
         self._process_start: Optional[float] = None
         self._json_output_path: Optional[str] = None
@@ -933,10 +937,22 @@ class RegenderTUI(App):
         self.print("")
         self.print("  [bold #00ff00]n[/]  No  [#00aa00]— skip QC (faster, cheaper)[/]")
         self.print("")
+        lit_marker = " [#00ff00]◄ on[/]" if self._run_literary else ""
+        self.print(
+            f"  [bold #00ff00]L[/]  Literary pass  [#00aa00]— style, rhythm, ambiguity review (review or auto-apply after)[/]{lit_marker}"
+        )
+        self.print("")
         self.set_prompt(">  ")
 
     def _handle_options_input(self, value: str) -> None:
-        """Handle quality control selection."""
+        """Handle quality control and literary pass selection."""
+        if value.lower() in ("l",):
+            self._run_literary = not self._run_literary
+            state = "on" if self._run_literary else "off"
+            self.print(f"[#00ff00]✓[/] Literary pass {state}")
+            self.print("")
+            self._show_options_menu()
+            return
         if value.lower() in ("n", "no"):
             self._no_qc = True
             self.print("[#00ff00]✓[/] Skipping QC")
@@ -1001,6 +1017,10 @@ class RegenderTUI(App):
             self._handle_transform_input(value)
         elif self._stage == "options":
             self._handle_options_input(value)
+        elif self._stage == "literary_menu":
+            self._handle_literary_menu_input(value)
+        elif self._stage == "literary_review":
+            self._handle_literary_review_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -1489,6 +1509,7 @@ class RegenderTUI(App):
             "input": str(self._selected_book),
             "transform_type": self._selected_transform,
             "no_qc": self._no_qc,
+            "run_literary": self._run_literary,
             "output_path": str(self._output_path) if self._output_path else None,
         }
 
@@ -1574,6 +1595,7 @@ class RegenderTUI(App):
                 transform_type=transform_type,
                 output_path=self._result.get("output_path"),
                 quality_control=not self._result.get("no_qc", True),
+                literary_pass=self._result.get("run_literary", False),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -1757,28 +1779,23 @@ class RegenderTUI(App):
                 f"  [#00aa00]QC score:[/] [#00ff00]{qc_score}%[/] [#00aa00]({qc_corrections} corrections)[/]"
             )
 
-        # Show export options from FORMATS
-        self._stage = "export"
-        self._export_format_list = list(FORMATS.keys())
-        self.print("")
-        self.print("[#00ff00]?[/] [bold #00ff00]Export format[/]")
-        self.print("")
-        for i, key in enumerate(self._export_format_list, 1):
-            info = FORMATS[key]
-            self.print(f"  [bold #00ff00]{i}[/]  {key:<15} [#00aa00]{info['description']}[/]")
-        skip_num = len(self._export_format_list) + 1
-        self.print(f"  [bold #00ff00]{skip_num}[/]  skip [#00aa00](JSON only)[/]")
-        self.print("")
+        # Check for literary suggestions
+        literary_suggestions = result.get("literary_suggestions") or []
+        if literary_suggestions:
+            self._literary_suggestions = literary_suggestions
+            self._literary_accepted = []
+            self._literary_idx = 0
+            # Re-enable input before showing the literary menu
+            try:
+                input_bar = self.query_one(InputBar)
+                input_bar.stop_loading_animation()
+                input_bar.enable()
+            except Exception:
+                pass
+            self._show_literary_menu()
+            return
 
-        self.status_text = "Export?"
-
-        # Re-enable input for export selection
-        try:
-            input_bar = self.query_one(InputBar)
-            input_bar.stop_loading_animation()
-            input_bar.enable()
-        except Exception:
-            pass
+        self._show_export_menu()
 
     def _handle_export_input(self, value: str) -> None:
         """Handle export format selection."""
@@ -1817,6 +1834,156 @@ class RegenderTUI(App):
 
         self._show_final()
 
+    # -------------------------------------------------------------------------
+    # Literary Pass
+    # -------------------------------------------------------------------------
+
+    def _show_literary_menu(self) -> None:
+        """Show the literary pass menu after QC completes."""
+        suggestions = self._literary_suggestions
+        n = len(suggestions)
+        # Count unique chapters
+        chapters_seen = {s["chapter_title"] for s in suggestions}
+        n_chapters = len(chapters_seen)
+
+        # Breakdown by reason keyword
+        ambiguity_count = sum(
+            1
+            for s in suggestions
+            if "ambigui" in s.get("reason", "").lower() or "pronoun" in s.get("reason", "").lower()
+        )
+        rhythm_count = sum(
+            1
+            for s in suggestions
+            if "rhythm" in s.get("reason", "").lower()
+            or "register" in s.get("reason", "").lower()
+            or "mechanical" in s.get("reason", "").lower()
+        )
+
+        self.print("")
+        self.print("[#00ff00]─[/]" * 50)
+        self.print("")
+        self.print("[#00ff00]?[/] [bold #00ff00]Literary quality pass[/]")
+        self.print("")
+        self.print(
+            f"  Found [bold #00ff00]{n}[/] suggested refinements across {n_chapters} chapter(s)."
+        )
+        if ambiguity_count or rhythm_count:
+            parts = []
+            if ambiguity_count:
+                parts.append(
+                    f"{ambiguity_count} pronoun ambiguit{'y' if ambiguity_count == 1 else 'ies'}"
+                )
+            if rhythm_count:
+                parts.append(f"{rhythm_count} rhythm adjustment{'s' if rhythm_count != 1 else ''}")
+            self.print(f"  [#00aa00]{'  ·  '.join(parts)}[/]")
+        self.print("  [#00aa00](These are editorial changes to prose, not accuracy fixes.)[/]")
+        self.print("")
+        self.print("  [bold #00ff00]Y[/]  Review each suggestion")
+        self.print("  [bold #00ff00]A[/]  Auto-apply all")
+        self.print("  [bold #00ff00]n[/]  Skip")
+        self._stage = "literary_menu"
+
+    def _show_literary_suggestion(self) -> None:
+        """Show the current literary suggestion for review."""
+        n = len(self._literary_suggestions)
+        s = self._literary_suggestions[self._literary_idx]
+        self.print("")
+        self.print(
+            f"  [#00aa00]Refinement {self._literary_idx + 1} of {n} — {s['chapter_title']}[/]"
+        )
+        self.print("")
+        self.print("  [#00aa00]CURRENT:[/]")
+        self.print(f"  {s['current']}")
+        self.print("")
+        self.print("  [bold #00ff00]SUGGESTED:[/]")
+        self.print(f"  {s['suggested']}")
+        self.print("")
+        self.print(f"  [#00aa00]Reason: {s['reason']}[/]")
+        self.print("")
+        self.print(
+            "  [bold #00ff00]A[/]  Accept   [bold #00ff00]S[/]  Skip   [bold #00ff00]Q[/]  Quit (auto-apply remaining)"
+        )
+        self._stage = "literary_review"
+
+    def _handle_literary_menu_input(self, value: str) -> None:
+        """Handle literary menu selection: Y=review, A=auto-apply all, n=skip."""
+        v = value.lower().strip()
+        if v == "a":
+            self._literary_accepted = list(self._literary_suggestions)
+            self._apply_literary_and_finish()
+        elif v == "n":
+            self._literary_accepted = []
+            total = len(self._literary_suggestions)
+            self.print(f"[#00ff00]✓[/] Literary pass: 0 of {total} refinements accepted (skipped)")
+            self.print("")
+            self._show_export_menu()
+        else:
+            # Y or anything else → start review
+            self._literary_idx = 0
+            self._show_literary_suggestion()
+
+    def _handle_literary_review_input(self, value: str) -> None:
+        """Handle per-suggestion review: A=accept, S=skip, Q=quit+auto-apply remaining."""
+        v = value.lower().strip()
+        current = self._literary_suggestions[self._literary_idx]
+        if v == "a":
+            self._literary_accepted.append(current)
+            self._literary_idx += 1
+        elif v == "q":
+            # Auto-apply all remaining (unreviewed) suggestions
+            remaining = self._literary_suggestions[self._literary_idx + 1 :]
+            self._literary_accepted.extend(remaining)
+            self._apply_literary_and_finish()
+            return
+        else:
+            # S or anything else → skip
+            self._literary_idx += 1
+
+        if self._literary_idx < len(self._literary_suggestions):
+            self._show_literary_suggestion()
+        else:
+            self._apply_literary_and_finish()
+
+    def _apply_literary_and_finish(self) -> None:
+        """Apply accepted literary suggestions, show summary, proceed to export."""
+        accepted = self._literary_accepted
+        total = len(self._literary_suggestions)
+
+        if accepted and self._json_output_path:
+            try:
+                from src.app import Application
+
+                app = Application("src/config.json")
+                app.apply_literary_suggestions(self._json_output_path, accepted)
+                app.shutdown()
+            except Exception as e:
+                self.print(f"[#00ff00]⚠ Could not apply literary suggestions:[/] {e}")
+
+        self.print(f"[#00ff00]✓[/] Literary pass: {len(accepted)} of {total} refinements accepted")
+        self.print("")
+        self._show_export_menu()
+
+    def _show_export_menu(self) -> None:
+        """Show the export format menu (extracted from _show_complete for reuse)."""
+        self._stage = "export"
+        self._export_format_list = list(FORMATS.keys())
+        self.print("[#00ff00]?[/] [bold #00ff00]Export format[/]")
+        self.print("")
+        for i, key in enumerate(self._export_format_list, 1):
+            info = FORMATS[key]
+            self.print(f"  [bold #00ff00]{i}[/]  {key:<15} [#00aa00]{info['description']}[/]")
+        skip_num = len(self._export_format_list) + 1
+        self.print(f"  [bold #00ff00]{skip_num}[/]  skip [#00aa00](JSON only)[/]")
+        self.print("")
+        self.status_text = "Export?"
+        try:
+            input_bar = self.query_one(InputBar)
+            input_bar.stop_loading_animation()
+            input_bar.enable()
+        except Exception:
+            pass
+
     def _show_final(self) -> None:
         """Offer to transform another book or quit."""
         self._stage = "done"
@@ -1849,6 +2016,10 @@ class RegenderTUI(App):
         self._selected_book = None
         self._selected_transform = None
         self._no_qc = False
+        self._run_literary = False
+        self._literary_suggestions = []
+        self._literary_accepted = []
+        self._literary_idx = 0
         self._result = None
         self._process_start = None
         self._json_output_path = None

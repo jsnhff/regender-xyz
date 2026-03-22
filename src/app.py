@@ -285,6 +285,7 @@ class Application:
         output_path: Optional[str] = None,
         selected_characters: Optional[list[str]] = None,
         quality_control: bool = False,
+        literary_pass: bool = False,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -295,6 +296,7 @@ class Application:
             output_path: Optional output path
             quality_control: Whether to apply quality control
             selected_characters: Optional list of character names to transform
+            literary_pass: Whether to run literary quality pass (Pass 3)
 
         Returns:
             Processing results
@@ -361,6 +363,37 @@ class Application:
                 except Exception as e:
                     self.logger.warning(f"QC pass failed (continuing without): {e}")
 
+            # Apply literary quality pass if requested (Pass 3)
+            literary_suggestions: list[dict] = []
+            style_fingerprint: str = ""
+            if literary_pass:
+                self.logger.info("Applying literary quality pass...")
+                try:
+                    provider = self._get_provider()
+                    lit_service = QualityService(provider=provider)
+
+                    # Parse the original file fresh for comparison
+                    orig_parser = self.get_service("parser")
+                    original_book = await orig_parser.process(file_path)
+                    self._apply_title_fallback(original_book, file_path)
+
+                    # Get the (possibly QC-corrected) transformed book
+                    transformed_book = transformation.get_transformed_book()
+
+                    style_fingerprint = await lit_service.get_style_fingerprint(original_book)
+                    literary_suggestions = await lit_service.suggest_literary_refinements(
+                        original_book,
+                        transformed_book,
+                        characters,
+                        TransformType(transform_type),
+                        style_fingerprint,
+                    )
+                    self.logger.info(
+                        f"Literary pass complete: {len(literary_suggestions)} suggestions"
+                    )
+                except Exception as e:
+                    self.logger.warning(f"Literary pass failed (continuing without): {e}")
+
             # Save output if requested
             if output_path:
                 # Save JSON transformation immediately
@@ -384,6 +417,8 @@ class Application:
                 "output_path": output_path,
                 "quality_score": qc_score,
                 "qc_corrections": qc_corrections,
+                "literary_suggestions": literary_suggestions,
+                "style_fingerprint": style_fingerprint,
             }
 
         except Exception as e:
@@ -423,6 +458,46 @@ class Application:
                 f.write(text_content)
 
         self.logger.info(f"Saved output to {output_path}")
+
+    def apply_literary_suggestions(self, json_path: str, accepted_suggestions: list[dict]) -> str:
+        """
+        Apply accepted literary suggestions to the saved JSON file.
+
+        For each accepted suggestion, replaces the paragraph's sentences with
+        the suggested revision, then saves the updated JSON back to disk.
+
+        Args:
+            json_path: Path to the transformation JSON file
+            accepted_suggestions: List of suggestion dicts with ch_idx, para_idx, suggested
+
+        Returns:
+            json_path (unchanged)
+        """
+        if not accepted_suggestions:
+            return json_path
+
+        path = Path(json_path)
+        with open(path, encoding="utf-8") as f:
+            book_data = json.load(f)
+
+        for suggestion in accepted_suggestions:
+            ch_idx = suggestion["ch_idx"]
+            para_idx = suggestion["para_idx"]
+            suggested_text = suggestion["suggested"]
+            try:
+                book_data["chapters"][ch_idx]["paragraphs"][para_idx]["sentences"] = [
+                    suggested_text
+                ]
+            except (IndexError, KeyError) as e:
+                self.logger.warning(
+                    f"Could not apply suggestion at ch={ch_idx} para={para_idx}: {e}"
+                )
+
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(book_data, f, indent=2, ensure_ascii=False)
+
+        self.logger.info(f"Applied {len(accepted_suggestions)} literary suggestions to {json_path}")
+        return json_path
 
     async def parse_book(self, file_path: str, output_path: Optional[str] = None) -> dict[str, Any]:
         """

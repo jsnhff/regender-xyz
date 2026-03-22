@@ -13,7 +13,12 @@ from src.models.character import CharacterAnalysis, Gender
 from src.models.transformation import TransformType
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
-from src.services.prompts import CHARACTER_AUDIT_PROMPT_TEMPLATE, QC_REVIEW_PROMPT_TEMPLATE
+from src.services.prompts import (
+    CHARACTER_AUDIT_PROMPT_TEMPLATE,
+    LITERARY_QUALITY_PROMPT_TEMPLATE,
+    QC_REVIEW_PROMPT_TEMPLATE,
+    STYLE_FINGERPRINT_PROMPT_TEMPLATE,
+)
 
 
 class QualityService(BaseService):
@@ -299,6 +304,132 @@ class QualityService(BaseService):
         except Exception as e:
             self.logger.warning(f"QC batch failed, keeping original: {e}")
             return paragraphs
+
+    def _get_para_text(self, para: Any) -> str:
+        """Return plain text for a paragraph."""
+        return " ".join(para.sentences) if para.sentences else ""
+
+    async def get_style_fingerprint(self, book: Book) -> str:
+        """
+        Generate a style fingerprint from the first few paragraphs of the book.
+
+        Returns a short prose description of the author's style, or empty string on error.
+        """
+        if not self.provider:
+            return ""
+
+        # Collect first 5 non-empty paragraphs
+        excerpts: list[str] = []
+        for chapter in book.chapters:
+            for para in chapter.paragraphs:
+                text = self._get_para_text(para)
+                if text.strip():
+                    excerpts.append(text)
+                if len(excerpts) >= 5:
+                    break
+            if len(excerpts) >= 5:
+                break
+
+        if not excerpts:
+            return ""
+
+        excerpt = "\n\n".join(excerpts)
+        prompt = STYLE_FINGERPRINT_PROMPT_TEMPLATE.format(excerpt=excerpt)
+        try:
+            messages = [{"role": "user", "content": prompt}]
+            response = await self.provider.complete(messages, temperature=0.3)
+            return response.strip()
+        except Exception as e:
+            self.logger.warning(f"Style fingerprint failed: {e}")
+            return ""
+
+    async def suggest_literary_refinements(
+        self,
+        original_book: Book,
+        transformed_book: Book,
+        characters: Optional[CharacterAnalysis],
+        transform_type: TransformType,
+        style_fingerprint: str,
+    ) -> list[dict]:
+        """
+        Pass 3: literary quality pass comparing original vs transformed paragraphs.
+
+        Returns a list of suggestion dicts (not applied here — the TUI applies them).
+        Each dict has: ch_idx, para_idx, current, suggested, reason, chapter_title.
+        """
+        if not self.provider:
+            return []
+
+        rules_summary = self._build_rules_summary(transform_type)
+
+        # Pair up paragraphs and find those that differ
+        differing: list[
+            tuple[int, int, str, str, str]
+        ] = []  # (ch_idx, para_idx, orig, trans, ch_title)
+        for ch_idx, (orig_chapter, trans_chapter) in enumerate(
+            zip(original_book.chapters, transformed_book.chapters)
+        ):
+            ch_title = orig_chapter.title or f"Chapter {ch_idx + 1}"
+            for para_idx, (orig_para, trans_para) in enumerate(
+                zip(orig_chapter.paragraphs, trans_chapter.paragraphs)
+            ):
+                orig_text = self._get_para_text(orig_para)
+                trans_text = self._get_para_text(trans_para)
+                if orig_text.strip() and orig_text.strip() != trans_text.strip():
+                    differing.append((ch_idx, para_idx, orig_text, trans_text, ch_title))
+
+        if not differing:
+            return []
+
+        suggestions: list[dict] = []
+        batch_size = 20
+        batches = [differing[i : i + batch_size] for i in range(0, len(differing), batch_size)]
+
+        for batch in batches:
+            # Build numbered paragraph lines
+            lines = []
+            for local_idx, (_, _, orig_text, trans_text, _) in enumerate(batch):
+                orig_trunc = orig_text[:300] if len(orig_text) > 300 else orig_text
+                trans_trunc = trans_text[:300] if len(trans_text) > 300 else trans_text
+                lines.append(f"{local_idx} | {orig_trunc} → {trans_trunc}")
+            paragraphs_str = "\n".join(lines)
+
+            prompt = LITERARY_QUALITY_PROMPT_TEMPLATE.format(
+                style_fingerprint=style_fingerprint or "(not available)",
+                transform_type=transform_type.value,
+                rules_summary=rules_summary,
+                paragraphs=paragraphs_str,
+            )
+
+            try:
+                messages = [{"role": "user", "content": prompt}]
+                response = await self.provider.complete(messages, temperature=0.2)
+                raw = self._parse_json_corrections(response)
+                for item in raw:
+                    local_idx = item.get("index")
+                    suggested = item.get("suggested", "")
+                    reason = item.get("reason", "")
+                    if local_idx is None or not suggested:
+                        continue
+                    if not (0 <= local_idx < len(batch)):
+                        continue
+                    ch_idx, para_idx, _, trans_text, ch_title = batch[local_idx]
+                    suggestions.append(
+                        {
+                            "ch_idx": ch_idx,
+                            "para_idx": para_idx,
+                            "current": trans_text,
+                            "suggested": suggested,
+                            "reason": reason,
+                            "chapter_title": ch_title,
+                        }
+                    )
+            except Exception as e:
+                self.logger.warning(f"Literary quality batch failed: {e}")
+                continue
+
+        self.logger.info(f"Literary pass complete: {len(suggestions)} suggestions generated")
+        return suggestions
 
     def _build_rules_summary(self, transform_type: TransformType) -> str:
         """Build a concise human-readable rules summary for the prompt."""

@@ -138,3 +138,32 @@ NO explanations, NO markdown fences.
 
 PARAGRAPHS:
 {paragraphs}"""
+
+
+STYLE_FINGERPRINT_PROMPT_TEMPLATE = """Analyze the style of this prose excerpt in 2-3 sentences.
+Describe: sentence structure, tone, vocabulary register, any distinctive rhetorical devices (irony, wit, free indirect discourse, etc).
+Be specific and concise — this description will guide literary editing.
+
+EXCERPT:
+{excerpt}"""
+
+
+LITERARY_QUALITY_PROMPT_TEMPLATE = """You are a literary editor reviewing a gender-transformed book for print publication.
+
+STYLE OF THIS WORK: {style_fingerprint}
+TRANSFORMATION: {transform_type} — {rules_summary}
+
+Your task: compare each ORIGINAL paragraph with its TRANSFORMED version.
+Flag only paragraphs where the transformation creates:
+1. Pronoun ambiguity (two+ same-gender characters, unclear who "she/he/they" refers to)
+2. Unnatural rhythm or register (sounds mechanical/translated rather than written)
+3. Lost irony, humor, or wit from the original
+
+Return a JSON array. For each issue found:
+{{"index": <number>, "suggested": "<revised paragraph>", "reason": "<one line: what issue and what you changed>"}}
+
+If a paragraph is fine, do NOT include it. Return [] if all paragraphs are clean.
+NO markdown fences. NO explanations outside the JSON.
+
+PARAGRAPHS (index | ORIGINAL → TRANSFORMED):
+{paragraphs}"""
