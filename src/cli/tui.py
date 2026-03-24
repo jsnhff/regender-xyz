@@ -10,6 +10,7 @@ import math
 import os
 import re
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -877,12 +878,14 @@ class RegenderTUI(App):
             # For character analysis: save to book's output folder
             output_dir = Path("books/output") / book_folder
             output_dir.mkdir(parents=True, exist_ok=True)
-            self._output_path = output_dir / "characters.json"
+            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
+            self._output_path = output_dir / f"characters_{ts}.json"
         else:
-            # For transformations: save to book's output folder with transformation type
+            # For transformations: save to book's output folder with transformation type + timestamp
             output_dir = Path("books/output") / book_folder
             output_dir.mkdir(parents=True, exist_ok=True)
-            self._output_path = output_dir / f"{self._selected_transform}.json"
+            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
+            self._output_path = output_dir / f"{self._selected_transform}_{ts}.json"
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle input."""
