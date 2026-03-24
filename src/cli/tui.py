@@ -1561,8 +1561,13 @@ class RegenderTUI(App):
         self.print("")
         self.print("[#00ff00]?[/] [bold #00ff00]What next?[/]")
         self.print("")
-        self.print("  [bold #00ff00]1[/]  Transform another book")
-        self.print("  [bold #00ff00]2[/]  Quit")
+        if self._selected_book:
+            book_name = self._selected_book.stem
+            self.print(f"  [bold #00ff00]1[/]  Transform [#00aa00]{book_name}[/] again [#00aa00](different type)[/]")
+        else:
+            self.print("  [bold #00ff00]1[/]  Transform same book again")
+        self.print("  [bold #00ff00]2[/]  Transform a different book")
+        self.print("  [bold #00ff00]3[/]  Quit")
         self.print("")
         self.status_text = "Complete ✓"
 
@@ -1576,11 +1581,27 @@ class RegenderTUI(App):
     def _handle_done_input(self, value: str) -> None:
         """Handle post-completion menu: restart or quit."""
         if value in ("1", "again", "a", "y", "yes"):
+            self._restart_same_book()
+        elif value in ("2", "b", "book"):
             self._restart_flow()
-        elif value in ("2", "q", "quit", "exit", ""):
+        elif value in ("3", "q", "quit", "exit", ""):
             self.exit()
         else:
-            self.print("[#00ff00]Enter 1 or 2[/]")
+            self.print("[#00ff00]Enter 1, 2, or 3[/]")
+
+    def _restart_same_book(self) -> None:
+        """Reset transform state only, keeping the selected book, and jump to transform menu."""
+        saved_book = self._selected_book
+        saved_stats = self._book_stats
+        self._restart_flow()
+        # Restore book so user skips file selection
+        self._selected_book = saved_book
+        self._book_stats = saved_stats
+        if saved_book:
+            self.book_title = saved_book.stem
+        # Jump straight to transform selection
+        self.print("")
+        self._show_transform_menu()
 
     def _restart_flow(self) -> None:
         """Reset state and start a new transformation."""
