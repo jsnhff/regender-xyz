@@ -913,10 +913,12 @@ class RegenderTUI(App):
             if sample.exists():
                 self._select_book(sample)
             else:
-                self.print("[#00ff00]Sample not found[/]")
+                self.print("[#00ff00]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]")
         elif value == "2":
             self.print("[#00aa00]  Drag a .txt file into this window, or paste the full path[/]")
             self.set_prompt("path>  ")
+        elif value.lower() == "regender me":
+            self._easter_egg()
         elif value.lower() in ("q", "quit"):
             self.exit()
         else:
@@ -927,6 +929,24 @@ class RegenderTUI(App):
                 self.print("[#00ff00]That's a directory[/]")
             else:
                 self.print("[#00ff00]File not found[/]")
+
+    def _easter_egg(self) -> None:
+        """Regender the regendering tool."""
+        lines = [
+            "",
+            gradient_text("regendering the regendering tool...", GREEN_GRADIENT),
+            "",
+            "  [#00aa00]Original:[/]  [#00ff00]She transforms gender representation in literature using AI.[/]",
+            "  [#00aa00]Regendered:[/] [#00ff00]He transforms gender representation in literature using AI.[/]",
+            "  [#00aa00]Regendered:[/] [#00ff00]They transform gender representation in literature using AI.[/]",
+            "  [#00aa00]Regendered:[/] [#00ff00]It transforms gender representation in literature using AI.[/]",
+            "",
+            "  [#00aa00]✓ regendered in 0.000s · quality score 100%[/]",
+            "",
+        ]
+        for line in lines:
+            self.print(line)
+
 
     def _select_book(self, path: Path) -> None:
         """Select a book and show analysis."""
