@@ -660,6 +660,13 @@ class StatusBar(Static):
 # =============================================================================
 
 
+class _TxtDirectoryTree(DirectoryTree):
+    """DirectoryTree that shows only directories and .txt files."""
+
+    def filter_paths(self, paths):
+        return [p for p in paths if p.is_dir() or p.suffix == ".txt"]
+
+
 class FileBrowserScreen(Screen):
     """Full-screen file browser for selecting a book file."""
 
@@ -672,17 +679,17 @@ class FileBrowserScreen(Screen):
         color: #00aa00;
         padding: 0 1;
     }
-    FileBrowserScreen DirectoryTree {
+    FileBrowserScreen _TxtDirectoryTree {
         background: #000000;
         color: #00ff00;
         height: 1fr;
         border: solid #00aa00;
     }
-    FileBrowserScreen DirectoryTree > .tree--cursor {
+    FileBrowserScreen _TxtDirectoryTree > .tree--cursor {
         background: #003300;
         color: #00ff00;
     }
-    FileBrowserScreen DirectoryTree:focus > .tree--cursor {
+    FileBrowserScreen _TxtDirectoryTree:focus > .tree--cursor {
         background: #005500;
         color: #00ff00;
     }
@@ -698,14 +705,14 @@ class FileBrowserScreen(Screen):
         self._start_path = start_path
 
     def compose(self) -> ComposeResult:
-        yield Label("Browse — navigate with arrows, Enter to select, Esc to cancel")
-        yield DirectoryTree(str(self._start_path))
+        yield Label("Browse — arrows to navigate, Enter to select, Esc to cancel  (.txt files only)")
+        yield _TxtDirectoryTree(str(self._start_path))
 
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
         self.dismiss(Path(event.path))
 
     def action_select(self) -> None:
-        tree = self.query_one(DirectoryTree)
+        tree = self.query_one(_TxtDirectoryTree)
         node = tree.cursor_node
         if node and node.data and node.data.path:
             path = Path(node.data.path)
