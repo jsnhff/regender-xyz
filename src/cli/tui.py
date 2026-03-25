@@ -21,7 +21,8 @@ from textual import work
 from textual.app import App, ComposeResult
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.reactive import reactive
-from textual.widgets import Input, Label, Static
+from textual.screen import Screen
+from textual.widgets import DirectoryTree, Input, Label, Static
 
 from src.exporters import FORMATS, export_book
 from src.progress import ProgressContext, ProgressEvent, Stage, StageCompleteEvent
@@ -659,6 +660,59 @@ class StatusBar(Static):
 # =============================================================================
 
 
+class FileBrowserScreen(Screen):
+    """Full-screen file browser for selecting a book file."""
+
+    DEFAULT_CSS = """
+    FileBrowserScreen {
+        background: #000000;
+        padding: 0;
+    }
+    FileBrowserScreen Label {
+        color: #00aa00;
+        padding: 0 1;
+    }
+    FileBrowserScreen DirectoryTree {
+        background: #000000;
+        color: #00ff00;
+        height: 1fr;
+        border: solid #00aa00;
+    }
+    FileBrowserScreen DirectoryTree > .tree--cursor {
+        background: #003300;
+        color: #00ff00;
+    }
+    FileBrowserScreen DirectoryTree:focus > .tree--cursor {
+        background: #005500;
+        color: #00ff00;
+    }
+    """
+
+    BINDINGS = [
+        ("escape", "dismiss(None)", "Cancel"),
+        ("enter", "select", "Select"),
+    ]
+
+    def __init__(self, start_path: Path, **kwargs):
+        super().__init__(**kwargs)
+        self._start_path = start_path
+
+    def compose(self) -> ComposeResult:
+        yield Label("Browse — navigate with arrows, Enter to select, Esc to cancel")
+        yield DirectoryTree(str(self._start_path))
+
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        self.dismiss(Path(event.path))
+
+    def action_select(self) -> None:
+        tree = self.query_one(DirectoryTree)
+        node = tree.cursor_node
+        if node and node.data and node.data.path:
+            path = Path(node.data.path)
+            if path.is_file():
+                self.dismiss(path)
+
+
 class RegenderTUI(App):
     """
     Unified TUI for Regender.
@@ -827,8 +881,16 @@ class RegenderTUI(App):
         self._stage = "book"
         self.print("[#00ff00]?[/] [bold #00ff00]Select a book[/]")
         self.print("")
-        self.print("  [bold #00ff00]1[/]  Pride and Prejudice [#00aa00](sample)[/]")
+        self.print(
+            "  [#00aa00]Add plain-text (.txt) books to [bold]books/texts/[/] in this folder[/]"
+        )
+        self.print(
+            "  [#00aa00]then choose an option below.[/]"
+        )
+        self.print("")
+        self.print("  [bold #00ff00]1[/]  Browse files in [bold]books/texts/[/]...")
         self.print("  [bold #00ff00]2[/]  Enter or drag file path...")
+        self.print("  [bold #00ff00]3[/]  Pride and Prejudice [#00aa00](sample)[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -921,13 +983,16 @@ class RegenderTUI(App):
         sample = Path("books/texts/pride-prejudice-sample.txt")
 
         if value == "1":
+            start = Path("books/texts") if Path("books/texts").exists() else Path.home()
+            self.push_screen(FileBrowserScreen(start), self._on_file_browser_result)
+        elif value == "2":
+            self.print("[#00aa00]  Drag a .txt file into this window, or paste the full path[/]")
+            self.set_prompt("path>  ")
+        elif value == "3":
             if sample.exists():
                 self._select_book(sample)
             else:
                 self.print("[#00ff00]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]")
-        elif value == "2":
-            self.print("[#00aa00]  Drag a .txt file into this window, or paste the full path[/]")
-            self.set_prompt("path>  ")
         elif value.lower() == "regender me":
             self._easter_egg()
         elif value.lower() in ("q", "quit"):
@@ -958,6 +1023,14 @@ class RegenderTUI(App):
         for line in lines:
             self.print(line)
 
+    def _on_file_browser_result(self, path: Path | None) -> None:
+        """Called when the file browser screen is dismissed."""
+        if path is None:
+            return  # user pressed Esc
+        if path.is_file():
+            self._select_book(path)
+        else:
+            self.print("[#00ff00]No file selected[/]")
 
     def _select_book(self, path: Path) -> None:
         """Select a book and show analysis."""
