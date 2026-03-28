@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 """
 Textual TUI for Regender
 
 A polished terminal user interface with fixed header, scrollable content,
 and input footer.
 """
+
+from __future__ import annotations
 
 import contextlib
 import math
@@ -391,7 +391,7 @@ class HeaderBar(Container):
             self._transform = transform
         self._refresh()
 
-    def update_meta(self, stats: Optional[dict], char_count: Optional[int] = None) -> None:
+    def update_meta(self, stats: dict | None, char_count: int | None = None) -> None:
         """Update all metadata fields."""
         if stats:
             self._pages = str(stats.get("pages", "—"))
@@ -459,7 +459,7 @@ class ContentArea(ScrollableContainer):
     }
     """
 
-    _progress_label: Optional[Label] = None
+    _progress_label: Label | None = None
 
     def add_line(self, content: str) -> None:
         """Add a line to the content area."""
@@ -683,21 +683,21 @@ class RegenderTUI(App):
     transform_type: reactive[str] = reactive("—")
     status_text: reactive[str] = reactive("Ready")
 
-    def __init__(self, process_callback: Optional[Callable] = None, **kwargs):
+    def __init__(self, process_callback: Callable | None = None, **kwargs):
         super().__init__(**kwargs)
         self._process_callback = process_callback
         self._stage = "book"  # book, transform, options, processing, done
-        self._selected_book: Optional[Path] = None
-        self._selected_transform: Optional[str] = None
+        self._selected_book: Path | None = None
+        self._selected_transform: str | None = None
         self._no_qc = False
-        self._result: Optional[dict] = None
-        self._process_start: Optional[float] = None
-        self._json_output_path: Optional[str] = None
-        self._output_path: Optional[Path] = None
-        self._stage_start: Optional[float] = None
-        self._current_stage: Optional[str] = None
-        self._last_progress_line_id: Optional[str] = None
-        self._book_stats: Optional[dict] = None
+        self._result: dict | None = None
+        self._process_start: float | None = None
+        self._json_output_path: str | None = None
+        self._output_path: Path | None = None
+        self._stage_start: float | None = None
+        self._current_stage: str | None = None
+        self._last_progress_line_id: str | None = None
+        self._book_stats: dict | None = None
         self._analysis_running: bool = False
 
     def compose(self) -> ComposeResult:
@@ -1692,7 +1692,7 @@ class RegenderTUI(App):
             on_stage_complete=self._on_stage_complete,
         )
 
-    def get_result(self) -> Optional[dict]:
+    def get_result(self) -> dict | None:
         """Get the selection result."""
         return self._result
 
@@ -1702,7 +1702,7 @@ class RegenderTUI(App):
 # =============================================================================
 
 
-def run_tui(process_callback: Optional[Callable] = None) -> Optional[dict]:
+def run_tui(process_callback: Callable | None = None) -> dict | None:
     """
     Run the full TUI experience.
 
@@ -1722,7 +1722,7 @@ def run_tui(process_callback: Optional[Callable] = None) -> Optional[dict]:
     return app.get_result()
 
 
-def run_selection() -> Optional[dict]:
+def run_selection() -> dict | None:
     """Run selection only (no processing), return result for external processing."""
     app = RegenderTUI(process_callback=None)
     app.run()
