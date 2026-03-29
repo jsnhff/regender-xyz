@@ -345,6 +345,15 @@ class HeaderBar(Container):
     HeaderBar #stats-row1 > Label, HeaderBar #stats-row2 > Label {
         width: 1fr;
     }
+
+    HeaderBar #stats-row1 > Label:first-child,
+    HeaderBar #stats-row2 > Label:first-child {
+        width: 2fr;
+    }
+
+    HeaderBar #stats-row2 > Label#model-label {
+        width: 2fr;
+    }
     """
 
     def __init__(self, **kwargs):
@@ -380,7 +389,7 @@ class HeaderBar(Container):
         # Row 2: processing info
         with Horizontal(id="stats-row2"):
             yield Label(f"[#00aa00]transformation:[/] [#00ff00]{self._transform}[/]")
-            yield Label(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]")
+            yield Label(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]", id="model-label")
             yield Label(f"[#00aa00]total cost:[/] [#00ff00]{self._cost}[/]")
 
     def update_status(self, book: str = None, transform: str = None, status: str = None) -> None:
