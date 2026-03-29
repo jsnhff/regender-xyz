@@ -695,10 +695,11 @@ class RegenderTUI(App):
     def __init__(self, process_callback: Callable | None = None, **kwargs):
         super().__init__(**kwargs)
         self._process_callback = process_callback
-        self._stage = "book"  # book, transform, options, processing, done
+        self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
         self._no_qc = False
+        self._name_map: dict[str, str] | None = None
         self._result: dict | None = None
         self._process_start: float | None = None
         self._json_output_path: str | None = None
@@ -850,11 +851,8 @@ class RegenderTUI(App):
         self.print(f"  [#00ff00]{self._output_path}[/]")
         self.print("")
 
-        # TODO: Re-enable QC prompt once app.process_book() supports
-        # a quality_control parameter. Currently QC is commented out
-        # in app.py (line 323), so the prompt was cosmetic.
         self._no_qc = True
-        self._start_processing()
+        self._show_name_map_prompt()
 
     def _get_book_title(self, path: Path) -> str:
         """Extract book title from path."""
@@ -911,6 +909,8 @@ class RegenderTUI(App):
             self._handle_transform_input(value)
         elif self._stage == "options":
             self._handle_options_input(value)
+        elif self._stage == "name_map":
+            self._handle_name_map_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -1235,6 +1235,41 @@ class RegenderTUI(App):
 
         self.print(f"[#00ff00]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
 
+    def _show_name_map_prompt(self) -> None:
+        """Prompt user to optionally supply character name substitutions."""
+        self._stage = "name_map"
+        self.print("[#00aa00]rename characters?[/] [#005500](optional)[/]")
+        self.print("  format: [#00ff00]OldName=NewName, OldName2=NewName2[/]")
+        self.print("  e.g.  [#00ff00]Elizabeth=Edward, Jane=John[/]")
+        self.print("  [#005500]press enter to skip[/]")
+        self.print("")
+
+    def _handle_name_map_input(self, value: str) -> None:
+        """Parse optional name map and proceed to processing."""
+        self._name_map = None
+        if value.strip():
+            try:
+                pairs = [p.strip() for p in value.split(",") if "=" in p]
+                self._name_map = {
+                    k.strip(): v.strip()
+                    for k, v in (p.split("=", 1) for p in pairs)
+                    if k.strip() and v.strip()
+                }
+                if self._name_map:
+                    names = ", ".join(f"[#00ff00]{k}→{v}[/]" for k, v in self._name_map.items())
+                    self.print(f"[#00ff00]✓[/] renaming: {names}")
+                else:
+                    self.print("[#005500]no valid pairs found — skipping[/]")
+                    self._name_map = None
+            except Exception:
+                self.print("[#005500]couldn't parse — skipping[/]")
+                self._name_map = None
+        else:
+            self.print("[#005500]no renames — using original names[/]")
+
+        self.print("")
+        self._start_processing()
+
     def _handle_options_input(self, value: str) -> None:
         """Handle options."""
         if value.lower() in ("n", "no"):
@@ -1300,6 +1335,7 @@ class RegenderTUI(App):
             "transform_type": self._selected_transform,
             "no_qc": self._no_qc,
             "output_path": str(self._output_path) if self._output_path else None,
+            "name_map": self._name_map,
         }
 
         # Run processing in background worker
@@ -1356,6 +1392,7 @@ class RegenderTUI(App):
                 file_path=self._result["input"],
                 transform_type=self._result["transform_type"],
                 output_path=self._result.get("output_path"),
+                name_map=self._result.get("name_map"),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
