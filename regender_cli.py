@@ -8,6 +8,7 @@ analyze characters, and apply gender transformations.
 
 import argparse
 import asyncio
+import json
 import logging
 import os
 import sys
@@ -94,6 +95,13 @@ async def process_book(args):
                 selected_characters = [line.strip() for line in f if line.strip()]
             print(f"  Selective transformation for {len(selected_characters)} characters from file")
 
+        # Parse name map if provided
+        name_map = None
+        if args.name_map:
+            p = Path(args.name_map.strip())
+            name_map = json.loads(p.read_text() if p.is_file() else args.name_map)
+            print(f"  Name substitutions: {', '.join(f'{k}→{v}' for k, v in name_map.items())}")
+
         # Process the book with transformation
         print(f"Processing {input_path} with {args.transform_type} transformation...")
         result = await app.process_book(
@@ -101,6 +109,7 @@ async def process_book(args):
             transform_type=args.transform_type,
             output_path=str(output_path),
             selected_characters=selected_characters,
+            name_map=name_map,
         )
 
     # Display results
@@ -197,6 +206,14 @@ async def async_main():
     parser.add_argument(
         "--characters-file",
         help="Path to file containing character names to transform (one per line)",
+    )
+
+    parser.add_argument(
+        "--name-map",
+        help=(
+            "JSON string or path to .json file mapping original character names to replacements, "
+            "e.g. '{\"Elizabeth\":\"Edward\",\"Jane\":\"John\"}'"
+        ),
     )
 
     # Parse arguments

@@ -6,6 +6,7 @@ This service handles gender transformation of books.
 
 import asyncio
 import os
+import re
 import time
 from typing import Any, Optional
 
@@ -21,10 +22,10 @@ from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import TRANSFORM_BATCH_PROMPT_TEMPLATE, TRANSFORM_SIMPLE_PROMPT_TEMPLATE
 from src.strategies.transform import SmartTransformStrategy, TransformStrategy
 from src.utils.errors import (
-    ValidationError,
-    TransformationError,
     ConfigurationError,
     ErrorHandler,
+    TransformationError,
+    ValidationError,
 )
 from src.utils.token_manager import TokenManager
 
@@ -155,6 +156,7 @@ class TransformService(BaseService):
         transform_type: TransformType,
         characters: Optional[CharacterAnalysis] = None,
         selected_characters: Optional[list[str]] = None,
+        name_map: Optional[dict[str, str]] = None,
     ) -> Transformation:
         """
         Transform a book with the specified transformation type.
@@ -164,6 +166,7 @@ class TransformService(BaseService):
             transform_type: Type of transformation
             characters: Pre-analyzed characters (optional)
             selected_characters: Specific characters to transform (optional)
+            name_map: Optional mapping of original character names to replacement names
 
         Returns:
             Transformation object with results
@@ -238,7 +241,7 @@ class TransformService(BaseService):
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
             transformed_chapters, all_changes = await self._transform_chapters(
-                book.chapters, context
+                book.chapters, context, name_map=name_map
             )
 
             # Create transformation result
@@ -495,7 +498,10 @@ class TransformService(BaseService):
         return mappings
 
     async def _transform_chapters(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """
         Transform chapters with the given context.
@@ -511,12 +517,15 @@ class TransformService(BaseService):
         use_parallel = len(chapters) > 2 and self.config.async_enabled and self.provider
 
         if use_parallel:
-            return await self._transform_chapters_parallel(chapters, context)
+            return await self._transform_chapters_parallel(chapters, context, name_map=name_map)
         else:
-            return await self._transform_chapters_sequential(chapters, context)
+            return await self._transform_chapters_sequential(chapters, context, name_map=name_map)
 
     async def _transform_chapters_sequential(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters sequentially with rate limiting."""
         transformed_chapters = []
@@ -546,7 +555,9 @@ class TransformService(BaseService):
 
             self.logger.debug(f"Transforming chapter {i + 1}/{len(chapters)}")
 
-            transformed_chapter, changes = await self._transform_single_chapter(chapter, i, context)
+            transformed_chapter, changes = await self._transform_single_chapter(
+                chapter, i, context, name_map=name_map
+            )
 
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
@@ -558,18 +569,21 @@ class TransformService(BaseService):
         return transformed_chapters, all_changes
 
     async def _transform_chapters_parallel(
-        self, chapters: list[Chapter], context: dict[str, Any]
+        self,
+        chapters: list[Chapter],
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters in parallel with rate limiting."""
 
         # For OpenAI, force sequential processing due to rate limits
         if self.provider and "openai" in self.provider.name.lower():
             self.logger.info("OpenAI detected - using sequential processing for rate limiting")
-            return await self._transform_chapters_sequential(chapters, context)
+            return await self._transform_chapters_sequential(chapters, context, name_map=name_map)
 
         # Create tasks for each chapter
         tasks = [
-            self._transform_single_chapter(chapter, i, context)
+            self._transform_single_chapter(chapter, i, context, name_map=name_map)
             for i, chapter in enumerate(chapters)
         ]
 
@@ -594,7 +608,11 @@ class TransformService(BaseService):
         return transformed_chapters, all_changes
 
     async def _transform_single_chapter(
-        self, chapter: Chapter, chapter_index: int, context: dict[str, Any]
+        self,
+        chapter: Chapter,
+        chapter_index: int,
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]] = None,
     ) -> tuple[Chapter, list[TransformationChange]]:
         """
         Transform a single chapter.
@@ -603,6 +621,7 @@ class TransformService(BaseService):
             chapter: Chapter to transform
             chapter_index: Index of the chapter
             context: Transformation context
+            name_map: Optional mapping of original names to replacement names
 
         Returns:
             Tuple of (transformed chapter, list of changes)
@@ -696,6 +715,10 @@ class TransformService(BaseService):
                         self.logger.debug(f"Original text: {repr(original_text[:100])}")
                         self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
 
+                    # Apply name substitutions after LLM transform
+                    if name_map:
+                        transformed_text = self._apply_name_map(transformed_text, name_map)
+
                     # Track changes
                     if transformed_text != original_text:
                         changes.append(
@@ -735,6 +758,22 @@ class TransformService(BaseService):
         )
 
         return transformed_chapter, changes
+
+    def _apply_name_map(self, text: str, name_map: dict[str, str]) -> str:
+        """Apply case-aware name substitutions to a paragraph of text."""
+        for original, replacement in name_map.items():
+            pattern = re.compile(re.escape(original), re.IGNORECASE)
+
+            def _replace(m, r=replacement):
+                word = m.group()
+                if word.isupper():
+                    return r.upper()
+                if word[0].isupper():
+                    return r[0].upper() + r[1:] if len(r) > 1 else r.upper()
+                return r.lower()
+
+            text = pattern.sub(_replace, text)
+        return text
 
     def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
         """Parse batch response into individual paragraph texts."""

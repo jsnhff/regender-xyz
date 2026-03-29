@@ -268,6 +268,7 @@ class Application:
         transform_type: str,
         output_path: Optional[str] = None,
         selected_characters: Optional[list[str]] = None,
+        name_map: Optional[dict[str, str]] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -278,6 +279,7 @@ class Application:
             output_path: Optional output path
             quality_control: Whether to apply quality control
             selected_characters: Optional list of character names to transform
+            name_map: Optional mapping of original character names to replacement names
 
         Returns:
             Processing results
@@ -316,7 +318,8 @@ class Application:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
             transformation = await transformer.transform_book(
-                book, TransformType(transform_type), characters, selected_characters
+                book, TransformType(transform_type), characters, selected_characters,
+                name_map=name_map,
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
