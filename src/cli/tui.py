@@ -1180,7 +1180,7 @@ class RegenderTUI(App):
                 self.query_one(HeaderBar).update_meta(stats)
 
         self.print("")
-        self._show_character_analysis_prompt()
+        self._show_model_menu()
 
     def _estimate_cost_str(self, token_fraction: float = 1.0) -> str:
         """Return a formatted cost estimate string for a fraction of the book's tokens."""
@@ -1222,7 +1222,7 @@ class RegenderTUI(App):
         else:
             self.print("[#ffffff]✓[/] Skipped")
             self.print("")
-            self._show_model_menu()
+            self._show_transform_menu()
 
     @work(exclusive=True)
     async def _run_character_analysis(self) -> None:
@@ -1359,7 +1359,7 @@ class RegenderTUI(App):
                             self.print(f"    [#aaaaaa]... and {len(main_chars) - 5} more[/]")
 
                     self.print("")
-                    self._show_model_menu()
+                    self._show_transform_menu()
 
                 show_results()
             else:
@@ -1379,7 +1379,7 @@ class RegenderTUI(App):
                 self.print("[#aaaaaa]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
-                self._show_model_menu()
+                self._show_transform_menu()
 
         except Exception as e:
             error_msg = str(e)
@@ -1400,7 +1400,7 @@ class RegenderTUI(App):
             self.print("[#aaaaaa]  See logs/tui_debug.log for full traceback[/]")
             self._show_api_key_help(error_msg)
             self.print("")
-            self._show_model_menu()
+            self._show_transform_menu()
 
     def _show_api_key_help(self, error_msg: str) -> None:
         """Show helpful message if error is about missing API keys."""
@@ -1420,7 +1420,7 @@ class RegenderTUI(App):
     def _handle_transform_input(self, value: str) -> None:
         """Handle transform selection."""
         if value.lower() in ("back", "b"):
-            self._show_model_menu()
+            self._show_character_analysis_prompt()
             return
 
         try:
@@ -1455,7 +1455,7 @@ class RegenderTUI(App):
         if not has_openai and not has_anthropic:
             self.print("[#aaaaaa]No API keys configured — skipping model selection[/]")
             self._model_choices = []
-            self._show_transform_menu()
+            self._show_character_analysis_prompt()
             return
 
         self.print("[#aaaaaa]Detecting available models...[/]")
@@ -1518,7 +1518,7 @@ class RegenderTUI(App):
     def _render_model_menu(self) -> None:
         """Display model selection menu after model list has been fetched."""
         if not self._model_choices:
-            self._show_transform_menu()
+            self._show_character_analysis_prompt()
             return
 
         if len(self._model_choices) == 1:
@@ -1527,7 +1527,7 @@ class RegenderTUI(App):
             self.print(f"[#ffffff]✓[/] Using [bold #ffffff]{display_name}[/]")
             self._recalculate_cost(model_id)
             self.print("")
-            self._show_transform_menu()
+            self._show_character_analysis_prompt()
             return
 
         self._stage = "model"
@@ -1562,7 +1562,7 @@ class RegenderTUI(App):
         """Handle model selection."""
         choices = self._model_choices
         if not choices:
-            self._show_transform_menu()
+            self._show_character_analysis_prompt()
             return
 
         if value.lower() == "m":
@@ -1579,7 +1579,7 @@ class RegenderTUI(App):
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
-                self._show_transform_menu()
+                self._show_character_analysis_prompt()
                 return
         except ValueError:
             pass
@@ -1590,7 +1590,7 @@ class RegenderTUI(App):
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
-                self._show_transform_menu()
+                self._show_character_analysis_prompt()
                 return
 
         limit = len(choices) if self._model_showing_all else min(5, len(choices))
