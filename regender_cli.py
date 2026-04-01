@@ -110,6 +110,7 @@ async def process_book(args):
             output_path=str(output_path),
             selected_characters=selected_characters,
             name_map=name_map,
+            custom_title=args.title or None,
         )
 
     # Display results
@@ -214,6 +215,11 @@ async def async_main():
             "JSON string or path to .json file mapping original character names to replacements, "
             "e.g. '{\"Elizabeth\":\"Edward\",\"Jane\":\"John\"}'"
         ),
+    )
+
+    parser.add_argument(
+        "--title",
+        help="Custom title for the output book (overrides the title extracted from the file)",
     )
 
     # Parse arguments

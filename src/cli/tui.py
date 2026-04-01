@@ -883,6 +883,7 @@ class RegenderTUI(App):
         self._name_review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
+        self._custom_title: str = ""
         self._model_choices: list = []
         self._model_showing_all: bool = False
         self._result: dict | None = None
@@ -1043,7 +1044,27 @@ class RegenderTUI(App):
         self.print("[#aaaaaa]Output will be saved to:[/]")
         self.print(f"  [#ffffff]{self._output_path}[/]")
         self.print("")
+        self._show_retitle_prompt()
 
+    def _show_retitle_prompt(self) -> None:
+        """Ask if user wants a custom title for the output."""
+        self._stage = "retitle"
+        current = self._custom_title or self.book_title
+        self.print("[#ffffff]?[/] [bold #ffffff]Title for output book[/]")
+        self.print(f"  [#aaaaaa]Current: {current}[/]")
+        self.print("")
+        self.print("  Type a new title, or press [bold #ffffff]Enter[/] to keep it")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_retitle_input(self, value: str) -> None:
+        """Handle retitle prompt input."""
+        if value.strip():
+            self._custom_title = value.strip()
+            self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
+        else:
+            self.print(f"[#ffffff]✓[/] Keeping: [bold #ffffff]{self._custom_title or self.book_title}[/]")
+        self.print("")
         self._no_qc = True
         self._run_name_review()
 
@@ -1104,6 +1125,8 @@ class RegenderTUI(App):
             self._handle_model_input(value)
         elif self._stage == "options":
             self._handle_options_input(value)
+        elif self._stage == "retitle":
+            self._handle_retitle_input(value)
         elif self._stage == "name_review":
             self._handle_name_review_input(value)
         elif self._stage == "export":
@@ -1882,6 +1905,7 @@ class RegenderTUI(App):
                 transform_type=self._result["transform_type"],
                 output_path=self._result.get("output_path"),
                 name_map=self._result.get("name_map"),
+                custom_title=self._custom_title or None,
                 on_chapter_complete=on_chapter_complete,
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")

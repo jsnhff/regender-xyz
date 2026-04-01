@@ -269,6 +269,7 @@ class Application:
         output_path: Optional[str] = None,
         selected_characters: Optional[list[str]] = None,
         name_map: Optional[dict[str, str]] = None,
+        custom_title: Optional[str] = None,
         on_chapter_complete: Optional[Any] = None,
     ) -> dict[str, Any]:
         """
@@ -291,6 +292,8 @@ class Application:
             # Parse the book
             parser = self.get_service("parser")
             book = await parser.process(file_path)
+            if custom_title:
+                book.title = custom_title
             self.logger.info(f"Parsed book: {book.title}")
 
             # Determine output directory early if we have an output path
