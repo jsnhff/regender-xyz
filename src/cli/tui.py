@@ -884,6 +884,7 @@ class RegenderTUI(App):
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._custom_title: str = ""
+        self._setup_provider: str = ""
         self._model_choices: list = []
         self._model_showing_all: bool = False
         self._result: dict | None = None
@@ -905,19 +906,18 @@ class RegenderTUI(App):
         """Initialize the app."""
         self._update_header()
 
-        # Simple welcome message
         self.print("[#ffffff]◆[/] [#aaaaaa]Welcome to regender.xyz[/]")
         self.print("")
 
-        # Check LLM setup
-        self._check_llm_setup()
-
-        self._show_book_menu()
+        # Show setup wizard for first-time users, book menu for returning users
+        if self._check_llm_setup():
+            self._show_setup_wizard()
+        else:
+            self._show_book_menu()
         self.query_one("#input", Input).focus()
 
-    def _check_llm_setup(self) -> None:
-        """Check if LLM provider is properly configured."""
-        # Ensure .env is loaded
+    def _check_llm_setup(self) -> bool:
+        """Check if LLM provider is configured. Returns True if setup wizard is needed."""
         from dotenv import load_dotenv
 
         load_dotenv()
@@ -930,44 +930,106 @@ class RegenderTUI(App):
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
 
         if not has_openai and not has_anthropic:
-            # No API keys configured
-            self.print("[bold #ffffff]⚠ No API keys detected[/]")
+            return True  # Needs setup
+
+        if not provider:
+            # Has keys but no provider set — auto-fix silently
+            auto = "anthropic" if has_anthropic else "openai"
+            os.environ["DEFAULT_PROVIDER"] = auto
+            from dotenv import set_key
+            set_key(".env", "DEFAULT_PROVIDER", auto)
+
+        return False  # All good
+
+    def _show_setup_wizard(self) -> None:
+        """Interactive first-run setup wizard."""
+        self._stage = "setup_provider"
+        self.print("[#aaaaaa]To transform books you'll need an API key from an AI provider.[/]")
+        self.print("[#aaaaaa]This takes about 2 minutes — just pick one and paste a key.[/]")
+        self.print("")
+        self.print("[#ffffff]?[/] [bold #ffffff]Which provider would you like to use?[/]")
+        self.print("")
+        self.print("  [bold #ffffff]1[/]  Anthropic [bold #ffffff](Claude)[/]")
+        self.print("     [#aaaaaa]Nuanced, literary — excellent for complex prose[/]")
+        self.print("     [#aaaaaa]→ console.anthropic.com/settings/keys[/]")
+        self.print("")
+        self.print("  [bold #ffffff]2[/]  OpenAI [bold #ffffff](ChatGPT)[/]")
+        self.print("     [#aaaaaa]Fast and affordable — good for most books[/]")
+        self.print("     [#aaaaaa]→ platform.openai.com/api-keys[/]")
+        self.print("")
+        self.print("  [bold #ffffff]↵[/]  Skip for now [#aaaaaa](parse_only still works without a key)[/]")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_setup_provider_input(self, value: str) -> None:
+        """Handle provider selection in setup wizard."""
+        if value == "1":
+            self._setup_provider = "anthropic"
+            self.print("[#ffffff]✓[/] Anthropic selected")
             self.print("")
-            self.print(
-                "[#aaaaaa]Add these to[/] [bold #ffffff].env[/] [#aaaaaa]in the project folder:[/]"
-            )
+            self._show_setup_key_prompt()
+        elif value == "2":
+            self._setup_provider = "openai"
+            self.print("[#ffffff]✓[/] OpenAI selected")
             self.print("")
-            self.print("  [#ffffff]# For OpenAI:[/]")
-            self.print("  [#ffffff]OPENAI_API_KEY=sk-...[/]")
-            self.print("  [#ffffff]DEFAULT_PROVIDER=openai[/]")
+            self._show_setup_key_prompt()
+        elif value.strip() == "":
+            self.print("[#aaaaaa]Skipping setup — you can add keys to .env any time.[/]")
             self.print("")
-            self.print("  [#ffffff]# Or for Anthropic:[/]")
-            self.print("  [#ffffff]ANTHROPIC_API_KEY=sk-ant-...[/]")
-            self.print("  [#ffffff]DEFAULT_PROVIDER=anthropic[/]")
-            self.print("")
-            self.print(
-                "[#aaaaaa]Then restart the app. You can still use 'parse_only' without keys.[/]"
-            )
-            self.print("")
-        elif not provider:
-            # Has keys but no provider set
-            available = []
-            if has_openai:
-                available.append("openai")
-            if has_anthropic:
-                available.append("anthropic")
-            self.print("[bold #ffffff]⚠ DEFAULT_PROVIDER not set[/]")
-            self.print("")
-            self.print(f"[#aaaaaa]You have API keys for: {', '.join(available)}[/]")
-            self.print(
-                "[#aaaaaa]Add this to[/] [bold #ffffff].env[/] [#aaaaaa]in the project folder:[/]"
-            )
-            self.print(f"  [#ffffff]DEFAULT_PROVIDER={available[0]}[/]")
-            self.print("")
+            self._show_book_menu()
         else:
-            # All good - show which provider is active
-            self.print(f"[#ffffff]◆[/] [#aaaaaa]Using {provider} for LLM calls[/]")
+            self.print("[#ffffff]Enter 1, 2, or press Enter to skip[/]")
+
+    def _show_setup_key_prompt(self) -> None:
+        """Prompt user to paste their API key."""
+        self._stage = "setup_key"
+        if self._setup_provider == "anthropic":
+            self.print("  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://console.anthropic.com/settings/keys[/]")
+            self.print("  [#aaaaaa]Sign in, click \"Create Key\", and paste it below.[/]")
+            self.print("  [#aaaaaa]It starts with[/] [bold #ffffff]sk-ant-[/]")
+        else:
+            self.print("  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://platform.openai.com/api-keys[/]")
+            self.print("  [#aaaaaa]Sign in, click \"Create new secret key\", and paste it below.[/]")
+            self.print("  [#aaaaaa]It starts with[/] [bold #ffffff]sk-[/]")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_setup_key_input(self, value: str) -> None:
+        """Handle API key paste in setup wizard."""
+        key = value.strip()
+
+        if not key:
+            self.print("[#aaaaaa]Skipping — you can add your key to .env any time.[/]")
             self.print("")
+            self._show_book_menu()
+            return
+
+        # Validate format — warn but don't block
+        if self._setup_provider == "anthropic" and not key.startswith("sk-ant-"):
+            self.print("[bold #ffffff]⚠ That doesn't look like an Anthropic key (expected sk-ant-...)[/]")
+            self.print("[#aaaaaa]Press Enter to skip, or paste your key again[/]")
+            return
+        if self._setup_provider == "openai" and not key.startswith("sk-"):
+            self.print("[bold #ffffff]⚠ That doesn't look like an OpenAI key (expected sk-...)[/]")
+            self.print("[#aaaaaa]Press Enter to skip, or paste your key again[/]")
+            return
+
+        self._save_api_key(self._setup_provider, key)
+        self.print("[#ffffff]✓[/] Key saved to [bold #ffffff].env[/]")
+        self.print("")
+        self.print("[#aaaaaa]You're all set — let's pick a book.[/]")
+        self.print("")
+        self._show_book_menu()
+
+    def _save_api_key(self, provider: str, key: str) -> None:
+        """Write API key to .env and apply to current process immediately."""
+        from dotenv import set_key
+
+        env_var = "ANTHROPIC_API_KEY" if provider == "anthropic" else "OPENAI_API_KEY"
+        set_key(".env", env_var, key)
+        set_key(".env", "DEFAULT_PROVIDER", provider)
+        os.environ[env_var] = key
+        os.environ["DEFAULT_PROVIDER"] = provider
 
     # -------------------------------------------------------------------------
     # Header Updates
@@ -1181,7 +1243,11 @@ class RegenderTUI(App):
         value = event.value.strip()
         event.input.value = ""
 
-        if self._stage == "book":
+        if self._stage == "setup_provider":
+            self._handle_setup_provider_input(value)
+        elif self._stage == "setup_key":
+            self._handle_setup_key_input(value)
+        elif self._stage == "book":
             self._handle_book_input(value)
         elif self._stage == "analyze_prompt":
             self._handle_analyze_prompt_input(value)
