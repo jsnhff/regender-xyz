@@ -25,10 +25,10 @@ from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import EXTRACTION_PROMPT_TEMPLATE, MERGE_PROMPT_TEMPLATE
 from src.utils.errors import (
-    ValidationError,
     CharacterExtractionError,
     ConfigurationError,
     ErrorHandler,
+    ValidationError,
 )
 
 
@@ -960,3 +960,107 @@ class CharacterService(BaseService):
             "by_gender": gender_counts,
             "by_importance": importance_counts,
         }
+
+    async def suggest_name_alternatives(
+        self,
+        characters: CharacterAnalysis,
+        transform_type: Any,
+        style_context: str = "",
+    ) -> list[dict[str, str]]:
+        """Suggest gender-appropriate name alternatives for characters whose gender changes.
+
+        Returns list of dicts: [{"original": ..., "suggested": ..., "character_id": ...}]
+        Only returns characters whose gender actually changes for this transform type.
+        """
+        from src.models.transformation import TransformType
+
+        if isinstance(transform_type, str):
+            try:
+                transform_type = TransformType(transform_type)
+            except ValueError:
+                return []
+
+        # Determine which characters need name changes
+        chars_needing_changes = []
+        for char in characters.characters:
+            gender_val = char.gender.value if hasattr(char.gender, "value") else str(char.gender)
+            needs_change = False
+
+            if (
+                transform_type == TransformType.ALL_FEMALE
+                and gender_val == "male"
+                or transform_type == TransformType.ALL_MALE
+                and gender_val == "female"
+                or transform_type == TransformType.GENDER_SWAP
+                and gender_val in ("male", "female")
+                or transform_type == TransformType.NONBINARY
+                and gender_val in ("male", "female")
+            ):
+                needs_change = True
+
+            if needs_change:
+                chars_needing_changes.append(char)
+
+        if not chars_needing_changes:
+            return []
+
+        # Build character list for prompt
+        char_lines = []
+        for char in chars_needing_changes:
+            gender_val = char.gender.value if hasattr(char.gender, "value") else str(char.gender)
+            char_lines.append(f'  - name: "{char.name}", gender: {gender_val}')
+        char_list_str = "\n".join(char_lines)
+
+        style_note = f"\nStyle context: {style_context}" if style_context else ""
+
+        prompt = f"""You are a literary name consultant. For a gender-transformed version of a book, suggest new names for characters whose gender is changing.
+
+Transform type: {transform_type.value}
+Characters needing new names:
+{char_list_str}{style_note}
+
+Rules:
+- Suggest names from the same cultural/ethnic tradition as the original
+- Match the rhythm and feel of the original name (similar syllables, similar register)
+- Keep the era/period appropriate (Victorian names stay Victorian, etc.)
+- For titles like "Sir [Name]": use "Dame [Name]" for female equivalents; for "Mr." use "Ms." or "Mrs."
+- Do NOT change family surnames — only given names and honorific titles
+- For nonbinary transforms: use gender-neutral given names where possible
+- Return a JSON array only, no other text:
+[{{"original": "original name here", "suggested": "suggested name here", "character_id": "original name here"}}]
+
+Return ONLY the JSON array."""
+
+        try:
+            response = await self._complete_with_retry(prompt, temperature=0.5)
+            parsed = self._parse_json_response(response)
+
+            # Handle both list and dict responses
+            if isinstance(parsed, dict):
+                for key in ("suggestions", "names", "characters", "results"):
+                    if isinstance(parsed.get(key), list):
+                        parsed = parsed[key]
+                        break
+                else:
+                    return []
+
+            if not isinstance(parsed, list):
+                return []
+
+            # Validate and clean each entry
+            result = []
+            for item in parsed:
+                if not isinstance(item, dict):
+                    continue
+                original = str(item.get("original", "")).strip()
+                suggested = str(item.get("suggested", "")).strip()
+                character_id = str(item.get("character_id", original)).strip()
+                if original and suggested and original != suggested:
+                    result.append(
+                        {"original": original, "suggested": suggested, "character_id": character_id}
+                    )
+
+            return result
+
+        except Exception:
+            return []
