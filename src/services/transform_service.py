@@ -157,6 +157,7 @@ class TransformService(BaseService):
         characters: Optional[CharacterAnalysis] = None,
         selected_characters: Optional[list[str]] = None,
         name_map: Optional[dict[str, str]] = None,
+        on_chapter_complete: Optional[Any] = None,
     ) -> Transformation:
         """
         Transform a book with the specified transformation type.
@@ -238,10 +239,18 @@ class TransformService(BaseService):
             # Create transformation context
             context = self._create_context(characters, transform_type, selected_characters)
 
+            # Auto-expand name_map with character aliases so nicknames are caught.
+            # Best-effort: depends on the character service detecting aliases consistently.
+            if name_map and characters:
+                expanded = self._expand_name_map_with_aliases(name_map, characters)
+                if len(expanded) > len(name_map):
+                    self.logger.info(f"Expanded name_map with {len(expanded) - len(name_map)} character aliases")
+                name_map = expanded
+
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
             transformed_chapters, all_changes = await self._transform_chapters(
-                book.chapters, context, name_map=name_map
+                book.chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
             )
 
             # Create transformation result
@@ -502,6 +511,7 @@ class TransformService(BaseService):
         chapters: list[Chapter],
         context: dict[str, Any],
         name_map: Optional[dict[str, str]] = None,
+        on_chapter_complete: Optional[Any] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """
         Transform chapters with the given context.
@@ -517,15 +527,20 @@ class TransformService(BaseService):
         use_parallel = len(chapters) > 2 and self.config.async_enabled and self.provider
 
         if use_parallel:
-            return await self._transform_chapters_parallel(chapters, context, name_map=name_map)
+            return await self._transform_chapters_parallel(
+                chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
+            )
         else:
-            return await self._transform_chapters_sequential(chapters, context, name_map=name_map)
+            return await self._transform_chapters_sequential(
+                chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
+            )
 
     async def _transform_chapters_sequential(
         self,
         chapters: list[Chapter],
         context: dict[str, Any],
         name_map: Optional[dict[str, str]] = None,
+        on_chapter_complete: Optional[Any] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters sequentially with rate limiting."""
         transformed_chapters = []
@@ -539,6 +554,7 @@ class TransformService(BaseService):
             rate_limiter = OpenAIRateLimiter(tier=self.config.rate_limit_tier)
             self.logger.info(f"Using OpenAI rate limiter for {len(chapters)} chapters")
 
+        total = len(chapters)
         for i, chapter in enumerate(chapters):
             # Apply rate limiting if needed
             if rate_limiter:
@@ -553,7 +569,7 @@ class TransformService(BaseService):
                     provider=self.provider.name if self.provider else "unknown",
                 )
 
-            self.logger.debug(f"Transforming chapter {i + 1}/{len(chapters)}")
+            self.logger.debug(f"Transforming chapter {i + 1}/{total}")
 
             transformed_chapter, changes = await self._transform_single_chapter(
                 chapter, i, context, name_map=name_map
@@ -562,9 +578,11 @@ class TransformService(BaseService):
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
 
-            # Show progress
-            if (i + 1) % 5 == 0:
-                self.logger.info(f"Progress: {i + 1}/{len(chapters)} chapters transformed")
+            # Notify progress
+            if on_chapter_complete:
+                on_chapter_complete(i + 1, total, chapter.title or f"Chapter {i + 1}")
+            elif (i + 1) % 5 == 0:
+                self.logger.info(f"Progress: {i + 1}/{total} chapters transformed")
 
         return transformed_chapters, all_changes
 
@@ -573,34 +591,38 @@ class TransformService(BaseService):
         chapters: list[Chapter],
         context: dict[str, Any],
         name_map: Optional[dict[str, str]] = None,
+        on_chapter_complete: Optional[Any] = None,
     ) -> tuple[list[Chapter], list[TransformationChange]]:
         """Transform chapters in parallel with rate limiting."""
 
         # For OpenAI, force sequential processing due to rate limits
         if self.provider and "openai" in self.provider.name.lower():
             self.logger.info("OpenAI detected - using sequential processing for rate limiting")
-            return await self._transform_chapters_sequential(chapters, context, name_map=name_map)
+            return await self._transform_chapters_sequential(
+                chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
+            )
 
-        # Create tasks for each chapter
-        tasks = [
-            self._transform_single_chapter(chapter, i, context, name_map=name_map)
-            for i, chapter in enumerate(chapters)
-        ]
+        total = len(chapters)
+        completed = 0
 
-        # Limit concurrency
+        async def run_chapter(chapter, i):
+            nonlocal completed
+            result = await self._transform_single_chapter(chapter, i, context, name_map=name_map)
+            completed += 1
+            if on_chapter_complete:
+                on_chapter_complete(completed, total, chapter.title or f"Chapter {i + 1}")
+            return result
+
         semaphore = asyncio.Semaphore(self.config.max_concurrent)
 
-        async def limited_task(task):
+        async def limited_task(chapter, i):
             async with semaphore:
-                return await task
+                return await run_chapter(chapter, i)
 
-        # Execute all tasks
-        results = await asyncio.gather(*[limited_task(t) for t in tasks])
+        results = await asyncio.gather(*[limited_task(ch, i) for i, ch in enumerate(chapters)])
 
-        # Separate chapters and changes
         transformed_chapters = []
         all_changes = []
-
         for transformed_chapter, changes in results:
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
@@ -678,6 +700,7 @@ class TransformService(BaseService):
         except ImportError:
             progress_bar = None
 
+        transform_type = context.get("transform_type", TransformType.GENDER_SWAP)
         batch_start = 0
         for batch_num, batch_paragraphs in enumerate(batches, 1):
             batch_end = batch_start + len(batch_paragraphs)
@@ -718,6 +741,9 @@ class TransformService(BaseService):
                     # Apply name substitutions after LLM transform
                     if name_map:
                         transformed_text = self._apply_name_map(transformed_text, name_map)
+
+                    # Apply deterministic term substitutions (safety net for LLM misses)
+                    transformed_text = self._apply_term_map(transformed_text, transform_type)
 
                     # Track changes
                     if transformed_text != original_text:
@@ -774,6 +800,139 @@ class TransformService(BaseService):
 
             text = pattern.sub(_replace, text)
         return text
+
+    # Gendered terms that the LLM occasionally misses — keyed by transform type.
+    # ALL_MALE maps female→male; ALL_FEMALE maps male→female; GENDER_SWAP includes both.
+    _TERM_MAPS: dict[str, dict[str, str]] = {
+        "all_male": {
+            # Familial / relational
+            "aunt": "uncle",
+            "niece": "nephew",
+            "grandmother": "grandfather",
+            "granddaughter": "grandson",
+            "widow": "widower",
+            "maiden": "bachelor",
+            "woman": "man",
+            "girl": "boy",
+            "female": "male",
+            # Social / aristocratic
+            "queen": "king",
+            "princess": "prince",
+            "duchess": "duke",
+            "countess": "count",
+            "baroness": "baron",
+            "empress": "emperor",
+            "abbess": "abbot",
+            # Occupational / address
+            "mistress": "master",
+            "madam": "sir",
+            "maid": "manservant",
+        },
+        "all_female": {
+            # Familial / relational
+            "uncle": "aunt",
+            "nephew": "niece",
+            "grandfather": "grandmother",
+            "grandson": "granddaughter",
+            "widower": "widow",
+            "bachelor": "maiden",
+            "man": "woman",
+            "boy": "girl",
+            "male": "female",
+            # Social / aristocratic
+            "king": "queen",
+            "prince": "princess",
+            "duke": "duchess",
+            "count": "countess",
+            "baron": "baroness",
+            "emperor": "empress",
+            "abbot": "abbess",
+            # Occupational / address
+            "master": "mistress",
+            "sir": "madam",
+            "manservant": "maid",
+        },
+        "gender_swap": {
+            # Familial / relational (both directions)
+            "aunt": "uncle",
+            "uncle": "aunt",
+            "niece": "nephew",
+            "nephew": "niece",
+            "grandmother": "grandfather",
+            "grandfather": "grandmother",
+            "granddaughter": "grandson",
+            "grandson": "granddaughter",
+            "widow": "widower",
+            "widower": "widow",
+            "maiden": "bachelor",
+            "bachelor": "maiden",
+            "woman": "man",
+            "man": "woman",
+            "girl": "boy",
+            "boy": "girl",
+            "female": "male",
+            "male": "female",
+            # Social / aristocratic
+            "queen": "king",
+            "king": "queen",
+            "princess": "prince",
+            "prince": "princess",
+            "duchess": "duke",
+            "duke": "duchess",
+            "countess": "count",
+            "count": "countess",
+            "baroness": "baron",
+            "baron": "baroness",
+            "empress": "emperor",
+            "emperor": "empress",
+            "abbess": "abbot",
+            "abbot": "abbess",
+            # Occupational / address
+            "mistress": "master",
+            "master": "mistress",
+            "madam": "sir",
+            "sir": "madam",
+            "maid": "manservant",
+            "manservant": "maid",
+        },
+    }
+
+    def _apply_term_map(self, text: str, transform_type: "TransformType") -> str:
+        """Apply deterministic word-boundary term substitutions as a safety net after LLM transform."""
+        term_map = self._TERM_MAPS.get(transform_type.value, {})
+        for original, replacement in term_map.items():
+            pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
+
+            def _replace(m, r=replacement):
+                word = m.group()
+                if word.isupper():
+                    return r.upper()
+                if word[0].isupper():
+                    return r[0].upper() + r[1:] if len(r) > 1 else r.upper()
+                return r.lower()
+
+            text = pattern.sub(_replace, text)
+        return text
+
+    def _expand_name_map_with_aliases(
+        self, name_map: dict[str, str], characters: "CharacterAnalysis"
+    ) -> dict[str, str]:
+        """Expand name_map to include aliases of mapped characters.
+
+        Checks both the character's canonical name and all stored aliases against the name_map.
+        If any name for a character is in the map, all other aliases are added automatically.
+        e.g. name_map has 'Elizabeth'; character 'Elizabeth Bennet' has aliases ['Lizzy','Eliza']
+        → 'Lizzy' and 'Eliza' are added pointing to the same target.
+        """
+        expanded = dict(name_map)
+        for char in characters.characters:
+            all_names = [char.name] + list(char.aliases)
+            matched_target = next((name_map[n] for n in all_names if n in name_map), None)
+            if matched_target:
+                for name in all_names:
+                    if name not in expanded:
+                        expanded[name] = matched_target
+        return expanded
 
     def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
         """Parse batch response into individual paragraph texts."""
@@ -897,6 +1056,7 @@ class TransformService(BaseService):
 {rules}
 {character_instructions}
 
+For paired opposite-gender terms (e.g. "boys and girls", "ladies and gentlemen", "father and mother"), simplify to the target gender only (e.g. "girls", "ladies", "mother").
 Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
 
         # Simpler format without markers - just numbered paragraphs

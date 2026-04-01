@@ -269,6 +269,7 @@ class Application:
         output_path: Optional[str] = None,
         selected_characters: Optional[list[str]] = None,
         name_map: Optional[dict[str, str]] = None,
+        on_chapter_complete: Optional[Any] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -320,6 +321,7 @@ class Application:
             transformation = await transformer.transform_book(
                 book, TransformType(transform_type), characters, selected_characters,
                 name_map=name_map,
+                on_chapter_complete=on_chapter_complete,
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
