@@ -55,7 +55,7 @@ python regender_cli.py books/texts/pg1342.txt nonbinary -v
 - **Character Analysis**: LLM-based character identification with gender detection from pronouns and context, name variant merging, and relationship tracking
 - **Quality Control**: Automated accuracy review with an interactive warning review UI before export
 - **Export Formats**: Plain text (`.txt`), Rich Text (`.rtf`), and structured JSON (`.json`)
-- **Advanced Book Parser**: Handles diverse Project Gutenberg formats including illustrated editions, plays, letters, and multiple languages
+- **Advanced Book Parser**: Handles diverse book formats including illustrated editions, plays, letters, and multiple languages
 
 ## Requirements
 
@@ -100,7 +100,7 @@ regender-xyz/
 │   ├── cli/                # TUI (tui.py)
 │   └── config.json         # Service configuration
 ├── books/
-│   ├── texts/              # Source .txt files (Project Gutenberg)
+│   ├── texts/              # Source .txt files
 │   └── output/             # Transformed output
 ├── tests/                  # Test suite
 └── regender_cli.py         # Main entry point
