@@ -57,7 +57,7 @@ def gradient_text(text: str, colors: list[str]) -> str:
 
 # Smooth 2-color gradient palettes
 MAGENTA_PINK = [
-    "#00ff00",
+    "#ffffff",
     "#ff0080",
     "#ff1a8c",
     "#ff3399",
@@ -66,9 +66,9 @@ MAGENTA_PINK = [
     "#ff80c0",
     "#ff99cc",
 ]
-CYAN_BLUE = ["#00ff00", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff", "#004dff", "#0033ff"]
+CYAN_BLUE = ["#ffffff", "#00d4ff", "#00b3ff", "#0099ff", "#007fff", "#0066ff", "#004dff", "#0033ff"]
 YELLOW_ORANGE = [
-    "#00ff00",
+    "#ffffff",
     "#ffb00a",
     "#ffa209",
     "#ff9408",
@@ -78,7 +78,7 @@ YELLOW_ORANGE = [
     "#ff5c04",
 ]
 VIOLET_MAGENTA = [
-    "#00ff00",
+    "#ffffff",
     "#9033e8",
     "#9d2ee4",
     "#aa29e0",
@@ -88,7 +88,7 @@ VIOLET_MAGENTA = [
     "#de15d0",
 ]
 PINK_VIOLET = [
-    "#00ff00",
+    "#ffffff",
     "#f01a82",
     "#e13396",
     "#d24daa",
@@ -97,7 +97,7 @@ PINK_VIOLET = [
     "#a599e6",
     "#96b3fa",
 ]
-FIRE_GLOW = ["#00ff00", "#ff3355", "#ff5c3d", "#ff8526", "#ffae0f"]
+FIRE_GLOW = ["#ffffff", "#ff3355", "#ff5c3d", "#ff8526", "#ffae0f"]
 
 
 # =============================================================================
@@ -120,6 +120,16 @@ def _get_resolved_model() -> str:
     return os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
+def _format_model_name(model: str) -> str:
+    """Shorten model IDs for display: claude-opus-4-5-20251101 → claude opus 4.5"""
+    import re
+
+    m = re.match(r"claude-(opus|sonnet|haiku)-(\d+)-(\d+)", model)
+    if m:
+        return f"claude {m.group(1)} {m.group(2)}.{m.group(3)}"
+    return model
+
+
 # (input, output) cost per 1M tokens — updated Feb 2026
 MODEL_COSTS = {
     "gpt-4o": (2.50, 10.00),
@@ -136,14 +146,115 @@ MODEL_COSTS = {
 }
 
 
-def _lookup_model_cost(model: str) -> tuple[float, float]:
-    """Match model string to cost table, using prefix matching for dated variants."""
+def _lookup_model_cost(model: str) -> tuple[float, float] | None:
+    """Match model string to cost table. Returns None if model is unrecognized."""
     if model in MODEL_COSTS:
         return MODEL_COSTS[model]
     for key in MODEL_COSTS:
         if model.startswith(key):
             return MODEL_COSTS[key]
-    return (3.00, 15.00)
+    return None
+
+
+# Recommended model IDs — best quality/cost balance for literary transforms
+_RECOMMENDED_MODELS = ("claude-sonnet-4-6", "claude-sonnet-4", "gpt-4o")
+
+
+def _is_recommended_model(model_id: str) -> bool:
+    """Return True if this model is our recommended choice for transforms."""
+    return any(model_id.startswith(prefix) for prefix in _RECOMMENDED_MODELS)
+
+
+_MODEL_SECS_PER_1K_TOKENS: dict[str, float] = {
+    "claude-haiku": 6.0,
+    "claude-sonnet": 12.0,
+    "claude-opus": 28.0,
+    "gpt-4o-mini": 7.0,
+    "gpt-4o": 13.0,
+    "gpt-4-turbo": 20.0,
+    "gpt-4": 22.0,
+    "gpt-3.5-turbo": 5.0,
+}
+
+
+def _estimate_transform_time(model_id: str, tokens: int) -> str:
+    """Return a human-readable time estimate for transforming `tokens` book tokens."""
+    if tokens <= 0:
+        return ""
+    secs_per_1k = 6.0
+    for prefix, rate in _MODEL_SECS_PER_1K_TOKENS.items():
+        if model_id.startswith(prefix):
+            secs_per_1k = rate
+            break
+    total_secs = tokens / 1000 * secs_per_1k
+    if total_secs < 90:
+        return f"~{int(total_secs)}s"
+    minutes = total_secs / 60
+    return "~1 min" if minutes < 2 else f"~{int(minutes)} min"
+
+
+_FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
+    "anthropic": [
+        ("claude-sonnet-4-6", "Claude Sonnet 4.6", "$3 / $15 per 1M tokens"),
+        ("claude-opus-4-6", "Claude Opus 4.6", "$15 / $75 per 1M tokens"),
+        ("claude-haiku-4-5-20251001", "Claude Haiku 4.5", "$0.80 / $4 per 1M tokens"),
+    ],
+    "openai": [
+        ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
+        ("gpt-4o-mini", "GPT-4o Mini", "$0.15 / $0.60 per 1M tokens"),
+    ],
+}
+
+_OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
+_OPENAI_SKIP_PATTERNS = (
+    "instruct", "realtime", "audio", "tts", "whisper", "dall-e", "embedding", "search",
+)
+
+
+def _should_show_openai_model(model_id: str) -> bool:
+    """Return True if this OpenAI model is suitable for text generation."""
+    if any(s in model_id for s in _OPENAI_SKIP_PATTERNS):
+        return False
+    return any(model_id.startswith(p) for p in _OPENAI_SHOW_PREFIXES)
+
+
+def _openai_display_name(model_id: str) -> str:
+    """Convert an OpenAI model ID to a short display name."""
+    for mid, name, _ in _FALLBACK_MODELS.get("openai", []):
+        if mid == model_id:
+            return name
+    name = model_id
+    for prefix, replacement in (("gpt-", "GPT-"), ("o1", "O1"), ("o3", "O3"), ("o4", "O4")):
+        if name.startswith(prefix):
+            name = replacement + name[len(prefix):]
+            break
+    return name.replace("-", " ")
+
+
+def _version_from_model_id(model_id: str) -> str:
+    """Extract semantic version string from a model ID, e.g. 'claude-sonnet-4-6' → '4.6'."""
+    m = re.search(r"-(\d+)-(\d+)(?:-\d+)?$", model_id)
+    return f"{m.group(1)}.{m.group(2)}" if m else ""
+
+
+def _friendly_model_name(model: str) -> str:
+    """Convert API model ID to a short display name."""
+    all_models = [m for models in _FALLBACK_MODELS.values() for m in models]
+    for model_id, display_name, _ in all_models:
+        if model == model_id:
+            return display_name
+    for model_id, display_name, _ in sorted(all_models, key=lambda m: -len(m[0])):
+        if model.startswith(model_id):
+            return display_name
+    return _format_model_name(model)
+
+
+def _versioned_display_name(model_id: str, api_display: str) -> str:
+    """Ensure the display name includes the version number from the model ID."""
+    version = _version_from_model_id(model_id)
+    if version and version not in api_display:
+        return f"{api_display} {version}"
+    return api_display
 
 
 def analyze_book_file(path: Path) -> dict:
@@ -185,10 +296,12 @@ def analyze_book_file(path: Path) -> dict:
     tokens = char_count // 4
 
     model = _get_resolved_model()
-    input_cost, output_cost = _lookup_model_cost(model)
+    costs = _lookup_model_cost(model)
 
     # Input = book text + prompts, output ~ same size as book
-    estimated_cost = (tokens / 1_000_000 * input_cost) + (tokens / 1_000_000 * output_cost)
+    estimated_cost = (
+        (tokens / 1_000_000 * costs[0]) + (tokens / 1_000_000 * costs[1]) if costs else None
+    )
 
     return {
         "chapters": chapters,
@@ -206,16 +319,16 @@ def analyze_book_file(path: Path) -> dict:
 # =============================================================================
 
 THEME_CSS = """
-$primary: #00ff00;        /* Hot magenta */
-$secondary: #00ff00;      /* Electric cyan */
-$accent: #00ff00;         /* Bold yellow */
-$violet: #00ff00;         /* Deep violet */
+$primary: #ffffff;        /* Hot magenta */
+$secondary: #ffffff;      /* Electric cyan */
+$accent: #ffffff;         /* Bold yellow */
+$violet: #ffffff;         /* Deep violet */
 $background: #000000;     /* Black */
 $surface: #000000;        /* Black */
-$text: #00ff00;           /* Green */
-$text-dim: #00aa00;       /* Lavender dim */
-$success: #00ff00;        /* Cyan */
-$error: #00ff00;          /* Magenta */
+$text: #ffffff;           /* Green */
+$text-dim: #aaaaaa;       /* Lavender dim */
+$success: #ffffff;        /* Cyan */
+$error: #ffffff;          /* Magenta */
 """
 
 
@@ -225,10 +338,10 @@ $error: #00ff00;          /* Magenta */
 
 
 # Green gradient palette for header
-GREEN_GRADIENT = ["#00ff00", "#00dd00", "#00bb00", "#00aa00", "#008800"]
+GREEN_GRADIENT = ["#ffffff", "#dddddd", "#bbbbbb", "#aaaaaa", "#888888"]
 
 # Logo - green gradient on black
-LOGO_ART = gradient_text("regender", GREEN_GRADIENT) + gradient_text(".xyz", ["#00aa00", "#00ff00"])
+LOGO_ART = gradient_text("regender", GREEN_GRADIENT) + gradient_text(".xyz", ["#aaaaaa", "#ffffff"])
 
 
 class SineWaveLoader(Static):
@@ -265,7 +378,7 @@ class SineWaveLoader(Static):
             width = 60
             height_chars = "▁▂▃▄▅▆▇█"
             # Green gradient for the wave
-            wave_colors = ["#00ff00", "#00dd00", "#00bb00", "#009900", "#007700", "#005500"]
+            wave_colors = ["#ffffff", "#dddddd", "#bbbbbb", "#999999", "#777777", "#555555"]
 
             # Generate sine wave
             wave = []
@@ -286,7 +399,7 @@ class SineWaveLoader(Static):
                 wave.append(f"[{color}]{height_chars[char_idx]}[/]")
 
             # Message with green
-            msg = gradient_text(self._message, ["#00ff00", "#00aa00"])
+            msg = gradient_text(self._message, ["#ffffff", "#aaaaaa"])
 
             # Compose output
             wave_str = "".join(wave)
@@ -309,7 +422,7 @@ class HeaderBar(Container):
         dock: top;
         height: 6;
         background: #000000;
-        border-bottom: heavy #00ff00;
+        border-bottom: heavy #ffffff;
         padding: 0;
     }
 
@@ -340,7 +453,7 @@ class HeaderBar(Container):
     HeaderBar #border1, HeaderBar #border2 {
         width: 100%;
         height: 1;
-        color: #00ff00;
+        color: #ffffff;
     }
 
     HeaderBar #stats-row1 > Label, HeaderBar #stats-row2 > Label {
@@ -372,26 +485,26 @@ class HeaderBar(Container):
         with Horizontal(id="top-bar"), Horizontal(id="top-bar-content"):
             tagline = gradient_text("transform characters' gender in books", GREEN_GRADIENT)
             yield Label(f"{LOGO_ART}  {tagline}")
-            yield Label(gradient_text("v1.0", ["#00aa00", "#00ff00"]), id="version")
+            yield Label(gradient_text("v1.0", ["#aaaaaa", "#ffffff"]), id="version")
 
         # Border (wide enough for large terminals)
         yield Label("─" * 200, id="border1")
 
         # Row 1: book stats
         with Horizontal(id="stats-row1"):
-            yield Label(f"[#00aa00]book:[/] [#00ff00]{self._book}[/]")
-            yield Label(f"[#00aa00]pages:[/] [#00ff00]{self._pages}[/]")
-            yield Label(f"[#00aa00]chapters:[/] [#00ff00]{self._chapters}[/]")
-            yield Label(f"[#00aa00]characters:[/] [#00ff00]{self._characters}[/]")
+            yield Label(f"[#aaaaaa]book:[/] [#ffffff]{self._book}[/]")
+            yield Label(f"[#aaaaaa]pages:[/] [#ffffff]{self._pages}[/]")
+            yield Label(f"[#aaaaaa]chapters:[/] [#ffffff]{self._chapters}[/]")
+            yield Label(f"[#aaaaaa]characters:[/] [#ffffff]{self._characters}[/]")
 
         # Border (wide enough for large terminals)
         yield Label("─" * 200, id="border2")
 
         # Row 2: processing info
         with Horizontal(id="stats-row2"):
-            yield Label(f"[#00aa00]transformation:[/] [#00ff00]{self._transform}[/]")
-            yield Label(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]", id="model-label")
-            yield Label(f"[#00aa00]total cost:[/] [#00ff00]{self._cost}[/]")
+            yield Label(f"[#aaaaaa]transformation:[/] [#ffffff]{self._transform}[/]")
+            yield Label(f"[#aaaaaa]model:[/] [#ffffff]{self._model}[/]", id="model-label")
+            yield Label(f"[#aaaaaa]total cost:[/] [#ffffff]{self._cost}[/]")
 
     def update_status(self, book: str = None, transform: str = None, status: str = None) -> None:
         """Update book and transform fields."""
@@ -407,7 +520,7 @@ class HeaderBar(Container):
             self._pages = str(stats.get("pages", "—"))
             self._chapters = str(stats.get("chapters", "—"))
             self._cost = f"${stats.get('estimated_cost', 0):.2f}"
-            self._model = stats.get("model", "—")
+            self._model = _format_model_name(stats.get("model", "—"))
 
         if char_count is not None:
             self._characters = str(char_count)
@@ -419,23 +532,23 @@ class HeaderBar(Container):
         try:
             labels = self.query("#stats-row1 > Label")
             if len(labels) >= 4:
-                labels[0].update(Text.from_markup(f"[#00aa00]book:[/] [#00ff00]{self._book}[/]"))
-                labels[1].update(Text.from_markup(f"[#00aa00]pages:[/] [#00ff00]{self._pages}[/]"))
+                labels[0].update(Text.from_markup(f"[#aaaaaa]book:[/] [#ffffff]{self._book}[/]"))
+                labels[1].update(Text.from_markup(f"[#aaaaaa]pages:[/] [#ffffff]{self._pages}[/]"))
                 labels[2].update(
-                    Text.from_markup(f"[#00aa00]chapters:[/] [#00ff00]{self._chapters}[/]")
+                    Text.from_markup(f"[#aaaaaa]chapters:[/] [#ffffff]{self._chapters}[/]")
                 )
                 labels[3].update(
-                    Text.from_markup(f"[#00aa00]characters:[/] [#00ff00]{self._characters}[/]")
+                    Text.from_markup(f"[#aaaaaa]characters:[/] [#ffffff]{self._characters}[/]")
                 )
 
             labels = self.query("#stats-row2 > Label")
             if len(labels) >= 3:
                 labels[0].update(
-                    Text.from_markup(f"[#00aa00]transformation:[/] [#00ff00]{self._transform}[/]")
+                    Text.from_markup(f"[#aaaaaa]transformation:[/] [#ffffff]{self._transform}[/]")
                 )
-                labels[1].update(Text.from_markup(f"[#00aa00]model:[/] [#00ff00]{self._model}[/]"))
+                labels[1].update(Text.from_markup(f"[#aaaaaa]model:[/] [#ffffff]{self._model}[/]"))
                 labels[2].update(
-                    Text.from_markup(f"[#00aa00]total cost:[/] [#00ff00]{self._cost}[/]")
+                    Text.from_markup(f"[#aaaaaa]total cost:[/] [#ffffff]{self._cost}[/]")
                 )
         except Exception:
             pass
@@ -449,23 +562,27 @@ class ContentArea(ScrollableContainer):
         height: 1fr;
         padding: 1 1;
         background: #000000;
-        scrollbar-color: #00aa00;
-        scrollbar-color-hover: #00ff00;
-        scrollbar-color-active: #00ff00;
+        scrollbar-background: #000000;
+        scrollbar-background-hover: #000000;
+        scrollbar-background-active: #000000;
+        scrollbar-color: #333333;
+        scrollbar-color-hover: #ffffff;
+        scrollbar-color-active: #ffffff;
+        scrollbar-size: 1 1;
     }
 
     ContentArea .log-line {
         height: auto;
         margin: 0;
         padding: 0;
-        color: #00ff00;
+        color: #ffffff;
     }
 
     ContentArea .progress-line {
         height: auto;
         margin: 0;
         padding: 0;
-        color: #00ff00;
+        color: #ffffff;
     }
     """
 
@@ -533,7 +650,7 @@ class BrailleLoader(Static):
             time_str = f"{mins}m {secs}s" if mins > 0 else f"{secs}s"
 
             frame_char = BRAILLE_LOADING_FRAMES[self._frame % len(BRAILLE_LOADING_FRAMES)]
-            msg = f"[#00ff00]{frame_char}[/] [#00aa00]{self._activity}[/] [#00ff00]({time_str})[/]"
+            msg = f"[#ffffff]{frame_char}[/] [#aaaaaa]{self._activity}[/] [#ffffff]({time_str})[/]"
             self.update(Text.from_markup(msg))
 
     def stop(self) -> None:
@@ -549,7 +666,7 @@ class InputBar(Static):
         dock: bottom;
         height: 2;
         background: #000000;
-        border-top: heavy #00ff00;
+        border-top: heavy #ffffff;
         padding: 0 1;
     }
 
@@ -560,24 +677,24 @@ class InputBar(Static):
 
     InputBar #prompt {
         width: auto;
-        color: #00ff00;
+        color: #ffffff;
     }
 
     InputBar #input {
         width: 1fr;
         border: none;
         background: #000000;
-        color: #00ff00;
+        color: #ffffff;
         padding: 0;
     }
 
     InputBar #input:focus {
         border: none;
-        color: #00ff00;
+        color: #ffffff;
     }
 
     InputBar #input.-disabled {
-        color: #00aa00;
+        color: #aaaaaa;
     }
     """
 
@@ -619,7 +736,7 @@ class InputBar(Static):
 
         def tick() -> None:
             frame = BRAILLE_LOADING_FRAMES[self._loading_frame % len(BRAILLE_LOADING_FRAMES)]
-            self.set_prompt(f"[#00ff00]{frame}[/] ")
+            self.set_prompt(f"[#ffffff]{frame}[/] ")
             self._loading_frame += 1
 
         self._loading_interval = self.set_interval(0.12, tick)
@@ -640,9 +757,9 @@ class StatusBar(Static):
         dock: bottom;
         height: 1;
         background: #000000;
-        border-top: solid #00ff00;
+        border-top: solid #ffffff;
         padding: 0 2;
-        color: #00ff00;
+        color: #ffffff;
     }
     """
 
@@ -676,22 +793,22 @@ class FileBrowserScreen(Screen):
         padding: 0;
     }
     FileBrowserScreen Label {
-        color: #00aa00;
+        color: #aaaaaa;
         padding: 0 1;
     }
     FileBrowserScreen _TxtDirectoryTree {
         background: #000000;
-        color: #00ff00;
+        color: #ffffff;
         height: 1fr;
-        border: solid #00aa00;
+        border: solid #aaaaaa;
     }
     FileBrowserScreen _TxtDirectoryTree > .tree--cursor {
-        background: #003300;
-        color: #00ff00;
+        background: #333333;
+        color: #ffffff;
     }
     FileBrowserScreen _TxtDirectoryTree:focus > .tree--cursor {
-        background: #005500;
-        color: #00ff00;
+        background: #555555;
+        color: #ffffff;
     }
     """
 
@@ -761,6 +878,13 @@ class RegenderTUI(App):
         self._selected_transform: str | None = None
         self._no_qc = False
         self._name_map: dict[str, str] | None = None
+        self._pending_characters = None
+        self._name_suggestions: list[dict] = []
+        self._name_review_idx: int = 0
+        self._name_edit_mode: bool = False
+        self._name_custom_mode: bool = False
+        self._model_choices: list = []
+        self._model_showing_all: bool = False
         self._result: dict | None = None
         self._process_start: float | None = None
         self._json_output_path: str | None = None
@@ -781,7 +905,7 @@ class RegenderTUI(App):
         self._update_header()
 
         # Simple welcome message
-        self.print("[#00ff00]◆[/] [#00aa00]Welcome to regender.xyz[/]")
+        self.print("[#ffffff]◆[/] [#aaaaaa]Welcome to regender.xyz[/]")
         self.print("")
 
         # Check LLM setup
@@ -806,22 +930,22 @@ class RegenderTUI(App):
 
         if not has_openai and not has_anthropic:
             # No API keys configured
-            self.print("[bold #00ff00]⚠ No API keys detected[/]")
+            self.print("[bold #ffffff]⚠ No API keys detected[/]")
             self.print("")
             self.print(
-                "[#00aa00]Add these to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
+                "[#aaaaaa]Add these to[/] [bold #ffffff].env[/] [#aaaaaa]in the project folder:[/]"
             )
             self.print("")
-            self.print("  [#00ff00]# For OpenAI:[/]")
-            self.print("  [#00ff00]OPENAI_API_KEY=sk-...[/]")
-            self.print("  [#00ff00]DEFAULT_PROVIDER=openai[/]")
+            self.print("  [#ffffff]# For OpenAI:[/]")
+            self.print("  [#ffffff]OPENAI_API_KEY=sk-...[/]")
+            self.print("  [#ffffff]DEFAULT_PROVIDER=openai[/]")
             self.print("")
-            self.print("  [#00ff00]# Or for Anthropic:[/]")
-            self.print("  [#00ff00]ANTHROPIC_API_KEY=sk-ant-...[/]")
-            self.print("  [#00ff00]DEFAULT_PROVIDER=anthropic[/]")
+            self.print("  [#ffffff]# Or for Anthropic:[/]")
+            self.print("  [#ffffff]ANTHROPIC_API_KEY=sk-ant-...[/]")
+            self.print("  [#ffffff]DEFAULT_PROVIDER=anthropic[/]")
             self.print("")
             self.print(
-                "[#00aa00]Then restart the app. You can still use 'parse_only' without keys.[/]"
+                "[#aaaaaa]Then restart the app. You can still use 'parse_only' without keys.[/]"
             )
             self.print("")
         elif not provider:
@@ -831,17 +955,17 @@ class RegenderTUI(App):
                 available.append("openai")
             if has_anthropic:
                 available.append("anthropic")
-            self.print("[bold #00ff00]⚠ DEFAULT_PROVIDER not set[/]")
+            self.print("[bold #ffffff]⚠ DEFAULT_PROVIDER not set[/]")
             self.print("")
-            self.print(f"[#00aa00]You have API keys for: {', '.join(available)}[/]")
+            self.print(f"[#aaaaaa]You have API keys for: {', '.join(available)}[/]")
             self.print(
-                "[#00aa00]Add this to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
+                "[#aaaaaa]Add this to[/] [bold #ffffff].env[/] [#aaaaaa]in the project folder:[/]"
             )
-            self.print(f"  [#00ff00]DEFAULT_PROVIDER={available[0]}[/]")
+            self.print(f"  [#ffffff]DEFAULT_PROVIDER={available[0]}[/]")
             self.print("")
         else:
             # All good - show which provider is active
-            self.print(f"[#00ff00]◆[/] [#00aa00]Using {provider} for LLM calls[/]")
+            self.print(f"[#ffffff]◆[/] [#aaaaaa]Using {provider} for LLM calls[/]")
             self.print("")
 
     # -------------------------------------------------------------------------
@@ -886,28 +1010,28 @@ class RegenderTUI(App):
     def _show_book_menu(self) -> None:
         """Show book selection with colorful styling."""
         self._stage = "book"
-        self.print("[#00ff00]?[/] [bold #00ff00]Select a book[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]Select a book[/]")
         self.print("")
         self.print(
-            "  [#00aa00]Add plain-text (.txt) books to [bold]books/texts/[/] in this folder[/]"
+            "  [#aaaaaa]Add plain-text (.txt) books to [bold]books/texts/[/] in this folder[/]"
         )
         self.print(
-            "  [#00aa00]then choose an option below.[/]"
+            "  [#aaaaaa]then choose an option below.[/]"
         )
         self.print("")
-        self.print("  [bold #00ff00]1[/]  Browse files in [bold]books/texts/[/]...")
-        self.print("  [bold #00ff00]2[/]  Enter or drag file path...")
-        self.print("  [bold #00ff00]3[/]  Pride and Prejudice [#00aa00](sample)[/]")
+        self.print("  [bold #ffffff]1[/]  Browse files in [bold]books/texts/[/]...")
+        self.print("  [bold #ffffff]2[/]  Enter or drag file path...")
+        self.print("  [bold #ffffff]3[/]  Pride and Prejudice [#aaaaaa](sample)[/]")
         self.print("")
         self.set_prompt(">  ")
 
     def _show_transform_menu(self) -> None:
         """Show transform selection with colorful styling."""
         self._stage = "transform"
-        self.print("[#00ff00]?[/] [bold #00ff00]Select transformation[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]Select transformation[/]")
         self.print("")
         for i, (name, desc) in enumerate(self.TRANSFORM_TYPES, 1):
-            self.print(f"  [bold #00ff00]{i}[/]  {name:<18} [#00aa00]{desc}[/]")
+            self.print(f"  [bold #ffffff]{i}[/]  {name:<18} [#aaaaaa]{desc}[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -916,12 +1040,12 @@ class RegenderTUI(App):
         # Calculate and show output path
         self._calculate_output_path()
         self.print("")
-        self.print("[#00aa00]Output will be saved to:[/]")
-        self.print(f"  [#00ff00]{self._output_path}[/]")
+        self.print("[#aaaaaa]Output will be saved to:[/]")
+        self.print(f"  [#ffffff]{self._output_path}[/]")
         self.print("")
 
         self._no_qc = True
-        self._show_name_map_prompt()
+        self._run_name_review()
 
     def _get_book_title(self, path: Path) -> str:
         """Extract book title from path."""
@@ -976,10 +1100,12 @@ class RegenderTUI(App):
             self._handle_analyze_prompt_input(value)
         elif self._stage == "transform":
             self._handle_transform_input(value)
+        elif self._stage == "model":
+            self._handle_model_input(value)
         elif self._stage == "options":
             self._handle_options_input(value)
-        elif self._stage == "name_map":
-            self._handle_name_map_input(value)
+        elif self._stage == "name_review":
+            self._handle_name_review_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -993,13 +1119,13 @@ class RegenderTUI(App):
             start = Path("books/texts") if Path("books/texts").exists() else Path.home()
             self.push_screen(FileBrowserScreen(start), self._on_file_browser_result)
         elif value == "2":
-            self.print("[#00aa00]  Drag a .txt file into this window, or paste the full path[/]")
+            self.print("[#aaaaaa]  Drag a .txt file into this window, or paste the full path[/]")
             self.set_prompt("path>  ")
         elif value == "3":
             if sample.exists():
                 self._select_book(sample)
             else:
-                self.print("[#00ff00]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]")
+                self.print("[#ffffff]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]")
         elif value.lower() == "regender me":
             self._easter_egg()
         elif value.lower() in ("q", "quit"):
@@ -1009,9 +1135,9 @@ class RegenderTUI(App):
             if path.exists() and path.is_file():
                 self._select_book(path)
             elif path.exists():
-                self.print("[#00ff00]That's a directory[/]")
+                self.print("[#ffffff]That's a directory[/]")
             else:
-                self.print("[#00ff00]File not found[/]")
+                self.print("[#ffffff]File not found[/]")
 
     def _easter_egg(self) -> None:
         """Regender the regendering tool."""
@@ -1019,12 +1145,12 @@ class RegenderTUI(App):
             "",
             gradient_text("regendering the regendering tool...", GREEN_GRADIENT),
             "",
-            "  [#00aa00]Original:[/]  [#00ff00]She transforms gender representation in literature using AI.[/]",
-            "  [#00aa00]Regendered:[/] [#00ff00]He transforms gender representation in literature using AI.[/]",
-            "  [#00aa00]Regendered:[/] [#00ff00]They transform gender representation in literature using AI.[/]",
-            "  [#00aa00]Regendered:[/] [#00ff00]It transforms gender representation in literature using AI.[/]",
+            "  [#aaaaaa]Original:[/]  [#ffffff]She transforms gender representation in literature using AI.[/]",
+            "  [#aaaaaa]Regendered:[/] [#ffffff]He transforms gender representation in literature using AI.[/]",
+            "  [#aaaaaa]Regendered:[/] [#ffffff]They transform gender representation in literature using AI.[/]",
+            "  [#aaaaaa]Regendered:[/] [#ffffff]It transforms gender representation in literature using AI.[/]",
             "",
-            "  [#00aa00]✓ regendered in 0.000s · quality score 100%[/]",
+            "  [#aaaaaa]✓ regendered in 0.000s · quality score 100%[/]",
             "",
         ]
         for line in lines:
@@ -1037,13 +1163,13 @@ class RegenderTUI(App):
         if path.is_file():
             self._select_book(path)
         else:
-            self.print("[#00ff00]No file selected[/]")
+            self.print("[#ffffff]No file selected[/]")
 
     def _select_book(self, path: Path) -> None:
         """Select a book and show analysis."""
         self._selected_book = path
         self.book_title = self._get_book_title(path)
-        self.print(f"[#00ff00]✓[/] {self.book_title}")
+        self.print(f"[#ffffff]✓[/] {self.book_title}")
 
         # Analyze the book and update header
         stats = analyze_book_file(path)
@@ -1062,19 +1188,21 @@ class RegenderTUI(App):
             return ""
         tokens = self._book_stats.get("tokens", 0)
         model = os.environ.get("DEFAULT_MODEL", "")
-        input_cost, output_cost = _lookup_model_cost(model)
-        cost = tokens * token_fraction / 1_000_000 * (input_cost + output_cost)
+        costs = _lookup_model_cost(model)
+        if not costs:
+            return ""
+        cost = tokens * token_fraction / 1_000_000 * (costs[0] + costs[1])
         return f"~${cost:.2f}"
 
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
         self._stage = "analyze_prompt"
-        self.print("[#00ff00]?[/] [bold #00ff00]Analyze characters first?[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]Analyze characters first?[/]")
         self.print("")
         cost = self._estimate_cost_str(0.2)
         cost_hint = f", costs {cost}" if cost else ""
-        self.print(f"  [bold #00ff00]Y[/]  Yes [#00aa00](identifies characters{cost_hint})[/]")
-        self.print("  [bold #00ff00]n[/]  No  [#00aa00](skip to transformation)[/]")
+        self.print(f"  [bold #ffffff]Y[/]  Yes [#aaaaaa](identifies characters{cost_hint})[/]")
+        self.print("  [bold #ffffff]n[/]  No  [#aaaaaa](skip to transformation)[/]")
         self.print("")
         self.set_prompt(">  ")
 
@@ -1092,9 +1220,9 @@ class RegenderTUI(App):
 
             self._run_character_analysis()
         else:
-            self.print("[#00ff00]✓[/] Skipped")
+            self.print("[#ffffff]✓[/] Skipped")
             self.print("")
-            self._show_transform_menu()
+            self._show_model_menu()
 
     @work(exclusive=True)
     async def _run_character_analysis(self) -> None:
@@ -1167,6 +1295,7 @@ class RegenderTUI(App):
             debug_log.info("Step 4: Analyzing characters (LLM call)...")
             characters = await character_service.process(book)
             debug_log.info(f"  found {len(characters.characters)} characters")
+            self._pending_characters = characters
 
             stats = characters.get_statistics()
             result = {
@@ -1210,7 +1339,7 @@ class RegenderTUI(App):
                         self.query_one(HeaderBar).update_meta(self._book_stats, char_count)
 
                     self.print(
-                        f"[#00ff00]✓[/] Found [bold #00ff00]{char_count}[/] characters [#00aa00]({elapsed:.1f}s)[/]"
+                        f"[#ffffff]✓[/] Found [bold #ffffff]{char_count}[/] characters [#aaaaaa]({elapsed:.1f}s)[/]"
                     )
 
                     # Show gender breakdown
@@ -1218,19 +1347,19 @@ class RegenderTUI(App):
                     for gender, count in by_gender.items():
                         gender_parts.append(f"{count} {gender}")
                     if gender_parts:
-                        self.print(f"  [#00aa00]Genders:[/] {', '.join(gender_parts)}")
+                        self.print(f"  [#aaaaaa]Genders:[/] {', '.join(gender_parts)}")
 
                     # Show top characters
                     if main_chars:
                         self.print("")
-                        self.print("  [#00aa00]Main characters:[/]")
+                        self.print("  [#aaaaaa]Main characters:[/]")
                         for name in main_chars[:5]:
-                            self.print(f"    [#00ff00]•[/] {name}")
+                            self.print(f"    [#ffffff]•[/] {name}")
                         if len(main_chars) > 5:
-                            self.print(f"    [#00aa00]... and {len(main_chars) - 5} more[/]")
+                            self.print(f"    [#aaaaaa]... and {len(main_chars) - 5} more[/]")
 
                     self.print("")
-                    self._show_transform_menu()
+                    self._show_model_menu()
 
                 show_results()
             else:
@@ -1246,11 +1375,11 @@ class RegenderTUI(App):
                         pass
                 self.status_text = "Ready"
 
-                self.print(f"\n[#00ff00]Analysis failed:[/] {error_msg}")
-                self.print("[#00aa00]  See logs/tui_debug.log for details[/]")
+                self.print(f"\n[#ffffff]Analysis failed:[/] {error_msg}")
+                self.print("[#aaaaaa]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
-                self._show_transform_menu()
+                self._show_model_menu()
 
         except Exception as e:
             error_msg = str(e)
@@ -1267,11 +1396,11 @@ class RegenderTUI(App):
                     pass
             self.status_text = "Ready"
 
-            self.print(f"\n[#00ff00]Error:[/] {error_msg}")
-            self.print("[#00aa00]  See logs/tui_debug.log for full traceback[/]")
+            self.print(f"\n[#ffffff]Error:[/] {error_msg}")
+            self.print("[#aaaaaa]  See logs/tui_debug.log for full traceback[/]")
             self._show_api_key_help(error_msg)
             self.print("")
-            self._show_transform_menu()
+            self._show_model_menu()
 
     def _show_api_key_help(self, error_msg: str) -> None:
         """Show helpful message if error is about missing API keys."""
@@ -1282,16 +1411,16 @@ class RegenderTUI(App):
         ):
             self.print("")
             self.print(
-                "[#00aa00]Add your API keys to[/] [bold #00ff00].env[/] [#00aa00]in the project folder:[/]"
+                "[#aaaaaa]Add your API keys to[/] [bold #ffffff].env[/] [#aaaaaa]in the project folder:[/]"
             )
-            self.print("[#00aa00]  OPENAI_API_KEY=sk-...[/]")
-            self.print("[#00aa00]  DEFAULT_PROVIDER=openai[/]")
-            self.print("[#00aa00]Then restart the app.[/]")
+            self.print("[#aaaaaa]  OPENAI_API_KEY=sk-...[/]")
+            self.print("[#aaaaaa]  DEFAULT_PROVIDER=openai[/]")
+            self.print("[#aaaaaa]Then restart the app.[/]")
 
     def _handle_transform_input(self, value: str) -> None:
         """Handle transform selection."""
         if value.lower() in ("back", "b"):
-            self._show_book_menu()
+            self._show_model_menu()
             return
 
         try:
@@ -1299,8 +1428,7 @@ class RegenderTUI(App):
             if 0 <= idx < len(self.TRANSFORM_TYPES):
                 self._selected_transform = self.TRANSFORM_TYPES[idx][0]
                 self.transform_type = self._selected_transform
-                self.print(f"[#00ff00]✓[/] {self._selected_transform}")
-                self.print("")
+                self.print(f"[#ffffff]✓[/] {self._selected_transform}")
                 self._show_options_menu()
                 return
         except ValueError:
@@ -1308,56 +1436,335 @@ class RegenderTUI(App):
                 if value.lower() == name.lower():
                     self._selected_transform = name
                     self.transform_type = name
-                    self.print(f"[#00ff00]✓[/] {name}")
-                    self.print("")
+                    self.print(f"[#ffffff]✓[/] {name}")
                     self._show_options_menu()
                     return
 
-        self.print(f"[#00ff00]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
+        self.print(f"[#ffffff]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
 
-    def _show_name_map_prompt(self) -> None:
-        """Prompt user to optionally supply character name substitutions."""
-        self._stage = "name_map"
-        self.print("[#00aa00]rename characters?[/] [#005500](optional)[/]")
-        self.print("  format: [#00ff00]OldName=NewName, OldName2=NewName2[/]")
-        self.print("  e.g.  [#00ff00]Elizabeth=Edward, Jane=John[/]")
-        self.print("  [#005500]press enter to skip[/]")
-        self.print("")
+    def _show_model_menu(self) -> None:
+        """Kick off async model detection then render the selection menu."""
+        from dotenv import load_dotenv
 
-    def _handle_name_map_input(self, value: str) -> None:
-        """Parse optional name map and proceed to processing."""
-        self._name_map = None
-        if value.strip():
+        load_dotenv()
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        has_openai = bool(openai_key and not openai_key.startswith("your-"))
+        has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
+
+        if not has_openai and not has_anthropic:
+            self.print("[#aaaaaa]No API keys configured — skipping model selection[/]")
+            self._model_choices = []
+            self._show_transform_menu()
+            return
+
+        self.print("[#aaaaaa]Detecting available models...[/]")
+        self._fetch_and_show_models(has_openai, has_anthropic)
+
+    @work(exclusive=True)
+    async def _fetch_and_show_models(self, has_openai: bool, has_anthropic: bool) -> None:
+        """Fetch live model lists from APIs, fall back to hardcoded list on error."""
+        choices: list[tuple[str, str, str]] = []
+
+        if has_anthropic:
             try:
-                pairs = [p.strip() for p in value.split(",") if "=" in p]
-                self._name_map = {
-                    k.strip(): v.strip()
-                    for k, v in (p.split("=", 1) for p in pairs)
-                    if k.strip() and v.strip()
-                }
-                if self._name_map:
-                    names = ", ".join(f"[#00ff00]{k}→{v}[/]" for k, v in self._name_map.items())
-                    self.print(f"[#00ff00]✓[/] renaming: {names}")
-                else:
-                    self.print("[#005500]no valid pairs found — skipping[/]")
-                    self._name_map = None
-            except Exception:
-                self.print("[#005500]couldn't parse — skipping[/]")
-                self._name_map = None
-        else:
-            self.print("[#005500]no renames — using original names[/]")
+                from anthropic import AsyncAnthropic
 
+                client = AsyncAnthropic()
+                page = await client.models.list(limit=50)
+                for m in page.data:
+                    if m.id.startswith("claude-"):
+                        costs = _lookup_model_cost(m.id)
+                        pricing = (
+                            f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
+                            if costs
+                            else "pricing unknown"
+                        )
+                        display = _versioned_display_name(
+                            m.id, getattr(m, "display_name", m.id)
+                        )
+                        choices.append((m.id, display, pricing))
+            except Exception:
+                choices.extend(_FALLBACK_MODELS.get("anthropic", []))
+
+        if has_openai:
+            try:
+                from openai import AsyncOpenAI
+
+                client = AsyncOpenAI()
+                models_page = await client.models.list()
+                openai_models: list[tuple[str, str, str]] = []
+                seen: set[str] = set()
+                for m in sorted(models_page.data, key=lambda x: x.id):
+                    if m.id in seen or not _should_show_openai_model(m.id):
+                        continue
+                    seen.add(m.id)
+                    costs = _lookup_model_cost(m.id)
+                    pricing = (
+                        f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
+                        if costs
+                        else "pricing unknown"
+                    )
+                    openai_models.append((m.id, _openai_display_name(m.id), pricing))
+                choices.extend(
+                    openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
+                )
+            except Exception:
+                choices.extend(_FALLBACK_MODELS.get("openai", []))
+
+        self._model_choices = choices
+        self._render_model_menu()
+
+    def _render_model_menu(self) -> None:
+        """Display model selection menu after model list has been fetched."""
+        if not self._model_choices:
+            self._show_transform_menu()
+            return
+
+        if len(self._model_choices) == 1:
+            model_id, display_name, _ = self._model_choices[0]
+            os.environ["DEFAULT_MODEL"] = model_id
+            self.print(f"[#ffffff]✓[/] Using [bold #ffffff]{display_name}[/]")
+            self._recalculate_cost(model_id)
+            self.print("")
+            self._show_transform_menu()
+            return
+
+        self._stage = "model"
+        self._model_showing_all = False
+        self._render_model_list(show_all=False)
+
+    def _render_model_list(self, show_all: bool = False) -> None:
+        """Print the numbered model list."""
+        choices = self._model_choices
+        current = _get_resolved_model()
+        visible = choices if show_all else choices[:5]
+        tokens = self._book_stats.get("tokens", 0) if self._book_stats else 0
+        self.print("[#ffffff]?[/] [bold #ffffff]Select a model[/]")
         self.print("")
-        self._start_processing()
+        for i, (model_id, display_name, pricing) in enumerate(visible, 1):
+            is_current = model_id == current or current.startswith(model_id)
+            marker = " [#aaaaaa]◄ default[/]" if is_current else ""
+            rec = " [bold #ffffff]★ recommended[/]" if _is_recommended_model(model_id) else ""
+            time_est = _estimate_transform_time(model_id, tokens)
+            time_tag = f"  [#666666]{time_est}[/]" if time_est else ""
+            self.print(
+                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{pricing}[/]{time_tag}{rec}{marker}"
+            )
+        if not show_all and len(choices) > 5:
+            self.print(
+                f"  [bold #ffffff]M[/]  [#aaaaaa]More models ({len(choices) - 5} additional)...[/]"
+            )
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_model_input(self, value: str) -> None:
+        """Handle model selection."""
+        choices = self._model_choices
+        if not choices:
+            self._show_transform_menu()
+            return
+
+        if value.lower() == "m":
+            self._model_showing_all = True
+            self._render_model_list(show_all=True)
+            return
+
+        visible = choices if self._model_showing_all else choices[:5]
+        try:
+            idx = int(value) - 1
+            if 0 <= idx < len(visible):
+                model_id, display_name, _ = visible[idx]
+                os.environ["DEFAULT_MODEL"] = model_id
+                self.print(f"[#ffffff]✓[/] {display_name}")
+                self._recalculate_cost(model_id)
+                self.print("")
+                self._show_transform_menu()
+                return
+        except ValueError:
+            pass
+
+        for model_id, display_name, _ in choices:
+            if value.lower() in (model_id.lower(), display_name.lower()):
+                os.environ["DEFAULT_MODEL"] = model_id
+                self.print(f"[#ffffff]✓[/] {display_name}")
+                self._recalculate_cost(model_id)
+                self.print("")
+                self._show_transform_menu()
+                return
+
+        limit = len(choices) if self._model_showing_all else min(5, len(choices))
+        self.print(f"[#ffffff]Enter 1-{limit}[/]")
+
+    def _recalculate_cost(self, model: str) -> None:
+        """Recalculate cost estimate for the selected model and update header."""
+        if not self._book_stats:
+            return
+        tokens = self._book_stats.get("tokens", 0)
+        costs = _lookup_model_cost(model)
+        estimated_cost = (
+            (tokens / 1_000_000 * costs[0]) + (tokens / 1_000_000 * costs[1]) if costs else None
+        )
+        self._book_stats["estimated_cost"] = estimated_cost
+        display = next(
+            (name for mid, name, _ in self._model_choices if mid == model),
+            _friendly_model_name(model),
+        )
+        self._book_stats["model"] = display
+        with contextlib.suppress(Exception):
+            self.query_one(HeaderBar).update_meta(self._book_stats)
+
+    @work(exclusive=True)
+    async def _run_name_review(self) -> None:
+        """Fetch AI name suggestions and show review menu."""
+        if not self._pending_characters:
+            # No character analysis was run — skip straight to processing
+            self._start_processing()
+            return
+
+        # Show loader while fetching suggestions
+        loader_start = time.time()
+        loader = BrailleLoader("Suggesting names", loader_start)
+        with contextlib.suppress(Exception):
+            self.query_one("#content", ContentArea).add_widget(loader)
+
+        suggestions: list[dict] = []
+        try:
+            from dotenv import load_dotenv
+
+            from src.app import Application
+
+            load_dotenv()
+            app = Application("src/config.json")
+            character_service = app.get_service("character")
+            suggestions = await character_service.suggest_name_alternatives(
+                self._pending_characters,
+                self._selected_transform or "",
+            )
+            app.shutdown()
+        except Exception:
+            suggestions = []
+        finally:
+            with contextlib.suppress(Exception):
+                loader.stop()
+                loader.remove()
+
+        self._name_suggestions = suggestions
+        self._show_name_review_menu()
+
+    def _show_name_review_menu(self) -> None:
+        """Show numbered list of suggested name changes."""
+        self._stage = "name_review"
+        self._name_edit_mode = False
+        self._name_custom_mode = False
+
+        if not self._name_suggestions:
+            self.print("[#555555]No name suggestions — you can add custom mappings or skip[/]")
+            self.print("")
+            self.print("  [#aaaaaa]M[/] add mapping  [#aaaaaa]K[/] skip")
+            self.print("")
+            self.set_prompt(">  ")
+            return
+
+        n = len(self._name_suggestions)
+        self.print("[#aaaaaa]Suggested name changes:[/]")
+        self.print("")
+        for i, suggestion in enumerate(self._name_suggestions, 1):
+            orig = suggestion["original"]
+            sugg = suggestion["suggested"]
+            self.print(
+                f"  [bold #ffffff]{i}[/]  [#ffffff]{orig:<18}[/] [#aaaaaa]→[/]  [#ffffff]{sugg}[/]"
+            )
+        self.print("")
+        self.print(
+            f"  [#aaaaaa]A[/] accept all  [#aaaaaa]K[/] keep originals"
+            f"  [#aaaaaa]1-{n}[/] edit entry  [#aaaaaa]M[/] add custom"
+        )
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_name_review_input(self, value: str) -> None:
+        """Handle A/K/M/number input on the name review menu."""
+        if self._name_custom_mode:
+            # User is entering a custom "Original=Target" mapping
+            raw = value.strip()
+            if raw and "=" in raw:
+                parts = raw.split("=", 1)
+                orig, target = parts[0].strip(), parts[1].strip()
+                if orig and target:
+                    self._name_suggestions.append({"original": orig, "suggested": target})
+                    self.print(f"[#ffffff]✓[/] Added: {orig} → {target}")
+                    self.print("")
+                    self._show_name_review_menu()
+                    return
+            self.print("[#555555]Skipped (use Original=Target format, e.g. Lizzy=Eddie)[/]")
+            self.print("")
+            self._name_custom_mode = False
+            self._show_name_review_menu()
+            return
+
+        if self._name_edit_mode:
+            # User typed a replacement name for the current entry
+            idx = self._name_review_idx
+            if value.strip():
+                self._name_suggestions[idx]["suggested"] = value.strip()
+                sugg = self._name_suggestions[idx]
+                self.print(f"[#ffffff]✓[/] Updated: {sugg['original']} → {sugg['suggested']}")
+            else:
+                self.print("[#555555]No change[/]")
+            self._name_edit_mode = False
+            self.print("")
+            self._show_name_review_menu()
+            return
+
+        v = value.strip().lower()
+        if v in ("a", ""):  # Accept all (A or Enter)
+            self._name_map = {s["original"]: s["suggested"] for s in self._name_suggestions}
+            n = len(self._name_map)
+            label = "character" if n == 1 else "characters"
+            self.print(f"[#ffffff]✓[/] {n} {label} renamed")
+            self.print("")
+            self._start_processing()
+        elif v == "k":  # Keep originals
+            self._name_map = None
+            self.print("[#555555]Keeping original names[/]")
+            self._start_processing()
+        elif v == "m":  # Add custom mapping
+            self._name_custom_mode = True
+            self.print("[#aaaaaa]Enter mapping as Original=Target (e.g. Lizzy=Eddie):[/]")
+            self.set_prompt(">  ")
+        else:
+            # Try to parse as a number for inline editing
+            try:
+                n = int(value.strip())
+                if 1 <= n <= len(self._name_suggestions):
+                    idx = n - 1
+                    self._name_review_idx = idx
+                    self._name_edit_mode = True
+                    orig = self._name_suggestions[idx]["original"]
+                    curr = self._name_suggestions[idx]["suggested"]
+                    self.print(
+                        f"[#aaaaaa]New name for [#ffffff]{orig}[/]"
+                        f" [#aaaaaa](currently [#ffffff]{curr}[/]):[/]"
+                    )
+                    self.set_prompt(f"  {orig} → ")
+                else:
+                    self.print(
+                        f"[#ffffff]Enter A, K, M, or a number 1-{len(self._name_suggestions)}[/]"
+                    )
+            except ValueError:
+                self.print(
+                    f"[#ffffff]Enter A, K, M, or a number 1-{len(self._name_suggestions)}[/]"
+                )
 
     def _handle_options_input(self, value: str) -> None:
         """Handle options."""
         if value.lower() in ("n", "no"):
             self._no_qc = True
-            self.print("[#00ff00]✓[/] QC disabled")
+            self.print("[#ffffff]✓[/] QC disabled")
         else:
             self._no_qc = False
-            self.print("[#00ff00]✓[/] QC enabled")
+            self.print("[#ffffff]✓[/] QC enabled")
 
         self.print("")
         self._start_processing()
@@ -1395,19 +1802,16 @@ class RegenderTUI(App):
         # Disable input during processing
         try:
             input_bar = self.query_one(InputBar)
-            input_bar.start_loading_animation()
             input_bar.disable()
         except Exception:
             pass
 
-        self.print(f"{gradient_text('Starting transformation', ['#00ff00', '#00aa00'])}...")
+        self.print(f"{gradient_text('Starting transformation', ['#ffffff', '#aaaaaa'])}...")
 
         # Show braille loader with elapsed timer
         self._transform_loader = BrailleLoader("Transforming", self._process_start)
         with contextlib.suppress(Exception):
             self.query_one("#content", ContentArea).add_widget(self._transform_loader)
-
-        self.print("")
 
         # Build result for callback
         self._result = {
@@ -1468,11 +1872,17 @@ class RegenderTUI(App):
             debug_log.info("Application created OK")
 
             debug_log.info("Calling process_book (await)...")
+
+            def on_chapter_complete(done: int, total: int, _title: str) -> None:
+                if self._transform_loader:
+                    self._transform_loader._activity = f"Transforming · Ch {done}/{total}"
+
             result = await app.process_book(
                 file_path=self._result["input"],
                 transform_type=self._result["transform_type"],
                 output_path=self._result.get("output_path"),
                 name_map=self._result.get("name_map"),
+                on_chapter_complete=on_chapter_complete,
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -1523,11 +1933,11 @@ class RegenderTUI(App):
             if rate > 0:
                 remaining = (event.total - event.current) / rate
                 if remaining < 60:
-                    eta_str = f" [#00aa00]~{int(remaining)}s left[/]"
+                    eta_str = f" [#aaaaaa]~{int(remaining)}s left[/]"
                 else:
                     mins = int(remaining // 60)
                     secs = int(remaining % 60)
-                    eta_str = f" [#00aa00]~{mins}m {secs}s left[/]"
+                    eta_str = f" [#aaaaaa]~{mins}m {secs}s left[/]"
 
         # Build gradient progress bar (green)
         bar_width = 50
@@ -1536,12 +1946,12 @@ class RegenderTUI(App):
 
         # Gradient colors for filled portion
         gradient_colors = [
-            "#00ff00",
-            "#00dd00",
-            "#00bb00",
-            "#009900",
-            "#007700",
-            "#005500",
+            "#ffffff",
+            "#dddddd",
+            "#bbbbbb",
+            "#999999",
+            "#777777",
+            "#555555",
         ]
         filled_chars = []
         for i in range(filled):
@@ -1551,14 +1961,14 @@ class RegenderTUI(App):
             filled_chars.append(f"[{color}]━[/]")
 
         filled_str = "".join(filled_chars)
-        empty_str = f"[#00ff00]{'━' * empty}[/]"
+        empty_str = f"[#ffffff]{'━' * empty}[/]"
         bar = filled_str + empty_str
 
         # Percentage color
-        pct_color = "#00ff00"
+        pct_color = "#ffffff"
 
         # Stage name with green gradient
-        stage_gradient = gradient_text(stage_name, ["#00ff00", "#00aa00"])
+        stage_gradient = gradient_text(stage_name, ["#ffffff", "#aaaaaa"])
 
         def update():
             self.status_text = f"{stage_name} {pct_int}%"
@@ -1595,10 +2005,10 @@ class RegenderTUI(App):
                 self.query_one("#content", ContentArea).clear_progress()
 
             # Add completion message with gradient
-            stage_gradient = gradient_text(stage_name, ["#00ff00", "#00aa00"])
-            msg = f"[#00ff00]✓[/] {stage_gradient} [#00aa00]({event.elapsed_seconds:.1f}s)[/]"
+            stage_gradient = gradient_text(stage_name, ["#ffffff", "#aaaaaa"])
+            msg = f"[#ffffff]✓[/] {stage_gradient} [#aaaaaa]({event.elapsed_seconds:.1f}s)[/]"
             if stats:
-                msg += f" [#00aa00]— {stats}[/]"
+                msg += f" [#aaaaaa]— {stats}[/]"
             self.print(msg)
             self.status_text = f"{stage_name} ✓"
 
@@ -1621,9 +2031,9 @@ class RegenderTUI(App):
         else:
             # Transformation said it succeeded but no file exists
             self.print("")
-            self.print("[#00ff00]⚠ Transformation completed but output file not found[/]")
-            self.print(f"  [#00aa00]Expected:[/] {output_path}")
-            self.print(f"  [#00aa00]Time:[/] {elapsed:.1f}s (suspicious if < 5s)")
+            self.print("[#ffffff]⚠ Transformation completed but output file not found[/]")
+            self.print(f"  [#aaaaaa]Expected:[/] {output_path}")
+            self.print(f"  [#aaaaaa]Time:[/] {elapsed:.1f}s (suspicious if < 5s)")
             self.print("")
             self._json_output_path = None
             self._show_final()
@@ -1639,21 +2049,21 @@ class RegenderTUI(App):
                 pass
 
         self.print("")
-        self.print(f"[#00ff00]✓[/] {gradient_text('Transformation complete!', ['#00ff00', '#00aa00'])}")
-        self.print(f"  [#00aa00]Time:[/] [#00ff00]{elapsed:.1f}s[/]")
-        self.print(f"  [#00aa00]Saved:[/] [#00ff00]{self._json_output_path}[/]")
+        self.print(f"[#ffffff]✓[/] {gradient_text('Transformation complete!', ['#ffffff', '#aaaaaa'])}")
+        self.print(f"  [#aaaaaa]Time:[/] [#ffffff]{elapsed:.1f}s[/]")
+        self.print(f"  [#aaaaaa]Saved:[/] [#ffffff]{self._json_output_path}[/]")
 
         # Show export options from FORMATS
         self._stage = "export"
         self._export_format_list = list(FORMATS.keys())
         self.print("")
-        self.print("[#00ff00]?[/] [bold #00ff00]Export format[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]Export format[/]")
         self.print("")
         for i, key in enumerate(self._export_format_list, 1):
             info = FORMATS[key]
-            self.print(f"  [bold #00ff00]{i}[/]  {key:<15} [#00aa00]{info['description']}[/]")
+            self.print(f"  [bold #ffffff]{i}[/]  {key:<15} [#aaaaaa]{info['description']}[/]")
         skip_num = len(self._export_format_list) + 1
-        self.print(f"  [bold #00ff00]{skip_num}[/]  skip [#00aa00](JSON only)[/]")
+        self.print(f"  [bold #ffffff]{skip_num}[/]  skip [#aaaaaa](JSON only)[/]")
         self.print("")
 
         self.status_text = "Export?"
@@ -1672,7 +2082,7 @@ class RegenderTUI(App):
         format_list = getattr(self, "_export_format_list", None) or list(FORMATS.keys())
         skip_num = len(format_list) + 1
         if value in (str(skip_num), "skip", "s", ""):
-            self.print("[#00ff00]✓[/] Skipped export")
+            self.print("[#ffffff]✓[/] Skipped export")
             self._show_final()
             return
 
@@ -1681,12 +2091,12 @@ class RegenderTUI(App):
         format_map["text"] = "txt"
         format_key = format_map.get(value.lower() if value else "")
         if not format_key:
-            self.print(f"[#00ff00]Enter 1-{skip_num} or format key[/]")
+            self.print(f"[#ffffff]Enter 1-{skip_num} or format key[/]")
             return
 
         if not self._json_output_path:
             self.print(
-                "[#00ff00]⚠[/] [#00aa00]No JSON output path available. Transformation may have saved to a different location.[/]"
+                "[#ffffff]⚠[/] [#aaaaaa]No JSON output path available. Transformation may have saved to a different location.[/]"
             )
             self._show_final()
             return
@@ -1697,9 +2107,9 @@ class RegenderTUI(App):
 
             json_path = Path(self._json_output_path)
             output_path = export_book(str(json_path), format_key)
-            self.print(f"[#00ff00]✓[/] Exported to [#00ff00]{output_path}[/]")
+            self.print(f"[#ffffff]✓[/] Exported to [#ffffff]{output_path}[/]")
         except Exception as e:
-            self.print(f"[#00ff00]Export error:[/] {e}")
+            self.print(f"[#ffffff]Export error:[/] {e}")
 
         self._show_final()
 
@@ -1707,21 +2117,21 @@ class RegenderTUI(App):
         """Offer to transform another book or quit."""
         self._stage = "done"
         self.print("")
-        self.print("[#00ff00]?[/] [bold #00ff00]What next?[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]What next?[/]")
         self.print("")
         if self._selected_book:
             book_name = self._selected_book.stem
-            self.print(f"  [bold #00ff00]1[/]  Transform [#00aa00]{book_name}[/] again [#00aa00](different type)[/]")
+            self.print(f"  [bold #ffffff]1[/]  Transform [#aaaaaa]{book_name}[/] again [#aaaaaa](different type)[/]")
         else:
-            self.print("  [bold #00ff00]1[/]  Transform same book again")
-        self.print("  [bold #00ff00]2[/]  Transform a different book")
-        self.print("  [bold #00ff00]3[/]  Quit")
+            self.print("  [bold #ffffff]1[/]  Transform same book again")
+        self.print("  [bold #ffffff]2[/]  Transform a different book")
+        self.print("  [bold #ffffff]3[/]  Quit")
         self.print("")
         self.status_text = "Complete ✓"
 
         try:
             input_bar = self.query_one(InputBar)
-            input_bar.stop_loading_animation(restore="[#00ff00]✓[/]  ")
+            input_bar.stop_loading_animation(restore="[#ffffff]✓[/]  ")
             input_bar.enable()
         except Exception:
             pass
@@ -1735,7 +2145,7 @@ class RegenderTUI(App):
         elif value in ("3", "q", "quit", "exit", ""):
             self.exit()
         else:
-            self.print("[#00ff00]Enter 1, 2, or 3[/]")
+            self.print("[#ffffff]Enter 1, 2, or 3[/]")
 
     def _restart_same_book(self) -> None:
         """Reset transform state only, keeping the selected book, and jump to transform menu."""
@@ -1747,9 +2157,9 @@ class RegenderTUI(App):
         self._book_stats = saved_stats
         if saved_book:
             self.book_title = saved_book.stem
-        # Jump straight to transform selection
+        # Jump straight to model selection
         self.print("")
-        self._show_transform_menu()
+        self._show_model_menu()
 
     def _restart_flow(self) -> None:
         """Reset state and start a new transformation."""
@@ -1776,7 +2186,7 @@ class RegenderTUI(App):
         self.status_text = "Ready"
 
         self.print("")
-        self.print("[#00ff00]─[/]" * 50)
+        self.print("[#ffffff]─[/]" * 50)
         self.print("")
         self._show_book_menu()
 
@@ -1794,19 +2204,19 @@ class RegenderTUI(App):
                 setattr(self, attr, None)
 
         self.print("")
-        self.print(f"[bold #00ff00]✗ Error:[/bold #00ff00] {error}")
+        self.print(f"[bold #ffffff]✗ Error:[/bold #ffffff] {error}")
         self.print("")
         self.status_text = "Error"
 
         self._stage = "done"
-        self.print("[#00ff00]?[/] [bold #00ff00]What next?[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]What next?[/]")
         self.print("")
-        self.print("  [bold #00ff00]1[/]  Try another book")
-        self.print("  [bold #00ff00]2[/]  Quit")
+        self.print("  [bold #ffffff]1[/]  Try another book")
+        self.print("  [bold #ffffff]2[/]  Quit")
         self.print("")
         try:
             input_bar = self.query_one(InputBar)
-            input_bar.stop_loading_animation(restore="[#00ff00]✗[/]  ")
+            input_bar.stop_loading_animation(restore="[#ffffff]✗[/]  ")
             input_bar.enable()
         except Exception:
             pass
