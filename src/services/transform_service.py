@@ -769,14 +769,26 @@ class TransformService(BaseService):
                     progress_bar.update(1)
 
             except Exception as e:
-                self.logger.warning(f"Failed to transform batch {batch_start}-{batch_end}: {e}")
-                # Keep originals on error
-                for paragraph in batch_paragraphs:
-                    transformed_paragraphs.append(paragraph)
+                self.logger.warning(
+                    f"Batch {batch_num}/{total_batches} failed ({e}), retrying at sentence level..."
+                )
+                retry_results = await self._retry_at_sentence_level(
+                    batch_paragraphs, context, name_map, transform_type
+                )
+                transformed_paragraphs.extend(retry_results)
+                batch_start = batch_end
 
         # Close progress bar
         if progress_bar:
             progress_bar.close()
+
+        # Final term_map pass over all paragraphs — catches any that couldn't be LLM-transformed
+        # (e.g. batches that failed retry). Idempotent on already-transformed paragraphs.
+        for i, para in enumerate(transformed_paragraphs):
+            current_text = para.get_text()
+            fixed_text = self._apply_term_map(current_text, transform_type)
+            if fixed_text != current_text:
+                transformed_paragraphs[i] = Paragraph(sentences=[fixed_text])
 
         # Create transformed chapter
         transformed_chapter = Chapter(
@@ -805,16 +817,21 @@ class TransformService(BaseService):
     # ALL_MALE maps female→male; ALL_FEMALE maps male→female; GENDER_SWAP includes both.
     _TERM_MAPS: dict[str, dict[str, str]] = {
         "all_male": {
-            # Familial / relational
+            # Familial / relational (also serves as fallback for timed-out batches)
+            "mother": "father",
+            "daughter": "son",
+            "sister": "brother",
             "aunt": "uncle",
             "niece": "nephew",
             "grandmother": "grandfather",
             "granddaughter": "grandson",
             "widow": "widower",
             "maiden": "bachelor",
+            "spinster": "bachelor",
             "woman": "man",
             "girl": "boy",
             "female": "male",
+            "lass": "lad",
             # Social / aristocratic
             "queen": "king",
             "princess": "prince",
@@ -823,13 +840,27 @@ class TransformService(BaseService):
             "baroness": "baron",
             "empress": "emperor",
             "abbess": "abbot",
+            "lady": "lord",
+            "dame": "sir",
+            "heroine": "hero",
+            "bride": "groom",
             # Occupational / address
             "mistress": "master",
             "madam": "sir",
             "maid": "manservant",
+            "governess": "tutor",
+            "housekeeper": "steward",
+            "landlady": "landlord",
+            "actress": "actor",
+            "hostess": "host",
+            "waitress": "waiter",
+            "barmaid": "barman",
         },
         "all_female": {
             # Familial / relational
+            "father": "mother",
+            "son": "daughter",
+            "brother": "sister",
             "uncle": "aunt",
             "nephew": "niece",
             "grandfather": "grandmother",
@@ -839,6 +870,7 @@ class TransformService(BaseService):
             "man": "woman",
             "boy": "girl",
             "male": "female",
+            "lad": "lass",
             # Social / aristocratic
             "king": "queen",
             "prince": "princess",
@@ -847,13 +879,29 @@ class TransformService(BaseService):
             "baron": "baroness",
             "emperor": "empress",
             "abbot": "abbess",
+            "lord": "lady",
+            "hero": "heroine",
+            "groom": "bride",
             # Occupational / address
             "master": "mistress",
             "sir": "madam",
             "manservant": "maid",
+            "tutor": "governess",
+            "steward": "housekeeper",
+            "landlord": "landlady",
+            "actor": "actress",
+            "host": "hostess",
+            "waiter": "waitress",
+            "barman": "barmaid",
         },
         "gender_swap": {
             # Familial / relational (both directions)
+            "mother": "father",
+            "father": "mother",
+            "daughter": "son",
+            "son": "daughter",
+            "sister": "brother",
+            "brother": "sister",
             "aunt": "uncle",
             "uncle": "aunt",
             "niece": "nephew",
@@ -866,12 +914,15 @@ class TransformService(BaseService):
             "widower": "widow",
             "maiden": "bachelor",
             "bachelor": "maiden",
+            "spinster": "bachelor",
             "woman": "man",
             "man": "woman",
             "girl": "boy",
             "boy": "girl",
             "female": "male",
             "male": "female",
+            "lass": "lad",
+            "lad": "lass",
             # Social / aristocratic
             "queen": "king",
             "king": "queen",
@@ -887,6 +938,13 @@ class TransformService(BaseService):
             "emperor": "empress",
             "abbess": "abbot",
             "abbot": "abbess",
+            "lady": "lord",
+            "lord": "lady",
+            "dame": "sir",
+            "heroine": "hero",
+            "hero": "heroine",
+            "bride": "groom",
+            "groom": "bride",
             # Occupational / address
             "mistress": "master",
             "master": "mistress",
@@ -894,6 +952,20 @@ class TransformService(BaseService):
             "sir": "madam",
             "maid": "manservant",
             "manservant": "maid",
+            "governess": "tutor",
+            "tutor": "governess",
+            "housekeeper": "steward",
+            "steward": "housekeeper",
+            "landlady": "landlord",
+            "landlord": "landlady",
+            "actress": "actor",
+            "actor": "actress",
+            "hostess": "host",
+            "host": "hostess",
+            "waitress": "waiter",
+            "waiter": "waitress",
+            "barmaid": "barman",
+            "barman": "barmaid",
         },
     }
 
@@ -913,6 +985,71 @@ class TransformService(BaseService):
 
             text = pattern.sub(_replace, text)
         return text
+
+    async def _transform_single_paragraph(
+        self,
+        para: Any,
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]],
+        transform_type: "TransformType",
+    ) -> str:
+        """Transform one paragraph via LLM, applying post-processing. Used by retry logic."""
+        prompt = self._create_batch_transform_prompt([para], context, 1)
+        messages = [
+            {"role": "system", "content": prompt["system"]},
+            {"role": "user", "content": prompt["user"]},
+        ]
+        response = await self.provider.complete(
+            messages=messages,
+            temperature=self.config.llm_temperature,
+        )
+        texts = self._parse_batch_response(response, 1)
+        transformed_text = texts[0] if texts else para.get_text()
+        if name_map:
+            transformed_text = self._apply_name_map(transformed_text, name_map)
+        return self._apply_term_map(transformed_text, transform_type)
+
+    async def _retry_at_sentence_level(
+        self,
+        batch_paragraphs: list,
+        context: dict[str, Any],
+        name_map: Optional[dict[str, str]],
+        transform_type: "TransformType",
+    ) -> list:
+        """Retry a failed batch by processing each paragraph alone.
+
+        If a single paragraph also times out (e.g. an extremely long paragraph like
+        Darcy's letter), split its sentences into groups of ~10 and process each group
+        separately, then merge the results back into a single paragraph.
+        """
+        from src.models.book import Paragraph
+
+        results = []
+        for para in batch_paragraphs:
+            try:
+                transformed_text = await self._transform_single_paragraph(
+                    para, context, name_map, transform_type
+                )
+                results.append(Paragraph(sentences=[transformed_text]))
+            except Exception as e:
+                self.logger.warning(f"Single-paragraph retry failed ({e}), splitting by sentences...")
+                sentences = para.sentences if para.sentences else [para.get_text()]
+                # Process in groups of 10 sentences to stay well within timeout
+                group_size = 10
+                groups = [sentences[i : i + group_size] for i in range(0, len(sentences), group_size)]
+                merged_parts = []
+                for group in groups:
+                    group_para = Paragraph(sentences=group)
+                    try:
+                        part_text = await self._transform_single_paragraph(
+                            group_para, context, name_map, transform_type
+                        )
+                        merged_parts.append(part_text)
+                    except Exception:
+                        # True last resort: keep original sentence group text
+                        merged_parts.append(group_para.get_text())
+                results.append(Paragraph(sentences=[" ".join(merged_parts)]))
+        return results
 
     def _expand_name_map_with_aliases(
         self, name_map: dict[str, str], characters: "CharacterAnalysis"
