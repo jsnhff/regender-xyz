@@ -1046,20 +1046,86 @@ class RegenderTUI(App):
         self.print("")
         self._show_retitle_prompt()
 
+    # Gendered words likely to appear in book titles, by transform type
+    _TITLE_WORD_SWAPS: dict[str, dict[str, str]] = {
+        "all_male": {
+            "women": "men", "woman": "man", "girl": "boy", "girls": "boys",
+            "lady": "lord", "ladies": "lords", "queen": "king", "queens": "kings",
+            "mother": "father", "mothers": "fathers", "sister": "brother", "sisters": "brothers",
+            "daughter": "son", "daughters": "sons", "wife": "husband", "wives": "husbands",
+            "widow": "widower", "widows": "widowers", "nun": "monk", "nuns": "monks",
+            "princess": "prince", "duchess": "duke", "empress": "emperor",
+        },
+        "all_female": {
+            "men": "women", "man": "woman", "boy": "girl", "boys": "girls",
+            "lord": "lady", "lords": "ladies", "king": "queen", "kings": "queens",
+            "father": "mother", "fathers": "mothers", "brother": "sister", "brothers": "sisters",
+            "son": "daughter", "sons": "daughters", "husband": "wife", "husbands": "wives",
+            "widower": "widow", "widowers": "widows", "monk": "nun", "monks": "nuns",
+            "prince": "princess", "duke": "duchess", "emperor": "empress",
+        },
+        "gender_swap": {
+            "women": "men", "men": "women", "woman": "man", "man": "woman",
+            "girl": "boy", "boy": "girl", "girls": "boys", "boys": "girls",
+            "lady": "lord", "lord": "lady", "queen": "king", "king": "queen",
+            "sister": "brother", "brother": "sister",
+            "daughter": "son", "son": "daughter",
+            "wife": "husband", "husband": "wife",
+            "princess": "prince", "prince": "princess",
+        },
+        "nonbinary": {
+            "women": "people", "woman": "person", "men": "people", "man": "person",
+            "girl": "youth", "girls": "youth", "boy": "youth", "boys": "youth",
+            "sister": "sibling", "brother": "sibling",
+            "queen": "monarch", "king": "monarch",
+            "lady": "noble", "lord": "noble",
+        },
+    }
+
+    def _suggest_title(self, title: str, transform_type: str) -> str:
+        """Return a gendered-word-swapped version of title, or the original if nothing changes."""
+        swaps = self._TITLE_WORD_SWAPS.get(transform_type, {})
+        result = title
+        for old, new in swaps.items():
+            pattern = re.compile(r"\b" + re.escape(old) + r"\b", re.IGNORECASE)
+            def _replace(m, _new=new):
+                w = m.group(0)
+                if w.isupper():
+                    return _new.upper()
+                if w[0].isupper():
+                    return _new.capitalize()
+                return _new
+            result = pattern.sub(_replace, result)
+        return result
+
     def _show_retitle_prompt(self) -> None:
         """Ask if user wants a custom title for the output."""
         self._stage = "retitle"
         current = self._custom_title or self.book_title
+        suggested = self._suggest_title(current, self._selected_transform or "")
+        self._suggested_title = suggested if suggested != current else ""
+
         self.print("[#ffffff]?[/] [bold #ffffff]Title for output book[/]")
         self.print(f"  [#aaaaaa]Current: {current}[/]")
-        self.print("")
-        self.print("  Type a new title, or press [bold #ffffff]Enter[/] to keep it")
+        if self._suggested_title:
+            self.print(f"  [bold #ffffff]Suggested:[/] {self._suggested_title}")
+            self.print("")
+            self.print("  [bold #ffffff]S[/]  Use suggested title")
+            self.print("  [bold #ffffff]↵[/]  Keep current")
+            self.print("  [#aaaaaa]or type a new title[/]")
+        else:
+            self.print("")
+            self.print("  Type a new title, or press [bold #ffffff]Enter[/] to keep it")
         self.print("")
         self.set_prompt(">  ")
 
     def _handle_retitle_input(self, value: str) -> None:
         """Handle retitle prompt input."""
-        if value.strip():
+        suggested = getattr(self, "_suggested_title", "")
+        if value.strip().lower() == "s" and suggested:
+            self._custom_title = suggested
+            self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
+        elif value.strip():
             self._custom_title = value.strip()
             self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
         else:
