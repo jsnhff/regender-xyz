@@ -7,6 +7,7 @@ and input footer.
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import math
 import os
@@ -944,8 +945,8 @@ class RegenderTUI(App):
     def _show_setup_wizard(self) -> None:
         """Interactive first-run setup wizard."""
         self._stage = "setup_provider"
-        self.print("[#aaaaaa]To transform books you'll need an API key from an AI provider.[/]")
-        self.print("[#aaaaaa]This takes about 2 minutes — just pick one and paste a key.[/]")
+        self.print("[#aaaaaa]To transform books you'll need access to an AI model.[/]")
+        self.print("[#aaaaaa]Pick one below — or press Enter to skip for now.[/]")
         self.print("")
         self.print("[#ffffff]?[/] [bold #ffffff]Which provider would you like to use?[/]")
         self.print("")
@@ -956,6 +957,10 @@ class RegenderTUI(App):
         self.print("  [bold #ffffff]2[/]  OpenAI [bold #ffffff](ChatGPT)[/]")
         self.print("     [#aaaaaa]Fast and affordable — good for most books[/]")
         self.print("     [#aaaaaa]→ platform.openai.com/api-keys[/]")
+        self.print("")
+        self.print("  [bold #ffffff]3[/]  Local model [bold #ffffff](Ollama)[/]")
+        self.print("     [#aaaaaa]Free, runs on your computer — no API key needed[/]")
+        self.print("     [#aaaaaa]→ ollama.com[/]")
         self.print("")
         self.print("  [bold #ffffff]↵[/]  Skip for now [#aaaaaa](parse_only still works without a key)[/]")
         self.print("")
@@ -973,12 +978,17 @@ class RegenderTUI(App):
             self.print("[#ffffff]✓[/] OpenAI selected")
             self.print("")
             self._show_setup_key_prompt()
+        elif value == "3":
+            self._setup_provider = "ollama"
+            self.print("[#ffffff]✓[/] Local model selected")
+            self.print("")
+            self._show_setup_ollama_prompt()
         elif value.strip() == "":
             self.print("[#aaaaaa]Skipping setup — you can add keys to .env any time.[/]")
             self.print("")
             self._show_book_menu()
         else:
-            self.print("[#ffffff]Enter 1, 2, or press Enter to skip[/]")
+            self.print("[#ffffff]Enter 1, 2, 3, or press Enter to skip[/]")
 
     def _show_setup_key_prompt(self) -> None:
         """Prompt user to paste their API key."""
@@ -1020,6 +1030,69 @@ class RegenderTUI(App):
         self.print("[#aaaaaa]You're all set — let's pick a book.[/]")
         self.print("")
         self._show_book_menu()
+
+    def _show_setup_ollama_prompt(self) -> None:
+        """Prompt for Ollama model name."""
+        self._stage = "setup_model"
+        self.print("  [#aaaaaa]You'll need Ollama installed on your computer.[/]")
+        self.print("  [#aaaaaa]Download it free at →[/] [bold #ffffff]https://ollama.com[/]")
+        self.print("")
+        self.print("  [#aaaaaa]Once installed, pull a model in your terminal:[/]")
+        self.print("    [bold #ffffff]ollama pull llama3[/]")
+        self.print("")
+        self.print("  [#aaaaaa]Popular models: llama3, mistral, phi3, mixtral[/]")
+        self.print("  Press [bold #ffffff]Enter[/] to use llama3, or type a model name")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_setup_model_input(self, value: str) -> None:
+        """Handle Ollama model name input, then test connection."""
+        model = value.strip() or "llama3"
+        self.print(f"[#ffffff]✓[/] Using model [bold #ffffff]{model}[/]")
+        self.print("")
+        self._test_ollama_connection(model)
+
+    @work(exclusive=True)
+    async def _test_ollama_connection(self, model: str) -> None:
+        """Test connection to local Ollama, then proceed."""
+        self.print("[#aaaaaa]Testing connection to Ollama...[/]")
+        try:
+            from openai import AsyncOpenAI
+
+            base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+            client = AsyncOpenAI(api_key="ollama", base_url=base_url)
+            # Minimal test call
+            await asyncio.wait_for(
+                client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": "hi"}],
+                    max_tokens=1,
+                ),
+                timeout=10.0,
+            )
+            self._save_ollama_config(model)
+            self.print("[#ffffff]✓[/] Connected — using [bold #ffffff]{model}[/]".replace("{model}", model))
+            self.print("")
+            self.print("[#aaaaaa]You're all set — let's pick a book.[/]")
+            self.print("")
+        except Exception:
+            self.print("[bold #ffffff]⚠ Can't connect to Ollama at localhost:11434[/]")
+            self.print("[#aaaaaa]  Make sure Ollama is running:[/]")
+            self.print("    [bold #ffffff]open the Ollama app[/] [#aaaaaa]or run[/] [bold #ffffff]ollama serve[/]")
+            self.print("")
+            self.print("[#aaaaaa]Saving config anyway — restart the app once Ollama is running.[/]")
+            self._save_ollama_config(model)
+            self.print("")
+        self._show_book_menu()
+
+    def _save_ollama_config(self, model: str) -> None:
+        """Write Ollama config to .env and apply to current process."""
+        from dotenv import set_key
+
+        set_key(".env", "DEFAULT_PROVIDER", "ollama")
+        set_key(".env", "OLLAMA_MODEL", model)
+        os.environ["DEFAULT_PROVIDER"] = "ollama"
+        os.environ["OLLAMA_MODEL"] = model
 
     def _save_api_key(self, provider: str, key: str) -> None:
         """Write API key to .env and apply to current process immediately."""
@@ -1247,6 +1320,8 @@ class RegenderTUI(App):
             self._handle_setup_provider_input(value)
         elif self._stage == "setup_key":
             self._handle_setup_key_input(value)
+        elif self._stage == "setup_model":
+            self._handle_setup_model_input(value)
         elif self._stage == "book":
             self._handle_book_input(value)
         elif self._stage == "analyze_prompt":
@@ -1602,24 +1677,46 @@ class RegenderTUI(App):
         from dotenv import load_dotenv
 
         load_dotenv()
+        provider = os.environ.get("DEFAULT_PROVIDER", "")
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
         has_openai = bool(openai_key and not openai_key.startswith("your-"))
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
+        has_ollama = provider == "ollama"
 
-        if not has_openai and not has_anthropic:
+        if not has_openai and not has_anthropic and not has_ollama:
             self.print("[#aaaaaa]No API keys configured — skipping model selection[/]")
             self._model_choices = []
             self._show_character_analysis_prompt()
             return
 
         self.print("[#aaaaaa]Detecting available models...[/]")
-        self._fetch_and_show_models(has_openai, has_anthropic)
+        self._fetch_and_show_models(has_openai, has_anthropic, has_ollama)
 
     @work(exclusive=True)
-    async def _fetch_and_show_models(self, has_openai: bool, has_anthropic: bool) -> None:
+    async def _fetch_and_show_models(self, has_openai: bool, has_anthropic: bool, has_ollama: bool = False) -> None:
         """Fetch live model lists from APIs, fall back to hardcoded list on error."""
         choices: list[tuple[str, str, str]] = []
+
+        if has_ollama:
+            try:
+                import httpx
+
+                base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    resp = await client.get(f"{base_url}/api/tags")
+                    models = resp.json().get("models", [])
+                for m in models:
+                    name = m.get("name", "")
+                    if name:
+                        choices.append((name, name, "local"))
+            except Exception:
+                # Fallback to common Ollama models
+                for m in ["llama3", "mistral", "phi3", "mixtral"]:
+                    choices.append((m, m, "local"))
+            self._model_choices = choices
+            self._render_model_menu()
+            return
 
         if has_anthropic:
             try:

@@ -142,7 +142,8 @@ class Application:
         # List of provider files to try loading (excluding base classes)
         provider_modules = {
             "openai": "src.providers.openai",
-            "anthropic": "src.providers.anthropic"
+            "anthropic": "src.providers.anthropic",
+            "ollama": "src.providers.ollama",
         }
 
         # Load all available provider plugins
