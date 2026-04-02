@@ -13,11 +13,12 @@ ENV/
 .env.local
 .env.*.local
 
-# Book data directories
-# Uncomment to ignore book files
-# books/texts/
-# books/json/
-# books/output/
+# Book data directories — generated/cached output, not committed
+books/json/
+books/output/
+# Individual full books in texts/ are also excluded (too large for a starter repo)
+# The sample file (pride-prejudice-sample.txt) stays tracked
+books/texts/pg*.txt
 
 # Old directories (cleanup)
 clean_json_books/
@@ -37,6 +38,12 @@ parsed_books/
 # Keep: book_format_analysis.json
 # Keep: parser_test_results.json
 # Keep: conversion_report.json
+
+# Claude Code development files (local only)
+.claude/settings.local.json
+.claude/todos.md
+.claude/plans/
+.claude/projects/
 
 # OS
 .DS_Store
