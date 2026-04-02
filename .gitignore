@@ -1,0 +1,97 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Environment files (contains API keys)
+.env
+.env.local
+.env.*.local
+
+# Book data directories — generated/cached output, not committed
+books/json/
+books/output/
+# Individual full books in texts/ are also excluded (too large for a starter repo)
+# The sample file (pride-prejudice-sample.txt) stays tracked
+books/texts/pg*.txt
+
+# Old directories (cleanup)
+clean_json_books/
+parsed_books/
+book_texts/
+book_json/
+book_transforms/
+
+# Test outputs
+test_*.json
+*_test.json
+*_v2.json
+test_data/
+parsed_books/
+
+# Reports (keep the important ones)
+# Keep: book_format_analysis.json
+# Keep: parser_test_results.json
+# Keep: conversion_report.json
+
+# Claude Code development files (local only)
+.claude/settings.local.json
+.claude/todos.md
+.claude/plans/
+.claude/projects/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.cache/
+test_it/
+logs/
+
+# Output files
+*.transformed.txt
+*.neutral.txt
+*.feminine.txt
+*.masculine.txt
+
+# Virtual environment folders
+venv/
+.env/
+myenv/
+my_multi_agent_env/
+test_it/
+*_testing/
+*_v*/
+
+# Transformed output files
+transformed_*.txt
+*_chunk*.txt
+
+# IDE Config Files (optional)
+.vscode/
+.idea/
+
+# Python specific
+.DS_Store
+
+# Archive
+archive/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Test outputs
+transformed_*.txt
+*_log.json
+character_list.json

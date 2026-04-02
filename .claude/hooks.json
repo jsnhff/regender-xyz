@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "pre-edit": {
+      "description": "Run ruff check and format before editing Python files",
+      "enabled": true,
+      "commands": [
+        {
+          "pattern": "*.py",
+          "command": "ruff check --fix {file}",
+          "description": "Fix linting issues"
+        },
+        {
+          "pattern": "*.py",
+          "command": "ruff format {file}",
+          "description": "Format Python code"
+        }
+      ]
+    },
+    "post-edit": {
+      "description": "Verify code quality after editing Python files",
+      "enabled": true,
+      "commands": [
+        {
+          "pattern": "*.py",
+          "command": "ruff check {file}",
+          "description": "Check for linting issues",
+          "allow_failure": false
+        }
+      ]
+    },
+    "pre-write": {
+      "description": "Format and check before writing new Python files",
+      "enabled": true,
+      "commands": [
+        {
+          "pattern": "*.py",
+          "command": "ruff format {file}",
+          "description": "Format new Python file"
+        },
+        {
+          "pattern": "*.py",
+          "command": "ruff check --fix {file}",
+          "description": "Fix any linting issues"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "auto_fix": true,
+    "format_on_save": true,
+    "check_on_edit": true,
+    "fail_on_error": false
+  }
+}
