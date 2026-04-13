@@ -1,10 +1,10 @@
-# regender-xyz
+# regender.xyz
 
 A command-line tool for analyzing and transforming gender representation in literature using AI.
 
 ## Overview
 
-Regender-XYZ uses AI (OpenAI or Anthropic/Claude) to identify characters in books and transform gender representation while preserving narrative coherence. It features an interactive TUI, a powerful book parser that handles diverse text formats, and a deterministic post-processing layer that achieves near-100% accuracy even when API calls fail or time out.
+regender.xyz uses AI (OpenAI or Anthropic/Claude) to identify characters in books and transform gender representation while preserving narrative coherence. It features an interactive TUI, a powerful book parser that handles diverse text formats, and a deterministic post-processing layer that achieves near-100% accuracy even when API calls fail or time out.
 
 ## Quick Start
 
