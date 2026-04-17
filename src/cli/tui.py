@@ -563,6 +563,7 @@ class ContentArea(ScrollableContainer):
         height: 1fr;
         padding: 1 1;
         background: #000000;
+        overflow-x: hidden;
         scrollbar-background: #000000;
         scrollbar-background-hover: #000000;
         scrollbar-background-active: #000000;
