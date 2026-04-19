@@ -117,27 +117,29 @@ class HierarchyBuilder:
     def _setup_patterns(self):
         """Set up section detection patterns."""
         # Patterns for different section types
+        # Roman numeral character class — full set (I V X L C D M)
+        _rn = r"[IVXLCDM]+"
         self.patterns = {
             SectionType.VOLUME: [
-                (r"^\s*VOLUME\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*Volume\s+([IVX]+)", lambda m: m.group(1)),
+                (rf"^\s*VOLUME\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Volume\s+({_rn})\b", lambda m: m.group(1)),
                 (r"^\s*VOLUME\s+(ONE|TWO|THREE|FOUR|FIVE)", lambda m: m.group(1)),
                 (r"^\s*Vol\.\s*(\d+)", lambda m: m.group(1)),
             ],
             SectionType.PART: [
-                (r"^\s*PART\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*Part\s+([IVX]+)", lambda m: m.group(1)),
+                (rf"^\s*PART\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Part\s+({_rn})\b", lambda m: m.group(1)),
                 (r"^\s*PART\s+(ONE|TWO|THREE|FOUR|FIVE)", lambda m: m.group(1)),
             ],
             SectionType.BOOK: [
-                (r"^\s*BOOK\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*Book\s+([IVX]+)", lambda m: m.group(1)),
+                (rf"^\s*BOOK\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Book\s+({_rn})\b", lambda m: m.group(1)),
                 (r"^\s*BOOK\s+(ONE|TWO|THREE|FOUR|FIVE)", lambda m: m.group(1)),
             ],
             SectionType.ACT: [
-                (r"^\s*ACT\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*Act\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*ACTUS\s+([IVX]+)", lambda m: m.group(1)),  # Latin
+                (rf"^\s*ACT\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Act\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*ACTUS\s+({_rn})\b", lambda m: m.group(1)),  # Latin
             ],
             SectionType.CHAPTER: [
                 (
@@ -148,36 +150,36 @@ class HierarchyBuilder:
                     r"^\s*Chapter\s+(One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)",
                     lambda m: m.group(1),
                 ),
-                (r"^\s*CHAPTER\s+([IVX]+)\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
-                (r"^\s*Chapter\s+([IVX]+)\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
+                (rf"^\s*CHAPTER\s+({_rn})\b\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
+                (rf"^\s*Chapter\s+({_rn})\b\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
                 (r"^\s*CHAPTER\s+(\d+)\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
                 (r"^\s*Chapter\s+(\d+)\.?\s*(.*)", lambda m: (m.group(1), m.group(2).strip())),
                 (
-                    r"^\s*([IVX]+)\.\s+([A-Z][A-Z ]+)$",
+                    rf"^\s*({_rn})\.\s+([A-Z][A-Z ]+)$",
                     lambda m: (m.group(1), m.group(2).strip()),
                 ),  # Roman + CAPS title
                 (
-                    r"^\s*([IVX]+)\.\s+([A-Z].+)",
+                    rf"^\s*({_rn})\.\s+([A-Z].+)",
                     lambda m: (m.group(1), m.group(2).strip()),
                 ),  # Roman + title
-                (r"^\s*([IVX]+)\.?\s*$", lambda m: m.group(1)),  # Just Roman numerals
+                (rf"^\s*({_rn})\.?\s*$", lambda m: m.group(1)),  # Just Roman numerals
                 # Removed the overly broad numbered list pattern
-                (r"^\s*ADVENTURE\s+([IVX]+)", lambda m: m.group(1)),  # Adventure stories
-                (r"^\s*Story\s+([IVX]+)", lambda m: m.group(1)),  # Story format
+                (rf"^\s*ADVENTURE\s+({_rn})\b", lambda m: m.group(1)),  # Adventure stories
+                (rf"^\s*Story\s+({_rn})\b", lambda m: m.group(1)),  # Story format
             ],
             SectionType.SCENE: [
-                (r"^\s*SCENE\s+([ivxIVX]+)", lambda m: m.group(1)),
-                (r"^\s*Scene\s+([ivxIVX]+)", lambda m: m.group(1)),
-                (r"^\s*Sc\.\s*([ivxIVX]+)", lambda m: m.group(1)),
+                (rf"^\s*SCENE\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Scene\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Sc\.\s*({_rn})\b", lambda m: m.group(1)),
             ],
             SectionType.LETTER: [
-                (r"^\s*LETTER\s+([IVX]+)", lambda m: m.group(1)),
-                (r"^\s*Letter\s+([IVX]+)", lambda m: m.group(1)),
+                (rf"^\s*LETTER\s+({_rn})\b", lambda m: m.group(1)),
+                (rf"^\s*Letter\s+({_rn})\b", lambda m: m.group(1)),
                 (r"^\s*LETTER\s+(\d+)", lambda m: m.group(1)),
             ],
             SectionType.POEM: [
                 (r"^\s*(\d+)\s*$", lambda m: m.group(1)),
-                (r"^\s*([IVX]+)\s*$", lambda m: m.group(1)),
+                (rf"^\s*({_rn})\s*$", lambda m: m.group(1)),
                 (r"^\s*Sonnet\s+(\d+)", lambda m: m.group(1)),
             ],
         }
