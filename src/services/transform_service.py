@@ -912,6 +912,12 @@ class TransformService(BaseService):
             "wench": "knave",
             "damsel": "youth",
             "harlot": "rake",
+            # Pronoun safety nets — unambiguous forms only
+            # ("her" omitted: ambiguous object/possessive → LLM handles in context)
+            "she": "he",
+            "herself": "himself",
+            # Title safety nets — LLM sometimes leaves gendered titles on character names
+            "Mrs": "Mr",
         },
         "all_female": {
             # Familial / relational
@@ -976,6 +982,13 @@ class TransformService(BaseService):
             # Period / colloquial
             "knave": "wench",
             "rake": "harlot",
+            # Pronoun safety nets — unambiguous forms only
+            # ("her" omitted: ambiguous object/possessive → LLM handles in context)
+            "he": "she",
+            "him": "her",
+            "himself": "herself",
+            # Title safety nets — LLM sometimes leaves gendered titles on character names
+            "Mr": "Ms",
         },
         "gender_swap": {
             # Familial / relational (both directions)
@@ -1193,7 +1206,37 @@ class TransformService(BaseService):
             "Mrs": "Mx",
             # LLM typo correction: "nibling" is the target but LLM sometimes writes "nibbling"
             "nibbling": "nibling",
+            # Verb agreement: singular 'they' takes 'were/have/do/are', not 'was/has/does/is'
+            # The LLM inherits conjugation from the source gender and does not adjust.
+            "they was": "they were",
+            "they wasn't": "they weren't",
+            "they has": "they have",
+            "they hasn't": "they haven't",
+            "they does": "they do",
+            "they doesn't": "they don't",
+            "they is": "they are",
         },
+    }
+
+    # Case-sensitive regex fixes applied after _apply_term_map.
+    # Keyed by transform type value. Used for patterns where re.IGNORECASE
+    # would cause false positives (e.g. "Miss" verb vs title).
+    _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
+        # "Miss Name" (title form — capital following word). Safe because:
+        # - Verb "miss" is always lowercase in flowing prose
+        # - Title "Miss" precedes a capital proper name
+        "nonbinary": [
+            (re.compile(r"Miss (?=[A-Z])"), "Mx. "),
+            (re.compile(r"_Miss ([A-Z])"), r"_Mx. \1"),
+        ],
+        "all_male": [
+            (re.compile(r"Miss (?=[A-Z])"), "Mr. "),
+            (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
+        ],
+        "all_female": [
+            # "Miss" is already female — only need to catch "Mr." on now-female characters.
+            # Handled by the "Mr" → "Ms" term map entry; no case-sensitive fix needed here.
+        ],
     }
 
     def _apply_term_map(self, text: str, transform_type: "TransformType") -> str:
@@ -1211,6 +1254,10 @@ class TransformService(BaseService):
                 return r.lower()
 
             text = pattern.sub(_replace, text)
+
+        for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(transform_type.value, []):
+            text = pattern.sub(replacement, text)
+
         return text
 
     async def _transform_single_paragraph(
