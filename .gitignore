@@ -86,6 +86,9 @@ transformed_*.txt
 # Archive
 archive/
 
+# Internal plans / notes (not for public repo)
+docs/plans/
+
 # Python cache
 __pycache__/
 *.pyc
