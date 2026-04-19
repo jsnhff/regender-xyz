@@ -10,6 +10,18 @@ from enum import Enum
 from typing import Any, Optional
 
 
+def _roman_to_int(s: str) -> int:
+    """Convert a Roman numeral string to an integer (e.g. 'XIII' → 13)."""
+    values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    result = 0
+    prev = 0
+    for ch in reversed(s.upper()):
+        val = values.get(ch, 0)
+        result += val if val >= prev else -val
+        prev = val
+    return result
+
+
 class SectionType(Enum):
     """Types of book sections."""
 
@@ -306,6 +318,9 @@ class HierarchyBuilder:
                     else:
                         number = result
                         title = None
+                    # Convert Roman numerals to integers for clean display
+                    if number and re.fullmatch(r"[IVXLCDMivxlcdm]+", number):
+                        number = str(_roman_to_int(number))
                     return (section_type, number, title)
         return None
 
