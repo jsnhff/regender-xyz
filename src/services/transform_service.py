@@ -1183,6 +1183,16 @@ class TransformService(BaseService):
             "stepbrother": "stepsibling",
             "godmother": "godparent",
             "godfather": "godparent",
+            # Compound titles not caught by single-word rules
+            "Ladyship": "Nobleship",
+            "lordship": "nobleship",
+            # Gendered titles the LLM sometimes leaves on character names
+            # (period preserved from surrounding text for Mr/Mrs; Mx. added for Miss)
+            # Note: "Miss" omitted here — case-insensitive match would corrupt the verb "miss"
+            "Mr": "Mx",
+            "Mrs": "Mx",
+            # LLM typo correction: "nibling" is the target but LLM sometimes writes "nibbling"
+            "nibbling": "nibling",
         },
     }
 
