@@ -1410,6 +1410,8 @@ class TransformService(BaseService):
 {rules}
 {character_instructions}
 
+PRONOUN DISAMBIGUATION: In scenes where multiple characters share the same pronoun after transformation, replace ambiguous pronouns with the character's name where a first-time reader would be uncertain who is referred to. Prioritize dialogue attribution lines and sentences immediately following a speaker change. Do not alter sentence rhythm or add words beyond the name substitution.
+
 For paired opposite-gender terms (e.g. "boys and girls", "ladies and gentlemen", "father and mother"), simplify to the target gender only (e.g. "girls", "ladies", "mother").
 Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
 

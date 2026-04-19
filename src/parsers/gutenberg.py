@@ -5,6 +5,7 @@ Line-based parser for Project Gutenberg texts.
 Avoids regex where possible for better reliability and maintainability.
 """
 
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -289,23 +290,22 @@ class GutenbergParser:
         # (common pattern: title on one line, "by Author" on next)
         if not metadata.title or not metadata.author:
             non_blank_lines = []
-            for line in header_lines[:50]:  # Look at first 50 lines
+            for line in header_lines[:100]:  # Look at first 100 lines
                 line_stripped = line.strip()
                 if line_stripped and not line_stripped.startswith("***"):
                     non_blank_lines.append(line_stripped)
-                    if len(non_blank_lines) >= 10:  # Get enough context
+                    if len(non_blank_lines) >= 30:  # Get enough context
                         break
 
-            # Pattern: Title followed by "by Author"
+            _skip_words = ["contents", "table of", "chapter", "act ", "scene ", "volume"]
+
+            # Pattern 1: Title followed by "by Author" on the same next line
             for i in range(len(non_blank_lines) - 1):
                 current = non_blank_lines[i]
                 next_line = non_blank_lines[i + 1]
 
                 # Skip common non-title lines
-                if any(
-                    skip in current.lower()
-                    for skip in ["contents", "table of", "chapter", "act ", "scene ", "volume"]
-                ):
+                if any(skip in current.lower() for skip in _skip_words):
                     continue
 
                 # Check if next line is "by Author"
@@ -316,6 +316,62 @@ class GutenbergParser:
                     if not metadata.author:
                         metadata.author = next_line[3:].strip()
                     break
+
+            # Pattern 2: "by" alone on its own line, author on the next line
+            # (common in illustrated editions: PRIDE.\nand\nPREJUDICE\n\nby\nJane Austen,)
+            if not metadata.title or not metadata.author:
+                _publisher_words = [
+                    "road",
+                    "house",
+                    "cross",
+                    "london",
+                    "george",
+                    "allen",
+                    "ruskin",
+                    "press",
+                ]
+                for i, nbline in enumerate(non_blank_lines):
+                    if nbline.lower() == "by" and i + 1 < len(non_blank_lines):
+                        if not metadata.author:
+                            metadata.author = non_blank_lines[i + 1].strip().rstrip(",.")
+                        if not metadata.title:
+                            # Collect the title words immediately preceding "by"
+                            title_parts = []
+                            for k in range(i - 1, -1, -1):
+                                part = non_blank_lines[k].strip()
+                                # Stop at publisher/address lines or illustration markers
+                                if any(c.isdigit() for c in part):
+                                    break
+                                if any(kw in part.lower() for kw in _publisher_words):
+                                    break
+                                if part in ("]", "[", ""):
+                                    break
+                                if part.startswith("["):
+                                    break
+                                if 1 < len(part) <= 40:
+                                    title_parts.insert(0, part.rstrip("."))
+                                else:
+                                    break
+                            if title_parts:
+                                _minor_words = {
+                                    "and",
+                                    "or",
+                                    "of",
+                                    "the",
+                                    "in",
+                                    "a",
+                                    "an",
+                                    "to",
+                                    "for",
+                                }
+                                words = " ".join(title_parts).split()
+                                metadata.title = " ".join(
+                                    w.lower()
+                                    if w.lower() in _minor_words and i > 0
+                                    else w.capitalize()
+                                    for i, w in enumerate(words)
+                                )
+                        break
 
         return metadata
 
@@ -363,7 +419,7 @@ class GutenbergParser:
                 continue
 
             # Skip lines that start with a quote character (dialogue, not a title)
-            if line_stripped[0] in '"\'_':
+            if line_stripped[0] in "\"'_":
                 continue
 
             # Accept all-caps titles (convert to title case) or naturally-cased titles
@@ -502,6 +558,11 @@ class GutenbergParser:
             if in_illustration:
                 if line_stripped.endswith("]"):
                     in_illustration = False
+                    # If the closing line contains a chapter heading, preserve it
+                    # e.g. "Chapter I.]" inside an illustration caption
+                    inner = line_stripped.rstrip("]").rstrip(".").strip()
+                    if re.match(r"^(Chapter|CHAPTER)\s+[IVXLCDM\d]+", inner):
+                        cleaned.append(inner)
                 continue
 
             # Skip page numbers (lines that are purely digits/spaces)
