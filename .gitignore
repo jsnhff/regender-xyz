@@ -98,3 +98,20 @@ __pycache__/
 transformed_*.txt
 *_log.json
 character_list.json
+
+# Electron wrapper build artifacts
+electron/node_modules/
+electron/dist/
+electron/out/
+electron/*.log
+python-arm64/
+
+# Local-only book layout scripts (InDesign/IDML pipeline — not part of the public tool)
+/scripts/apply_styles.py
+/scripts/clean_styles.py
+/scripts/make_idml.py
+/scripts/make_rtf.py
+/scripts/chapter_formatter.py
+
+# Personal review notes
+/Model feedback from *.rtf
