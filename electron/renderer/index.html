@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Regender</title>
+    <link rel="stylesheet" href="../node_modules/xterm/css/xterm.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+        font-family:
+          "SF Mono", Menlo, Monaco, "Courier New", monospace;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      /* Allow text selection inside the terminal viewport */
+      #terminal,
+      #terminal * {
+        -webkit-user-select: text;
+        user-select: text;
+      }
+      /* Title-bar drag region for the frameless window top */
+      #drag-region {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 28px;
+        -webkit-app-region: drag;
+        z-index: 10;
+      }
+      #terminal {
+        position: absolute;
+        top: 28px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+      }
+      .xterm-viewport::-webkit-scrollbar {
+        width: 6px;
+      }
+      .xterm-viewport::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="drag-region"></div>
+    <div id="terminal"></div>
+    <script src="../node_modules/xterm/lib/xterm.js"></script>
+    <script src="../node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+    <script src="../node_modules/xterm-addon-web-links/lib/xterm-addon-web-links.js"></script>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
