@@ -2,6 +2,22 @@
 
 A command-line tool for analyzing and transforming gender representation in literature using AI.
 
+## Try it now
+
+### Mac app (easiest — no setup)
+
+Download the latest **Regender.dmg** from [Releases](https://github.com/jsnhff/regender-xyz/releases/latest), drag it to Applications, and open it. Apple Silicon Macs only.
+
+### From the terminal
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jsnhff/regender-xyz/master/start.sh | bash
+```
+
+The script installs everything and walks you through setup.
+
+---
+
 ## Overview
 
 regender.xyz uses AI (OpenAI or Anthropic/Claude) to identify characters in books and transform gender representation while preserving narrative coherence. It features an interactive TUI, a powerful book parser that handles diverse text formats, and a deterministic post-processing layer that achieves near-100% accuracy even when API calls fail or time out.

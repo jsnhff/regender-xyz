@@ -13,6 +13,7 @@ import math
 import os
 import re
 import time
+import webbrowser
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
@@ -886,6 +887,7 @@ class RegenderTUI(App):
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._custom_title: str = ""
+        self._friendly_mode: bool = False
         self._setup_provider: str = ""
         self._model_choices: list = []
         self._model_showing_all: bool = False
@@ -913,7 +915,7 @@ class RegenderTUI(App):
 
         # Show setup wizard for first-time users, book menu for returning users
         if self._check_llm_setup():
-            self._show_setup_wizard()
+            self._show_friendly_mode_question()
         else:
             self._show_book_menu()
         self.query_one("#input", Input).focus()
@@ -942,6 +944,46 @@ class RegenderTUI(App):
             set_key(".env", "DEFAULT_PROVIDER", auto)
 
         return False  # All good
+
+    def _show_friendly_mode_question(self) -> None:
+        """Ask whether the user wants guided (friendly) or standard setup."""
+        self._stage = "setup_mode"
+        self.print("[#aaaaaa]First time here? We can walk you through setup step by step.[/]")
+        self.print("")
+        self.print("  [bold #ffffff]1[/]  Yes, guide me through it")
+        self.print("  [bold #ffffff]2[/]  I know what I'm doing")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _handle_friendly_mode_input(self, value: str) -> None:
+        """Route to friendly setup or standard wizard."""
+        if value == "1":
+            self._friendly_mode = True
+            self.print("")
+            self._show_friendly_setup()
+        elif value == "2":
+            self._friendly_mode = False
+            self.print("")
+            self._show_setup_wizard()
+        else:
+            self.print("[#aaaaaa]Enter 1 or 2[/]")
+
+    def _show_friendly_setup(self) -> None:
+        """Guided Anthropic setup for first-time non-technical users."""
+        self._stage = "setup_key"
+        self._setup_provider = "anthropic"
+        self.print("[#aaaaaa]Regender uses Claude AI to rewrite your book.[/]")
+        self.print("[#aaaaaa]You'll need a free Anthropic account and an API key.[/]")
+        self.print("")
+        self.print("[#ffffff]Opening the Anthropic website in your browser...[/]")
+        self.print("")
+        webbrowser.open("https://console.anthropic.com/settings/keys")
+        self.print("[#aaaaaa]1. Sign up for a free account (or log in)[/]")
+        self.print("[#aaaaaa]2. Click[/] [bold #ffffff]Create Key[/]")
+        self.print("[#aaaaaa]3. Copy the key — it starts with[/] [bold #ffffff]sk-ant-[/]")
+        self.print("[#aaaaaa]4. Paste it here and press Enter[/]")
+        self.print("")
+        self.set_prompt(">  ")
 
     def _show_setup_wizard(self) -> None:
         """Interactive first-run setup wizard."""
@@ -1317,7 +1359,9 @@ class RegenderTUI(App):
         value = event.value.strip()
         event.input.value = ""
 
-        if self._stage == "setup_provider":
+        if self._stage == "setup_mode":
+            self._handle_friendly_mode_input(value)
+        elif self._stage == "setup_provider":
             self._handle_setup_provider_input(value)
         elif self._stage == "setup_key":
             self._handle_setup_key_input(value)
