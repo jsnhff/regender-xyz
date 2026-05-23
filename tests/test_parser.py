@@ -1,9 +1,12 @@
 """
 Parser smoke tests - does our parsing logic work?
 """
+
+from pathlib import Path
+
 import pytest
 
-from src.parsers.parser import IntegratedParser
+from src.parsers.parser import IntegratedParser, parse_book
 
 
 def test_parse_simple_text():
@@ -49,6 +52,23 @@ def test_parse_gutenberg_headers():
     full_text = str(result.chapters)
     assert "PROJECT GUTENBERG" not in full_text
     assert "actual content" in full_text.lower()
+
+
+def test_trailing_colophon_stripped():
+    """pg1342 has a 'CHISWICK PRESS' colophon between the last sentence and the
+    `*** END` marker. It must not survive into chapter content."""
+    pg1342 = Path("books/texts/pg1342-Pride_and_Prejudice.txt")
+    if not pg1342.exists():
+        pytest.skip(f"{pg1342} not available in this checkout")
+
+    book = parse_book(str(pg1342))
+    last_chapter = book.chapters[-1]
+    tail = " ".join(last_chapter["paragraphs"][-3:])
+
+    assert "uniting them." in tail
+    assert "CHISWICK" not in tail
+    assert "TOOKS COURT" not in tail
+    assert "WHITTINGHAM" not in tail
 
 
 def test_parser_handles_empty_input():

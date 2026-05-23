@@ -9,6 +9,52 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
+# Words that signal printer/publisher boilerplate (colophons, advert pages, transcriber
+# notes). Used both when assembling titles from front matter and when trimming
+# trailing junk from the tail of the book.
+_TRAILING_JUNK_WORDS = (
+    "press",
+    "printed by",
+    "printers",
+    "& co",
+    "chiswick",
+    "whittingham",
+    "court",
+    "chancery",
+    "london",
+    "edinburgh",
+    "glasgow",
+    "transcriber",
+    "proofread",
+    "errata",
+    "colophon",
+)
+
+
+def _is_trailing_junk_line(line: str) -> bool:
+    """Return True if a line looks like end-of-book boilerplate.
+
+    Two independent signals — either is sufficient:
+    1. Publisher/printer keyword anywhere in the line.
+    2. Short (≤80 chars), mostly uppercase, and does not end with sentence-terminal
+       punctuation. Real narrative prose always closes a paragraph with `.`, `!`, `?`,
+       or a closing quote; colophons and advert pages typically don't.
+    """
+    stripped = line.strip()
+    if not stripped:
+        return False
+
+    lowered = stripped.lower()
+    if any(word in lowered for word in _TRAILING_JUNK_WORDS):
+        return True
+
+    if len(stripped) <= 80 and not stripped.endswith((".", "!", "?", '"', "'")):
+        letters = [c for c in stripped if c.isalpha()]
+        if letters and sum(1 for c in letters if c.isupper()) / len(letters) >= 0.6:
+            return True
+
+    return False
+
 
 @dataclass
 class GutenbergMetadata:
@@ -136,27 +182,38 @@ class GutenbergParser:
 
             # Most common end marker
             if "END OF" in line_upper and "PROJECT GUTENBERG" in line_upper:
-                # Back up over blank lines
-                j = i - 1
-                while j > 0 and not lines[j].strip():
-                    j -= 1
-                return j + 1
+                return self._trim_trailing_junk(lines, i)
 
             # Other end markers
             if lines[i].startswith("End of the Project Gutenberg"):
-                return i
+                return self._trim_trailing_junk(lines, i)
 
             if lines[i].startswith("End of Project Gutenberg"):
-                return i
+                return self._trim_trailing_junk(lines, i)
 
             if "***** This file should be named" in lines[i]:
-                return i
+                return self._trim_trailing_junk(lines, i)
 
             # Simple "THE END" marker
             if lines[i].strip().upper() == "THE END":
                 return i + 1
 
         return None
+
+    def _trim_trailing_junk(self, lines: list[str], marker_idx: int) -> int:
+        """Back up from an end marker past blank lines and trailing boilerplate.
+
+        Returns an exclusive end index suitable for slicing. Walks backwards from
+        ``marker_idx - 1`` while lines are blank or match `_is_trailing_junk_line`,
+        and stops on the first real-content line (typically the closing sentence of
+        the last narrative paragraph). Bounded to 30 lines of look-back so a
+        misfire can't eat the actual ending.
+        """
+        j = marker_idx - 1
+        min_idx = max(marker_idx - 30, 0)
+        while j > min_idx and (not lines[j].strip() or _is_trailing_junk_line(lines[j])):
+            j -= 1
+        return j + 1
 
     def _find_actual_start(self, lines: list[str]) -> int:
         """
@@ -219,7 +276,7 @@ class GutenbergParser:
 
             for phrase in end_phrases:
                 if phrase in line_lower:
-                    return i
+                    return self._trim_trailing_junk(lines, i)
 
         return len(lines)
 
