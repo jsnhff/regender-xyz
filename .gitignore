@@ -112,6 +112,7 @@ python-arm64/
 /scripts/make_idml.py
 /scripts/make_rtf.py
 /scripts/chapter_formatter.py
+/scripts/layout_book.py
 
 # Personal review notes
 /Model feedback from *.rtf
