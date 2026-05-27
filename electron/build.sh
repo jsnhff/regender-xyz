@@ -99,7 +99,8 @@ else
   : "${APPLE_ID:?set APPLE_ID}"
   : "${APPLE_APP_SPECIFIC_PASSWORD:?set APPLE_APP_SPECIFIC_PASSWORD (app-specific password from appleid.apple.com)}"
   : "${APPLE_TEAM_ID:?set APPLE_TEAM_ID}"
-  npx electron-builder --mac --arm64
+  npx electron-builder --mac --arm64 \
+    -c.mac.notarize.teamId="${APPLE_TEAM_ID}"
 fi
 
 echo ""
