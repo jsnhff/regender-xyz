@@ -87,8 +87,8 @@ python tests/test_end_to_end.py
 1. **src/services/** - Core business services
    - `ParserService` - Parses books from various text formats
    - `CharacterService` - Analyzes characters and genders
-   - `TransformService` - Applies gender transformations
-   - `QualityService` - Validates and improves quality
+   - `TransformService` - Applies gender transformations (includes deterministic QC post-processing)
+   - `TextExportService` - Exports transformed books to plain text
 
 2. **src/models/** - Domain models
    - `Book`, `Chapter`, `Paragraph` - Book structure
@@ -96,16 +96,16 @@ python tests/test_end_to_end.py
    - `Transformation` - Transformation results
 
 3. **src/strategies/** - Pluggable algorithms
-   - `ParsingStrategy` - Different parsing approaches
-   - `AnalysisStrategy` - Character analysis methods
-   - `TransformStrategy` - Transformation algorithms
-   - `QualityStrategy` - Quality control approaches
+   - `parsing.py` / `integrated_parsing.py` - Parsing approaches
+   - `analysis.py` - Character analysis chunking strategies
+   - `transform.py` - Transformation algorithms
 
 4. **src/providers/** - LLM Provider plugins
-   - `legacy_client.py` - Unified LLM interface
-   - `openai_provider.py` - OpenAI integration
-   - `anthropic_provider.py` - Anthropic integration
-   - `unified_provider.py` - Provider wrapper
+   - `base_provider.py` / `base.py` - Provider plugin interface
+   - `openai.py` - OpenAI integration
+   - `anthropic.py` - Anthropic integration
+   - `ollama.py` - Local models via Ollama (OpenAI-compatible endpoint, no API key)
+   - `rate_limiter.py` - Provider rate limiting
 
 ### Data Flow
 
@@ -134,7 +134,7 @@ The `src/config.json` file defines:
 
 ## Development Notes
 
-- Main branch is `master`
+- Main branch is `main`
 - Service-oriented architecture with dependency injection
 - Environment variables loaded through provider configuration
 - Test suite uses unittest-style patterns

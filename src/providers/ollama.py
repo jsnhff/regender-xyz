@@ -35,11 +35,13 @@ class OllamaProvider(BaseProviderPlugin):
 
     @property
     def supports_json(self) -> bool:
-        return False
+        # Ollama supports JSON mode (format: json) since v0.1.9, exposed through
+        # the OpenAI-compatible endpoint as response_format {"type": "json_object"}.
+        return True
 
     @property
     def max_tokens(self) -> int:
-        return 8192
+        return self.get_model_info().get("context_window", 8192)
 
     @property
     def rate_limit(self) -> Optional[int]:
@@ -75,15 +77,20 @@ class OllamaProvider(BaseProviderPlugin):
             }
             if "max_tokens" in kwargs:
                 request_params["max_tokens"] = kwargs["max_tokens"]
+            if kwargs.get("response_format") == "json_object":
+                request_params["response_format"] = {"type": "json_object"}
 
+            timeout = float(os.getenv("OLLAMA_TIMEOUT", "600"))
             response = await asyncio.wait_for(
                 self.client.chat.completions.create(**request_params),
-                timeout=120.0,  # Local models can be slower
+                timeout=timeout,  # Local models can be slower; long batches need headroom
             )
             return response.choices[0].message.content
 
         except asyncio.TimeoutError as e:
-            raise TimeoutError("Ollama request timed out. The model may be loading or your hardware is slow.") from e
+            raise TimeoutError(
+                "Ollama request timed out. The model may be loading or your hardware is slow."
+            ) from e
         except Exception as e:
             if "connection" in str(e).lower() or "refused" in str(e).lower():
                 raise ConnectionError(
@@ -94,7 +101,47 @@ class OllamaProvider(BaseProviderPlugin):
             raise
 
     def get_model_info(self) -> dict[str, Any]:
-        return {"context_window": 8192, "max_output": 4096, "supports_vision": False, "supports_json": False}
+        context_window = self._get_context_window()
+        return {
+            "context_window": context_window,
+            "max_output": min(context_window // 2, 8192),
+            "supports_vision": False,
+            "supports_json": True,
+        }
+
+    def _get_context_window(self) -> int:
+        """Read the model's real context length from Ollama's /api/show.
+
+        The effective window is the smaller of the model's trained context and the
+        server's num_ctx (OLLAMA_CONTEXT_LENGTH, VRAM-based default). Falls back to
+        8192 if the server is unreachable.
+        """
+        if getattr(self, "_context_window", None):
+            return self._context_window
+
+        import json as _json
+        import urllib.request
+
+        base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1").removesuffix("/v1")
+        try:
+            req = urllib.request.Request(
+                f"{base}/api/show",
+                data=_json.dumps({"model": self.model}).encode(),
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                info = _json.load(resp).get("model_info", {})
+            model_ctx = next((v for k, v in info.items() if k.endswith(".context_length")), 8192)
+        except Exception as e:
+            self.logger.debug(f"Could not read context length from Ollama: {e}")
+            model_ctx = 8192
+
+        server_ctx = os.getenv("OLLAMA_CONTEXT_LENGTH")
+        if server_ctx and server_ctx.isdigit():
+            model_ctx = min(model_ctx, int(server_ctx))
+
+        self._context_window = model_ctx
+        return model_ctx
 
     async def get_rate_limits(self) -> dict:
         return {"note": "Local model — no rate limits"}
