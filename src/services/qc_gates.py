@@ -148,6 +148,19 @@ _THEY_ALLOWLIST = {
     "assess",
     "wits",
     "less",
+    "sometimes",
+    "afterwards",
+    "towards",
+    "upwards",
+    "downwards",
+    "backwards",
+    "forwards",
+    "doubtless",
+    "regardless",
+    "nevertheless",
+    "nowadays",
+    "whereas",
+    "others",
 }
 
 _INVENTED_RANK = re.compile(
