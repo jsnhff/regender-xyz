@@ -37,7 +37,7 @@ def pp_cast():
                 name="Fitzwilliam Darcy",
                 gender=Gender.MALE,
                 pronouns={},
-                aliases=["Mr. Darcy"],
+                aliases=["Mr. Darcy", "Darcy"],
                 titles=["Mr."],
             ),
             Character(
@@ -375,6 +375,26 @@ class TestQCGates:
             transformed_chapters=49,
         )
         assert result["passed"] is False
+
+    def test_doubled_target_names_fail(self):
+        # Alias-expansion regression: "Darcy" → "Felicity Darcy" turned every
+        # "Felicity Darcy" into "Felicity Felicity Darcy".
+        result = run_qc_gates(
+            original_text="Fitzwilliam Darcy bowed.",
+            transformed_text="Felicity Felicity Darcy bowed.",
+            transform_type="all_female",
+            characters=None,
+            name_map={"Fitzwilliam Darcy": "Felicity Darcy"},
+        )
+        verdicts = {g["name"]: g["verdict"] for g in result["gates"]}
+        assert verdicts["name_consistency"] == "FAIL"
+
+    def test_alias_expansion_skips_surnames_and_uses_given(self, ts, pp_cast):
+        nm = {"Elizabeth Bennet": "Ellis Bennet", "Elizabeth": "Ellis"}
+        expanded = ts._expand_name_map_with_aliases(nm, pp_cast)
+        assert "Darcy" not in expanded  # surname alias never mapped
+        assert expanded.get("Lizzy") == "Ellis"  # nickname → given name only
+        assert "Miss Bennet" not in expanded  # title-led alias untouched
 
     def test_they_allowlist_no_false_positives(self):
         text = "they express regret; they always pass; they miss the Bennets; they address the room"

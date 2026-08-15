@@ -1460,7 +1460,17 @@ class TransformService(BaseService):
         e.g. name_map has 'Elizabeth'; character 'Elizabeth Bennet' has aliases ['Lizzy','Eliza']
         → 'Lizzy' and 'Eliza' are added pointing to the same target.
         """
-        from src.services.name_engine import _is_title_led
+        from src.services.name_engine import _is_title_led, _strip_titles
+
+        # Surname tokens across the whole cast: aliases matching one of these
+        # ("Darcy" for Fitzwilliam Darcy) are family-name references and must
+        # never get a rename entry — mapping "Darcy" → "Felicity Darcy" turns
+        # every "Felicity Darcy" into "Felicity Felicity Darcy".
+        surname_tokens: set[str] = set()
+        for char in characters.characters:
+            tokens = _strip_titles(char.name)
+            for tok in tokens[1:]:
+                surname_tokens.add(tok.lower())
 
         expanded = dict(name_map)
         for char in characters.characters:
@@ -1471,8 +1481,17 @@ class TransformService(BaseService):
                     # Title-led aliases ("Miss Bennet") are title+surname
                     # references: the term map transforms the title and the
                     # surname must survive, so they never get a rename entry.
-                    if name not in expanded and not _is_title_led(name):
-                        expanded[name] = matched_target
+                    # Multi-token aliases are too ambiguous to map wholesale.
+                    if (
+                        name in expanded
+                        or _is_title_led(name)
+                        or " " in name
+                        or name.lower() in surname_tokens
+                    ):
+                        continue
+                    # A single-token nickname maps to the target's given name,
+                    # never the full "Given Surname" target.
+                    expanded[name] = matched_target.split()[0]
         return expanded
 
     def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:

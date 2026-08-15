@@ -250,6 +250,14 @@ def name_consistency_gate(
         if n:
             examples = _find_all(rf"\b{re.escape(orig)}\b", scrubbed, limit=2)
             details.append(f"'{orig}' still appears {n}× after rename — {'; '.join(examples)}")
+    # A rename applied on top of an already-renamed span reads as a doubled
+    # name ("Felicity Felicity Darcy") — catch it for every target given name.
+    for target in {v.split()[0] for v in name_map.values()}:
+        pat = rf"\b{re.escape(target)}\s+{re.escape(target)}\b"
+        n = _count(pat, transformed)
+        if n:
+            examples = _find_all(pat, transformed, limit=2)
+            details.append(f"doubled name '{target} {target}' {n}× — {'; '.join(examples)}")
     # Phrase-only entries (ambiguous names like Fitzwilliam): report, don't fail.
     for key in name_map:
         if " " in key:
