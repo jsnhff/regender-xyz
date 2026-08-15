@@ -155,6 +155,8 @@ _INVENTED_RANK = re.compile(
     r"(?:le|la|e|ess|essa|ette|ina)\b"
 )
 
+_GATE_ARTICLE_WORDS = {"The", "A", "An"}
+
 _GATE_TITLES = (
     "Sir",
     "Lady",
@@ -306,10 +308,22 @@ def immutability_gate(
     givens: set[str] = set()
     for char in characters.characters:
         tokens = _strip_titles(char.name)
+        # Names like "The Miss Webbs" survive title-stripping with a leading
+        # article and an embedded title; the immutable surname is only the
+        # family-name tail ("Webbs") — a vanished "Miss" is a correct
+        # transform, not a mutated surname.
+        had_prefix = False
+        while tokens and (
+            tokens[0].rstrip(".") in _GATE_ARTICLE_WORDS or not tokens[0][0].isupper()
+        ):
+            tokens.pop(0)
+            had_prefix = True
+        if had_prefix:
+            tokens = _strip_titles(" ".join(tokens))
         if len(tokens) > 1:
             givens.add(tokens[0])
             surnames.add(" ".join(tokens[1:]))
-        elif len(tokens) == 1 and tokens[0] != char.name.strip():
+        elif len(tokens) == 1 and (had_prefix or tokens[0] != char.name.strip()):
             surnames.add(tokens[0])
         elif len(tokens) == 1:
             givens.add(tokens[0])

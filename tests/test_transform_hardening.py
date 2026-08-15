@@ -396,6 +396,23 @@ class TestQCGates:
         assert expanded.get("Lizzy") == "Ellis"  # nickname → given name only
         assert "Miss Bennet" not in expanded  # title-led alias untouched
 
+    def test_article_title_names_dont_fake_surname_mutation(self):
+        # "The Miss Webbs" → surname is "Webbs"; the vanished "Miss" is a
+        # correct all_male transform, not a mutated surname.
+        cast = CharacterAnalysis(
+            book_id="x",
+            characters=[Character(name="The Miss Webbs", gender=Gender.FEMALE, pronouns={})],
+        )
+        result = run_qc_gates(
+            original_text="They dined with the Miss Webbs.",
+            transformed_text="They dined with the Mr. Webbs.",
+            transform_type="all_male",
+            characters=cast,
+            name_map={},
+        )
+        verdicts = {g["name"]: g["verdict"] for g in result["gates"]}
+        assert verdicts["surname_place_immutability"] == "PASS"
+
     def test_they_allowlist_no_false_positives(self):
         text = "they express regret; they always pass; they miss the Bennets; they address the room"
         result = run_qc_gates(
