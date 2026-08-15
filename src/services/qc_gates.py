@@ -28,6 +28,7 @@ from .name_engine import RANK_TITLES, _strip_titles
 _RESIDUAL_PATTERNS: dict[str, list[str]] = {
     "all_male": [
         r"\bshe\b",
+        r"\bher\b",
         r"\bherself\b",
         r"\bhers\b",
         r"\bMrs\.?(?=\s)",
@@ -51,6 +52,7 @@ _RESIDUAL_PATTERNS: dict[str, list[str]] = {
     ],
     "all_female": [
         r"\bhe\b",
+        r"\bhis\b",
         r"\bhimself\b",
         r"\bMr\.(?=\s)",
         r"\bsir\b",
@@ -73,6 +75,7 @@ _RESIDUAL_PATTERNS: dict[str, list[str]] = {
         r"\bhe\b",
         r"\bshe\b",
         r"\bhim\b",
+        r"\bher\b",
         r"\bhis\b",
         r"\bhers\b",
         r"\bhimself\b",
@@ -176,10 +179,17 @@ class GateResult:
         return {"name": self.name, "verdict": self.verdict, "details": self.details}
 
 
+def _pattern_flags(pattern: str) -> int:
+    """Lowercase-only patterns match case-insensitively ("His" is residue as
+    much as "his"); patterns with deliberate capitals (Miss, Sir, Mr.) stay
+    case-sensitive."""
+    return 0 if any(c.isupper() for c in pattern) else re.IGNORECASE
+
+
 def _find_all(pattern: str, text: str, limit: int = 8) -> list[str]:
     """Occurrences of pattern with a little context, capped for readability."""
     out = []
-    for m in re.finditer(pattern, text):
+    for m in re.finditer(pattern, text, _pattern_flags(pattern)):
         start = max(0, m.start() - 25)
         out.append(f"…{text[start : m.end() + 25]}…".replace("\n", " "))
         if len(out) >= limit:
@@ -188,7 +198,7 @@ def _find_all(pattern: str, text: str, limit: int = 8) -> list[str]:
 
 
 def _count(pattern: str, text: str) -> int:
-    return sum(1 for _ in re.finditer(pattern, text))
+    return sum(1 for _ in re.finditer(pattern, text, _pattern_flags(pattern)))
 
 
 # ------------------------------------------------------------------- gates
@@ -215,7 +225,7 @@ def verb_agreement_gate(transformed: str, variant: str) -> GateResult:
     if variant != "nonbinary":
         return GateResult("verb_agreement", "INFO", ["nonbinary-only gate"])
     details = []
-    for m in re.finditer(r"\bthey ([a-z]+(?:s|es))\b", transformed):
+    for m in re.finditer(r"\b[Tt]hey ([a-z]+(?:s|es))\b", transformed):
         word = m.group(1)
         if word not in _THEY_ALLOWLIST:
             start = max(0, m.start() - 25)
@@ -343,6 +353,18 @@ def title_atomicity_gate(transformed: str, name_map: dict[str, str]) -> GateResu
     return GateResult("title_name_atomicity", "FAIL" if details else "PASS", details)
 
 
+def text_integrity_gate(original: str, transformed: str) -> GateResult:
+    """Transformed text must not silently lose content (empty-paragraph class)."""
+    ow, tw = len(original.split()), len(transformed.split())
+    if ow and tw / ow < 0.9:
+        return GateResult(
+            "text_integrity",
+            "FAIL",
+            [f"transformed text has {tw} words vs {ow} in source ({tw / ow:.0%}) — content lost"],
+        )
+    return GateResult("text_integrity", "PASS", [f"{tw} words vs {ow} in source"])
+
+
 def chapter_count_gate(original_count: int, transformed_count: int) -> GateResult:
     if original_count != transformed_count:
         return GateResult(
@@ -377,6 +399,7 @@ def run_qc_gates(
         name_consistency_gate(transformed_text, name_map or {}, engine_flags),
         immutability_gate(original_text, transformed_text, characters),
         title_atomicity_gate(transformed_text, name_map or {}),
+        text_integrity_gate(original_text, transformed_text),
     ]
     if original_chapters is not None and transformed_chapters is not None:
         gates.append(chapter_count_gate(original_chapters, transformed_chapters))

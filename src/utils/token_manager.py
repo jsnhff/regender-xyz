@@ -384,6 +384,11 @@ class TokenManager:
             self.config = custom_config
         elif model_name in self.MODEL_CONFIGS:
             self.config = self.MODEL_CONFIGS[model_name]
+        elif "claude" in model_name.lower():
+            # Any unlisted Claude model gets a Claude-family config: the gpt-4
+            # fallback's 8k context forced absurdly small transform batches.
+            logger.info(f"Unlisted Claude model {model_name}, using claude-3-sonnet config")
+            self.config = self.MODEL_CONFIGS["claude-3-sonnet"]
         else:
             logger.warning(f"Unknown model {model_name}, using gpt-4 config")
             self.config = self.MODEL_CONFIGS["gpt-4"]

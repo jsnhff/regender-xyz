@@ -41,6 +41,7 @@ class TextExportService(BaseService):
 
         try:
             import unidecode
+
             self.unidecode = unidecode
             self.logger.info("Using unidecode for text normalization")
         except ImportError:
@@ -48,15 +49,18 @@ class TextExportService(BaseService):
 
         try:
             import ftfy
+
             self.ftfy = ftfy
             self.logger.info("Using ftfy for text fixing")
         except ImportError:
             self.logger.debug("ftfy not available")
 
         # Configuration options
-        extra = config.extra_config if hasattr(config, 'extra_config') else {}
+        extra = config.extra_config if hasattr(config, "extra_config") else {}
         self.use_unicode = extra.get("preserve_unicode", False)
-        self.normalize_method = extra.get("normalize_method", "unidecode")  # unidecode, ftfy, or basic
+        self.normalize_method = extra.get(
+            "normalize_method", "unidecode"
+        )  # unidecode, ftfy, or basic
 
         self.logger.info(f"Initialized {self.__class__.__name__}")
 
@@ -112,28 +116,28 @@ class TextExportService(BaseService):
         """
         # Smart replacements that preserve meaning
         replacements = {
-            '\u2019': "'",  # Right single quotation mark → apostrophe
-            '\u2018': "'",  # Left single quotation mark → apostrophe
-            '\u201C': '"',  # Left double quotation mark → regular quote
-            '\u201D': '"',  # Right double quotation mark → regular quote
-            '\u2014': "--",  # Em dash → double hyphen
-            '\u2013': "-",   # En dash → hyphen
-            '\u2026': "...", # Ellipsis → three dots
-            '\u00A0': " ",   # Non-breaking space → regular space
-            '\u2009': " ",   # Thin space → regular space
-            '\u2002': " ",   # En space → regular space
-            '\u2003': " ",   # Em space → regular space
-            '\u200B': "",    # Zero-width space → remove
-            '\u00AD': "",    # Soft hyphen → remove
-            '\uFEFF': "",    # Zero-width no-break space → remove
-            '\u00B4': "'",   # Acute accent → apostrophe
-            '\u0060': "'",   # Grave accent → apostrophe
-            '\u00A9': "(c)", # Copyright symbol
-            '\u00AE': "(R)", # Registered trademark
-            '\u2122': "(TM)", # Trademark symbol
-            '\u00BC': "1/4", # One quarter
-            '\u00BD': "1/2", # One half
-            '\u00BE': "3/4", # Three quarters
+            "\u2019": "'",  # Right single quotation mark → apostrophe
+            "\u2018": "'",  # Left single quotation mark → apostrophe
+            "\u201c": '"',  # Left double quotation mark → regular quote
+            "\u201d": '"',  # Right double quotation mark → regular quote
+            "\u2014": "--",  # Em dash → double hyphen
+            "\u2013": "-",  # En dash → hyphen
+            "\u2026": "...",  # Ellipsis → three dots
+            "\u00a0": " ",  # Non-breaking space → regular space
+            "\u2009": " ",  # Thin space → regular space
+            "\u2002": " ",  # En space → regular space
+            "\u2003": " ",  # Em space → regular space
+            "\u200b": "",  # Zero-width space → remove
+            "\u00ad": "",  # Soft hyphen → remove
+            "\ufeff": "",  # Zero-width no-break space → remove
+            "\u00b4": "'",  # Acute accent → apostrophe
+            "\u0060": "'",  # Grave accent → apostrophe
+            "\u00a9": "(c)",  # Copyright symbol
+            "\u00ae": "(R)",  # Registered trademark
+            "\u2122": "(TM)",  # Trademark symbol
+            "\u00bc": "1/4",  # One quarter
+            "\u00bd": "1/2",  # One half
+            "\u00be": "3/4",  # Three quarters
         }
 
         for old, new in replacements.items():
@@ -158,7 +162,7 @@ class TextExportService(BaseService):
 
         # Normalize using Python's built-in unicodedata
         # NFKD = compatibility decomposition
-        text = unicodedata.normalize('NFKD', text)
+        text = unicodedata.normalize("NFKD", text)
 
         # Keep only ASCII characters
         ascii_text = []
@@ -168,15 +172,15 @@ class TextExportService(BaseService):
             else:
                 # Try to get a name-based replacement
                 try:
-                    name = unicodedata.name(char, '')
-                    if 'LATIN' in name and 'LETTER' in name:
+                    name = unicodedata.name(char, "")
+                    if "LATIN" in name and "LETTER" in name:
                         # Skip combining marks
-                        if 'COMBINING' not in name:
-                            ascii_text.append('?')
+                        if "COMBINING" not in name:
+                            ascii_text.append("?")
                 except:
                     pass
 
-        return ''.join(ascii_text)
+        return "".join(ascii_text)
 
     async def process(self, book: Book) -> str:
         """
@@ -194,12 +198,12 @@ class TextExportService(BaseService):
         if book.title:
             title = self.simplify_text(book.title)
             lines.append(title)
-            lines.append('=' * len(title))
-            lines.append('')
+            lines.append("=" * len(title))
+            lines.append("")
 
         if book.author:
             lines.append(f"Author: {self.simplify_text(book.author)}")
-            lines.append('')
+            lines.append("")
 
         # Process chapters
         for chapter_num, chapter in enumerate(book.chapters, 1):
@@ -209,10 +213,10 @@ class TextExportService(BaseService):
             else:
                 chapter_title = f"Chapter {chapter_num}"
 
-            lines.append('')
+            lines.append("")
             lines.append(chapter_title)
-            lines.append('-' * len(chapter_title))
-            lines.append('')
+            lines.append("-" * len(chapter_title))
+            lines.append("")
 
             # Add paragraphs
             for paragraph in chapter.paragraphs:
@@ -221,9 +225,9 @@ class TextExportService(BaseService):
 
                 if cleaned_text.strip():
                     lines.append(cleaned_text)
-                    lines.append('')  # Empty line between paragraphs
+                    lines.append("")  # Empty line between paragraphs
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     def export_to_file(self, book: Book, output_path: str) -> str:
         """
@@ -246,7 +250,7 @@ class TextExportService(BaseService):
         output_path_obj = Path(output_path)
         output_path_obj.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path_obj, 'w', encoding='utf-8') as f:
+        with open(output_path_obj, "w", encoding="utf-8") as f:
             f.write(text_content)
 
         self.logger.info(f"Exported text to: {output_path_obj}")
@@ -273,7 +277,7 @@ class TextExportService(BaseService):
 
         # Load JSON
         json_path_obj = Path(json_path)
-        with open(json_path_obj, encoding='utf-8') as f:
+        with open(json_path_obj, encoding="utf-8") as f:
             data = json.load(f)
 
         # Create Book object from JSON
@@ -281,6 +285,6 @@ class TextExportService(BaseService):
 
         # Determine output path
         if output_path is None:
-            output_path = str(json_path_obj.with_suffix('.txt'))
+            output_path = str(json_path_obj.with_suffix(".txt"))
 
         return self.export_to_file(book, output_path)

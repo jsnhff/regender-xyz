@@ -6,6 +6,7 @@ Implements Anthropic API support for Claude models.
 
 import asyncio
 import json
+import os
 from typing import Any
 
 from src.providers.base_provider import BaseProviderPlugin
@@ -57,13 +58,9 @@ class AnthropicProvider(BaseProviderPlugin):
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.logger.debug("Anthropic async client initialized")
         except ImportError as e:
-            raise ImportError(
-                "anthropic package not installed. Run: pip install anthropic"
-            ) from e
+            raise ImportError("anthropic package not installed. Run: pip install anthropic") from e
 
-    async def _complete_impl(
-        self, messages: list[dict[str, str]], **kwargs
-    ) -> str:
+    async def _complete_impl(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Anthropic-specific completion implementation.
 
@@ -84,16 +81,13 @@ class AnthropicProvider(BaseProviderPlugin):
                 if msg["role"] == "system":
                     system_message = msg["content"]
                 else:
-                    claude_messages.append({
-                        "role": msg["role"],
-                        "content": msg["content"]
-                    })
+                    claude_messages.append({"role": msg["role"], "content": msg["content"]})
 
             # Prepare request parameters
             request_params = {
                 "model": kwargs.get("model", self.model),
                 "messages": claude_messages,
-                "max_tokens": kwargs.get("max_tokens", 4096),
+                "max_tokens": kwargs.get("max_tokens", 8192),
                 "temperature": kwargs.get("temperature", 0.7),
             }
 
@@ -109,10 +103,14 @@ class AnthropicProvider(BaseProviderPlugin):
             if system_message:
                 request_params["system"] = system_message
 
-            # Make the API call with await and timeout (60 seconds)
+            # Make the API call with a configurable timeout. 60s was too short
+            # for long-paragraph transforms (Darcy's Ch 35 letter class): the
+            # call timed out, retries timed out the same way, and the text
+            # shipped untransformed.
+            timeout_s = float(os.getenv("API_TIMEOUT", "240"))
             response = await asyncio.wait_for(
                 self.client.messages.create(**request_params),
-                timeout=60.0
+                timeout=timeout_s,
             )
 
             # Extract the response text
@@ -128,7 +126,7 @@ class AnthropicProvider(BaseProviderPlugin):
             return content
 
         except asyncio.TimeoutError:
-            self.logger.error("Anthropic API call timed out after 60 seconds")
+            self.logger.error(f"Anthropic API call timed out after {timeout_s:.0f} seconds")
             raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.")
         except Exception as e:
             error_message = str(e)
@@ -223,5 +221,5 @@ class AnthropicProvider(BaseProviderPlugin):
             "requests_limit": self.rate_limit,
             "tokens_remaining": "N/A",
             "reset_time": "Per minute",
-            "note": "Anthropic uses per-minute rate limits"
+            "note": "Anthropic uses per-minute rate limits",
         }

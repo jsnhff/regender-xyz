@@ -858,6 +858,15 @@ class TransformService(BaseService):
                         self.logger.debug(f"Original text: {repr(original_text[:100])}")
                         self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
 
+                    # A response mismatch pads with "" — never let that erase a
+                    # paragraph. Keep the original; the final deterministic
+                    # pass still applies and QC flags any residue.
+                    if not transformed_text.strip() and original_text.strip():
+                        self.logger.warning(
+                            f"Empty transform for paragraph {para_idx + 1}; keeping original text"
+                        )
+                        transformed_text = original_text
+
                     # Apply name substitutions after LLM transform
                     if name_map:
                         transformed_text = self._apply_name_map(transformed_text, name_map)
@@ -904,12 +913,19 @@ class TransformService(BaseService):
         if progress_bar:
             progress_bar.close()
 
-        # Final term_map pass over all paragraphs — catches any that couldn't be LLM-transformed
-        # (e.g. batches that failed retry). Idempotent on already-transformed paragraphs.
+        # Final deterministic pass over all paragraphs — catches any that
+        # couldn't be LLM-transformed (e.g. batches whose retries all failed
+        # and kept original text). The name map MUST run here too: a kept
+        # original otherwise ships with original names ("George Wickham"
+        # surviving in an all_female book). Both passes are idempotent on
+        # already-transformed paragraphs.
         for i, para in enumerate(transformed_paragraphs):
             current_text = para.get_text()
+            fixed_text = current_text
+            if name_map:
+                fixed_text = self._apply_name_map(fixed_text, name_map)
             fixed_text = self._apply_term_map(
-                current_text, transform_type, context.get("protected_patterns")
+                fixed_text, transform_type, context.get("protected_patterns")
             )
             if fixed_text != current_text:
                 transformed_paragraphs[i] = Paragraph(sentences=[fixed_text])
@@ -993,6 +1009,7 @@ class TransformService(BaseService):
             "niece": "nephew",
             "grandmother": "grandfather",
             "granddaughter": "grandson",
+            "goddaughter": "godson",
             "widow": "widower",
             "maiden": "bachelor",
             "spinster": "bachelor",
@@ -1069,6 +1086,7 @@ class TransformService(BaseService):
             "nephew": "niece",
             "grandfather": "grandmother",
             "grandson": "granddaughter",
+            "godson": "goddaughter",
             "widower": "widow",
             "bachelor": "maiden",
             "man": "woman",
@@ -1166,6 +1184,8 @@ class TransformService(BaseService):
             "grandfather": "grandparent",
             "granddaughter": "grandchild",
             "grandson": "grandchild",
+            "goddaughter": "godchild",
+            "godson": "godchild",
             "wife": "spouse",
             "husband": "spouse",
             "widow": "bereaved",
@@ -1553,6 +1573,11 @@ class TransformService(BaseService):
             - response_overhead
             - char_context_tokens
         )
+        # A transform batch's OUTPUT is roughly the size of its input, and the
+        # provider caps output tokens (Anthropic default 8192). Batches sized
+        # only by context window get their responses truncated — the
+        # "expected N paragraphs, got M" failure. Keep headroom under the cap.
+        available_tokens = min(available_tokens, 5000)
 
         self.logger.debug(
             f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})"
