@@ -985,6 +985,8 @@ class TransformService(BaseService):
         "all_male": {
             # Familial / relational (also serves as fallback for timed-out batches)
             "mother": "father",
+            "mamma": "papa",
+            "mama": "papa",
             "daughter": "son",
             "sister": "brother",
             "aunt": "uncle",
@@ -1060,6 +1062,7 @@ class TransformService(BaseService):
         "all_female": {
             # Familial / relational
             "father": "mother",
+            "papa": "mamma",
             "son": "daughter",
             "brother": "sister",
             "uncle": "aunt",
@@ -1148,6 +1151,9 @@ class TransformService(BaseService):
             # Familial / relational
             "mother": "parent",
             "father": "parent",
+            "mamma": "parent",
+            "mama": "parent",
+            "papa": "parent",
             "daughter": "child",
             "son": "child",
             "sister": "sibling",
@@ -1454,13 +1460,18 @@ class TransformService(BaseService):
         e.g. name_map has 'Elizabeth'; character 'Elizabeth Bennet' has aliases ['Lizzy','Eliza']
         → 'Lizzy' and 'Eliza' are added pointing to the same target.
         """
+        from src.services.name_engine import _is_title_led
+
         expanded = dict(name_map)
         for char in characters.characters:
             all_names = [char.name] + list(char.aliases)
             matched_target = next((name_map[n] for n in all_names if n in name_map), None)
             if matched_target:
                 for name in all_names:
-                    if name not in expanded:
+                    # Title-led aliases ("Miss Bennet") are title+surname
+                    # references: the term map transforms the title and the
+                    # surname must survive, so they never get a rename entry.
+                    if name not in expanded and not _is_title_led(name):
                         expanded[name] = matched_target
         return expanded
 

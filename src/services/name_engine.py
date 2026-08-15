@@ -90,6 +90,26 @@ def _strip_titles(name: str) -> list[str]:
     return tokens
 
 
+def _is_title_led(alias: str) -> bool:
+    """True for alias forms like "Miss Bennet" / "Mr. Darcy".
+
+    These are title+surname references, not nicknames: the term map transforms
+    the title and the surname must survive, so they never belong in a rename map.
+    """
+    tokens = alias.split()
+    return bool(tokens) and tokens[0].rstrip(".") in (GENDERED_TITLES | RANK_TITLES)
+
+
+def _is_descriptive_name(name: str) -> bool:
+    """True for extraction artifacts like "Young Lucas boy".
+
+    Any lowercase token after title-stripping means this is a description, not
+    a Given+Surname name; renaming its first token would corrupt ordinary
+    words ("Young …") throughout the book.
+    """
+    return any(not t[0].isupper() for t in _strip_titles(name))
+
+
 def _is_plausible_name(target: str) -> bool:
     return bool(re.fullmatch(r"[A-Z][a-zA-Z'\-]+", target))
 
@@ -172,7 +192,7 @@ class NameEngine:
         cast_lines = "\n".join(
             f"- {info['given']} ({info['char'].gender.value}"
             + (
-                f", nicknames: {', '.join(a for a in info['char'].aliases if len(_strip_titles(a)) == 1 and _strip_titles(a)[0] != info['given'])}"
+                f", nicknames: {', '.join(a for a in info['char'].aliases if not _is_title_led(a) and len(_strip_titles(a)) == 1 and _strip_titles(a)[0] != info['given'])}"
                 if info["char"].aliases
                 else ""
             )
@@ -255,6 +275,7 @@ class NameEngine:
             info
             for info in index.values()
             if info["given"]
+            and not _is_descriptive_name(info["char"].name)
             and self._needs_rename(info["char"], transform_type, selected)
             and info["given"].lower() not in base_lower
             and info["char"].name.lower() not in base_lower
@@ -317,7 +338,7 @@ class NameEngine:
                 if surname:
                     name_map[f"{given} {surname}"] = f"{target} {surname}"
             for alias, nick_target in nicknames.items():
-                if alias.lower() in surnames_lower:
+                if alias.lower() in surnames_lower or _is_title_led(alias):
                     continue
                 if _is_plausible_name(nick_target) and not _is_invented(alias, nick_target):
                     name_map[alias] = nick_target

@@ -295,18 +295,28 @@ def immutability_gate(
             surnames.add(tokens[0])
         elif len(tokens) == 1:
             givens.add(tokens[0])
+    infos = []
     for surname in sorted(surnames):
         pat = rf"\b{re.escape(surname)}\b"
         before, after = _count(pat, original), _count(pat, transformed)
-        if before != after:
+        if after < before:
+            # Fewer occurrences means the surname was rewritten somewhere
+            # (the Mary King → Mary Monarch class).
             details.append(f"surname '{surname}': {before}× in source, {after}× after transform")
+        elif after > before:
+            # More occurrences is expected: pronoun disambiguation inserts
+            # names for clarity. Annotate, don't fail.
+            infos.append(f"surname '{surname}': {before}× → {after}× (disambiguation insertions)")
     for given in sorted(givens):
         for span in _protected_place_spans(original, [given]):
             before = original.count(span)
             after = transformed.count(span)
             if before != after:
                 details.append(f"place '{span}': {before}× in source, {after}× after transform")
-    return GateResult("surname_place_immutability", "FAIL" if details else "PASS", details)
+    verdict = "FAIL" if details else "PASS"
+    return GateResult(
+        "surname_place_immutability", verdict, details + [f"[info] {i}" for i in infos]
+    )
 
 
 def title_atomicity_gate(transformed: str, name_map: dict[str, str]) -> GateResult:

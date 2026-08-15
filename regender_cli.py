@@ -78,10 +78,12 @@ async def process_book(args):
     # Check mode
     if args.transform_type == "parse_only":
         print(f"Parsing {input_path} to canonical JSON format...")
-        result = app.parse_book_sync(file_path=input_path, output_path=str(output_path))
+        # Await directly: the _sync wrappers spin a nested event loop, which
+        # raises inside async_main's running loop.
+        result = await app.parse_book(file_path=input_path, output_path=str(output_path))
     elif args.transform_type == "character_analysis":
         print(f"Analyzing characters in {input_path}...")
-        result = app.analyze_characters_sync(file_path=input_path, output_path=str(output_path))
+        result = await app.analyze_characters(file_path=input_path, output_path=str(output_path))
     else:
         # Process selected characters if specified
         selected_characters = None
