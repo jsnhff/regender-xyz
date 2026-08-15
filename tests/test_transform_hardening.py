@@ -226,6 +226,62 @@ class TestNameEngine:
         assert nm["William"] == "Georgiana"
         assert nm.get("Sir William") == "Lady Georgiana"
 
+    def test_descriptive_and_stoplist_names_never_renamed(self):
+        # "The Archbishop" / "Young Lucas": renaming "The" or "Young" would
+        # rewrite ordinary words across the whole book.
+        cast = CharacterAnalysis(
+            book_id="x",
+            characters=[
+                Character(name="The Archbishop", gender=Gender.MALE, pronouns={}),
+                Character(name="Young Lucas", gender=Gender.MALE, pronouns={}),
+                Character(name="Old Mr. Daniels", gender=Gender.MALE, pronouns={}),
+            ],
+        )
+        resp = json.dumps(
+            {
+                "renames": [
+                    {"original": "The", "target": "Theodora", "nicknames": {}},
+                    {"original": "Young", "target": "Yvonne", "nicknames": {}},
+                ]
+            }
+        )
+        engine = NameEngine(provider=_Provider([resp, resp]))
+        nm, _ = self._run(engine.build_name_map(cast, TransformType.ALL_FEMALE))
+        assert "The" not in nm and "Young" not in nm and "Old" not in nm
+
+    def test_surname_only_characters_skipped(self):
+        # Officers known only by surname (Pratt, Chamberlayne) must not be
+        # renamed; the model marks them is_surname and the engine skips.
+        cast = CharacterAnalysis(
+            book_id="x",
+            characters=[Character(name="Pratt", gender=Gender.MALE, pronouns={})],
+        )
+        resp = json.dumps({"renames": [{"original": "Pratt", "is_surname": True}]})
+        engine = NameEngine(provider=_Provider([resp]))
+        nm, report = self._run(engine.build_name_map(cast, TransformType.ALL_FEMALE))
+        assert "Pratt" not in nm
+        assert any("surname" in f for f in report["flags"])
+
+    def test_shared_given_name_one_decision(self):
+        # Three Williams share one target; no spurious duplicate-target drops.
+        cast = CharacterAnalysis(
+            book_id="x",
+            characters=[
+                Character(name="William Lucas", gender=Gender.MALE, pronouns={}),
+                Character(name="William Collins", gender=Gender.MALE, pronouns={}),
+                Character(name="William Goulding", gender=Gender.MALE, pronouns={}),
+            ],
+        )
+        resp = json.dumps(
+            {"renames": [{"original": "William", "target": "Willa", "nicknames": {}}]}
+        )
+        engine = NameEngine(provider=_Provider([resp]))
+        nm, report = self._run(engine.build_name_map(cast, TransformType.ALL_FEMALE))
+        assert nm["William"] == "Willa"
+        assert nm["William Collins"] == "Willa Collins"
+        assert nm["William Goulding"] == "Willa Goulding"
+        assert report["dropped"] == []
+
     def test_no_provider_is_safe(self, pp_cast):
         engine = NameEngine(provider=None)
         nm, report = self._run(engine.build_name_map(pp_cast, TransformType.NONBINARY))

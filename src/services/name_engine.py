@@ -66,10 +66,11 @@ Full cast names and surnames already in use (targets must NOT collide with any o
 
 Rules:
 - Real, period-appropriate given names only. NEVER invent names (no "Fitzwilliama", no feminized ranks).
-- One target per character; no two characters may share a target.
+- One target per name; different names must not share a target.
 - Targets must not equal any name or surname in the reserved list.
 - For each nickname, give a matching nickname of the target name (e.g. Elizabeth→Elijah with Lizzy→Eli). If no natural nickname exists, reuse the target.
 - Keep the first letter of the original name when a natural option exists.
+- If a listed name is actually a SURNAME (family name) of a minor character — not a given name — return {{"original": "...", "is_surname": true}} for it instead of a target. Surnames must never be renamed.
 
 Required JSON:
 {{"renames": [{{"original": "Elizabeth", "target": "Elijah", "nicknames": {{"Lizzy": "Eli", "Eliza": "Eli"}}}}]}}"""
@@ -100,14 +101,23 @@ def _is_title_led(alias: str) -> bool:
     return bool(tokens) and tokens[0].rstrip(".") in (GENDERED_TITLES | RANK_TITLES)
 
 
-def _is_descriptive_name(name: str) -> bool:
-    """True for extraction artifacts like "Young Lucas boy".
+# Capitalized English words that character extraction sometimes mistakes for
+# given names ("The Archbishop", "Young Lucas"). Renaming one of these would
+# rewrite ordinary words across the whole book.
+_GIVEN_STOPLIST = {"the", "a", "an", "young", "old", "elder", "little", "poor", "dear"}
 
-    Any lowercase token after title-stripping means this is a description, not
-    a Given+Surname name; renaming its first token would corrupt ordinary
-    words ("Young …") throughout the book.
+
+def _is_descriptive_name(name: str) -> bool:
+    """True for extraction artifacts like "Young Lucas boy" or "The Archbishop".
+
+    A lowercase token after title-stripping, or a first token that is a common
+    English word, means this is a description rather than a Given+Surname name;
+    renaming its first token would corrupt ordinary words throughout the book.
     """
-    return any(not t[0].isupper() for t in _strip_titles(name))
+    tokens = _strip_titles(name)
+    if any(not t[0].isupper() for t in tokens):
+        return True
+    return bool(tokens) and tokens[0].lower() in _GIVEN_STOPLIST
 
 
 def _is_plausible_name(target: str) -> bool:
@@ -219,14 +229,26 @@ class NameEngine:
 
     def _validate(
         self, proposals: dict[str, dict], to_rename: list[dict], reserved: set[str]
-    ) -> tuple[dict[str, dict], list[str]]:
-        """Filter proposals; return (accepted, problems)."""
+    ) -> tuple[dict[str, dict], list[str], list[str]]:
+        """Filter proposals; return (accepted, problems, surname_skips).
+
+        to_rename must already be unique by given name: characters sharing a
+        given name share one rename decision (token replacement cannot tell
+        them apart anyway).
+        """
         accepted: dict[str, dict] = {}
         problems: list[str] = []
+        surname_skips: list[str] = []
         taken: set[str] = set()
         for info in to_rename:
             given = info["given"]
             prop = proposals.get(given)
+            if prop and prop.get("is_surname"):
+                # The model identified this single-token "given" as a family
+                # name (e.g. officers known only as Pratt, Chamberlayne).
+                # Surnames are immutable — skip, don't retry.
+                surname_skips.append(f"'{given}' identified as a surname — not renamed")
+                continue
             if not prop or not prop.get("target"):
                 problems.append(f"{given}: no target proposed")
                 continue
@@ -247,7 +269,7 @@ class NameEngine:
                 continue
             taken.add(target.lower())
             accepted[given] = prop
-        return accepted, problems
+        return accepted, problems, surname_skips
 
     # ----------------------------------------------------------------- build
 
@@ -280,32 +302,45 @@ class NameEngine:
             and info["given"].lower() not in base_lower
             and info["char"].name.lower() not in base_lower
         ]
+        # Characters sharing a given name (three Williams in P&P) share one
+        # rename decision — token replacement cannot tell them apart, and a
+        # consistent shared target is exactly what we want.
+        unique_by_given: dict[str, dict] = {}
+        for info in to_rename:
+            unique_by_given.setdefault(info["given"], info)
+        proposal_list = list(unique_by_given.values())
 
         report: dict[str, Any] = {"proposed": 0, "accepted": 0, "dropped": [], "flags": []}
         accepted: dict[str, dict] = {}
 
-        if to_rename and self.provider:
+        if proposal_list and self.provider:
             # Targets may not collide with anything in the book OR the user map.
             reserved_for_targets = reserved | {v.lower() for v in base_map.values()}
             try:
-                proposals = await self._propose(to_rename, transform_type, reserved_for_targets)
+                proposals = await self._propose(proposal_list, transform_type, reserved_for_targets)
                 report["proposed"] = len(proposals)
-                accepted, problems = self._validate(proposals, to_rename, reserved_for_targets)
+                accepted, problems, surname_skips = self._validate(
+                    proposals, proposal_list, reserved_for_targets
+                )
                 if problems:
                     self._log("warning", f"Name proposals rejected: {problems}; retrying once")
                     retry = await self._propose(
-                        to_rename,
+                        proposal_list,
                         transform_type,
                         reserved_for_targets,
                         feedback="\n".join(problems),
                     )
                     merged = {**retry, **{k: v for k, v in proposals.items() if k in accepted}}
-                    accepted, problems = self._validate(merged, to_rename, reserved_for_targets)
+                    accepted, problems, more_skips = self._validate(
+                        merged, proposal_list, reserved_for_targets
+                    )
+                    surname_skips = sorted(set(surname_skips) | set(more_skips))
                     report["dropped"] = problems
+                report["flags"].extend(surname_skips)
             except Exception as e:  # LLM/JSON failure → no auto renames, still safe
                 self._log("warning", f"Name proposal failed ({e}); characters keep original names")
                 report["dropped"] = [f"proposal failed: {e}"]
-        elif to_rename:
+        elif proposal_list:
             report["dropped"] = ["no provider — characters keep original names"]
 
         # ---------------- emit map entries
