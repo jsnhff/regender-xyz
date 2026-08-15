@@ -16,7 +16,6 @@ def test_pipeline_works_with_mock(app_with_mock, simple_story_path, tmp_path):
         file_path=simple_story_path,
         transform_type="gender_swap",
         output_path=output_file,
-        quality_control=False  # Skip QC for simplicity
     )
 
     # Basic checks that pipeline completed
@@ -94,7 +93,6 @@ def test_pipeline_handles_bad_input(app_with_mock, tmp_path):
     result = app_with_mock.process_book_sync(
         file_path=str(bad_file),
         transform_type="gender_swap",
-        quality_control=False
     )
 
     # Should handle gracefully (might fail or succeed with empty output)

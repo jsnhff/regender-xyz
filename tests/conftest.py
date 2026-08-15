@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures for testing.
 """
+
 import json
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock
@@ -17,6 +18,10 @@ class MockLLMProvider:
         self.supports_json = True
         self.calls = []
 
+    async def complete(self, messages, **kwargs):
+        """Mock LLM completion matching the real providers' async interface."""
+        return await self.complete_async(messages, **kwargs)
+
     async def complete_async(self, messages, **kwargs):
         """Mock LLM completion that returns gender-swapped text."""
         # Track the call
@@ -28,12 +33,14 @@ class MockLLMProvider:
         # Simple mock transformations based on content
         if "analyze characters" in user_msg.lower():
             # Return mock character analysis
-            return json.dumps({
-                "characters": [
-                    {"name": "James Wilson", "gender": "male", "importance": 10},
-                    {"name": "Sarah Chen", "gender": "female", "importance": 8}
-                ]
-            })
+            return json.dumps(
+                {
+                    "characters": [
+                        {"name": "James Wilson", "gender": "male", "importance": 10},
+                        {"name": "Sarah Chen", "gender": "female", "importance": 8},
+                    ]
+                }
+            )
         elif "gender" in user_msg.lower() and "swap" in user_msg.lower():
             # Return gender-swapped version
             response = user_msg.replace("Mr.", "Ms.")
@@ -47,12 +54,6 @@ class MockLLMProvider:
         else:
             # Default response
             return "Mocked response"
-
-    def complete(self, messages, **kwargs):
-        """Synchronous version for compatibility."""
-        import asyncio
-        loop = asyncio.new_event_loop()
-        return loop.run_until_complete(self.complete_async(messages, **kwargs))
 
 
 @pytest.fixture

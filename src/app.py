@@ -311,7 +311,7 @@ class Application:
             if output_dir:
                 char_file = output_dir / "characters.json"
                 if not char_file.exists():
-                    with open(char_file, 'w') as f:
+                    with open(char_file, "w") as f:
                         json.dump(characters.to_dict(), f, indent=2, default=str)
                     self.logger.info(f"Saved character analysis to {char_file}")
 
@@ -322,14 +322,63 @@ class Application:
             if selected_characters:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
+            # Decide every character rename ONCE, before any chapter is
+            # transformed. User-supplied name_map entries win; the engine fills
+            # in the rest so no chunk ever improvises its own target name.
+            from src.services.name_engine import NameEngine
+
+            engine = NameEngine(provider=transformer.provider, logger=self.logger)
+            name_map, name_report = await engine.build_name_map(
+                characters,
+                TransformType(transform_type),
+                base_map=name_map,
+                selected_characters=selected_characters,
+            )
+            self.logger.info(
+                f"Name map: {name_report['entries']} entries "
+                f"({name_report['accepted']} characters renamed)"
+            )
+            if output_dir:
+                with open(output_dir / "name_map.json", "w") as f:
+                    json.dump({"name_map": name_map, "report": name_report}, f, indent=2)
+
             transformation = await transformer.transform_book(
-                book, TransformType(transform_type), characters, selected_characters,
+                book,
+                TransformType(transform_type),
+                characters,
+                selected_characters,
                 name_map=name_map,
                 on_chapter_complete=on_chapter_complete,
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
-            # Quality control removed - transformations are applied directly
+            # QC gates: content-level checks on the final text. Execution
+            # success is not correctness — these fail the run on residual
+            # gendered language, inconsistent renames, mutated surnames/places,
+            # and half-transformed title+name units.
+            from src.services.qc_gates import run_qc_gates
+
+            def _book_text(b) -> str:
+                return "\n\n".join(p.get_text() for ch in b.chapters for p in ch.paragraphs)
+
+            transformed_book = transformation.get_transformed_book()
+            qc = run_qc_gates(
+                original_text=_book_text(book),
+                transformed_text=_book_text(transformed_book),
+                transform_type=transform_type,
+                characters=characters,
+                name_map=name_map,
+                engine_flags=name_report.get("flags"),
+                original_chapters=len(book.chapters),
+                transformed_chapters=len(transformed_book.chapters),
+            )
+            for gate in qc["gates"]:
+                if gate["verdict"] == "FAIL":
+                    self.logger.error(f"QC gate FAILED: {gate['name']} — {gate['details'][:3]}")
+            self.logger.info(f"QC gates {'passed' if qc['passed'] else 'FAILED'}")
+            if output_dir:
+                with open(output_dir / "qc_report.json", "w") as f:
+                    json.dump(qc, f, indent=2)
 
             # Save output if requested
             if output_path:
@@ -352,6 +401,9 @@ class Application:
                 "characters": len(characters.characters),
                 "changes": len(transformation.changes),
                 "output_path": output_path,
+                "qc_passed": qc["passed"],
+                "qc_gates": qc["gates"],
+                "name_map_entries": name_report["entries"],
             }
 
         except Exception as e:
@@ -379,7 +431,7 @@ class Application:
             config = ServiceConfig(
                 extra_config={
                     "preserve_unicode": False,
-                    "normalize_method": "unidecode"  # Use unidecode for clean ASCII
+                    "normalize_method": "unidecode",  # Use unidecode for clean ASCII
                 }
             )
 

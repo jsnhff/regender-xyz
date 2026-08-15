@@ -116,8 +116,7 @@ class TransformService(BaseService):
             raise ValidationError("'book' is required", field="book")
         if not isinstance(book, Book):
             raise ValidationError(
-                f"'book' must be a Book object, got {type(book).__name__}",
-                field="book"
+                f"'book' must be a Book object, got {type(book).__name__}", field="book"
             )
 
         # Extract and validate transform type
@@ -132,12 +131,12 @@ class TransformService(BaseService):
                 raise ValidationError(
                     f"Invalid transform type: {transform_type}",
                     field="transform_type",
-                    details={"valid_types": [t.value for t in TransformType]}
+                    details={"valid_types": [t.value for t in TransformType]},
                 ) from e
         elif not isinstance(transform_type, TransformType):
             raise ValidationError(
                 f"'transform_type' must be a TransformType or string, got {type(transform_type).__name__}",
-                field="transform_type"
+                field="transform_type",
             )
 
         # Optional characters validation
@@ -145,7 +144,7 @@ class TransformService(BaseService):
         if characters and not isinstance(characters, CharacterAnalysis):
             raise ValidationError(
                 f"'characters' must be a CharacterAnalysis object if provided, got {type(characters).__name__}",
-                field="characters"
+                field="characters",
             )
 
         return await self.transform_book(book, transform_type, characters)
@@ -182,8 +181,7 @@ class TransformService(BaseService):
 
         if not isinstance(book, Book):
             raise ValidationError(
-                f"Expected Book instance, got {type(book).__name__}",
-                field="book"
+                f"Expected Book instance, got {type(book).__name__}", field="book"
             )
 
         # Validate book has content
@@ -191,7 +189,7 @@ class TransformService(BaseService):
             raise ValidationError(
                 "Book has no chapters to transform",
                 field="book.chapters",
-                details={"book_title": book.title or "Unknown"}
+                details={"book_title": book.title or "Unknown"},
             )
 
         # Validate provider
@@ -199,14 +197,13 @@ class TransformService(BaseService):
             raise ConfigurationError(
                 "LLM provider not initialized",
                 config_key="provider",
-                details={"service": "TransformService"}
+                details={"service": "TransformService"},
             )
 
         # Validate transform type
         if not isinstance(transform_type, TransformType):
             raise ValidationError(
-                f"Invalid transform type: {transform_type}",
-                field="transform_type"
+                f"Invalid transform type: {transform_type}", field="transform_type"
             )
 
         # Validate selected characters if provided
@@ -214,12 +211,11 @@ class TransformService(BaseService):
             if not isinstance(selected_characters, list):
                 raise ValidationError(
                     f"selected_characters must be a list, got {type(selected_characters).__name__}",
-                    field="selected_characters"
+                    field="selected_characters",
                 )
             if not all(isinstance(char, str) for char in selected_characters):
                 raise ValidationError(
-                    "All selected characters must be strings",
-                    field="selected_characters"
+                    "All selected characters must be strings", field="selected_characters"
                 )
 
         start_time = time.time()
@@ -230,7 +226,7 @@ class TransformService(BaseService):
                 if not self.character_service:
                     raise ConfigurationError(
                         "Character service required when characters not provided",
-                        config_key="character_service"
+                        config_key="character_service",
                     )
 
                 self.logger.info("Analyzing characters...")
@@ -244,8 +240,14 @@ class TransformService(BaseService):
             if name_map and characters:
                 expanded = self._expand_name_map_with_aliases(name_map, characters)
                 if len(expanded) > len(name_map):
-                    self.logger.info(f"Expanded name_map with {len(expanded) - len(name_map)} character aliases")
+                    self.logger.info(
+                        f"Expanded name_map with {len(expanded) - len(name_map)} character aliases"
+                    )
                 name_map = expanded
+
+            # Make renames visible to the prompt builder so the LLM writes the
+            # same names the deterministic pass will enforce.
+            context["name_map"] = name_map or {}
 
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
@@ -286,8 +288,8 @@ class TransformService(BaseService):
                 transform_type=transform_type.value,
                 details={
                     "book_title": book.title or "Unknown",
-                    "processing_time": time.time() - start_time
-                }
+                    "processing_time": time.time() - start_time,
+                },
             ) from e
 
     def _create_context(
@@ -350,15 +352,71 @@ class TransformService(BaseService):
             "character_context": character_context,
             "characters_to_transform": characters_to_transform,
             "characters_to_preserve": characters_to_preserve,
+            "protected_patterns": self._build_protected_patterns(characters, transform_type),
         }
 
+    _TITLE_PREFIXES = (
+        "Mr",
+        "Mrs",
+        "Ms",
+        "Mx",
+        "Miss",
+        "Sir",
+        "Lady",
+        "Lord",
+        "Dame",
+        "Dr",
+        "Colonel",
+        "Captain",
+        "Major",
+        "General",
+        "Admiral",
+        "Noble",
+    )
+
+    def _build_protected_patterns(
+        self, characters: CharacterAnalysis, transform_type: TransformType
+    ) -> list:
+        """Patterns masking cast surnames that collide with gendered term-map keys.
+
+        A surname like "King" must never be hit by the queen/king (or NB
+        king/monarch) entries. Only capitalized occurrences preceded by another
+        word (a given name or title — "Mary King", "Miss King") are masked, so
+        the common noun "king" and sentence-initial royal uses stay mappable.
+        """
+        term_keys = {k.lower() for k in self._TERM_MAPS.get(transform_type.value, {})}
+        if not term_keys:
+            return []
+        colliding: set[str] = set()
+        for char in characters.characters:
+            for name in [char.name, *char.aliases]:
+                tokens = [t for t in re.split(r"\s+", name) if t]
+                while tokens and tokens[0].rstrip(".") in self._TITLE_PREFIXES:
+                    tokens.pop(0)
+                # Everything after the given name is surname; a lone token left
+                # behind a stripped title (e.g. "Miss King") is also a surname.
+                surname_tokens = (
+                    tokens[1:]
+                    if len(tokens) > 1
+                    else (tokens if len(tokens) == 1 and name != " ".join(tokens) else [])
+                )
+                for tok in surname_tokens:
+                    if tok.lower() in term_keys and tok[0].isupper():
+                        colliding.add(tok)
+        return [re.compile(rf"(?<=[\w.] ){re.escape(tok)}\b") for tok in sorted(colliding)]
+
     def _build_character_instructions(
-        self, characters: Optional[CharacterAnalysis], transform_type: TransformType, character_mappings: dict
+        self,
+        characters: Optional[CharacterAnalysis],
+        transform_type: TransformType,
+        character_mappings: dict,
+        name_map: Optional[dict[str, str]] = None,
     ) -> str:
         """Build character context for LLM transformation."""
         if not characters:
             return ""
 
+        name_map = name_map or {}
         lines = ["\nKNOWN CHARACTERS:"]
 
         # Build compact character list with their transformations
@@ -367,7 +425,9 @@ class TransformService(BaseService):
                 continue
 
             mapping = character_mappings[char.name]
-            current_gender = char.gender.value if hasattr(char.gender, 'value') else str(char.gender)
+            current_gender = (
+                char.gender.value if hasattr(char.gender, "value") else str(char.gender)
+            )
 
             # Determine target gender based on transform type
             if mapping.get("preserve", False):
@@ -392,9 +452,23 @@ class TransformService(BaseService):
             name_str = char.name
             if char.aliases:
                 name_str += f" (aka {', '.join(char.aliases[:3])})"  # Limit to 3 aliases
-            lines.append(f"- {name_str}: {current_gender}{target}")
+            line = f"- {name_str}: {current_gender}{target}"
 
-        lines.append("\nApply these specific character transformations consistently throughout the text.")
+            # State the exact renames decided for this character so every chunk
+            # writes the same names the deterministic pass enforces.
+            renames = [
+                f"{orig}→{new}"
+                for orig, new in name_map.items()
+                if orig in ([char.name, *char.aliases])
+                or orig.split()[0] in ([char.name.split()[0], *char.aliases])
+            ]
+            if renames and not mapping.get("preserve", False):
+                line += f", RENAME: {', '.join(sorted(set(renames))[:6])}"
+            lines.append(line)
+
+        lines.append(
+            "\nApply these specific character transformations consistently throughout the text."
+        )
 
         return "\n".join(lines)
 
@@ -517,16 +591,22 @@ class TransformService(BaseService):
         mappings = {
             "original_gender": character.gender,
             "name": character.name,
-            "aliases": character.aliases
+            "aliases": character.aliases,
         }
 
         # Just track whether to transform or preserve - let LLM handle the actual transformation
-        current_gender = character.gender.value if hasattr(character.gender, 'value') else str(character.gender)
+        current_gender = (
+            character.gender.value if hasattr(character.gender, "value") else str(character.gender)
+        )
 
         if transform_type == TransformType.GENDER_SWAP:
             # LLM will swap genders
             mappings["transform"] = True
-        elif transform_type in [TransformType.ALL_MALE, TransformType.ALL_FEMALE, TransformType.NONBINARY]:
+        elif transform_type in [
+            TransformType.ALL_MALE,
+            TransformType.ALL_FEMALE,
+            TransformType.NONBINARY,
+        ]:
             # LLM will apply the transformation type
             mappings["transform"] = True
         else:
@@ -682,7 +762,9 @@ class TransformService(BaseService):
 
         # Require LLM provider for transformation
         if not self.provider:
-            raise ValueError("LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic).")
+            raise ValueError(
+                "LLM provider is required for transformation. Please configure an LLM provider (OpenAI or Anthropic)."
+            )
 
         # Use LLM for transformation
         changes = []
@@ -714,17 +796,20 @@ class TransformService(BaseService):
         total_batches = len(batches)
 
         avg_batch_size = sum(len(b) for b in batches) / len(batches) if batches else 0
-        self.logger.info(f"Processing {total_paragraphs} paragraphs in {total_batches} token-optimized batches (avg size: {avg_batch_size:.1f})")
+        self.logger.info(
+            f"Processing {total_paragraphs} paragraphs in {total_batches} token-optimized batches (avg size: {avg_batch_size:.1f})"
+        )
 
         # Setup progress bar
-        disable_progress = not os.isatty(1) if hasattr(os, 'isatty') else True
+        disable_progress = not os.isatty(1) if hasattr(os, "isatty") else True
         try:
             from tqdm import tqdm
+
             progress_bar = tqdm(
                 total=total_batches,
                 desc=f"Transforming {chapter.title or 'chapter'}",
                 disable=disable_progress,
-                unit="batch"
+                unit="batch",
             )
         except ImportError:
             progress_bar = None
@@ -735,12 +820,16 @@ class TransformService(BaseService):
             batch_end = batch_start + len(batch_paragraphs)
 
             if not progress_bar:
-                self.logger.info(f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start+1}-{batch_end}, ~{self._estimate_batch_tokens(batch_paragraphs, context)} tokens)")
+                self.logger.info(
+                    f"Processing batch {batch_num}/{total_batches} (paragraphs {batch_start + 1}-{batch_end}, ~{self._estimate_batch_tokens(batch_paragraphs, context)} tokens)"
+                )
             else:
-                progress_bar.set_postfix({"paragraphs": f"{batch_start+1}-{batch_end}"})
+                progress_bar.set_postfix({"paragraphs": f"{batch_start + 1}-{batch_end}"})
 
             # Create batch prompt with the actual paragraph objects
-            prompt = self._create_batch_transform_prompt(batch_paragraphs, context, len(batch_paragraphs))
+            prompt = self._create_batch_transform_prompt(
+                batch_paragraphs, context, len(batch_paragraphs)
+            )
 
             try:
                 # Call LLM for batch
@@ -758,7 +847,9 @@ class TransformService(BaseService):
                 transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
 
                 # Process each paragraph in the batch
-                for i, (paragraph, transformed_text) in enumerate(zip(batch_paragraphs, transformed_texts)):
+                for i, (paragraph, transformed_text) in enumerate(
+                    zip(batch_paragraphs, transformed_texts)
+                ):
                     para_idx = batch_start + i
                     original_text = paragraph.get_text()
 
@@ -772,7 +863,9 @@ class TransformService(BaseService):
                         transformed_text = self._apply_name_map(transformed_text, name_map)
 
                     # Apply deterministic term substitutions (safety net for LLM misses)
-                    transformed_text = self._apply_term_map(transformed_text, transform_type)
+                    transformed_text = self._apply_term_map(
+                        transformed_text, transform_type, context.get("protected_patterns")
+                    )
 
                     # Track changes
                     if transformed_text != original_text:
@@ -815,7 +908,9 @@ class TransformService(BaseService):
         # (e.g. batches that failed retry). Idempotent on already-transformed paragraphs.
         for i, para in enumerate(transformed_paragraphs):
             current_text = para.get_text()
-            fixed_text = self._apply_term_map(current_text, transform_type)
+            fixed_text = self._apply_term_map(
+                current_text, transform_type, context.get("protected_patterns")
+            )
             if fixed_text != current_text:
                 transformed_paragraphs[i] = Paragraph(sentences=[fixed_text])
 
@@ -826,21 +921,63 @@ class TransformService(BaseService):
 
         return transformed_chapter, changes
 
+    # Place-name shapes that may contain a given name and must survive renames
+    # untouched: "St. James's", "Edward Street", "the George" (an inn).
+    _PLACE_SUFFIXES = r"(?:Street|Road|Lane|Square|Court|Park|House|Row)"
+
+    def _name_protection_patterns(self, name_map: dict[str, str]) -> list:
+        """Regexes for spans a name map must never rewrite."""
+        patterns = []
+        for name in name_map:
+            escaped = re.escape(name)
+            patterns.append(re.compile(rf"\bSt\.\s+{escaped}(?:'s)?\b"))
+            patterns.append(re.compile(rf"\b{escaped}\s+{self._PLACE_SUFFIXES}\b"))
+            patterns.append(re.compile(rf"\bthe\s+{escaped}\b"))
+        return patterns
+
+    @staticmethod
+    def _mask_protected(text: str, patterns: list) -> tuple[str, list[str]]:
+        """Replace protected spans with sentinels so substitutions skip them."""
+        spans: list[str] = []
+
+        def _stash(m):
+            spans.append(m.group())
+            return f"\x00{len(spans) - 1}\x00"
+
+        for pattern in patterns:
+            text = pattern.sub(_stash, text)
+        return text, spans
+
+    @staticmethod
+    def _unmask_protected(text: str, spans: list[str]) -> str:
+        """Restore protected spans stashed by _mask_protected."""
+        if not spans:
+            return text
+        return re.sub("\x00(\\d+)\x00", lambda m: spans[int(m.group(1))], text)
+
     def _apply_name_map(self, text: str, name_map: dict[str, str]) -> str:
-        """Apply case-aware name substitutions to a paragraph of text."""
+        """Apply name substitutions in a single pass.
+
+        Case-sensitive on purpose: nicknames like "Will" or "Kit" must not hit
+        the common words "will"/"kit". ALL-CAPS signature forms ("FITZWILLIAM
+        DARCY.") are matched explicitly and uppercased. Longest key wins, so
+        phrase entries ("Fitzwilliam Darcy", "Lady Catherine") take precedence
+        over their component names, and "Elizabeth" is never corrupted by an
+        "Eliza" entry.
+        """
+        if not name_map:
+            return text
+        text, spans = self._mask_protected(text, self._name_protection_patterns(name_map))
+
+        lookup: dict[str, str] = {}
         for original, replacement in name_map.items():
-            pattern = re.compile(re.escape(original), re.IGNORECASE)
+            lookup[original] = replacement
+            lookup[original.upper()] = replacement.upper()
+        keys = sorted(lookup, key=len, reverse=True)
+        pattern = re.compile(r"\b(?:" + "|".join(re.escape(k) for k in keys) + r")\b")
 
-            def _replace(m, r=replacement):
-                word = m.group()
-                if word.isupper():
-                    return r.upper()
-                if word[0].isupper():
-                    return r[0].upper() + r[1:] if len(r) > 1 else r.upper()
-                return r.lower()
-
-            text = pattern.sub(_replace, text)
-        return text
+        text = pattern.sub(lambda m: lookup[m.group()], text)
+        return self._unmask_protected(text, spans)
 
     # Gendered terms that the LLM occasionally misses — keyed by transform type.
     # ALL_MALE maps female→male; ALL_FEMALE maps male→female; GENDER_SWAP includes both.
@@ -878,6 +1015,7 @@ class TransformService(BaseService):
             # Occupational / address
             "mistress": "master",
             "madam": "sir",
+            "ma'am": "sir",
             "maid": "manservant",
             "governess": "tutor",
             "housekeeper": "steward",
@@ -990,130 +1128,13 @@ class TransformService(BaseService):
             # Title safety nets — LLM sometimes leaves gendered titles on character names
             "Mr": "Ms",
         },
-        "gender_swap": {
-            # Familial / relational (both directions)
-            "mother": "father",
-            "father": "mother",
-            "daughter": "son",
-            "son": "daughter",
-            "sister": "brother",
-            "brother": "sister",
-            "aunt": "uncle",
-            "uncle": "aunt",
-            "niece": "nephew",
-            "nephew": "niece",
-            "grandmother": "grandfather",
-            "grandfather": "grandmother",
-            "granddaughter": "grandson",
-            "grandson": "granddaughter",
-            "widow": "widower",
-            "widower": "widow",
-            "maiden": "bachelor",
-            "bachelor": "maiden",
-            "spinster": "bachelor",
-            "woman": "man",
-            "man": "woman",
-            "girl": "boy",
-            "boy": "girl",
-            "female": "male",
-            "male": "female",
-            "lass": "lad",
-            "lad": "lass",
-            # Social / aristocratic
-            "queen": "king",
-            "king": "queen",
-            "princess": "prince",
-            "prince": "princess",
-            "duchess": "duke",
-            "duke": "duchess",
-            "countess": "count",
-            "count": "countess",
-            "baroness": "baron",
-            "baron": "baroness",
-            "empress": "emperor",
-            "emperor": "empress",
-            "abbess": "abbot",
-            "abbot": "abbess",
-            "lady": "lord",
-            "lord": "lady",
-            "dame": "sir",
-            "heroine": "hero",
-            "hero": "heroine",
-            "bride": "groom",
-            "groom": "bride",
-            "marchioness": "marquess",
-            "marquess": "marchioness",
-            "viscountess": "viscount",
-            "viscount": "viscountess",
-            # Occupational / address
-            "mistress": "master",
-            "master": "mistress",
-            "madam": "sir",
-            "sir": "madam",
-            "maid": "manservant",
-            "manservant": "maid",
-            "governess": "tutor",
-            "tutor": "governess",
-            "housekeeper": "steward",
-            "steward": "housekeeper",
-            "landlady": "landlord",
-            "landlord": "landlady",
-            "actress": "actor",
-            "actor": "actress",
-            "hostess": "host",
-            "host": "hostess",
-            "waitress": "waiter",
-            "waiter": "waitress",
-            "barmaid": "barman",
-            "barman": "barmaid",
-            "authoress": "author",
-            "author": "authoress",
-            "poetess": "poet",
-            "poet": "poetess",
-            "murderess": "murderer",
-            "murderer": "murderess",
-            "shepherdess": "shepherd",
-            "shepherd": "shepherdess",
-            "huntress": "hunter",
-            "hunter": "huntress",
-            "handmaid": "page",
-            "handmaiden": "page",
-            "page": "handmaid",
-            "gentlewoman": "gentleman",
-            "gentleman": "gentlewoman",
-            # Religious / mythological
-            "nun": "monk",
-            "monk": "nun",
-            "witch": "warlock",
-            "warlock": "witch",
-            "prophetess": "prophet",
-            "prophet": "prophetess",
-            "priestess": "priest",
-            "priest": "priestess",
-            "enchantress": "enchanter",
-            "enchanter": "enchantress",
-            "sorceress": "sorcerer",
-            "sorcerer": "sorceress",
-            "nymph": "satyr",
-            "satyr": "nymph",
-            # Family (extended)
-            "stepmother": "stepfather",
-            "stepfather": "stepmother",
-            "stepdaughter": "stepson",
-            "stepson": "stepdaughter",
-            "stepsister": "stepbrother",
-            "stepbrother": "stepsister",
-            "godmother": "godfather",
-            "godfather": "godmother",
-            "kinswoman": "kinsman",
-            "kinsman": "kinswoman",
-            # Period / colloquial
-            "wench": "knave",
-            "knave": "wench",
-            "damsel": "youth",
-            "harlot": "rake",
-            "rake": "harlot",
-        },
+        # gender_swap has NO global term map, by design. After a swap, every
+        # gendered word in the output is legitimate for one direction or the
+        # other ("mother" is correct where the source said "father"), so a
+        # global substitution cannot distinguish an LLM miss from a correct
+        # transform — it re-swaps correct text. Swap-mode safety comes from
+        # per-character scoped phrases in the name map plus the QC gates.
+        "gender_swap": {},
         "nonbinary": {
             # Pronouns (safety net for any LLM misses)
             "he": "they",
@@ -1206,6 +1227,9 @@ class TransformService(BaseService):
             "Mrs": "Mx",
             # LLM typo correction: "nibling" is the target but LLM sometimes writes "nibbling"
             "nibbling": "nibling",
+            # Vocative address (house style: Mx., matching the madam entry above)
+            "ma'am": "Mx.",
+            "sir": "Mx.",
             # Verb agreement: singular 'they' takes 'were/have/do/are', not 'was/has/does/is'
             # The LLM inherits conjugation from the source gender and does not adjust.
             "they was": "they were",
@@ -1215,6 +1239,47 @@ class TransformService(BaseService):
             "they does": "they do",
             "they doesn't": "they don't",
             "they is": "they are",
+            "they isn't": "they aren't",
+            # Third-person-singular verbs observed surviving transforms (May 2026
+            # P&P print scan) plus common Austen-register verbs of the same shape.
+            "they likes": "they like",
+            "they practises": "they practise",
+            "they comes": "they come",
+            "they knows": "they know",
+            "they means": "they mean",
+            "they dines": "they dine",
+            "they sees": "they see",
+            "they finds": "they find",
+            "they plays": "they play",
+            "they gets": "they get",
+            "they says": "they say",
+            "they makes": "they make",
+            "they takes": "they take",
+            "they gives": "they give",
+            "they seems": "they seem",
+            "they thinks": "they think",
+            "they wants": "they want",
+            "they needs": "they need",
+            "they keeps": "they keep",
+            "they tells": "they tell",
+            "they asks": "they ask",
+            "they calls": "they call",
+            "they hears": "they hear",
+            "they stands": "they stand",
+            "they turns": "they turn",
+            "they appears": "they appear",
+            "they remains": "they remain",
+            "they returns": "they return",
+            "they replies": "they reply",
+            "they continues": "they continue",
+            "they deserves": "they deserve",
+            "they speaks": "they speak",
+            "they lives": "they live",
+            "they loves": "they love",
+            "they writes": "they write",
+            "they walks": "they walk",
+            "they looks": "they look",
+            "they feels": "they feel",
         },
     }
 
@@ -1222,43 +1287,91 @@ class TransformService(BaseService):
     # Keyed by transform type value. Used for patterns where re.IGNORECASE
     # would cause false positives (e.g. "Miss" verb vs title).
     _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
-        # "Miss Name" (title form — capital following word). Safe because:
+        # "Miss Name" / "Sir Name" (title form — capital following word). Safe because:
         # - Verb "miss" is always lowercase in flowing prose
-        # - Title "Miss" precedes a capital proper name
+        # - Title precedes a capital proper name
+        # Applied BEFORE the term map so titled names get the title treatment
+        # ("Sir William" → "Noble William") rather than the vocative one ("Mx. William").
         "nonbinary": [
             (re.compile(r"Miss (?=[A-Z])"), "Mx. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mx. \1"),
+            (re.compile(r"Sir (?=[A-Z])"), "Noble "),
         ],
         "all_male": [
             (re.compile(r"Miss (?=[A-Z])"), "Mr. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
         ],
         "all_female": [
-            # "Miss" is already female — only need to catch "Mr." on now-female characters.
-            # Handled by the "Mr" → "Ms" term map entry; no case-sensitive fix needed here.
+            # "Miss" is already female; "Mr." is handled by the "Mr" → "Ms" term
+            # map entry. "Sir Name" must become "Lady Name" (the vocative
+            # sir→madam entry must not touch titled names).
+            (re.compile(r"Sir (?=[A-Z])"), "Lady "),
         ],
     }
 
-    def _apply_term_map(self, text: str, transform_type: "TransformType") -> str:
-        """Apply deterministic word-boundary term substitutions as a safety net after LLM transform."""
-        term_map = self._TERM_MAPS.get(transform_type.value, {})
-        for original, replacement in term_map.items():
-            pattern = re.compile(r"\b" + re.escape(original) + r"\b", re.IGNORECASE)
+    # Compiled single-pass pattern cache, keyed by transform type value.
+    _term_pattern_cache: dict[str, tuple] = {}
 
-            def _replace(m, r=replacement):
+    def _apply_term_map(
+        self,
+        text: str,
+        transform_type: "TransformType",
+        protected_patterns: Optional[list] = None,
+    ) -> str:
+        """Apply deterministic term substitutions as a safety net after LLM transform.
+
+        All entries are applied in a SINGLE pass over the text (one combined
+        alternation, longest key first). Sequential per-entry passes would chain
+        substitutions — a term rewritten by one entry could be rewritten again
+        by a later one — which is why bidirectional maps were previously unsafe.
+
+        Spans matched by protected_patterns (e.g. surnames that collide with
+        gendered words, like King) are masked first and restored untouched.
+        """
+        term_map = self._TERM_MAPS.get(transform_type.value, {})
+        fixes = self._CASE_SENSITIVE_FIXES.get(transform_type.value, [])
+        if not term_map and not fixes:
+            return text
+
+        # Title fixes run BEFORE masking: "Miss King" must still become
+        # "Mx. King" even though the surname "King" is about to be masked.
+        for pattern, replacement in fixes:
+            text = pattern.sub(replacement, text)
+
+        if protected_patterns:
+            text, spans = self._mask_protected(text, protected_patterns)
+        else:
+            spans = []
+
+        if term_map:
+            cached = self._term_pattern_cache.get(transform_type.value)
+            if cached is None:
+                lower_map = {k.lower(): v for k, v in term_map.items()}
+                keys = sorted(term_map, key=len, reverse=True)
+                pattern = re.compile(
+                    r"\b(?:" + "|".join(re.escape(k) for k in keys) + r")\b", re.IGNORECASE
+                )
+                cached = (pattern, lower_map)
+                self._term_pattern_cache[transform_type.value] = cached
+            pattern, lower_map = cached
+
+            def _replace(m):
                 word = m.group()
-                if word.isupper():
+                r = lower_map[word.lower()]
+                if word.isupper() and len(word) > 1:
                     return r.upper()
                 if word[0].isupper():
                     return r[0].upper() + r[1:] if len(r) > 1 else r.upper()
-                return r.lower()
+                # A deliberately capitalized replacement (e.g. the honorific
+                # "Mx.") keeps its case even for a lowercase match.
+                return r if r[0].isupper() else r.lower()
 
             text = pattern.sub(_replace, text)
+            # A replacement ending in "." can land before the sentence's own
+            # period ("...tea, ma'am." → "...tea, Mx.."): collapse the doubling.
+            text = text.replace("Mx..", "Mx.")
 
-        for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(transform_type.value, []):
-            text = pattern.sub(replacement, text)
-
-        return text
+        return self._unmask_protected(text, spans)
 
     async def _transform_single_paragraph(
         self,
@@ -1281,7 +1394,9 @@ class TransformService(BaseService):
         transformed_text = texts[0] if texts else para.get_text()
         if name_map:
             transformed_text = self._apply_name_map(transformed_text, name_map)
-        return self._apply_term_map(transformed_text, transform_type)
+        return self._apply_term_map(
+            transformed_text, transform_type, context.get("protected_patterns")
+        )
 
     async def _retry_at_sentence_level(
         self,
@@ -1306,11 +1421,15 @@ class TransformService(BaseService):
                 )
                 results.append(Paragraph(sentences=[transformed_text]))
             except Exception as e:
-                self.logger.warning(f"Single-paragraph retry failed ({e}), splitting by sentences...")
+                self.logger.warning(
+                    f"Single-paragraph retry failed ({e}), splitting by sentences..."
+                )
                 sentences = para.sentences if para.sentences else [para.get_text()]
                 # Process in groups of 10 sentences to stay well within timeout
                 group_size = 10
-                groups = [sentences[i : i + group_size] for i in range(0, len(sentences), group_size)]
+                groups = [
+                    sentences[i : i + group_size] for i in range(0, len(sentences), group_size)
+                ]
                 merged_parts = []
                 for group in groups:
                     group_para = Paragraph(sentences=group)
@@ -1368,18 +1487,26 @@ class TransformService(BaseService):
 
         return paragraphs
 
-    def _create_token_optimized_batches(self, paragraphs: list, context: dict[str, Any]) -> list[list]:
+    def _create_token_optimized_batches(
+        self, paragraphs: list, context: dict[str, Any]
+    ) -> list[list]:
         """Create batches of paragraphs optimized for token count."""
         if not self.token_manager:
             # Fallback to fixed batch size if no token manager
             from src.utils.config import config as app_config
+
             batch_size = app_config.transform_batch_size
-            return [paragraphs[i:i + batch_size] for i in range(0, len(paragraphs), batch_size)]
+            return [paragraphs[i : i + batch_size] for i in range(0, len(paragraphs), batch_size)]
 
         # Get configuration
         from src.utils.config import config as app_config
-        target_utilization = app_config._config.get("transformation", {}).get("target_token_utilization", 0.66)
-        max_request_tokens = app_config._config.get("transformation", {}).get("max_tokens_per_request", 120000)
+
+        target_utilization = app_config._config.get("transformation", {}).get(
+            "target_token_utilization", 0.66
+        )
+        max_request_tokens = app_config._config.get("transformation", {}).get(
+            "max_tokens_per_request", 120000
+        )
 
         # Get max tokens for this model
         max_context = self.token_manager.config.max_context_tokens
@@ -1390,9 +1517,16 @@ class TransformService(BaseService):
         response_overhead = 2000  # Reserve space for response
         char_context_tokens = self._estimate_character_context_tokens(context)
 
-        available_tokens = int((max_context * target_utilization) - prompt_overhead - response_overhead - char_context_tokens)
+        available_tokens = int(
+            (max_context * target_utilization)
+            - prompt_overhead
+            - response_overhead
+            - char_context_tokens
+        )
 
-        self.logger.debug(f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})")
+        self.logger.debug(
+            f"Token budget: {available_tokens} (context: {max_context}, prompt: {prompt_overhead}, response: {response_overhead}, chars: {char_context_tokens})"
+        )
 
         batches = []
         current_batch = []
@@ -1414,7 +1548,9 @@ class TransformService(BaseService):
 
             # If single paragraph exceeds limit, put it in its own batch
             if para_tokens > available_tokens:
-                self.logger.warning(f"Paragraph exceeds token limit ({para_tokens} > {available_tokens})")
+                self.logger.warning(
+                    f"Paragraph exceeds token limit ({para_tokens} > {available_tokens})"
+                )
                 if len(current_batch) > 1:
                     # Remove it and add to next batch
                     current_batch.pop()
@@ -1452,7 +1588,9 @@ class TransformService(BaseService):
         char_info = context.get("character_info", "")
         return self.token_manager.estimate_tokens(char_info) if char_info else 200
 
-    def _create_batch_transform_prompt(self, batch_paragraphs: list, context: dict[str, Any], batch_size: int) -> dict[str, str]:
+    def _create_batch_transform_prompt(
+        self, batch_paragraphs: list, context: dict[str, Any], batch_size: int
+    ) -> dict[str, str]:
         """Create prompt for batch transformation."""
         transform_type = context.get("transform_type", TransformType.GENDER_SWAP)
         rules = context.get("rules", self._get_transformation_rules(transform_type))
@@ -1460,12 +1598,21 @@ class TransformService(BaseService):
         characters = context.get("characters")
 
         # Build character-specific transformation instructions
-        character_instructions = self._build_character_instructions(characters, transform_type, character_mappings)
+        character_instructions = self._build_character_instructions(
+            characters, transform_type, character_mappings, context.get("name_map")
+        )
 
         system_prompt = f"""Gender transformation expert. Transform {batch_size} paragraphs.
 
 {rules}
 {character_instructions}
+
+NAME RULES (hard constraints):
+- Use ONLY the RENAME targets listed above. NEVER invent a name, nickname, or feminized/masculinized form of a name that is not listed.
+- NEVER change surnames (family names). Only given names change, and only per the list.
+- NEVER alter place names, even ones containing a given name (e.g. "St. James's", "Edward Street", an inn called "the George").
+- Military and professional ranks (Colonel, Captain, Doctor) are gender-neutral: keep them exactly as written. There is no such rank as "Colonelle".
+- A title and its name change together as one unit ("Sir William" → "Lady Wilhelmina", never "Lady William").
 
 PRONOUN DISAMBIGUATION: In scenes where multiple characters share the same pronoun after transformation, replace ambiguous pronouns with the character's name where a first-time reader would be uncertain who is referred to. Prioritize dialogue attribution lines and sentences immediately following a speaker change. Do not alter sentence rhythm or add words beyond the name substitution.
 
@@ -1473,16 +1620,11 @@ For paired opposite-gender terms (e.g. "boys and girls", "ladies and gentlemen",
 Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
 
         # Simpler format without markers - just numbered paragraphs
-        paragraphs_text = "\n\n".join(
-            p.get_text() for p in batch_paragraphs
-        )
+        paragraphs_text = "\n\n".join(p.get_text() for p in batch_paragraphs)
 
         user_prompt = f"Transform these {batch_size} paragraphs (separated by blank lines):\n\n{paragraphs_text}"
 
-        return {
-            "system": system_prompt,
-            "user": user_prompt
-        }
+        return {"system": system_prompt, "user": user_prompt}
 
     def _create_transform_prompt(self, text: str, context: dict[str, Any]) -> dict[str, str]:
         """Create prompt for LLM transformation."""
@@ -1504,7 +1646,7 @@ Examples of transformations:
 
         system_prompt = f"""You are a precise text transformer. Apply gender swapping rules to the text.
 
-TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, 'value') else transform_type}
+TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, "value") else transform_type}
 
 {examples}
 

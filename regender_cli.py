@@ -130,6 +130,16 @@ async def process_book(args):
         else:
             print(f"  Characters: {result['characters']}")
             print(f"  Changes: {result['changes']}")
+            if "qc_passed" in result:
+                if result["qc_passed"]:
+                    print("  QC gates: ✅ all passed")
+                else:
+                    print("  QC gates: ❌ FAILED — output needs review (see qc_report.json)")
+                    for gate in result.get("qc_gates", []):
+                        if gate["verdict"] == "FAIL":
+                            print(f"    ✗ {gate['name']}: {len(gate['details'])} finding(s)")
+                            for d in gate["details"][:3]:
+                                print(f"        {d}")
         print(f"  Output: {result['output_path']}")
     else:
         print(f"\n❌ Error: {result['error']}")
@@ -137,7 +147,6 @@ async def process_book(args):
 
     # Clean up
     app.shutdown()
-
 
 
 def _calc_output_path(input_path: str, transform_type: str) -> Path:
@@ -213,7 +222,7 @@ async def async_main():
         "--name-map",
         help=(
             "JSON string or path to .json file mapping original character names to replacements, "
-            "e.g. '{\"Elizabeth\":\"Edward\",\"Jane\":\"John\"}'"
+            'e.g. \'{"Elizabeth":"Edward","Jane":"John"}\''
         ),
     )
 
