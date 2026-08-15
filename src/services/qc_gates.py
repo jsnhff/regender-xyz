@@ -311,14 +311,26 @@ def _protected_place_spans(text: str, given_names: list[str]) -> set[str]:
 
 
 def immutability_gate(
-    original: str, transformed: str, characters: Optional[CharacterAnalysis]
+    original: str,
+    transformed: str,
+    characters: Optional[CharacterAnalysis],
+    name_map: Optional[dict[str, str]] = None,
 ) -> GateResult:
-    """Surnames and name-bearing places must appear exactly as often as in the source."""
+    """Surnames and name-bearing places must survive the transform.
+
+    A decrease that is fully covered by gains in the same characters' target
+    given names is an address-style shift, not a mutation: bare-surname
+    address ("Bingley said") is male Regency convention, so a swapped-female
+    Bingley is correctly rendered by her new given name ("Clara said").
+    Anything else that lowers a surname count is the King→Monarch class.
+    """
     if not characters:
         return GateResult("surname_place_immutability", "INFO", ["no character analysis provided"])
+    name_map = name_map or {}
     details = []
     surnames: set[str] = set()
     givens: set[str] = set()
+    surname_to_targets: dict[str, set[str]] = {}
     for char in characters.characters:
         tokens = _strip_titles(char.name)
         # Names like "The Miss Webbs" survive title-stripping with a leading
@@ -335,19 +347,48 @@ def immutability_gate(
             tokens = _strip_titles(" ".join(tokens))
         if len(tokens) > 1:
             givens.add(tokens[0])
-            surnames.add(" ".join(tokens[1:]))
+            surname = " ".join(tokens[1:])
+            surnames.add(surname)
+            target = name_map.get(tokens[0])
+            if target:
+                surname_to_targets.setdefault(surname, set()).add(target.split()[0])
         elif len(tokens) == 1 and (had_prefix or tokens[0] != char.name.strip()):
             surnames.add(tokens[0])
         elif len(tokens) == 1:
             givens.add(tokens[0])
+    # Phrase renames also consume surname-words: "Fitzwilliam Darcy" →
+    # "Frederica Darcy" removes one occurrence of the Colonel's surname
+    # "Fitzwilliam". Credit the phrase's target given name against it.
+    for key, value in name_map.items():
+        key_tokens = key.split()
+        if len(key_tokens) > 1:
+            surname_to_targets.setdefault(key_tokens[0], set()).add(value.split()[0])
     infos = []
     for surname in sorted(surnames):
         pat = rf"\b{re.escape(surname)}\b"
         before, after = _count(pat, original), _count(pat, transformed)
         if after < before:
-            # Fewer occurrences means the surname was rewritten somewhere
-            # (the Mary King → Mary Monarch class).
-            details.append(f"surname '{surname}': {before}× in source, {after}× after transform")
+            # Address-style shift check: did this surname's characters gain at
+            # least that many mentions under their new given names?
+            gain = sum(
+                max(
+                    0,
+                    _count(rf"\b{re.escape(t)}\b", transformed)
+                    - _count(rf"\b{re.escape(t)}\b", original),
+                )
+                for t in surname_to_targets.get(surname, ())
+            )
+            if gain >= before - after:
+                infos.append(
+                    f"surname '{surname}': {before}× → {after}× (address style shifted to "
+                    f"{'/'.join(sorted(surname_to_targets[surname]))}, +{gain})"
+                )
+            else:
+                # Fewer occurrences not explained by renames: the surname was
+                # rewritten somewhere (the Mary King → Mary Monarch class).
+                details.append(
+                    f"surname '{surname}': {before}× in source, {after}× after transform"
+                )
         elif after > before:
             # More occurrences is expected: pronoun disambiguation inserts
             # names for clarity. Annotate, don't fail.
@@ -424,7 +465,7 @@ def run_qc_gates(
         residual_gender_gate(transformed_text, transform_type),
         verb_agreement_gate(transformed_text, transform_type),
         name_consistency_gate(transformed_text, name_map or {}, engine_flags),
-        immutability_gate(original_text, transformed_text, characters),
+        immutability_gate(original_text, transformed_text, characters, name_map),
         title_atomicity_gate(transformed_text, name_map or {}),
         text_integrity_gate(original_text, transformed_text),
     ]
