@@ -1014,7 +1014,17 @@ class TransformService(BaseService):
             "maiden": "bachelor",
             "spinster": "bachelor",
             "woman": "man",
+            "women": "men",
             "girl": "boy",
+            "girls": "boys",
+            "daughters": "sons",
+            "sisters": "brothers",
+            "aunts": "uncles",
+            "nieces": "nephews",
+            "mothers": "fathers",
+            "wives": "husbands",
+            "ladies": "lords",
+            "gentlewomen": "gentlemen",
             "female": "male",
             "lass": "lad",
             # Social / aristocratic
@@ -1090,7 +1100,17 @@ class TransformService(BaseService):
             "widower": "widow",
             "bachelor": "maiden",
             "man": "woman",
+            "men": "women",
             "boy": "girl",
+            "boys": "girls",
+            "sons": "daughters",
+            "brothers": "sisters",
+            "uncles": "aunts",
+            "nephews": "nieces",
+            "fathers": "mothers",
+            "husbands": "wives",
+            "lords": "ladies",
+            "gentlemen": "gentlewomen",
             "male": "female",
             "lad": "lass",
             # Social / aristocratic
@@ -1195,8 +1215,26 @@ class TransformService(BaseService):
             "spinster": "single",
             "woman": "person",
             "man": "person",
+            "women": "people",
+            "men": "people",
             "girl": "youth",
             "boy": "youth",
+            "girls": "youths",
+            "boys": "youths",
+            "daughters": "children",
+            "sons": "children",
+            "sisters": "siblings",
+            "brothers": "siblings",
+            "aunts": "relatives",
+            "uncles": "relatives",
+            "wives": "spouses",
+            "husbands": "spouses",
+            "mothers": "parents",
+            "fathers": "parents",
+            "ladies": "nobles",
+            "lords": "nobles",
+            "gentlemen": "people",
+            "gentlewomen": "people",
             "female": "person",
             "male": "person",
             # Social / aristocratic
@@ -1332,6 +1370,14 @@ class TransformService(BaseService):
             # map entry. "Sir Name" must become "Lady Name" (the vocative
             # sir→madam entry must not touch titled names).
             (re.compile(r"Sir (?=[A-Z])"), "Lady "),
+            # Possessive "his" is decidable by position: before a word it is a
+            # determiner ("his account" → "her account"); at a clause end it is
+            # predicative ("the fault is his" → "hers"). The term map excludes
+            # it as ambiguous, but with the lookahead it is deterministic.
+            (re.compile(r"\bhis(?=\s+[A-Za-z])"), "her"),
+            (re.compile(r"\bHis(?=\s+[A-Za-z])"), "Her"),
+            (re.compile(r"\bhis\b(?!\s+[A-Za-z])"), "hers"),
+            (re.compile(r"\bHis\b(?!\s+[A-Za-z])"), "Hers"),
         ],
     }
 
