@@ -23,7 +23,7 @@ load_dotenv()
 # Add src to path for new architecture
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.app import Application
+from src.app import Application  # noqa: E402
 
 
 def setup_logging(verbose: bool = False):
@@ -139,7 +139,6 @@ async def process_book(args):
     app.shutdown()
 
 
-
 def _calc_output_path(input_path: str, transform_type: str) -> Path:
     """Calculate output path from input path and transform type."""
     input_file = Path(input_path)
@@ -213,7 +212,7 @@ async def async_main():
         "--name-map",
         help=(
             "JSON string or path to .json file mapping original character names to replacements, "
-            "e.g. '{\"Elizabeth\":\"Edward\",\"Jane\":\"John\"}'"
+            'e.g. \'{"Elizabeth":"Edward","Jane":"John"}\''
         ),
     )
 

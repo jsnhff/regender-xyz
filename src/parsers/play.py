@@ -166,10 +166,9 @@ class PlayParser:
                 if not lines[i].strip():
                     consecutive_blanks += 1
                 else:
-                    if consecutive_blanks > 2:
-                        # Check if this looks like actual content
-                        if self._is_play_element(lines[i]):
-                            return i
+                    # Content after a run of blank lines starts the play proper
+                    if consecutive_blanks > 2 and self._is_play_element(lines[i]):
+                        return i
                     consecutive_blanks = 0
 
         return 0
@@ -317,7 +316,7 @@ class PlayParser:
 
         # Extract act number (Roman or Arabic)
         words = line_stripped.split()
-        for i, word in enumerate(words):
+        for word in words:
             word_clean = word.upper().strip(".,;:")
             # Roman numerals
             if all(c in "IVX" for c in word_clean) and word_clean:
@@ -386,12 +385,12 @@ class PlayParser:
 
         # Check if mostly uppercase letters (allowing for punctuation)
         letters = [c for c in line_stripped if c.isalpha()]
-        if letters and sum(1 for c in letters if c.isupper()) / len(letters) > 0.7:
-            # Check if it's not a stage direction
-            if not line_stripped.startswith("["):
-                return True
-
-        return False
+        # Mostly uppercase, and not a stage direction
+        return (
+            bool(letters)
+            and sum(1 for c in letters if c.isupper()) / len(letters) > 0.7
+            and not line_stripped.startswith("[")
+        )
 
     def _extract_character_name(self, line: str) -> str:
         """Extract character name from line."""

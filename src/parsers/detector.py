@@ -335,7 +335,7 @@ class FormatDetector:
 
         return None
 
-    def _get_hierarchy_levels(self, format: str, evidence: dict) -> int:
+    def _get_hierarchy_levels(self, book_format: str, evidence: dict) -> int:
         """
         Determine hierarchy depth from format and evidence.
         """
@@ -361,7 +361,7 @@ class FormatDetector:
         return 1  # Flat structure
 
     def _get_recommendations(
-        self, format: BookFormat, confidence: float, evidence: dict
+        self, book_format: BookFormat, confidence: float, evidence: dict
     ) -> list[str]:
         """
         Generate parsing recommendations based on detection.

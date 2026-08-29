@@ -255,7 +255,7 @@ class CharacterService(BaseService):
         chunks = await asyncio.to_thread(self._create_chunks, text)
 
         # Memory management: limit characters to prevent unbounded growth
-        MAX_CHARACTERS = 1000
+        max_characters = 1000
         seen_names = set()
         unique_characters = []
 
@@ -281,7 +281,7 @@ class CharacterService(BaseService):
                     for char in result:
                         char_name = char.get("name", "").lower().strip()
                         if char_name and char_name not in seen_names:
-                            if len(unique_characters) < MAX_CHARACTERS:
+                            if len(unique_characters) < max_characters:
                                 seen_names.add(char_name)
                                 batch_characters.append(char)
                             else:
@@ -319,7 +319,7 @@ class CharacterService(BaseService):
             del batch_results
 
             # Apply early deduplication if getting too large
-            if len(unique_characters) > MAX_CHARACTERS * 0.8:
+            if len(unique_characters) > max_characters * 0.8:
                 self.logger.debug(
                     f"Applying early deduplication at {len(unique_characters)} characters"
                 )
@@ -382,7 +382,7 @@ class CharacterService(BaseService):
 
         # Split text into chunks by character count, respecting word boundaries
         # Use memory-efficient approach with chunk limit
-        MAX_CHUNKS = 100  # Limit chunks to prevent excessive memory usage
+        max_chunks = 100  # Limit chunks to prevent excessive memory usage
         chunks = []
 
         # Process text line by line to avoid loading all words at once
@@ -391,8 +391,8 @@ class CharacterService(BaseService):
         current_chars = 0
 
         for line in lines:
-            if len(chunks) >= MAX_CHUNKS:
-                self.logger.warning(f"Reached maximum chunk limit ({MAX_CHUNKS}), truncating text")
+            if len(chunks) >= max_chunks:
+                self.logger.warning(f"Reached maximum chunk limit ({max_chunks}), truncating text")
                 break
 
             words = line.split()
@@ -403,13 +403,13 @@ class CharacterService(BaseService):
                     current_chunk = []
                     current_chars = 0
 
-                    if len(chunks) >= MAX_CHUNKS:
+                    if len(chunks) >= max_chunks:
                         break
 
                 current_chunk.append(word)
                 current_chars += word_len
 
-        if current_chunk and len(chunks) < MAX_CHUNKS:
+        if current_chunk and len(chunks) < max_chunks:
             chunks.append(" ".join(current_chunk))
 
         # Clear intermediate variables
@@ -638,10 +638,8 @@ class CharacterService(BaseService):
 
         # Token sort ratio for reordered names (e.g., "Bennet, Elizabeth" vs "Elizabeth Bennet")
         token_sort_ratio = fuzz.token_sort_ratio(name1, name2)
-        if token_sort_ratio >= threshold + 5:  # Slightly higher threshold
-            return True
-
-        return False
+        # Slightly higher threshold for the reordered form
+        return token_sort_ratio >= threshold + 5
 
     # === MERGING METHODS ===
 

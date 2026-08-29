@@ -183,3 +183,29 @@ async def test_openai_timeout_raises_timeouterror():
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
     assert provider.client.chat.completions.create.call_count == 1
+
+
+class TestErrorClassification:
+    """The error handler must recognise the timeout the providers actually raise."""
+
+    def test_builtin_timeout_is_classified_as_a_timeout(self):
+        """Providers raise the builtin TimeoutError.
+
+        errors.py used to define its own class of the same name, which shadowed
+        the builtin, so this branch never matched and every provider timeout was
+        reported as a generic INTERNAL_ERROR.
+        """
+        from src.utils.errors import ErrorHandler, OperationTimeoutError
+
+        handled = ErrorHandler().handle_error(TimeoutError("API call timed out"))
+
+        assert isinstance(handled, OperationTimeoutError)
+        assert handled.error_code == "TIMEOUT_ERROR"
+
+    def test_asyncio_timeout_is_classified_as_a_timeout(self):
+        import asyncio
+
+        from src.utils.errors import ErrorHandler, OperationTimeoutError
+
+        handled = ErrorHandler().handle_error(asyncio.TimeoutError("timed out"))
+        assert isinstance(handled, OperationTimeoutError)
