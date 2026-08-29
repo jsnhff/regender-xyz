@@ -336,7 +336,11 @@ class QCService:
         }
 
         for match in pattern.finditer(source):
-            if match.group(2).lower() not in self._nouns:
+            # The noun must be something this transform would change. In
+            # all_female "his wife" correctly becomes "her wife" — "wife" is
+            # already the target gender and was never going to move, so a
+            # pronoun-only change there is right, not a broken pair.
+            if match.group(2).lower() not in self._term_map:
                 continue
             pronoun = aligned.get(match.span(1))
             noun = aligned.get(match.span(2))

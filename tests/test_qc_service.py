@@ -166,3 +166,23 @@ class TestRepair:
         }
         fixed = repair_book(source, broken, TransformType.GENDER_SWAP)
         assert fixed["chapters"][0]["paragraphs"][0] == {"sentences": ["His daughter."]}
+
+
+class TestOneDirectionalTransforms:
+    """A pronoun-only change is correct when the noun is already on target."""
+
+    def test_all_female_his_wife_is_not_a_partial_pair(self):
+        qc = QCService(TransformType.ALL_FEMALE)
+        report = qc.check_book(book(["His wife spoke."]), book(["Her wife spoke."]))
+        assert "partial_pair" not in kinds(report)
+
+    def test_all_male_her_husband_is_not_a_partial_pair(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(book(["Her husband spoke."]), book(["His husband spoke."]))
+        assert "partial_pair" not in kinds(report)
+
+    def test_all_female_still_catches_a_real_miss(self):
+        """ "his brother" must become "her sister"; a stalled noun is a real pair break."""
+        qc = QCService(TransformType.ALL_FEMALE)
+        report = qc.check_book(book(["His brother spoke."]), book(["Her brother spoke."]))
+        assert "partial_pair" in kinds(report)
