@@ -449,7 +449,7 @@ class TransformService(BaseService):
         elif transform_type == TransformType.ALL_FEMALE:
             return {
                 "target_gender": "female",
-                "pronouns": {"he": "she", "him": "her", "his": "hers"},
+                "pronouns": {"he": "she", "him": "her", "his": "her/hers by role"},
                 "titles": {"Mr.": "Ms."},
                 "terms": {
                     "father": "mother",
@@ -468,7 +468,7 @@ class TransformService(BaseService):
                     "she": "he",
                     "him": "her",
                     "her": "him",
-                    "his": "hers",
+                    "his": "her/hers by role",
                     "hers": "his",
                 },
                 "titles": {"Mr.": "Ms.", "Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
@@ -2107,6 +2107,99 @@ class TransformService(BaseService):
         char_info = context.get("character_info", "")
         return self.token_manager.estimate_tokens(char_info) if char_info else 200
 
+    # What each transform is actually asking for, in the words the model reads.
+    # Previously the rules dict was interpolated raw, so the task arrived as
+    # "{'swap': True, 'pronouns': {...}}" and had to be inferred from a repr.
+    _TRANSFORM_BRIEF: dict[str, str] = {
+        "gender_swap": (
+            "TASK: Swap the gender of every character. Each man becomes a woman "
+            "and each woman becomes a man. There is no single target gender — a "
+            "phrase naming both genders keeps both, with the two exchanged."
+        ),
+        "all_male": "TASK: Make every character male.",
+        "all_female": "TASK: Make every character female.",
+        "nonbinary": (
+            "TASK: Make every character non-binary. Use they/them/their/theirs "
+            "and themself, with plural verb agreement (they were, they have), "
+            "and gender-neutral nouns and titles (Mx., parent, sibling, spouse)."
+        ),
+    }
+
+    def _describe_rules(self, transform_type: "TransformType", rules: Any) -> str:
+        """Render the rules as instructions rather than a Python dict repr."""
+        brief = self._TRANSFORM_BRIEF.get(transform_type.value, "TASK: Transform gender language.")
+        if not isinstance(rules, dict):
+            return brief
+
+        lines = [brief]
+        for label, key in (("Titles", "titles"), ("Terms", "terms")):
+            mapping = rules.get(key)
+            if isinstance(mapping, dict) and mapping:
+                pairs = ", ".join(f"{k} -> {v}" for k, v in mapping.items())
+                lines.append(f"{label}: {pairs}")
+        lines.append(
+            "These are examples, not an exhaustive list — apply the same "
+            "treatment to every other gendered word, including plurals."
+        )
+        return "\n".join(lines)
+
+    # "his" and "her" both split by syntactic role, and each transform needs a
+    # different half of that. Handing every transform the same rule told
+    # all_female to move a "her" that was already on target.
+    _POSSESSIVE_RULES: dict[str, str] = {
+        "gender_swap": (
+            'POSSESSIVES: "his" before a noun becomes "her" ("his name" -> "her '
+            'name"); standing alone it becomes "hers" ("the book is his" -> "the '
+            'book is hers"). "her" before a noun becomes "his" ("her husband" -> '
+            '"his wife"); as an object it becomes "him" ("spoke to her" -> "spoke '
+            'to him"). Both halves of a pair move together.'
+        ),
+        "all_female": (
+            'POSSESSIVES: "his" before a noun becomes "her" ("his name" -> "her '
+            'name"); standing alone it becomes "hers" ("the book is his" -> "the '
+            'book is hers"). "her" and "hers" are already correct — leave them.'
+        ),
+        "all_male": (
+            'POSSESSIVES: "her" before a noun becomes "his" ("her name" -> "his '
+            'name"); as an object it becomes "him" ("spoke to her" -> "spoke to '
+            'him"). "his" is already correct — leave it.'
+        ),
+        "nonbinary": (
+            'POSSESSIVES: "his" and "her" before a noun both become "their" ("her '
+            'mother" -> "their parent"); standing alone they become "theirs" and '
+            '"them" respectively ("spoke to her" -> "spoke to them").'
+        ),
+    }
+
+    def _possessives_rule(self, transform_type: "TransformType") -> str:
+        rule = self._POSSESSIVE_RULES.get(transform_type.value)
+        return f"{rule}\n" if rule else ""
+
+    def _paired_terms_rule(self, transform_type: "TransformType") -> str:
+        """Collapsing "ladies and gentlemen" is only right for a single target.
+
+        A swap has no target gender, so the same instruction there deletes half
+        the phrase and flattens exactly the pairs the transform exists to move.
+        """
+        targets = {
+            "all_male": "men",
+            "all_female": "ladies",
+            "nonbinary": "the neutral term",
+        }
+        target = targets.get(transform_type.value)
+        if target is None:
+            return (
+                'For paired opposite-gender terms (e.g. "ladies and gentlemen", '
+                '"father and mother"), keep both halves and exchange them '
+                '(e.g. "gentlemen and ladies", "mother and father"). Never '
+                "collapse a pair onto one gender.\n"
+            )
+        return (
+            'For paired opposite-gender terms (e.g. "boys and girls", "ladies '
+            'and gentlemen", "father and mother"), simplify to the target '
+            f"gender only (e.g. {target}).\n"
+        )
+
     def _create_batch_transform_prompt(
         self, batch_paragraphs: list, context: dict[str, Any], batch_size: int
     ) -> dict[str, str]:
@@ -2121,15 +2214,16 @@ class TransformService(BaseService):
             characters, transform_type, character_mappings
         )
 
-        system_prompt = f"""Gender transformation expert. Transform {batch_size} paragraphs.
+        plural = "" if batch_size == 1 else "s"
+        system_prompt = f"""You rewrite the gender language of literary prose. \
+Transform {batch_size} paragraph{plural}.
 
-{rules}
+{self._describe_rules(transform_type, rules)}
 {character_instructions}
-
+{self._possessives_rule(transform_type)}
 PRONOUN DISAMBIGUATION: In scenes where multiple characters share the same pronoun after transformation, replace ambiguous pronouns with the character's name where a first-time reader would be uncertain who is referred to. Prioritize dialogue attribution lines and sentences immediately following a speaker change. Do not alter sentence rhythm or add words beyond the name substitution.
-
-For paired opposite-gender terms (e.g. "boys and girls", "ladies and gentlemen", "father and mother"), simplify to the target gender only (e.g. "girls", "ladies", "mother").
-Each paragraph is preceded by a [[Pn]] marker. Return EXACTLY {batch_size} paragraphs, each preceded by its own unchanged marker, in the same order. Do not merge, split, drop or reorder paragraphs, and write nothing outside the markers. Keep original style. Only change gender language."""
+{self._paired_terms_rule(transform_type)}
+Each paragraph is preceded by a [[Pn]] marker. Return EXACTLY {batch_size} paragraph{plural}, each preceded by its own unchanged marker, in the same order. Do not merge, split, drop or reorder paragraphs, and write nothing outside the markers. Keep original style. Only change gender language."""
 
         paragraphs_text = "\n\n".join(
             f"[[P{index}]]\n{paragraph.get_text()}"
