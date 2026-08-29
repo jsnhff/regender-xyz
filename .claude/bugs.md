@@ -25,3 +25,24 @@ _Logged 2026-04-18. These are pre-existing issues unrelated to Roman numeral or 
 
 ## Anne of Green Gables (pg45)
 - **Title all-caps**: "ANNE OF GREEN GABLES" — title extraction preserves source capitalization; should apply title-case normalization
+
+---
+
+## Update 2026-08-29 — illustration-split paragraphs
+
+One cause common to several of the above was found and fixed on
+`claude/repo-state-5ylut4`: illustrated Gutenberg editions place plates in the
+middle of a sentence, and the parser removed the plate but left the blank lines
+around it, splitting one paragraph in two.
+
+In the P&P sample that was 1 split across 20 plates, and it reached print as a
+paragraph indent arriving mid-sentence. It also costs transform accuracy at that
+point, since the model gets a fragment ending on a bare possessive with the noun
+it belongs to in a different paragraph.
+
+Every title listed above is an illustrated edition, so **re-parse and re-check
+each one** — some of the chapter-count discrepancies here may be this. QC now
+reports the pattern as `split_sentence`.
+
+The title-extraction bugs (bracketed edition markers, subtitles, all-caps) are
+untouched and still open.
