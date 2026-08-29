@@ -14,6 +14,7 @@ from src.services.qc_service import (
     STRUCTURAL,
     QCService,
     format_report,
+    repair_book,
 )
 
 
@@ -121,3 +122,47 @@ class TestCoverageAccounting:
         rendered = format_report(report)
         assert "Coverage" in rendered
         assert "Chapter 1" in rendered
+
+
+class TestRepair:
+    """An edition produced before the fix can be corrected without an LLM."""
+
+    def test_repair_clears_auto_fixable_findings(self, qc):
+        source = book(["Her mother spoke to the king.", "A single man wants a wife."])
+        # What the pre-fix pipeline produced: the noun reverted, the pronoun did not.
+        broken = book(["His mother spoke to the king.", "A single woman wants a wife."])
+
+        before = qc.check_book(source, broken)
+        assert before.count(AUTO_FIXABLE) > 0
+
+        fixed = repair_book(source, broken, TransformType.GENDER_SWAP)
+        after = qc.check_book(source, fixed)
+
+        assert after.count(AUTO_FIXABLE) == 0
+        assert after.coverage == 1.0
+
+    def test_repair_produces_the_expected_prose(self, qc):
+        source = book(["A single man in possession of a good fortune must want a wife."])
+        broken = book(["A single woman in possession of a good fortune must want a wife."])
+        fixed = repair_book(source, broken, TransformType.GENDER_SWAP)
+        assert fixed["chapters"][0]["paragraphs"][0] == (
+            "A single woman in possession of a good fortune must want a husband."
+        )
+
+    def test_repair_leaves_a_correct_transform_alone(self, qc):
+        source = book(["Her husband spoke to the queen."])
+        good = book(["His wife spoke to the king."])
+        assert repair_book(source, good, TransformType.GENDER_SWAP) == good
+
+    def test_repair_preserves_paragraph_shape(self, qc):
+        """Sentence-list paragraphs must come back as sentence lists."""
+        source = {
+            "metadata": {},
+            "chapters": [{"number": 1, "title": "", "paragraphs": [{"sentences": ["Her son."]}]}],
+        }
+        broken = {
+            "metadata": {},
+            "chapters": [{"number": 1, "title": "", "paragraphs": [{"sentences": ["Her son."]}]}],
+        }
+        fixed = repair_book(source, broken, TransformType.GENDER_SWAP)
+        assert fixed["chapters"][0]["paragraphs"][0] == {"sentences": ["His daughter."]}

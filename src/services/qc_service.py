@@ -477,3 +477,38 @@ def check_files(
         Path(report_path).parent.mkdir(parents=True, exist_ok=True)
         Path(report_path).write_text(json.dumps(report.to_dict(), indent=2), encoding="utf-8")
     return report
+
+
+def repair_book(source: dict, transformed: dict, transform_type: TransformType) -> dict:
+    """Re-run the safety net over an existing transform, against its source.
+
+    Every auto_fixable finding is a word the current safety net can settle on
+    its own, so an edition produced before the net was fixed can be repaired
+    from the JSON without paying for another LLM pass. Words the net will not
+    guess at are left exactly as they are.
+    """
+    service = TransformService.__new__(TransformService)
+    repaired = dict(transformed)
+    repaired_chapters = []
+
+    for index, output_chapter in enumerate(transformed.get("chapters", [])):
+        source_chapter = (
+            source.get("chapters", [])[index] if index < len(source.get("chapters", [])) else {}
+        )
+        source_paragraphs = source_chapter.get("paragraphs", [])
+        chapter = dict(output_chapter)
+        paragraphs = []
+
+        for position, output_paragraph in enumerate(output_chapter.get("paragraphs", [])):
+            text = _text_of(output_paragraph)
+            if position < len(source_paragraphs):
+                text = service._apply_term_map(
+                    text, transform_type, source_text=_text_of(source_paragraphs[position])
+                )
+            paragraphs.append(text if isinstance(output_paragraph, str) else {"sentences": [text]})
+
+        chapter["paragraphs"] = paragraphs
+        repaired_chapters.append(chapter)
+
+    repaired["chapters"] = repaired_chapters
+    return repaired

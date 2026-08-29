@@ -39,7 +39,7 @@ jobs:
         run: python -m pytest -q
 
   lint:
-    name: Lint (advisory)
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,13 +53,10 @@ jobs:
       - name: Install ruff
         run: pip install ruff
 
-      # Advisory only: ruff findings are surfaced as annotations but do not
-      # fail the job, so the check stays green while the repo's pre-existing
-      # lint debt is paid down incrementally.
+      # Blocking: the pre-existing lint debt has been paid down, so any new
+      # finding is a regression rather than a known backlog item.
       - name: Ruff check
-        continue-on-error: true
         run: ruff check --output-format=github .
 
       - name: Ruff format check
-        continue-on-error: true
         run: ruff format --check .
