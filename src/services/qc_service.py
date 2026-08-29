@@ -222,6 +222,8 @@ class QCService:
                 )
             )
 
+        self._check_continuity(chapter, number, source_paragraphs)
+
         for position, (source_paragraph, output_paragraph) in enumerate(
             zip(source_paragraphs, output_paragraphs)
         ):
@@ -262,6 +264,34 @@ class QCService:
         self._check_pair_gender(chapter, number, position, source, output)
         self._check_names(chapter, number, position, source, output)
         self._check_residual_terms(chapter, number, position, output, residual)
+
+    def _check_continuity(self, chapter: ChapterReport, number: int, paragraphs: list) -> None:
+        """Paragraphs that are really one sentence cut in half.
+
+        Illustrated Gutenberg editions place plates mid-sentence; stripping the
+        plate can leave the blank lines around it and split the paragraph. The
+        break shows up as an indent mid-sentence in print, and the transform
+        sees a fragment ending on a bare possessive with its noun in a different
+        paragraph. Checked against the source, since the split is inherited from
+        the parse rather than introduced by the transform.
+        """
+        for position in range(len(paragraphs) - 1):
+            before = _text_of(paragraphs[position]).strip()
+            after = _text_of(paragraphs[position + 1]).strip()
+            if not before or not after:
+                continue
+            if (before[-1].isalnum() or before[-1] in ",;:-—") and after[0].islower():
+                chapter.findings.append(
+                    Finding(
+                        STRUCTURAL,
+                        "split_sentence",
+                        number,
+                        position,
+                        f"paragraph ends mid-sentence and the next opens lower case: "
+                        f"{before[-40:]!r} + {after[:40]!r}",
+                        _excerpt(after, 0),
+                    )
+                )
 
     def _check_length_drift(
         self, chapter: ChapterReport, number: int, position: int, source: str, output: str

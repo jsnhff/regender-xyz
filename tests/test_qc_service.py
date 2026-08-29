@@ -268,3 +268,26 @@ class TestNameVerification:
         qc = QCService(TransformType.GENDER_SWAP)
         report = qc.check_book(book(["my little Lizzy"]), book(["my little Lizzy"]))
         assert "residual_name" not in kinds(report)
+
+
+class TestParagraphContinuity:
+    """A sentence cut in half by a stripped illustration plate."""
+
+    def test_split_sentence_is_reported(self, qc):
+        source = book(
+            [
+                "Lady Lucas quieted her fears a little by starting the idea of his",
+                "being gone to London only to get a large party for the ball.",
+            ]
+        )
+        report = qc.check_book(source, source)
+        finding = next(f for f in report.all_findings if f.kind == "split_sentence")
+        assert finding.severity == STRUCTURAL
+
+    def test_ordinary_paragraphs_are_not_reported(self, qc):
+        source = book(["Mr. Bennet made no answer.", "This was invitation enough."])
+        assert "split_sentence" not in kinds(qc.check_book(source, source))
+
+    def test_lower_case_opening_after_a_full_stop_is_fine(self, qc):
+        source = book(["He came down on Monday.", "mid-sentence looking, but preceded by a stop."])
+        assert "split_sentence" not in kinds(qc.check_book(source, source))
