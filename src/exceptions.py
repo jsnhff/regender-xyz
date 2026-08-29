@@ -70,6 +70,16 @@ class TransformationError(ServiceError):
     pass
 
 
+class BatchResponseError(TransformationError):
+    """Raised when a batch response cannot be mapped onto its source paragraphs.
+
+    Signals the caller to retry the batch one paragraph at a time rather than
+    guessing an alignment, which would silently drop or duplicate text.
+    """
+
+    pass
+
+
 class QualityControlError(ServiceError):
     """Raised when quality control validation fails."""
 

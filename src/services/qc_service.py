@@ -41,6 +41,11 @@ STRUCTURAL = "structural"
 # the LLM either dropped a sentence or invented one.
 LENGTH_DRIFT_THRESHOLD = 0.25
 
+# Short paragraphs need an absolute budget too — 25% of a four-word line is one
+# word, so a hallucinated sentence would slip through a purely relative check.
+# Set above the couple of words the prompt's pronoun disambiguation may add.
+MIN_ABSOLUTE_DRIFT = 6
+
 # Words that read as gendered but carry no gender in the source text, so a
 # residual occurrence is not a miss worth reporting.
 _REVIEW_IGNORE = frozenset({"master", "mistress"})
@@ -143,9 +148,21 @@ class QCReport:
 class QCService:
     """Compares a transformed book against its source, chapter by chapter."""
 
-    def __init__(self, transform_type: TransformType):
+    def __init__(self, transform_type: TransformType, name_map: Optional[dict[str, str]] = None):
         self.transform_type = transform_type
         self.key = transform_type.value
+        # Renaming is driven by character analysis, not the term map, so QC is
+        # blind to it unless the map used for the run is handed over.
+        self.name_map = {k: v for k, v in (name_map or {}).items() if k.lower() != v.lower()}
+        self._name_pattern = (
+            re.compile(
+                r"(?<![A-Za-z'])(?:"
+                + "|".join(re.escape(name) for name in sorted(self.name_map, key=len, reverse=True))
+                + r")(?![A-Za-z'])"
+            )
+            if self.name_map
+            else None
+        )
         # Borrowed rather than duplicated: QC must judge the transform against
         # the same vocabulary the transform itself uses, or the two drift apart.
         self._transform = TransformService.__new__(TransformService)
@@ -242,25 +259,50 @@ class QCService:
             chapter, number, position, source, output, aligned, residual, repaired
         )
         self._check_auto_fixable(chapter, number, position, output, repaired)
-        self._check_partial_pairs(chapter, number, position, source, output)
+        self._check_pair_gender(chapter, number, position, source, output)
+        self._check_names(chapter, number, position, source, output)
         self._check_residual_terms(chapter, number, position, output, residual)
 
     def _check_length_drift(
         self, chapter: ChapterReport, number: int, position: int, source: str, output: str
     ) -> None:
-        """Catch truncated or padded paragraphs — usually a partial LLM response."""
+        """Catch truncated, padded or emptied paragraphs — a partial LLM response.
+
+        An empty output is always a finding: it is the signature of the old
+        batch parser padding a short response, which deleted paragraphs from the
+        book outright. Short paragraphs are held to an absolute word budget as
+        well as a relative one, so a four-word line cannot quietly grow by
+        twenty without tripping the check.
+        """
         source_words = len(source.split())
-        if source_words < 20:
+        output_words = len(output.split())
+
+        if source_words and not output_words:
+            chapter.findings.append(
+                Finding(
+                    STRUCTURAL,
+                    "empty_paragraph",
+                    number,
+                    position,
+                    f"output is empty; source has {source_words} words",
+                    _excerpt(source, 0),
+                )
+            )
             return
-        drift = abs(len(output.split()) - source_words) / source_words
-        if drift > LENGTH_DRIFT_THRESHOLD:
+
+        if not source_words:
+            return
+
+        delta = abs(output_words - source_words)
+        allowed = max(MIN_ABSOLUTE_DRIFT, LENGTH_DRIFT_THRESHOLD * source_words)
+        if delta > allowed:
             chapter.findings.append(
                 Finding(
                     STRUCTURAL,
                     "length_drift",
                     number,
                     position,
-                    f"word count moved {drift:.0%} ({source_words} -> {len(output.split())})",
+                    f"word count moved by {delta} ({source_words} -> {output_words})",
                     _excerpt(output, 0),
                 )
             )
@@ -311,19 +353,23 @@ class QCService:
                 )
             )
 
-    def _check_partial_pairs(
+    def _check_pair_gender(
         self, chapter: ChapterReport, number: int, position: int, source: str, output: str
     ) -> None:
-        """The "her husband" case: a possessive pronoun and its noun disagreeing.
+        """The "her husband" case: a possessive pronoun and its noun must agree.
 
-        Both halves of "her husband" have to move together. If exactly one of
-        them changed, the phrase is incoherent even though each word on its own
-        looks transformed.
+        Checking only whether each half *moved* is not enough — "his lady" can
+        become "her wife", where both halves moved and the phrase is still wrong.
+        So this compares the gender each half actually lands on against the
+        gender the transform calls for. In all_female "his wife" correctly
+        becomes "her wife" (both female); in gender_swap it must become
+        "her husband" (female possessor, male noun).
         """
         if not self._contextual:
             return
         pronouns = "|".join(self._contextual)
         pattern = re.compile(rf"\b({pronouns})\s+([A-Za-z']+)", re.IGNORECASE)
+
         # Keyed by position in the *source*, because that is where a pair's
         # pronoun and noun are located; the output spans have already shifted by
         # however much the words around them changed length.
@@ -336,31 +382,68 @@ class QCService:
         }
 
         for match in pattern.finditer(source):
-            # The noun must be something this transform would change. In
-            # all_female "his wife" correctly becomes "her wife" — "wife" is
-            # already the target gender and was never going to move, so a
-            # pronoun-only change there is right, not a broken pair.
             if match.group(2).lower() not in self._term_map:
                 continue
             pronoun = aligned.get(match.span(1))
             noun = aligned.get(match.span(2))
             if pronoun is None or noun is None:
                 continue
-            pronoun_moved = pronoun[0] != pronoun[1]
-            noun_moved = noun[0] != noun[1]
-            if pronoun_moved != noun_moved:
-                moved, stayed = (pronoun, noun) if pronoun_moved else (noun, pronoun)
+
+            problems = []
+            for role, (source_word, output_word, _span) in (
+                ("pronoun", pronoun),
+                ("noun", noun),
+            ):
+                wanted = TransformService.expected_gender(
+                    self.key, TransformService.gender_of(source_word)
+                )
+                if wanted is None:
+                    continue
+                landed = TransformService.gender_of(output_word)
+                if wanted == "neutral":
+                    if landed is not None:
+                        problems.append(f"{role} {output_word!r} is still {landed}")
+                elif landed != wanted:
+                    problems.append(
+                        f"{role} {source_word!r} became {output_word!r} "
+                        f"({landed or 'neutral'}, wanted {wanted})"
+                    )
+
+            if problems:
                 chapter.findings.append(
                     Finding(
                         NEEDS_REVIEW,
-                        "partial_pair",
+                        "pair_gender",
                         number,
                         position,
-                        f"{match.group(0)!r}: {moved[0]!r} became {moved[1]!r} "
-                        f"but {stayed[0]!r} did not change",
+                        f"{match.group(0)!r}: " + "; ".join(problems),
                         _excerpt(output, noun[2][0]),
                     )
                 )
+
+    def _check_names(
+        self, chapter: ChapterReport, number: int, position: int, source: str, output: str
+    ) -> None:
+        """A character name that should have been replaced but survived.
+
+        Nothing in the term map knows about character names, so a run can score
+        100% on gendered words while still calling a renamed character by their
+        original name.
+        """
+        if self._name_pattern is None or not self._name_pattern.search(source):
+            return
+        for match in self._name_pattern.finditer(output):
+            name = match.group(0)
+            chapter.findings.append(
+                Finding(
+                    NEEDS_REVIEW,
+                    "residual_name",
+                    number,
+                    position,
+                    f"{name!r} was not renamed to {self.name_map[name]!r}",
+                    _excerpt(output, match.start()),
+                )
+            )
 
     def _check_residual_terms(
         self, chapter: ChapterReport, number: int, position: int, output: str, residual: list
@@ -472,9 +555,10 @@ def check_files(
     transformed_path: str,
     transform_type: TransformType,
     report_path: Optional[str] = None,
+    name_map: Optional[dict[str, str]] = None,
 ) -> QCReport:
     """Compare two book JSON files, optionally writing the full report to disk."""
-    report = QCService(transform_type).check_book(
+    report = QCService(transform_type, name_map=name_map).check_book(
         load_book(source_path), load_book(transformed_path)
     )
     if report_path:

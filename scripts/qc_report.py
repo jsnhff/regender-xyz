@@ -5,6 +5,7 @@ Chapter-by-chapter QC for a transformed book. No LLM calls, no API keys.
     python scripts/qc_report.py source.json swap.json gender_swap --json out/qc.json
     python scripts/qc_report.py source.json swap.json gender_swap --fail-on auto_fixable
     python scripts/qc_report.py source.json swap.json gender_swap --repair fixed.json
+    python scripts/qc_report.py source.json swap.json gender_swap --name-map name_map.json
 
 Exits non-zero when findings at or above --fail-on are present, so it can gate
 CI or a print run. --repair re-runs the safety net over an existing transform
@@ -43,6 +44,12 @@ def main() -> int:
     )
     parser.add_argument("--json", dest="json_path", help="Write the full report here")
     parser.add_argument(
+        "--name-map",
+        metavar="name_map.json",
+        help="Character rename map used for the run, so renames are checked too "
+        "(written next to the output by the transform)",
+    )
+    parser.add_argument(
         "--fail-on",
         choices=sorted(SEVERITIES, key=SEVERITIES.get),
         default=AUTO_FIXABLE,
@@ -59,7 +66,10 @@ def main() -> int:
     transform_type = TransformType(args.transform_type)
     source = load_book(args.source)
     transformed = load_book(args.transformed)
-    service = QCService(transform_type)
+    name_map = None
+    if args.name_map:
+        name_map = json.loads(Path(args.name_map).read_text())
+    service = QCService(transform_type, name_map=name_map)
 
     report = service.check_book(source, transformed)
     print(format_report(report, limit=args.limit))

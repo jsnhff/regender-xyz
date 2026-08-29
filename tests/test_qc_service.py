@@ -47,21 +47,21 @@ class TestCleanTransform:
         assert report.coverage == 1.0
 
 
-class TestPartialPair:
+class TestPairGender:
     def test_pronoun_moved_but_noun_did_not(self, qc):
         """Carly's report: one half of "her husband" changes and the other does not."""
         source = book(["Her husband was there."])
         output = book(["His husband was there."])
         report = qc.check_book(source, output)
-        assert "partial_pair" in kinds(report)
-        finding = next(f for f in report.all_findings if f.kind == "partial_pair")
+        assert "pair_gender" in kinds(report)
+        finding = next(f for f in report.all_findings if f.kind == "pair_gender")
         assert "husband" in finding.detail
         assert finding.severity == NEEDS_REVIEW
 
     def test_noun_moved_but_pronoun_did_not(self, qc):
         source = book(["Her husband was there."])
         output = book(["Her wife was there."])
-        assert "partial_pair" in kinds(qc.check_book(source, output))
+        assert "pair_gender" in kinds(qc.check_book(source, output))
 
 
 class TestSafetyNetRegressions:
@@ -174,15 +174,97 @@ class TestOneDirectionalTransforms:
     def test_all_female_his_wife_is_not_a_partial_pair(self):
         qc = QCService(TransformType.ALL_FEMALE)
         report = qc.check_book(book(["His wife spoke."]), book(["Her wife spoke."]))
-        assert "partial_pair" not in kinds(report)
+        assert "pair_gender" not in kinds(report)
 
     def test_all_male_her_husband_is_not_a_partial_pair(self):
         qc = QCService(TransformType.ALL_MALE)
         report = qc.check_book(book(["Her husband spoke."]), book(["His husband spoke."]))
-        assert "partial_pair" not in kinds(report)
+        assert "pair_gender" not in kinds(report)
 
     def test_all_female_still_catches_a_real_miss(self):
         """ "his brother" must become "her sister"; a stalled noun is a real pair break."""
         qc = QCService(TransformType.ALL_FEMALE)
         report = qc.check_book(book(["His brother spoke."]), book(["Her brother spoke."]))
-        assert "partial_pair" in kinds(report)
+        assert "pair_gender" in kinds(report)
+
+
+class TestPairGenderCoherence:
+    """Both halves moving is not enough — they have to land on the right genders."""
+
+    def test_both_halves_moved_but_the_noun_landed_wrong(self):
+        """ "his lady" becoming "her wife" passes a moved/not-moved check and is
+        still wrong: the swap needs a female possessor and a male noun."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["said his lady to him"]), book(["said her wife to her"]))
+        finding = next(f for f in report.all_findings if f.kind == "pair_gender")
+        assert "wanted male" in finding.detail
+
+    def test_correct_swap_of_both_halves_passes(self):
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["said his lady to him"]), book(["said her lord to her"]))
+        assert "pair_gender" not in kinds(report)
+
+    def test_natural_rephrasing_passes(self):
+        """A model may write "her husband" where the term map would say "her lord"."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["said his lady to him"]), book(["said her husband to her"]))
+        assert "pair_gender" not in kinds(report)
+
+    def test_nonbinary_pair_must_end_up_neutral(self):
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(book(["her mother arrived"]), book(["their mother arrived"]))
+        finding = next(f for f in report.all_findings if f.kind == "pair_gender")
+        assert "still female" in finding.detail
+
+
+class TestStructuralSensitivity:
+    def test_emptied_paragraph_is_caught_however_short(self):
+        """The signature of the old batch parser padding a short response."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["Mrs. Bennet made no answer."]), book([""]))
+        assert "empty_paragraph" in kinds(report)
+
+    def test_short_paragraph_cannot_quietly_grow(self):
+        """25% of a four-word line is one word, so a relative check alone misses this."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(
+            book(["This was invitation enough."]),
+            book(["This was invitation enough. She smiled at the thought and said nothing more."]),
+        )
+        assert "length_drift" in kinds(report)
+
+    def test_a_normal_transform_does_not_trip_the_absolute_floor(self):
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(
+            book(["Mr. Bennet replied that he had not."]),
+            book(["Mrs. Bennet replied that she had not."]),
+        )
+        assert "length_drift" not in kinds(report)
+
+
+class TestNameVerification:
+    def test_unrenamed_character_is_caught(self):
+        qc = QCService(TransformType.GENDER_SWAP, name_map={"Lizzy": "Liam"})
+        report = qc.check_book(
+            book(["a good word for my little Lizzy"]), book(["a good word for my little Lizzy"])
+        )
+        finding = next(f for f in report.all_findings if f.kind == "residual_name")
+        assert "Liam" in finding.detail
+
+    def test_applied_rename_passes(self):
+        qc = QCService(TransformType.GENDER_SWAP, name_map={"Lizzy": "Liam"})
+        report = qc.check_book(
+            book(["a good word for my little Lizzy"]), book(["a good word for my little Liam"])
+        )
+        assert "residual_name" not in kinds(report)
+
+    def test_names_respect_word_boundaries(self):
+        """ "Ann" must not report a finding against "Anne"."""
+        qc = QCService(TransformType.GENDER_SWAP, name_map={"Ann": "Alan"})
+        report = qc.check_book(book(["Anne walked on"]), book(["Anne walked on"]))
+        assert "residual_name" not in kinds(report)
+
+    def test_no_name_map_means_no_name_checks(self):
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["my little Lizzy"]), book(["my little Lizzy"]))
+        assert "residual_name" not in kinds(report)

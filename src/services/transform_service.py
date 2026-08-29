@@ -11,6 +11,7 @@ import re
 import time
 from typing import Any, Optional
 
+from src.exceptions import BatchResponseError
 from src.models.book import Book, Chapter
 from src.models.character import CharacterAnalysis
 from src.models.transformation import (
@@ -882,6 +883,7 @@ class TransformService(BaseService):
     _EFFECTIVE_TERM_MAPS: dict[str, dict[str, str]] = {}
     _GENDERED_NOUNS: dict[str, frozenset] = {}
     _GENDERED_VOCABULARY: dict[str, frozenset] = {}
+    _GENDER_LEXICON: dict[str, str] = {}
     _COMPILED_SUBSTITUTIONS: dict[tuple, tuple] = {}
 
     # Gendered terms that the LLM occasionally misses — keyed by transform type.
@@ -1614,6 +1616,47 @@ class TransformService(BaseService):
         return result
 
     @classmethod
+    def gender_of(cls, word: str) -> Optional[str]:
+        """ "male", "female", or None for a word carrying no gender.
+
+        Derived from the one-directional maps, which encode the answer already:
+        all_female maps male terms onto female ones, all_male the reverse. Any
+        word the two disagree about is dropped rather than guessed at.
+        """
+        if not cls._GENDER_LEXICON:
+            male, female = set(), set()
+            for source_key, source_is_male in (("all_female", True), ("all_male", False)):
+                for original, replacement in cls._effective_term_map(source_key).items():
+                    origin, target = (male, female) if source_is_male else (female, male)
+                    origin.add(original.lower().rstrip("."))
+                    target.add(replacement.lower().rstrip("."))
+            male |= {"he", "him", "his", "himself"}
+            female |= {"she", "her", "hers", "herself"}
+            contested = male & female
+            cls._GENDER_LEXICON.update(dict.fromkeys(male - contested, "male"))
+            cls._GENDER_LEXICON.update(dict.fromkeys(female - contested, "female"))
+        return cls._GENDER_LEXICON.get(word.lower().rstrip("."))
+
+    @classmethod
+    def expected_gender(cls, key: str, source_gender: Optional[str]) -> Optional[str]:
+        """What a source word's gender should become under a transform.
+
+        Returns "neutral" when the transform targets no gender at all, and None
+        when the source word carries no gender to transform.
+        """
+        if source_gender is None:
+            return None
+        if key == "gender_swap":
+            return "female" if source_gender == "male" else "male"
+        if key == "all_male":
+            return "male"
+        if key == "all_female":
+            return "female"
+        if key == "nonbinary":
+            return "neutral"
+        return None
+
+    @classmethod
     def _gendered_vocabulary(cls, key: str) -> frozenset:
         """Every word a transform may rewrite — gendered nouns plus all pronouns.
 
@@ -1919,28 +1962,49 @@ class TransformService(BaseService):
                         expanded[name] = matched_target
         return expanded
 
-    def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
-        """Parse batch response into individual paragraph texts."""
-        # Simple approach: split by double newlines
-        # The LLM should return paragraphs separated by blank lines
-        paragraphs = response.strip().split("\n\n")
+    # Paragraph delimiter the model is asked to echo back. Blank lines alone are
+    # not a safe protocol: a merged pair, an added preamble, or a paragraph
+    # containing its own blank line shifts every later paragraph in the batch.
+    _PARAGRAPH_MARKER = re.compile(r"^[ \t]*\[\[P(\d+)\]\][ \t]*\n?", re.MULTILINE)
 
-        # If we got the expected number, great!
+    def _parse_batch_response(self, response: str, expected_count: int) -> list[str]:
+        """Split a batch response into one text per source paragraph.
+
+        Raises BatchResponseError when the response cannot be mapped onto the
+        batch with confidence. The caller retries those paragraphs one at a time,
+        where no ambiguity is possible. Guessing instead is what silently drops
+        text: padding a short response with empty strings deletes paragraphs from
+        the book, and truncating a long one drops the tail, both without error.
+        """
+        response = response.strip()
+
+        # A batch of one cannot be misaligned, so take the whole response.
+        if expected_count == 1:
+            return [self._PARAGRAPH_MARKER.sub("", response).strip()]
+
+        markers = list(self._PARAGRAPH_MARKER.finditer(response))
+        if markers:
+            found: dict[int, str] = {}
+            for position, marker in enumerate(markers):
+                end = (
+                    markers[position + 1].start() if position + 1 < len(markers) else len(response)
+                )
+                index = int(marker.group(1)) - 1
+                if 0 <= index < expected_count:
+                    found[index] = response[marker.end() : end].strip()
+            if len(found) == expected_count:
+                return [found[i] for i in range(expected_count)]
+            self.logger.warning(f"Batch response marked {len(found)}/{expected_count} paragraphs")
+
+        # Models that ignore the markers still usually honour blank lines.
+        paragraphs = [part.strip() for part in response.split("\n\n") if part.strip()]
         if len(paragraphs) == expected_count:
             return paragraphs
 
-        # Otherwise, try to be smart about it
-        self.logger.warning(f"Expected {expected_count} paragraphs, got {len(paragraphs)}")
-
-        # Pad or truncate as needed
-        if len(paragraphs) < expected_count:
-            # Pad with empty strings
-            paragraphs.extend([""] * (expected_count - len(paragraphs)))
-        else:
-            # Truncate
-            paragraphs = paragraphs[:expected_count]
-
-        return paragraphs
+        raise BatchResponseError(
+            f"Expected {expected_count} paragraphs, could not map response "
+            f"({len(paragraphs)} blank-line blocks, {len(markers)} markers)"
+        )
 
     def _create_token_optimized_batches(
         self, paragraphs: list, context: dict[str, Any]
@@ -2065,12 +2129,14 @@ class TransformService(BaseService):
 PRONOUN DISAMBIGUATION: In scenes where multiple characters share the same pronoun after transformation, replace ambiguous pronouns with the character's name where a first-time reader would be uncertain who is referred to. Prioritize dialogue attribution lines and sentences immediately following a speaker change. Do not alter sentence rhythm or add words beyond the name substitution.
 
 For paired opposite-gender terms (e.g. "boys and girls", "ladies and gentlemen", "father and mother"), simplify to the target gender only (e.g. "girls", "ladies", "mother").
-Return EXACTLY {batch_size} paragraphs separated by blank lines. Keep original style. Only change gender language."""
+Each paragraph is preceded by a [[Pn]] marker. Return EXACTLY {batch_size} paragraphs, each preceded by its own unchanged marker, in the same order. Do not merge, split, drop or reorder paragraphs, and write nothing outside the markers. Keep original style. Only change gender language."""
 
-        # Simpler format without markers - just numbered paragraphs
-        paragraphs_text = "\n\n".join(p.get_text() for p in batch_paragraphs)
+        paragraphs_text = "\n\n".join(
+            f"[[P{index}]]\n{paragraph.get_text()}"
+            for index, paragraph in enumerate(batch_paragraphs, 1)
+        )
 
-        user_prompt = f"Transform these {batch_size} paragraphs (separated by blank lines):\n\n{paragraphs_text}"
+        user_prompt = f"Transform these {batch_size} paragraphs:\n\n{paragraphs_text}"
 
         return {"system": system_prompt, "user": user_prompt}
 

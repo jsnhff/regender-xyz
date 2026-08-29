@@ -315,6 +315,14 @@ class Application:
                         json.dump(characters.to_dict(), f, indent=2, default=str)
                     self.logger.info(f"Saved character analysis to {char_file}")
 
+                # Persist the name map alongside the output. Without it there is
+                # no way to check afterwards that every rename actually landed.
+                if name_map:
+                    map_file = output_dir / "name_map.json"
+                    with open(map_file, "w") as f:
+                        json.dump(name_map, f, indent=2)
+                    self.logger.info(f"Saved name map to {map_file}")
+
             # Transform the book
             transformer = self.get_service("transform")
 
