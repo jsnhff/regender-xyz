@@ -86,9 +86,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         import os
 
         # Get API key from config or environment
-        self.api_key = config.get("api_key") or os.getenv(
-            f"{self.provider_name.upper()}_API_KEY"
-        )
+        self.api_key = config.get("api_key") or os.getenv(f"{self.provider_name.upper()}_API_KEY")
 
         if not self.api_key:
             raise ValueError(
@@ -106,16 +104,14 @@ class BaseProviderPlugin(LLMProvider, Plugin):
             # TokenBucketRateLimiter uses tokens_per_minute parameter
             self.rate_limiter = RateLimiter(
                 tokens_per_minute=100000,  # Default token limit
-                tokens_per_request=4000    # Estimated tokens per request
+                tokens_per_request=4000,  # Estimated tokens per request
             )
 
         # Provider-specific initialization
         self._initialize_client()
 
         self._initialized = True
-        self.logger.info(
-            f"Initialized {self.provider_name} provider with model {self.model}"
-        )
+        self.logger.info(f"Initialized {self.provider_name} provider with model {self.model}")
 
     @abstractmethod
     def _initialize_client(self):
@@ -138,9 +134,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
 
         return self.complete(messages, **context)
 
-    async def complete(
-        self, messages: list[dict[str, str]], **kwargs
-    ) -> str:
+    async def complete(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Complete a prompt (async by default).
 
@@ -162,9 +156,7 @@ class BaseProviderPlugin(LLMProvider, Plugin):
         return await self._complete_impl(messages, **kwargs)
 
     @abstractmethod
-    async def _complete_impl(
-        self, messages: list[dict[str, str]], **kwargs
-    ) -> str:
+    async def _complete_impl(self, messages: list[dict[str, str]], **kwargs) -> str:
         """
         Provider-specific completion implementation.
 

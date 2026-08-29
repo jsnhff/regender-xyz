@@ -311,7 +311,7 @@ class Application:
             if output_dir:
                 char_file = output_dir / "characters.json"
                 if not char_file.exists():
-                    with open(char_file, 'w') as f:
+                    with open(char_file, "w") as f:
                         json.dump(characters.to_dict(), f, indent=2, default=str)
                     self.logger.info(f"Saved character analysis to {char_file}")
 
@@ -323,7 +323,10 @@ class Application:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
             transformation = await transformer.transform_book(
-                book, TransformType(transform_type), characters, selected_characters,
+                book,
+                TransformType(transform_type),
+                characters,
+                selected_characters,
                 name_map=name_map,
                 on_chapter_complete=on_chapter_complete,
             )
@@ -379,7 +382,7 @@ class Application:
             config = ServiceConfig(
                 extra_config={
                     "preserve_unicode": False,
-                    "normalize_method": "unidecode"  # Use unidecode for clean ASCII
+                    "normalize_method": "unidecode",  # Use unidecode for clean ASCII
                 }
             )
 

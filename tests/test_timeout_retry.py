@@ -5,6 +5,7 @@ Simulates the Darcy's letter scenario: a very long paragraph that causes an API
 timeout on the first batch attempt. The retry logic should split the paragraph
 into sentence groups and successfully transform it without re-running the whole book.
 """
+
 import re
 
 import pytest
@@ -76,9 +77,7 @@ class TimeoutThenSucceedProvider:
         self.call_count += 1
         if self.call_count == 1:
             raise TimeoutError("Simulated API timeout on large paragraph")
-        user_msg = next(
-            (m["content"] for m in reversed(messages) if m["role"] == "user"), ""
-        )
+        user_msg = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
         paragraphs = _extract_paragraphs_from_prompt(user_msg)
         return "\n\n".join(_make_transformed(p) for p in paragraphs)
 
@@ -103,9 +102,7 @@ async def test_timeout_triggers_sentence_level_retry():
         "characters": CharacterAnalysis(book_id="test", characters=[]),
     }
 
-    transformed_chapter, _changes = await service._transform_single_chapter(
-        chapter, 0, context
-    )
+    transformed_chapter, _changes = await service._transform_single_chapter(chapter, 0, context)
 
     assert provider.call_count > 1, "Expected at least one retry call after initial timeout"
 
@@ -148,17 +145,19 @@ async def test_retry_falls_back_to_term_map_on_total_failure():
         "characters": CharacterAnalysis(book_id="test", characters=[]),
     }
 
-    transformed_chapter, _changes = await service._transform_single_chapter(
-        chapter, 0, context
-    )
+    transformed_chapter, _changes = await service._transform_single_chapter(chapter, 0, context)
 
     output_text = transformed_chapter.paragraphs[0].get_text()
 
     # Term_map should have caught these even though LLM completely failed.
     # Use word-boundary checks so "widower" doesn't match the "widow" pattern.
     assert not re.search(r"\baunt\b", output_text), f"'aunt' not caught by term_map: {output_text}"
-    assert not re.search(r"\bwidow\b", output_text), f"'widow' not caught by term_map: {output_text}"
-    assert not re.search(r"\bqueen\b", output_text), f"'queen' not caught by term_map: {output_text}"
+    assert not re.search(r"\bwidow\b", output_text), (
+        f"'widow' not caught by term_map: {output_text}"
+    )
+    assert not re.search(r"\bqueen\b", output_text), (
+        f"'queen' not caught by term_map: {output_text}"
+    )
     assert re.search(r"\buncle\b", output_text), f"'uncle' not in output: {output_text}"
     assert re.search(r"\bwidower\b", output_text), f"'widower' not in output: {output_text}"
     assert re.search(r"\bking\b", output_text), f"'king' not in output: {output_text}"

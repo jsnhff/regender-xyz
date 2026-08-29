@@ -209,7 +209,14 @@ _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
 
 _OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
 _OPENAI_SKIP_PATTERNS = (
-    "instruct", "realtime", "audio", "tts", "whisper", "dall-e", "embedding", "search",
+    "instruct",
+    "realtime",
+    "audio",
+    "tts",
+    "whisper",
+    "dall-e",
+    "embedding",
+    "search",
 )
 
 
@@ -228,7 +235,7 @@ def _openai_display_name(model_id: str) -> str:
     name = model_id
     for prefix, replacement in (("gpt-", "GPT-"), ("o1", "O1"), ("o3", "O3"), ("o4", "O4")):
         if name.startswith(prefix):
-            name = replacement + name[len(prefix):]
+            name = replacement + name[len(prefix) :]
             break
     return name.replace("-", " ")
 
@@ -825,7 +832,9 @@ class FileBrowserScreen(Screen):
         self._start_path = start_path
 
     def compose(self) -> ComposeResult:
-        yield Label("Browse — arrows to navigate, Enter to select, Esc to cancel  (.txt files only)")
+        yield Label(
+            "Browse — arrows to navigate, Enter to select, Esc to cancel  (.txt files only)"
+        )
         yield _TxtDirectoryTree(str(self._start_path))
 
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
@@ -941,6 +950,7 @@ class RegenderTUI(App):
             auto = "anthropic" if has_anthropic else "openai"
             os.environ["DEFAULT_PROVIDER"] = auto
             from dotenv import set_key
+
             set_key(".env", "DEFAULT_PROVIDER", auto)
 
         return False  # All good
@@ -1005,7 +1015,9 @@ class RegenderTUI(App):
         self.print("     [#aaaaaa]Free, runs on your computer — no API key needed[/]")
         self.print("     [#aaaaaa]→ ollama.com[/]")
         self.print("")
-        self.print("  [bold #ffffff]↵[/]  Skip for now [#aaaaaa](parse_only still works without a key)[/]")
+        self.print(
+            "  [bold #ffffff]↵[/]  Skip for now [#aaaaaa](parse_only still works without a key)[/]"
+        )
         self.print("")
         self.set_prompt(">  ")
 
@@ -1037,12 +1049,16 @@ class RegenderTUI(App):
         """Prompt user to paste their API key."""
         self._stage = "setup_key"
         if self._setup_provider == "anthropic":
-            self.print("  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://console.anthropic.com/settings/keys[/]")
-            self.print("  [#aaaaaa]Sign in, click \"Create Key\", and paste it below.[/]")
+            self.print(
+                "  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://console.anthropic.com/settings/keys[/]"
+            )
+            self.print('  [#aaaaaa]Sign in, click "Create Key", and paste it below.[/]')
             self.print("  [#aaaaaa]It starts with[/] [bold #ffffff]sk-ant-[/]")
         else:
-            self.print("  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://platform.openai.com/api-keys[/]")
-            self.print("  [#aaaaaa]Sign in, click \"Create new secret key\", and paste it below.[/]")
+            self.print(
+                "  [#aaaaaa]Get your key at →[/] [bold #ffffff]https://platform.openai.com/api-keys[/]"
+            )
+            self.print('  [#aaaaaa]Sign in, click "Create new secret key", and paste it below.[/]')
             self.print("  [#aaaaaa]It starts with[/] [bold #ffffff]sk-[/]")
         self.print("")
         self.set_prompt(">  ")
@@ -1059,7 +1075,9 @@ class RegenderTUI(App):
 
         # Validate format — warn but don't block
         if self._setup_provider == "anthropic" and not key.startswith("sk-ant-"):
-            self.print("[bold #ffffff]⚠ That doesn't look like an Anthropic key (expected sk-ant-...)[/]")
+            self.print(
+                "[bold #ffffff]⚠ That doesn't look like an Anthropic key (expected sk-ant-...)[/]"
+            )
             self.print("[#aaaaaa]Press Enter to skip, or paste your key again[/]")
             return
         if self._setup_provider == "openai" and not key.startswith("sk-"):
@@ -1114,14 +1132,18 @@ class RegenderTUI(App):
                 timeout=10.0,
             )
             self._save_ollama_config(model)
-            self.print("[#ffffff]✓[/] Connected — using [bold #ffffff]{model}[/]".replace("{model}", model))
+            self.print(
+                "[#ffffff]✓[/] Connected — using [bold #ffffff]{model}[/]".replace("{model}", model)
+            )
             self.print("")
             self.print("[#aaaaaa]You're all set — let's pick a book.[/]")
             self.print("")
         except Exception:
             self.print("[bold #ffffff]⚠ Can't connect to Ollama at localhost:11434[/]")
             self.print("[#aaaaaa]  Make sure Ollama is running:[/]")
-            self.print("    [bold #ffffff]open the Ollama app[/] [#aaaaaa]or run[/] [bold #ffffff]ollama serve[/]")
+            self.print(
+                "    [bold #ffffff]open the Ollama app[/] [#aaaaaa]or run[/] [bold #ffffff]ollama serve[/]"
+            )
             self.print("")
             self.print("[#aaaaaa]Saving config anyway — restart the app once Ollama is running.[/]")
             self._save_ollama_config(model)
@@ -1194,9 +1216,7 @@ class RegenderTUI(App):
         self.print(
             "  [#aaaaaa]Add plain-text (.txt) books to [bold]books/texts/[/] in this folder[/]"
         )
-        self.print(
-            "  [#aaaaaa]then choose an option below.[/]"
-        )
+        self.print("  [#aaaaaa]then choose an option below.[/]")
         self.print("")
         self.print("  [bold #ffffff]1[/]  Browse files in [bold]books/texts/[/]...")
         self.print("  [bold #ffffff]2[/]  Enter or drag file path...")
@@ -1227,36 +1247,92 @@ class RegenderTUI(App):
     # Gendered words likely to appear in book titles, by transform type
     _TITLE_WORD_SWAPS: dict[str, dict[str, str]] = {
         "all_male": {
-            "women": "men", "woman": "man", "girl": "boy", "girls": "boys",
-            "lady": "lord", "ladies": "lords", "queen": "king", "queens": "kings",
-            "mother": "father", "mothers": "fathers", "sister": "brother", "sisters": "brothers",
-            "daughter": "son", "daughters": "sons", "wife": "husband", "wives": "husbands",
-            "widow": "widower", "widows": "widowers", "nun": "monk", "nuns": "monks",
-            "princess": "prince", "duchess": "duke", "empress": "emperor",
+            "women": "men",
+            "woman": "man",
+            "girl": "boy",
+            "girls": "boys",
+            "lady": "lord",
+            "ladies": "lords",
+            "queen": "king",
+            "queens": "kings",
+            "mother": "father",
+            "mothers": "fathers",
+            "sister": "brother",
+            "sisters": "brothers",
+            "daughter": "son",
+            "daughters": "sons",
+            "wife": "husband",
+            "wives": "husbands",
+            "widow": "widower",
+            "widows": "widowers",
+            "nun": "monk",
+            "nuns": "monks",
+            "princess": "prince",
+            "duchess": "duke",
+            "empress": "emperor",
         },
         "all_female": {
-            "men": "women", "man": "woman", "boy": "girl", "boys": "girls",
-            "lord": "lady", "lords": "ladies", "king": "queen", "kings": "queens",
-            "father": "mother", "fathers": "mothers", "brother": "sister", "brothers": "sisters",
-            "son": "daughter", "sons": "daughters", "husband": "wife", "husbands": "wives",
-            "widower": "widow", "widowers": "widows", "monk": "nun", "monks": "nuns",
-            "prince": "princess", "duke": "duchess", "emperor": "empress",
+            "men": "women",
+            "man": "woman",
+            "boy": "girl",
+            "boys": "girls",
+            "lord": "lady",
+            "lords": "ladies",
+            "king": "queen",
+            "kings": "queens",
+            "father": "mother",
+            "fathers": "mothers",
+            "brother": "sister",
+            "brothers": "sisters",
+            "son": "daughter",
+            "sons": "daughters",
+            "husband": "wife",
+            "husbands": "wives",
+            "widower": "widow",
+            "widowers": "widows",
+            "monk": "nun",
+            "monks": "nuns",
+            "prince": "princess",
+            "duke": "duchess",
+            "emperor": "empress",
         },
         "gender_swap": {
-            "women": "men", "men": "women", "woman": "man", "man": "woman",
-            "girl": "boy", "boy": "girl", "girls": "boys", "boys": "girls",
-            "lady": "lord", "lord": "lady", "queen": "king", "king": "queen",
-            "sister": "brother", "brother": "sister",
-            "daughter": "son", "son": "daughter",
-            "wife": "husband", "husband": "wife",
-            "princess": "prince", "prince": "princess",
+            "women": "men",
+            "men": "women",
+            "woman": "man",
+            "man": "woman",
+            "girl": "boy",
+            "boy": "girl",
+            "girls": "boys",
+            "boys": "girls",
+            "lady": "lord",
+            "lord": "lady",
+            "queen": "king",
+            "king": "queen",
+            "sister": "brother",
+            "brother": "sister",
+            "daughter": "son",
+            "son": "daughter",
+            "wife": "husband",
+            "husband": "wife",
+            "princess": "prince",
+            "prince": "princess",
         },
         "nonbinary": {
-            "women": "people", "woman": "person", "men": "people", "man": "person",
-            "girl": "youth", "girls": "youth", "boy": "youth", "boys": "youth",
-            "sister": "sibling", "brother": "sibling",
-            "queen": "monarch", "king": "monarch",
-            "lady": "noble", "lord": "noble",
+            "women": "people",
+            "woman": "person",
+            "men": "people",
+            "man": "person",
+            "girl": "youth",
+            "girls": "youth",
+            "boy": "youth",
+            "boys": "youth",
+            "sister": "sibling",
+            "brother": "sibling",
+            "queen": "monarch",
+            "king": "monarch",
+            "lady": "noble",
+            "lord": "noble",
         },
     }
 
@@ -1266,6 +1342,7 @@ class RegenderTUI(App):
         result = title
         for old, new in swaps.items():
             pattern = re.compile(r"\b" + re.escape(old) + r"\b", re.IGNORECASE)
+
             def _replace(m, _new=new):
                 w = m.group(0)
                 if w.isupper():
@@ -1273,6 +1350,7 @@ class RegenderTUI(App):
                 if w[0].isupper():
                     return _new.capitalize()
                 return _new
+
             result = pattern.sub(_replace, result)
         return result
 
@@ -1307,7 +1385,9 @@ class RegenderTUI(App):
             self._custom_title = value.strip()
             self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
         else:
-            self.print(f"[#ffffff]✓[/] Keeping: [bold #ffffff]{self._custom_title or self.book_title}[/]")
+            self.print(
+                f"[#ffffff]✓[/] Keeping: [bold #ffffff]{self._custom_title or self.book_title}[/]"
+            )
         self.print("")
         self._no_qc = True
         self._run_name_review()
@@ -1400,7 +1480,9 @@ class RegenderTUI(App):
             if sample.exists():
                 self._select_book(sample)
             else:
-                self.print("[#ffffff]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]")
+                self.print(
+                    "[#ffffff]Sample not found — add pride-prejudice-sample.txt to books/texts/[/]"
+                )
         elif value.lower() == "regender me":
             self._easter_egg()
         elif value.lower() in ("q", "quit"):
@@ -1739,7 +1821,9 @@ class RegenderTUI(App):
         self._fetch_and_show_models(has_openai, has_anthropic, has_ollama)
 
     @work(exclusive=True)
-    async def _fetch_and_show_models(self, has_openai: bool, has_anthropic: bool, has_ollama: bool = False) -> None:
+    async def _fetch_and_show_models(
+        self, has_openai: bool, has_anthropic: bool, has_ollama: bool = False
+    ) -> None:
         """Fetch live model lists from APIs, fall back to hardcoded list on error."""
         choices: list[tuple[str, str, str]] = []
 
@@ -1777,9 +1861,7 @@ class RegenderTUI(App):
                             if costs
                             else "pricing unknown"
                         )
-                        display = _versioned_display_name(
-                            m.id, getattr(m, "display_name", m.id)
-                        )
+                        display = _versioned_display_name(m.id, getattr(m, "display_name", m.id))
                         choices.append((m.id, display, pricing))
             except Exception:
                 choices.extend(_FALLBACK_MODELS.get("anthropic", []))
@@ -2347,7 +2429,9 @@ class RegenderTUI(App):
                 pass
 
         self.print("")
-        self.print(f"[#ffffff]✓[/] {gradient_text('Transformation complete!', ['#ffffff', '#aaaaaa'])}")
+        self.print(
+            f"[#ffffff]✓[/] {gradient_text('Transformation complete!', ['#ffffff', '#aaaaaa'])}"
+        )
         self.print(f"  [#aaaaaa]Time:[/] [#ffffff]{elapsed:.1f}s[/]")
         self.print(f"  [#aaaaaa]Saved:[/] [#ffffff]{self._json_output_path}[/]")
 
@@ -2419,7 +2503,9 @@ class RegenderTUI(App):
         self.print("")
         if self._selected_book:
             book_name = self._selected_book.stem
-            self.print(f"  [bold #ffffff]1[/]  Transform [#aaaaaa]{book_name}[/] again [#aaaaaa](different type)[/]")
+            self.print(
+                f"  [bold #ffffff]1[/]  Transform [#aaaaaa]{book_name}[/] again [#aaaaaa](different type)[/]"
+            )
         else:
             self.print("  [bold #ffffff]1[/]  Transform same book again")
         self.print("  [bold #ffffff]2[/]  Transform a different book")
