@@ -5,6 +5,7 @@ This module provides custom exception types and error handling utilities
 for consistent error management across all services.
 """
 
+import asyncio
 import logging
 import traceback
 import uuid
@@ -176,7 +177,9 @@ class ErrorHandler:
         # asyncio.TimeoutError aliases on Python 3.11+. Previously this branch
         # tested against the custom class above, which shadowed the builtin, so
         # a provider timeout fell through and was reported as INTERNAL_ERROR.
-        if isinstance(error, TimeoutError):
+        # Before 3.11 asyncio.TimeoutError is a separate class, so name it too
+        # rather than relying on the alias.
+        if isinstance(error, (TimeoutError, asyncio.TimeoutError)):
             return OperationTimeoutError(
                 message=str(error),
                 details={"original_type": type(error).__name__},

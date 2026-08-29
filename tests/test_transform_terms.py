@@ -87,7 +87,14 @@ class TestBidirectionalMapDoesNotCollapse:
             # Collapsing pairs are fine now, but only because substitution is
             # a single simultaneous pass. Assert that pass is what runs.
             pattern, _ = TransformService._compile_substitution(tuple(sorted(effective.items())))
-            assert pattern.groups == 0, f"{key}: substitution must be one alternation"
+            # One alternation, one pass. The only capturing groups are the two
+            # structural ones (the term and an optional possessive clitic); a
+            # per-term group would mean the map had been split into passes.
+            assert set(pattern.groupindex) == {
+                "term",
+                "clitic",
+            }, f"{key}: substitution must be one alternation"
+            assert pattern.groups == 2, f"{key}: substitution must be one alternation"
             assert isinstance(collapsing, list)
 
 
@@ -237,3 +244,74 @@ class TestFallbackWhenLLMFails:
         assert "a man of mean understanding" in result
         assert "His wife" in result
         assert "his sons" in result
+
+
+class TestPossessives:
+    """A gendered noun in the possessive is still a gendered noun.
+
+    The safety net used to skip every one of them: the boundary after a term
+    refused a following apostrophe, and the source text's curly apostrophe
+    against the LLM's straight one meant the two never compared equal, so a
+    miss was read as a success. Roughly 79 kinship possessives survived
+    untransformed in the printed Pride and Prejudice.
+    """
+
+    @pytest.mark.parametrize(
+        "source,llm_output,expected",
+        [
+            ("her sister\u2019s room", "his sister's room", "his brother's room"),
+            ("my mother\u2019s purpose", "my mother's purpose", "my father's purpose"),
+            ("their aunt\u2019s house", "their aunt's house", "their uncle's house"),
+            ("her daughter\u2019s proposal", "his daughter's proposal", "his son's proposal"),
+            ("his father\u2019s estate", "her father's estate", "her mother's estate"),
+        ],
+    )
+    def test_possessive_kinship_terms_are_transformed(self, service, source, llm_output, expected):
+        assert (
+            service._apply_term_map(llm_output, TransformType.GENDER_SWAP, source_text=source)
+            == expected
+        )
+
+    def test_correct_possessive_is_not_swapped_back(self, service):
+        """The net must not undo a possessive the LLM already got right."""
+        assert (
+            service._apply_term_map(
+                "his mother's estate",
+                TransformType.GENDER_SWAP,
+                source_text="her father\u2019s estate",
+            )
+            == "his mother's estate"
+        )
+
+
+class TestProtectedPhrases:
+    """ "Good Lord!" is an exclamation, not a character.
+
+    The printed Pride and Prejudice carries "Good Lady!" twice and "Lady bless
+    me!" once, because the term map saw only a gendered title.
+    """
+
+    @pytest.mark.parametrize(
+        "source,llm_output",
+        [
+            ("But--good Lord! how unlucky!", "But--good Lord! how unlucky!"),
+            ("Good Lord! Sir William, how can you", "Good Lord! Lady William, how can you"),
+            ("Lord bless me! only think!", "Lord bless me! only think!"),
+        ],
+    )
+    def test_exclamations_are_not_swapped(self, service, source, llm_output):
+        assert (
+            service._apply_term_map(llm_output, TransformType.GENDER_SWAP, source_text=source)
+            == llm_output
+        )
+
+    def test_a_real_title_still_swaps(self, service):
+        """The guard must not shield an actual Lady."""
+        assert (
+            service._apply_term_map(
+                "Lady Catherine was indignant",
+                TransformType.GENDER_SWAP,
+                source_text="Lady Catherine was indignant",
+            )
+            == "Lord Catherine was indignant"
+        )

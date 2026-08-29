@@ -479,8 +479,11 @@ class QCService:
         self, chapter: ChapterReport, number: int, position: int, output: str, residual: list
     ) -> None:
         """Gendered words the LLM missed and the safety net declined to guess at."""
+        protected = TransformService.protected_spans(output)
         for _source_word, word, span, _source_span in residual:
             if word in _REVIEW_IGNORE:
+                continue
+            if any(a <= span[0] and span[1] <= b for a, b in protected):
                 continue
             if word not in self._term_map and word not in self._contextual:
                 continue

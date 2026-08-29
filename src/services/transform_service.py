@@ -869,9 +869,27 @@ class TransformService(BaseService):
         if not name_map:
             return text
         pattern, lookup = self._compile_substitution(tuple(sorted(name_map.items())))
-        return pattern.sub(lambda m: self._match_case(m.group(0), lookup[m.group(0).lower()]), text)
+        return pattern.sub(
+            lambda m: self._match_case(m.group("term"), lookup[m.group("term").lower()])
+            + (m.group("clitic") or ""),
+            text,
+        )
 
-    _WORD_RE = re.compile(r"[A-Za-z']+")
+    _WORD_RE = re.compile(r"[A-Za-z]+(?:['’][A-Za-z]+)*")
+
+    # A trailing possessive clitic is not part of the word. The source text uses
+    # curly apostrophes and LLM output uses straight ones, so without stripping
+    # it "mother’s" and "mother's" never compare equal and the safety net reads
+    # a miss as a success.
+    _CLITIC_RE = re.compile(r"['’]s$")
+
+    # Fixed expressions where a gendered word names no one. "Good Lord!" is an
+    # exclamation, not a title, and swapping it yields "Good Lady!" — which the
+    # printed Pride and Prejudice carries three times.
+    _PROTECTED_PHRASES = re.compile(
+        r"[Gg]ood\s+Lord|O\s+Lord|Lord\s+(?:bless|knows|have\s+mercy)"
+        r"|[Gg]ood\s+God|[Gg]ood\s+[Hh]eavens?"
+    )
 
     # Word boundaries that also break on "_", so gendered words wrapped in the
     # italic markup the exporters use ("_her_") are still matched. Python's \b
@@ -1688,9 +1706,9 @@ class TransformService(BaseService):
         keys = sorted(lookup, key=len, reverse=True)
         pattern = re.compile(
             cls._BOUNDARY_BEFORE
-            + r"(?:"
+            + r"(?P<term>"
             + "|".join(re.escape(k) for k in keys)
-            + r")"
+            + r")(?P<clitic>['’]s)?"
             + cls._BOUNDARY_AFTER,
             re.IGNORECASE,
         )
@@ -1736,9 +1754,10 @@ class TransformService(BaseService):
             anchors: list[str] = []
             slots: dict[int, list] = {}
             for match in cls._WORD_RE.finditer(raw):
-                word = match.group(0).lower()
+                word = cls._CLITIC_RE.sub("", match.group(0)).lower()
                 if word in vocabulary:
-                    slots.setdefault(len(anchors), []).append((word, match.span()))
+                    span = (match.start(), match.start() + len(word))
+                    slots.setdefault(len(anchors), []).append((word, span))
                 else:
                     anchors.append(word)
             return anchors, slots
@@ -1782,6 +1801,15 @@ class TransformService(BaseService):
             if source_word == output_word:
                 mask[start:end] = b"\x01" * (end - start)
         return mask
+
+    @classmethod
+    def protected_spans(cls, text: str) -> list:
+        """Character ranges holding a fixed expression, which must not be swapped."""
+        return [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+
+    @staticmethod
+    def _in_protected(spans: list, start: int, end: int) -> bool:
+        return any(a <= start and end <= b for a, b in spans)
 
     @staticmethod
     def _is_residual(mask: Optional[bytearray], text: str, start: int, end: int) -> bool:
@@ -1857,12 +1885,16 @@ class TransformService(BaseService):
             pattern, lookup = self._compile_substitution(tuple(sorted(term_map.items())))
             mask = self._residual_mask(source_text, text, key) if source_text is not None else None
             current = text
+            protected = self.protected_spans(text)
 
             def _replace(match: "re.Match") -> str:
-                start, end = match.span()
+                term = match.group("term")
+                start, end = match.span("term")
+                if self._in_protected(protected, start, end):
+                    return match.group(0)
                 if not self._is_residual(mask, current, start, end):
                     return match.group(0)
-                return self._match_case(match.group(0), lookup[match.group(0).lower()])
+                return self._match_case(term, lookup[term.lower()]) + (match.group("clitic") or "")
 
             text = pattern.sub(_replace, text)
 
