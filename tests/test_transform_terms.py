@@ -127,12 +127,70 @@ class TestContextualPronouns:
             == "spoke to them."
         )
 
-    def test_ambiguous_her_is_left_for_review(self, service):
-        """Neither reading is safe, so the safety net must not guess."""
-        result = apply(
-            service, "he gave her a book", "he gave her a book", TransformType.GENDER_SWAP
+    def test_objective_her_before_a_determiner(self, service):
+        """ "gave her a book" cannot be possessive — nothing follows "her a"."""
+        assert (
+            apply(
+                service,
+                "he gave her a book",
+                "he gave her a book",
+                TransformType.GENDER_SWAP,
+            )
+            == "she gave him a book"
         )
-        assert "her a book" in result
+
+    def test_possessive_his_before_an_ordinary_noun(self, service):
+        """ "his" has no objective form, so a following content word is possessed."""
+        assert (
+            apply(service, "What is his name?", "What is his name?", TransformType.GENDER_SWAP)
+            == "What is her name?"
+        )
+
+    def test_standalone_his_before_a_preposition(self, service):
+        assert (
+            apply(
+                service,
+                "a friend of his in town",
+                "a friend of his in town",
+                TransformType.GENDER_SWAP,
+            )
+            == "a friend of hers in town"
+        )
+
+    def test_adverb_marks_her_as_objective(self, service):
+        """A possessive determiner is never followed by an adverb."""
+        assert (
+            apply(
+                service,
+                "he danced with her twice",
+                "he danced with her twice",
+                TransformType.GENDER_SWAP,
+            )
+            == "she danced with him twice"
+        )
+
+    @pytest.mark.parametrize(
+        "source,expected",
+        [
+            ("her housekeeping", "his housekeeping"),
+            ("catching her eye", "catching his eye"),
+            ("the business of her life", "the business of his life"),
+        ],
+    )
+    def test_content_word_marks_her_as_possessive(self, service, source, expected):
+        assert apply(service, source, source, TransformType.GENDER_SWAP) == expected
+
+    def test_object_complement_is_a_known_limitation(self, service):
+        """Objective "her" before a participle is not distinguishable from the
+        possessive gerund in "depend on her serving you" without parsing. The
+        rule takes the possessive reading, which the Pride and Prejudice text
+        shows is by far the common one. Pinned here so the trade-off stays
+        visible rather than being discovered in print.
+        """
+        assert (
+            apply(service, "he saw her walking", "he saw her walking", TransformType.GENDER_SWAP)
+            == "she saw his walking"
+        )
 
 
 class TestCasePreservation:

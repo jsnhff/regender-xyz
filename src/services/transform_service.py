@@ -872,6 +872,12 @@ class TransformService(BaseService):
 
     _WORD_RE = re.compile(r"[A-Za-z']+")
 
+    # Word boundaries that also break on "_", so gendered words wrapped in the
+    # italic markup the exporters use ("_her_") are still matched. Python's \b
+    # counts "_" as a word character and skips them entirely.
+    _BOUNDARY_BEFORE = r"(?<![A-Za-z'])"
+    _BOUNDARY_AFTER = r"(?![A-Za-z'])"
+
     # Derived-once caches for the static term maps.
     _EFFECTIVE_TERM_MAPS: dict[str, dict[str, str]] = {}
     _GENDERED_NOUNS: dict[str, frozenset] = {}
@@ -1308,6 +1314,201 @@ class TransformService(BaseService):
         "nonbinary": {"her": ("their", "them"), "his": ("their", "theirs")},
     }
 
+    # "his" has no objective form: it is either a possessive determiner ("his
+    # name") or a possessive pronoun ("a friend of his"). "her" is the one that
+    # is genuinely ambiguous -- possessive in "her name", objective in "told her"
+    # -- so it only gets resolved where the context settles it.
+    _NO_OBJECTIVE_FORM = frozenset({"his"})
+
+    # A word that can only follow a possessive determiner. "her own" is never
+    # objective, so it settles a "her" that would otherwise be left ambiguous.
+    _POSSESSIVE_MARKERS = frozenset({"own"})
+
+    # Adverbs and degree words. A possessive determiner is never followed by one,
+    # so "danced with her twice" and "thought her quite beautiful" are objective
+    # while "her eye" and "her housekeeping" are possessive. Measured against the
+    # Pride and Prejudice text: these mark every objective "her" that is followed
+    # by a content word.
+    _ADVERBIAL_AFTER = frozenset(
+        {
+            "again",
+            "almost",
+            "alone",
+            "already",
+            "also",
+            "always",
+            "apart",
+            "aside",
+            "away",
+            "certainly",
+            "coldly",
+            "deeply",
+            "entirely",
+            "enough",
+            "even",
+            "ever",
+            "formerly",
+            "forth",
+            "greatly",
+            "hence",
+            "here",
+            "highly",
+            "however",
+            "immediately",
+            "indeed",
+            "instantly",
+            "just",
+            "kindly",
+            "lately",
+            "nearly",
+            "never",
+            "now",
+            "off",
+            "once",
+            "only",
+            "out",
+            "perhaps",
+            "presently",
+            "probably",
+            "quite",
+            "rather",
+            "really",
+            "surely",
+            "somewhat",
+            "soon",
+            "still",
+            "then",
+            "there",
+            "therefore",
+            "thus",
+            "together",
+            "too",
+            "twice",
+            "thrice",
+            "very",
+            "warmly",
+            "wholly",
+            "yesterday",
+        }
+    )
+
+    # Words that cannot begin a noun phrase. A pronoun followed by one of these
+    # is not a possessive determiner, so "a friend of his in town" resolves to
+    # the standalone form and "gave her a book" to the objective one.
+    _CLAUSE_CONTINUERS = frozenset(
+        {
+            # determiners and quantifiers
+            "a",
+            "an",
+            "the",
+            "this",
+            "that",
+            "these",
+            "those",
+            "some",
+            "any",
+            "each",
+            "every",
+            "no",
+            "another",
+            "such",
+            "much",
+            "many",
+            "more",
+            "most",
+            "few",
+            "several",
+            "both",
+            "either",
+            "neither",
+            # possessives that cannot follow another determiner
+            "my",
+            "your",
+            "our",
+            "their",
+            "its",
+            "his",
+            "her",
+            # prepositions
+            "of",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "from",
+            "by",
+            "with",
+            "about",
+            "into",
+            "upon",
+            "over",
+            "under",
+            "after",
+            "before",
+            "between",
+            "through",
+            "against",
+            "towards",
+            "toward",
+            "without",
+            "within",
+            "during",
+            "than",
+            "as",
+            "like",
+            # conjunctions and subordinators
+            "and",
+            "or",
+            "but",
+            "if",
+            "when",
+            "while",
+            "because",
+            "so",
+            "then",
+            "though",
+            "although",
+            "yet",
+            "since",
+            "unless",
+            "whether",
+            # relative and interrogative pronouns
+            "who",
+            "whom",
+            "whose",
+            "which",
+            "what",
+            "where",
+            "why",
+            "how",
+            # auxiliaries and common finite verbs
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "been",
+            "being",
+            "am",
+            "has",
+            "have",
+            "had",
+            "do",
+            "does",
+            "did",
+            "will",
+            "would",
+            "shall",
+            "should",
+            "can",
+            "could",
+            "may",
+            "might",
+            "must",
+        }
+    )
+
     # Irregular plurals for the gendered nouns in the term maps. Everything else
     # is derived by _pluralize so that "her sisters" is covered as well as
     # "her sister" -- a bare \b<singular>\b pattern never matches the plural.
@@ -1443,7 +1644,12 @@ class TransformService(BaseService):
         lookup = {k.lower(): v for k, v in items}
         keys = sorted(lookup, key=len, reverse=True)
         pattern = re.compile(
-            r"\b(?:" + "|".join(re.escape(k) for k in keys) + r")\b", re.IGNORECASE
+            cls._BOUNDARY_BEFORE
+            + r"(?:"
+            + "|".join(re.escape(k) for k in keys)
+            + r")"
+            + cls._BOUNDARY_AFTER,
+            re.IGNORECASE,
         )
         cls._COMPILED_SUBSTITUTIONS[items] = (pattern, lookup)
         return pattern, lookup
@@ -1464,21 +1670,21 @@ class TransformService(BaseService):
         return replacement.lower()
 
     @classmethod
-    def _residual_mask(cls, source_text: str, text: str, key: str) -> bytearray:
-        """Mark the characters of `text` holding gendered words the LLM left alone.
+    def align_gendered_words(cls, source_text: str, text: str, key: str) -> list[tuple]:
+        """Pair each gendered word in `text` with the source word it came from.
 
-        A swap map is not idempotent. Applying "mother->father, father->mother"
-        to text the LLM already transformed swaps it straight back, which is how
-        a correct "his father" degrades into "his mother" -- the pronoun moves
-        and the noun does not. Comparing the output against its source separates
-        genuine LLM misses (safe to substitute) from words it already handled.
+        Returns ``(source_word, output_word, output_span, source_span)`` tuples,
+        where ``source_word`` and ``source_span`` are None when no confident
+        counterpart exists. An entry whose two words are equal is a word the LLM
+        left untransformed. Both spans are reported because callers need to find
+        the word in either text, and the two drift apart as words change length.
 
-        The comparison anchors on the *non-gendered* words. Those are the ones
-        the LLM leaves untouched, so they say which source position each output
-        position came from. Diffing raw tokens instead would let a correctly
-        swapped pair match itself in reverse -- "queen and king" against "king
-        and queen" reports both words as unchanged -- and the safety net would
-        undo the swap it was meant to complete.
+        The alignment anchors on the *non-gendered* words. Those are the ones the
+        LLM leaves alone, so they say which source position each output position
+        came from. Diffing raw tokens instead would let a correctly swapped pair
+        match itself in reverse -- "queen and king" against "king and queen"
+        reports both words as unchanged -- and the safety net would undo the very
+        swap it exists to complete.
         """
         vocabulary = cls._gendered_vocabulary(key)
 
@@ -1497,9 +1703,9 @@ class TransformService(BaseService):
         source_anchors, source_slots = split(source_text)
         output_anchors, output_slots = split(text)
 
-        # Slot N holds the gendered words that follow the Nth anchor. Align the
-        # anchor streams to learn which source slot each output slot corresponds
-        # to; slots with no confident mapping are treated as already-transformed.
+        # Slot N holds the gendered words following the Nth anchor. Aligning the
+        # anchor streams says which source slot each output slot came from; a slot
+        # with no confident mapping yields None and is treated as transformed.
         slot_map = {0: 0}
         matcher = difflib.SequenceMatcher(a=source_anchors, b=output_anchors, autojunk=False)
         for tag, i1, _i2, j1, j2 in matcher.get_opcodes():
@@ -1508,12 +1714,30 @@ class TransformService(BaseService):
             for offset in range(j2 - j1):
                 slot_map[j1 + offset + 1] = i1 + offset + 1
 
-        mask = bytearray(len(text))
-        for slot, output_words in output_slots.items():
+        aligned = []
+        for slot in sorted(output_slots):
             counterpart = source_slots.get(slot_map.get(slot, -1), [])
-            for index, (word, (start, end)) in enumerate(output_words):
-                if index < len(counterpart) and counterpart[index][0] == word:
-                    mask[start:end] = b"\x01" * (end - start)
+            for index, (word, span) in enumerate(output_slots[slot]):
+                source = counterpart[index] if index < len(counterpart) else (None, None)
+                aligned.append((source[0], word, span, source[1]))
+        return aligned
+
+    @classmethod
+    def _residual_mask(cls, source_text: str, text: str, key: str) -> bytearray:
+        """Mark the characters of `text` holding gendered words the LLM left alone.
+
+        A swap map is not idempotent: applying "mother->father, father->mother"
+        to text the LLM already transformed swaps it straight back, which is how
+        a correct "his father" degrades into "his mother" -- the pronoun moves
+        and the noun does not. Only words that match their source counterpart are
+        genuine misses and safe to substitute.
+        """
+        mask = bytearray(len(text))
+        for source_word, output_word, (start, end), _source_span in cls.align_gendered_words(
+            source_text, text, key
+        ):
+            if source_word == output_word:
+                mask[start:end] = b"\x01" * (end - start)
         return mask
 
     @staticmethod
@@ -1537,20 +1761,37 @@ class TransformService(BaseService):
 
         nouns = self._gendered_nouns(key)
         mask = self._residual_mask(source_text, text, key) if source_text is not None else None
-        pattern = re.compile(r"\b(?:" + "|".join(rules) + r")\b", re.IGNORECASE)
+        pattern = re.compile(
+            self._BOUNDARY_BEFORE + r"(?:" + "|".join(rules) + r")" + self._BOUNDARY_AFTER,
+            re.IGNORECASE,
+        )
 
         def _replace(match: "re.Match") -> str:
             start, end = match.span()
             if not self._is_residual(mask, text, start, end):
                 return match.group(0)
-            possessive, standalone = rules[match.group(0).lower()]
+            pronoun = match.group(0).lower()
+            possessive, standalone = rules[pronoun]
             rest = text[end:]
-            following = re.match(r"\s+([A-Za-z']+)", rest)
-            if following and following.group(1).lower() in nouns:
-                return self._match_case(match.group(0), possessive)
-            if re.match(r"\s*(?:$|[^\w\s])", rest):
+
+            # End of clause: nothing can be possessed, so it is the standalone
+            # form -- "spoke to her." or "the book is his." Markup underscores
+            # are skipped rather than treated as the end of the clause.
+            if re.match(r"_?\s*(?:$|[^\w\s])", rest):
                 return self._match_case(match.group(0), standalone)
-            return match.group(0)
+
+            following = re.match(r"_?\s+_?([A-Za-z']+)", rest)
+            if following is None:
+                return match.group(0)
+            word = following.group(1).lower()
+
+            if word in self._POSSESSIVE_MARKERS or word in nouns:
+                return self._match_case(match.group(0), possessive)
+            if word in self._CLAUSE_CONTINUERS or word in self._ADVERBIAL_AFTER:
+                return self._match_case(match.group(0), standalone)
+            # A content word follows and nothing marks the pronoun as objective,
+            # so it heads a noun phrase: "his name", "her housekeeping".
+            return self._match_case(match.group(0), possessive)
 
         return pattern.sub(_replace, text)
 
