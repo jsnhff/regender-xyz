@@ -5,7 +5,6 @@ These prompts are designed to be explicit about JSON structure
 and prevent common parsing issues.
 """
 
-
 EXTRACTION_PROMPT_TEMPLATE = """Extract ALL characters from this text. Return ONLY valid JSON, no markdown or explanation.
 
 Find ALL: protagonists, main characters, family members (all siblings!), supporting roles, minor characters, unnamed roles.

@@ -77,7 +77,7 @@ class ParserService(BaseService):
 
         try:
             # If input is already JSON, load it directly
-            if input_path.suffix == '.json':
+            if input_path.suffix == ".json":
                 self.logger.info(f"Loading existing JSON file: {input_path}")
                 return await self.parse_json(input_path)
 

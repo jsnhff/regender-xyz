@@ -83,7 +83,9 @@ class OllamaProvider(BaseProviderPlugin):
             return response.choices[0].message.content
 
         except asyncio.TimeoutError as e:
-            raise TimeoutError("Ollama request timed out. The model may be loading or your hardware is slow.") from e
+            raise TimeoutError(
+                "Ollama request timed out. The model may be loading or your hardware is slow."
+            ) from e
         except Exception as e:
             if "connection" in str(e).lower() or "refused" in str(e).lower():
                 raise ConnectionError(
@@ -94,7 +96,12 @@ class OllamaProvider(BaseProviderPlugin):
             raise
 
     def get_model_info(self) -> dict[str, Any]:
-        return {"context_window": 8192, "max_output": 4096, "supports_vision": False, "supports_json": False}
+        return {
+            "context_window": 8192,
+            "max_output": 4096,
+            "supports_vision": False,
+            "supports_json": False,
+        }
 
     async def get_rate_limits(self) -> dict:
         return {"note": "Local model — no rate limits"}

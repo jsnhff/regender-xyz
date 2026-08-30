@@ -14,6 +14,11 @@ from src.providers.base_provider import BaseProviderPlugin
 class AnthropicProvider(BaseProviderPlugin):
     """Anthropic provider plugin implementation."""
 
+    # Maximum number of automatic retries on transient errors (529/429)
+    # before giving up and re-raising. Prevents unbounded recursion when
+    # the API is persistently overloaded or rate limited.
+    MAX_RETRIES = 3
+
     @property
     def provider_name(self) -> str:
         """Provider name."""
@@ -57,18 +62,17 @@ class AnthropicProvider(BaseProviderPlugin):
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.logger.debug("Anthropic async client initialized")
         except ImportError as e:
-            raise ImportError(
-                "anthropic package not installed. Run: pip install anthropic"
-            ) from e
+            raise ImportError("anthropic package not installed. Run: pip install anthropic") from e
 
     async def _complete_impl(
-        self, messages: list[dict[str, str]], **kwargs
+        self, messages: list[dict[str, str]], _attempt: int = 0, **kwargs
     ) -> str:
         """
         Anthropic-specific completion implementation.
 
         Args:
             messages: List of message dicts
+            _attempt: Internal retry counter (do not set manually)
             **kwargs: Additional parameters
 
         Returns:
@@ -84,10 +88,7 @@ class AnthropicProvider(BaseProviderPlugin):
                 if msg["role"] == "system":
                     system_message = msg["content"]
                 else:
-                    claude_messages.append({
-                        "role": msg["role"],
-                        "content": msg["content"]
-                    })
+                    claude_messages.append({"role": msg["role"], "content": msg["content"]})
 
             # Prepare request parameters
             request_params = {
@@ -111,8 +112,7 @@ class AnthropicProvider(BaseProviderPlugin):
 
             # Make the API call with await and timeout (60 seconds)
             response = await asyncio.wait_for(
-                self.client.messages.create(**request_params),
-                timeout=60.0
+                self.client.messages.create(**request_params), timeout=60.0
             )
 
             # Extract the response text
@@ -127,30 +127,40 @@ class AnthropicProvider(BaseProviderPlugin):
 
             return content
 
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             self.logger.error("Anthropic API call timed out after 60 seconds")
-            raise TimeoutError("Anthropic API call timed out. The API may be slow or overloaded.")
+            raise TimeoutError(
+                "Anthropic API call timed out. The API may be slow or overloaded."
+            ) from e
         except Exception as e:
             error_message = str(e)
 
-            # Check for overloaded error (529) and retry
-            if "529" in error_message or "overloaded" in error_message.lower():
-                self.logger.warning("Anthropic API overloaded (529), waiting 30 seconds...")
-                await asyncio.sleep(30)
-                # Retry once
-                return await self._complete_impl(messages, **kwargs)
+            is_overloaded = "529" in error_message or "overloaded" in error_message.lower()
+            is_rate_limit = "429" in error_message or "rate" in error_message.lower()
 
-            # Check for rate limit (429)
-            elif "429" in error_message or "rate" in error_message.lower():
-                self.logger.warning(f"Anthropic rate limit hit: {e}")
-                await asyncio.sleep(60)  # Wait 60 seconds for rate limit
-                # Retry once
-                return await self._complete_impl(messages, **kwargs)
+            # Retry transient errors (overloaded/rate limit) with a bounded
+            # number of attempts to avoid unbounded recursion.
+            if is_overloaded or is_rate_limit:
+                if _attempt >= self.MAX_RETRIES:
+                    self.logger.error(
+                        f"Anthropic API still failing after {self.MAX_RETRIES} "
+                        f"retries, giving up: {e}"
+                    )
+                    raise
+
+                wait_time = 30 if is_overloaded else 60
+                reason = "overloaded (529)" if is_overloaded else "rate limit (429)"
+                self.logger.warning(
+                    f"Anthropic API {reason}, waiting {wait_time}s "
+                    f"(retry {_attempt + 1}/{self.MAX_RETRIES})..."
+                )
+                await asyncio.sleep(wait_time)
+                return await self._complete_impl(messages, _attempt=_attempt + 1, **kwargs)
 
             # Check for insufficient credits
-            elif "credit" in error_message.lower() or "billing" in error_message.lower():
+            if "credit" in error_message.lower() or "billing" in error_message.lower():
                 self.logger.error("Anthropic API credits/billing issue")
-                raise ValueError("Anthropic API billing issue. Please check your account.")
+                raise ValueError("Anthropic API billing issue. Please check your account.") from e
 
             # Log and re-raise other errors
             self.logger.error(f"Anthropic API error: {e}")
@@ -223,5 +233,5 @@ class AnthropicProvider(BaseProviderPlugin):
             "requests_limit": self.rate_limit,
             "tokens_remaining": "N/A",
             "reset_time": "Per minute",
-            "note": "Anthropic uses per-minute rate limits"
+            "note": "Anthropic uses per-minute rate limits",
         }

@@ -14,6 +14,11 @@ from src.providers.base_provider import BaseProviderPlugin
 class OpenAIProvider(BaseProviderPlugin):
     """OpenAI provider plugin implementation."""
 
+    # Maximum number of automatic retries on transient errors (429)
+    # before giving up and re-raising. Prevents unbounded recursion when
+    # the API is persistently rate limited.
+    MAX_RETRIES = 3
+
     @property
     def provider_name(self) -> str:
         """Provider name."""
@@ -57,17 +62,18 @@ class OpenAIProvider(BaseProviderPlugin):
 
             self.client = AsyncOpenAI(api_key=self.api_key)
             self.logger.debug("OpenAI async client initialized")
-        except ImportError:
-            raise ImportError("openai package not installed. Run: pip install openai")
+        except ImportError as e:
+            raise ImportError("openai package not installed. Run: pip install openai") from e
 
     async def _complete_impl(
-        self, messages: list[dict[str, str]], **kwargs
+        self, messages: list[dict[str, str]], _attempt: int = 0, **kwargs
     ) -> str:
         """
         OpenAI-specific completion implementation.
 
         Args:
             messages: List of message dicts
+            _attempt: Internal retry counter (do not set manually)
             **kwargs: Additional parameters like temperature, max_tokens
 
         Returns:
@@ -91,8 +97,7 @@ class OpenAIProvider(BaseProviderPlugin):
 
             # Make the API call with await and timeout (60 seconds)
             response = await asyncio.wait_for(
-                self.client.chat.completions.create(**request_params),
-                timeout=60.0
+                self.client.chat.completions.create(**request_params), timeout=60.0
             )
 
             # Extract the response text
@@ -107,31 +112,42 @@ class OpenAIProvider(BaseProviderPlugin):
 
             return content
 
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             self.logger.error("OpenAI API call timed out after 60 seconds")
-            raise TimeoutError("OpenAI API call timed out. The API may be slow or overloaded.")
+            raise TimeoutError(
+                "OpenAI API call timed out. The API may be slow or overloaded."
+            ) from e
         except Exception as e:
             error_message = str(e)
 
-            # Handle rate limiting specifically
+            # Handle rate limiting specifically, with a bounded number of
+            # retries to avoid unbounded recursion under persistent limits.
             if "rate_limit" in error_message.lower() or "429" in error_message:
+                if _attempt >= self.MAX_RETRIES:
+                    self.logger.error(
+                        f"OpenAI API still rate limited after {self.MAX_RETRIES} "
+                        f"retries, giving up: {e}"
+                    )
+                    raise
+
                 self.logger.warning(f"Rate limit hit: {e}")
                 # Extract retry-after if available
                 wait_time = 60  # Default to 60 seconds
-                if hasattr(e, 'response') and e.response:
-                    retry_after = e.response.headers.get('retry-after')
+                if hasattr(e, "response") and e.response:
+                    retry_after = e.response.headers.get("retry-after")
                     if retry_after:
                         wait_time = int(retry_after)
 
-                self.logger.info(f"Waiting {wait_time} seconds before retry...")
+                self.logger.info(
+                    f"Waiting {wait_time}s before retry ({_attempt + 1}/{self.MAX_RETRIES})..."
+                )
                 await asyncio.sleep(wait_time)
-                # Retry once
-                return await self._complete_impl(messages, **kwargs)
+                return await self._complete_impl(messages, _attempt=_attempt + 1, **kwargs)
 
             # Handle other API errors
-            elif "insufficient_quota" in error_message.lower():
+            if "insufficient_quota" in error_message.lower():
                 self.logger.error("OpenAI API quota exceeded")
-                raise ValueError("OpenAI API quota exceeded. Please check your billing.")
+                raise ValueError("OpenAI API quota exceeded. Please check your billing.") from e
 
             # Log and re-raise other errors
             self.logger.error(f"OpenAI API error: {e}")
@@ -203,5 +219,5 @@ class OpenAIProvider(BaseProviderPlugin):
             "requests_limit": self.rate_limit,
             "tokens_remaining": "N/A",
             "reset_time": "Rolling window",
-            "note": "OpenAI uses rolling rate limits"
+            "note": "OpenAI uses rolling rate limits",
         }

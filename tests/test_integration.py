@@ -1,6 +1,7 @@
 """
 Integration test - does the whole pipeline work?
 """
+
 import json
 from pathlib import Path
 
@@ -16,11 +17,10 @@ def test_pipeline_works_with_mock(app_with_mock, simple_story_path, tmp_path):
         file_path=simple_story_path,
         transform_type="gender_swap",
         output_path=output_file,
-        quality_control=False  # Skip QC for simplicity
     )
 
     # Basic checks that pipeline completed
-    assert result["success"] == True
+    assert result["success"] is True
     assert result["book_title"] is not None
     # Characters might be 0 with simple mock, that's OK
     assert "characters" in result
@@ -45,13 +45,10 @@ def test_parser_only_mode(app_with_mock, simple_story_path, tmp_path):
     """Test that we can just parse a book without transformation."""
 
     output_file = str(tmp_path / "parsed.json")
-    result = app_with_mock.parse_book_sync(
-        file_path=simple_story_path,
-        output_path=output_file
-    )
+    result = app_with_mock.parse_book_sync(file_path=simple_story_path, output_path=output_file)
 
     # Check parsing succeeded
-    assert result["success"] == True
+    assert result["success"] is True
     assert result["chapters"] > 0
     assert Path(output_file).exists()
 
@@ -71,12 +68,11 @@ def test_character_analysis_mode(app_with_mock, simple_story_path, tmp_path):
 
     output_file = str(tmp_path / "characters.json")
     result = app_with_mock.analyze_characters_sync(
-        file_path=simple_story_path,
-        output_path=output_file
+        file_path=simple_story_path, output_path=output_file
     )
 
     # Check analysis succeeded (might not find characters with basic mock)
-    assert result["success"] == True
+    assert result["success"] is True
     # Just check output was created, don't worry about character count
     assert Path(output_file).exists()
 
@@ -94,7 +90,6 @@ def test_pipeline_handles_bad_input(app_with_mock, tmp_path):
     result = app_with_mock.process_book_sync(
         file_path=str(bad_file),
         transform_type="gender_swap",
-        quality_control=False
     )
 
     # Should handle gracefully (might fail or succeed with empty output)

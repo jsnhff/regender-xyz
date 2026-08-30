@@ -87,15 +87,15 @@ class CharacterService(BaseService):
         self.error_handler = ErrorHandler(self.logger)
 
         # Load configuration from config.json or use defaults
-        if config and hasattr(config, 'character_extraction'):
+        if config and hasattr(config, "character_extraction"):
             char_config = config.character_extraction
         else:
             # Load from config.json file
-            config_path = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+            config_path = os.path.join(os.path.dirname(__file__), "..", "config.json")
             if os.path.exists(config_path):
                 with open(config_path) as f:
                     config_data = json.load(f)
-                    char_config = config_data.get('character_extraction', {})
+                    char_config = config_data.get("character_extraction", {})
             else:
                 char_config = {}
 
@@ -111,19 +111,21 @@ class CharacterService(BaseService):
             raise ConfigurationError(
                 "Chunk size must be positive",
                 config_key="chunk_size_tokens",
-                details={"value": self.extraction_config["chunk_size"]}
+                details={"value": self.extraction_config["chunk_size"]},
             )
         if self.extraction_config["chunk_size"] > 100000:
             raise ConfigurationError(
                 "Chunk size too large (max 100000)",
                 config_key="chunk_size_tokens",
-                details={"value": self.extraction_config["chunk_size"]}
+                details={"value": self.extraction_config["chunk_size"]},
             )
 
         self.grouping_config = {
             "algorithm": "union_find",
             "similarity_threshold": char_config.get("similarity_threshold", 0.8),
-            "deduplication_similarity_threshold": char_config.get("deduplication_similarity_threshold", 80),
+            "deduplication_similarity_threshold": char_config.get(
+                "deduplication_similarity_threshold", 80
+            ),
             "max_group_size": 20,
         }
 
@@ -132,7 +134,7 @@ class CharacterService(BaseService):
             raise ConfigurationError(
                 "Deduplication threshold must be between 0 and 100",
                 config_key="deduplication_similarity_threshold",
-                details={"value": self.grouping_config["deduplication_similarity_threshold"]}
+                details={"value": self.grouping_config["deduplication_similarity_threshold"]},
             )
 
         self.merging_config = {
@@ -183,8 +185,7 @@ class CharacterService(BaseService):
 
         if not isinstance(book, Book):
             raise ValidationError(
-                f"Expected Book instance, got {type(book).__name__}",
-                field="book"
+                f"Expected Book instance, got {type(book).__name__}", field="book"
             )
 
         # Validate book has content
@@ -193,7 +194,7 @@ class CharacterService(BaseService):
             raise ValidationError(
                 "Book has no content to analyze",
                 field="book.text",
-                details={"book_title": book.title or "Unknown"}
+                details={"book_title": book.title or "Unknown"},
             )
 
         # Validate provider is initialized
@@ -201,7 +202,7 @@ class CharacterService(BaseService):
             raise ConfigurationError(
                 "LLM provider not initialized",
                 config_key="provider",
-                details={"service": "CharacterService"}
+                details={"service": "CharacterService"},
             )
 
         try:
@@ -235,7 +236,7 @@ class CharacterService(BaseService):
             self.error_handler.log_error(error)
             raise CharacterExtractionError(
                 f"Character analysis failed: {str(e)}",
-                details={"book_title": book.title or "Unknown"}
+                details={"book_title": book.title or "Unknown"},
             ) from e
 
     # === EXTRACTION METHODS ===
@@ -254,13 +255,13 @@ class CharacterService(BaseService):
         chunks = await asyncio.to_thread(self._create_chunks, text)
 
         # Memory management: limit characters to prevent unbounded growth
-        MAX_CHARACTERS = 1000
+        max_characters = 1000
         seen_names = set()
         unique_characters = []
 
         # Process chunks with limited concurrency to avoid overwhelming the API
         # Use batch size of 1 for OpenAI to avoid rate limiting
-        max_concurrent = 1 if 'openai' in str(type(self.provider)).lower() else 3
+        max_concurrent = 1 if "openai" in str(type(self.provider)).lower() else 3
 
         async def process_chunk_batch(batch_chunks: list[tuple[int, str]]):
             """Process a batch of chunks concurrently."""
@@ -280,7 +281,7 @@ class CharacterService(BaseService):
                     for char in result:
                         char_name = char.get("name", "").lower().strip()
                         if char_name and char_name not in seen_names:
-                            if len(unique_characters) < MAX_CHARACTERS:
+                            if len(unique_characters) < max_characters:
                                 seen_names.add(char_name)
                                 batch_characters.append(char)
                             else:
@@ -290,15 +291,16 @@ class CharacterService(BaseService):
 
         # Process in batches with progress
         # Check if we're in a TTY/interactive environment
-        disable_progress = not os.isatty(1) if hasattr(os, 'isatty') else True
+        disable_progress = not os.isatty(1) if hasattr(os, "isatty") else True
 
         try:
             from tqdm.asyncio import tqdm
+
             progress_bar = tqdm(
                 total=len(chunks),
                 desc="Extracting characters",
                 disable=disable_progress,
-                unit="chunk"
+                unit="chunk",
             )
         except ImportError:
             progress_bar = None
@@ -307,7 +309,7 @@ class CharacterService(BaseService):
             batch_end = min(batch_start + max_concurrent, len(chunks))
             batch_chunks = [(i, chunks[i]) for i in range(batch_start, batch_end)]
 
-            self.logger.debug(f"Processing chunks {batch_start} to {batch_end-1}")
+            self.logger.debug(f"Processing chunks {batch_start} to {batch_end - 1}")
             batch_results = await process_chunk_batch(batch_chunks)
 
             # Add unique characters and manage memory
@@ -317,8 +319,10 @@ class CharacterService(BaseService):
             del batch_results
 
             # Apply early deduplication if getting too large
-            if len(unique_characters) > MAX_CHARACTERS * 0.8:
-                self.logger.debug(f"Applying early deduplication at {len(unique_characters)} characters")
+            if len(unique_characters) > max_characters * 0.8:
+                self.logger.debug(
+                    f"Applying early deduplication at {len(unique_characters)} characters"
+                )
                 unique_characters = self._apply_early_deduplication(unique_characters)
 
             if progress_bar:
@@ -334,7 +338,9 @@ class CharacterService(BaseService):
         # Clear chunks from memory
         del chunks
 
-        self.logger.info(f"Extracted {len(unique_characters)} unique characters (deduped from {len(seen_names)} names)")
+        self.logger.info(
+            f"Extracted {len(unique_characters)} unique characters (deduped from {len(seen_names)} names)"
+        )
         return unique_characters
 
     def _apply_early_deduplication(self, characters: list[dict]) -> list[dict]:
@@ -348,7 +354,9 @@ class CharacterService(BaseService):
                 else:
                     # Keep the one with more details
                     existing = name_groups[name]
-                    if len(str(char.get("description", ""))) > len(str(existing.get("description", ""))):
+                    if len(str(char.get("description", ""))) > len(
+                        str(existing.get("description", ""))
+                    ):
                         name_groups[name] = char
         return list(name_groups.values())
 
@@ -374,7 +382,7 @@ class CharacterService(BaseService):
 
         # Split text into chunks by character count, respecting word boundaries
         # Use memory-efficient approach with chunk limit
-        MAX_CHUNKS = 100  # Limit chunks to prevent excessive memory usage
+        max_chunks = 100  # Limit chunks to prevent excessive memory usage
         chunks = []
 
         # Process text line by line to avoid loading all words at once
@@ -383,8 +391,8 @@ class CharacterService(BaseService):
         current_chars = 0
 
         for line in lines:
-            if len(chunks) >= MAX_CHUNKS:
-                self.logger.warning(f"Reached maximum chunk limit ({MAX_CHUNKS}), truncating text")
+            if len(chunks) >= max_chunks:
+                self.logger.warning(f"Reached maximum chunk limit ({max_chunks}), truncating text")
                 break
 
             words = line.split()
@@ -395,20 +403,22 @@ class CharacterService(BaseService):
                     current_chunk = []
                     current_chars = 0
 
-                    if len(chunks) >= MAX_CHUNKS:
+                    if len(chunks) >= max_chunks:
                         break
 
                 current_chunk.append(word)
                 current_chars += word_len
 
-        if current_chunk and len(chunks) < MAX_CHUNKS:
+        if current_chunk and len(chunks) < max_chunks:
             chunks.append(" ".join(current_chunk))
 
         # Clear intermediate variables
         del lines
         del current_chunk
 
-        self.logger.info(f"Created {len(chunks)} chunks of ~{chunk_size} tokens ({chars_per_chunk} chars) each")
+        self.logger.info(
+            f"Created {len(chunks)} chunks of ~{chunk_size} tokens ({chars_per_chunk} chars) each"
+        )
         return chunks
 
     async def _extract_from_chunk(self, chunk: str, chunk_index: int) -> list[dict]:
@@ -539,7 +549,9 @@ class CharacterService(BaseService):
 
         return candidates
 
-    def _find_best_matches(self, name: str, candidates: list[str], threshold: int = 80) -> list[tuple[str, float, int]]:
+    def _find_best_matches(
+        self, name: str, candidates: list[str], threshold: int = 80
+    ) -> list[tuple[str, float, int]]:
         """
         Find best matching names from candidates using rapidfuzz.
 
@@ -557,11 +569,7 @@ class CharacterService(BaseService):
         # Use rapidfuzz's extract to get best matches
         # Returns list of (match, score, index) tuples
         matches = process.extract(
-            name,
-            candidates,
-            scorer=fuzz.token_set_ratio,
-            limit=None,
-            score_cutoff=threshold
+            name, candidates, scorer=fuzz.token_set_ratio, limit=None, score_cutoff=threshold
         )
 
         return matches
@@ -630,10 +638,8 @@ class CharacterService(BaseService):
 
         # Token sort ratio for reordered names (e.g., "Bennet, Elizabeth" vs "Elizabeth Bennet")
         token_sort_ratio = fuzz.token_sort_ratio(name1, name2)
-        if token_sort_ratio >= threshold + 5:  # Slightly higher threshold
-            return True
-
-        return False
+        # Slightly higher threshold for the reordered form
+        return token_sort_ratio >= threshold + 5
 
     # === MERGING METHODS ===
 
@@ -742,8 +748,8 @@ class CharacterService(BaseService):
 
                 # Some models like gpt-5-mini only support temperature=1.0
                 # Check if the model has this limitation
-                model_name = getattr(self.provider, 'model', '')
-                if 'gpt-5-mini' in model_name or 'gpt-5-nano' in model_name:
+                model_name = getattr(self.provider, "model", "")
+                if "gpt-5-mini" in model_name or "gpt-5-nano" in model_name:
                     # These models only support temperature=1.0
                     kwargs["temperature"] = 1.0
                 else:
@@ -805,7 +811,11 @@ class CharacterService(BaseService):
         # Strategy 4: Find JSON-like content
         try:
             # More precise regex for JSON objects/arrays
-            json_match = re.search(r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])", response, re.DOTALL)
+            json_match = re.search(
+                r"(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}|\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\])",
+                response,
+                re.DOTALL,
+            )
             if json_match:
                 result = json.loads(json_match.group(1))
                 return result
@@ -816,20 +826,20 @@ class CharacterService(BaseService):
         try:
             # Remove everything before first { or [
             start_idx = min(
-                response.find('{') if '{' in response else len(response),
-                response.find('[') if '[' in response else len(response)
+                response.find("{") if "{" in response else len(response),
+                response.find("[") if "[" in response else len(response),
             )
             if start_idx < len(response):
                 trimmed = response[start_idx:]
                 # Find matching close
-                if trimmed[0] == '{':
-                    end_idx = trimmed.rfind('}')
+                if trimmed[0] == "{":
+                    end_idx = trimmed.rfind("}")
                     if end_idx > 0:
-                        trimmed = trimmed[:end_idx + 1]
+                        trimmed = trimmed[: end_idx + 1]
                 else:
-                    end_idx = trimmed.rfind(']')
+                    end_idx = trimmed.rfind("]")
                     if end_idx > 0:
-                        trimmed = trimmed[:end_idx + 1]
+                        trimmed = trimmed[: end_idx + 1]
 
                 cleaned = self._clean_json_text(trimmed)
                 result = json.loads(cleaned)
@@ -864,29 +874,29 @@ class CharacterService(BaseService):
 
         # Fix missing commas between array elements (common LLM error)
         text = re.sub(r'"\s*\n\s*"', '",\n"', text)
-        text = re.sub(r'}\s*\n\s*{', '},\n{', text)
-        text = re.sub(r'\]\s*\n\s*\[', '],\n[', text)
+        text = re.sub(r"}\s*\n\s*{", "},\n{", text)
+        text = re.sub(r"\]\s*\n\s*\[", "],\n[", text)
 
         # Fix trailing commas (not allowed in JSON)
-        text = re.sub(r',\s*}', '}', text)
-        text = re.sub(r',\s*]', ']', text)
-        text = re.sub(r',\s*,', ',', text)  # Remove double commas
+        text = re.sub(r",\s*}", "}", text)
+        text = re.sub(r",\s*]", "]", text)
+        text = re.sub(r",\s*,", ",", text)  # Remove double commas
 
         # Fix incomplete strings at the end (truncation issue)
         if text.count('"') % 2 != 0:
             # Odd number of quotes, likely truncated
             # Try to close the last string and array/object
-            if '...' in text[-10:]:
-                text = re.sub(r'\.\.\..*$', '"}]', text)
-            elif text.rstrip().endswith(','):
-                text = text.rstrip()[:-1] + '}]'
+            if "..." in text[-10:]:
+                text = re.sub(r"\.\.\..*$", '"}]', text)
+            elif text.rstrip().endswith(","):
+                text = text.rstrip()[:-1] + "}]"
             else:
                 # Determine what needs closing
-                open_braces = text.count('{') - text.count('}')
-                open_brackets = text.count('[') - text.count(']')
+                open_braces = text.count("{") - text.count("}")
+                open_brackets = text.count("[") - text.count("]")
                 closing = '"'
-                closing += '}' * open_braces
-                closing += ']' * open_brackets
+                closing += "}" * open_braces
+                closing += "]" * open_brackets
                 text += closing
 
         return text

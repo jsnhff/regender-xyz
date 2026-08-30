@@ -65,19 +65,41 @@ python regender_cli.py input.txt all_male --no-qc
 python regender_cli.py input.txt nonbinary -v
 ```
 
+### Quality Control
+
+Verify a transformed book against its source, chapter by chapter. Deterministic,
+no LLM calls, no API keys:
+
+```bash
+# Report coverage and findings per chapter
+python scripts/qc_report.py source.json gender_swap.json gender_swap
+
+# Machine-readable report, and a CI gate
+python scripts/qc_report.py source.json swap.json gender_swap --json qc.json
+python scripts/qc_report.py source.json swap.json gender_swap --fail-on auto_fixable
+
+# Repair an edition produced before the safety net was fixed (no LLM calls)
+python scripts/qc_report.py source.json swap.json gender_swap --repair fixed.json
+```
+
+Findings are graded by what can be done about them: `auto_fixable` (the safety
+net would still change this, so the text predates the fix), `needs_review` (a
+gendered word the net will not guess at), and `structural` (chapter/paragraph
+counts or suspicious length drift).
+
 ### Testing
 ```bash
 # Run all tests
 python -m pytest tests/
 
-# Test specific providers
-python tests/test_providers.py
+# Provider retry/timeout behaviour
+python -m pytest tests/test_providers.py
 
-# Test character analysis
-python tests/test_characters.py
+# Gender term substitution and the deterministic safety net
+python -m pytest tests/test_transform_terms.py
 
-# End-to-end tests
-python tests/test_end_to_end.py
+# Chapter-by-chapter QC checks
+python -m pytest tests/test_qc_service.py
 ```
 
 ## Architecture
@@ -88,7 +110,7 @@ python tests/test_end_to_end.py
    - `ParserService` - Parses books from various text formats
    - `CharacterService` - Analyzes characters and genders
    - `TransformService` - Applies gender transformations
-   - `QualityService` - Validates and improves quality
+   - `QCService` - Verifies a transform against its source, chapter by chapter
 
 2. **src/models/** - Domain models
    - `Book`, `Chapter`, `Paragraph` - Book structure
@@ -99,7 +121,6 @@ python tests/test_end_to_end.py
    - `ParsingStrategy` - Different parsing approaches
    - `AnalysisStrategy` - Character analysis methods
    - `TransformStrategy` - Transformation algorithms
-   - `QualityStrategy` - Quality control approaches
 
 4. **src/providers/** - LLM Provider plugins
    - `legacy_client.py` - Unified LLM interface
@@ -134,7 +155,7 @@ The `src/config.json` file defines:
 
 ## Development Notes
 
-- Main branch is `master`
+- Main branch is `main`
 - Service-oriented architecture with dependency injection
 - Environment variables loaded through provider configuration
 - Test suite uses unittest-style patterns

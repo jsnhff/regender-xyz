@@ -70,7 +70,7 @@ class Plugin(ABC):
         """
         pass
 
-    def shutdown(self):
+    def shutdown(self):  # noqa: B027 — optional hook, not every plugin needs one
         """
         Clean up plugin resources.
 
@@ -140,11 +140,13 @@ class PluginManager:
 
             # Find Plugin subclasses in the module
             plugin_classes = []
-            for name, obj in inspect.getmembers(module):
-                if (inspect.isclass(obj) and
-                    issubclass(obj, Plugin) and
-                    obj != Plugin and
-                    not inspect.isabstract(obj)):  # Skip abstract classes
+            for _name, obj in inspect.getmembers(module):
+                if (
+                    inspect.isclass(obj)
+                    and issubclass(obj, Plugin)
+                    and obj != Plugin
+                    and not inspect.isabstract(obj)
+                ):  # Skip abstract classes
                     plugin_classes.append(obj)
 
             if not plugin_classes:

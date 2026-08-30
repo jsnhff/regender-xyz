@@ -599,6 +599,9 @@ class GutenbergParser:
         cleaned = []
         blank_count = 0
         in_illustration = False  # Track multi-line illustration blocks
+        # True once an illustration block has been removed and we are waiting to
+        # see whether it had interrupted a sentence.
+        after_illustration = False
 
         for line in lines:
             line_stripped = line.strip()
@@ -615,11 +618,13 @@ class GutenbergParser:
             if in_illustration:
                 if line_stripped.endswith("]"):
                     in_illustration = False
+                    after_illustration = True
                     # If the closing line contains a chapter heading, preserve it
                     # e.g. "Chapter I.]" inside an illustration caption
                     inner = line_stripped.rstrip("]").rstrip(".").strip()
                     if re.match(r"^(Chapter|CHAPTER)\s+[IVXLCDM\d]+", inner):
                         cleaned.append(inner)
+                        after_illustration = False
                 continue
 
             # Skip page numbers (lines that are purely digits/spaces)
@@ -631,11 +636,36 @@ class GutenbergParser:
                 blank_count += 1
                 if blank_count <= 2:
                     cleaned.append(line)
-            else:
-                blank_count = 0
-                cleaned.append(line)
+                continue
+
+            # Illustrated editions place plates in the middle of a sentence.
+            # Removing the plate leaves the blank lines that surrounded it, which
+            # split one paragraph in two — "...the idea of his" ends a paragraph
+            # and "being gone to London..." starts the next. Beyond the visible
+            # break in print, it hands the transform a fragment ending on a bare
+            # possessive, with the noun it belongs to in a different paragraph.
+            if after_illustration and self._interrupts_sentence(cleaned, line_stripped):
+                while cleaned and not cleaned[-1].strip():
+                    cleaned.pop()
+
+            after_illustration = False
+            blank_count = 0
+            cleaned.append(line)
 
         return cleaned
+
+    @staticmethod
+    def _interrupts_sentence(cleaned: list[str], next_line: str) -> bool:
+        """True when the text either side of a removed block is one sentence.
+
+        Requires both halves to agree: the text before ends without terminal
+        punctuation, and the text after opens in lower case. Either signal alone
+        would join paragraphs that were meant to be separate.
+        """
+        previous = next((line.strip() for line in reversed(cleaned) if line.strip()), "")
+        if not previous or not next_line:
+            return False
+        return (previous[-1].isalnum() or previous[-1] in ",;:-—") and next_line[0].islower()
 
     def get_toc(self, text: str) -> Optional[str]:
         """

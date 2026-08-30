@@ -5,10 +5,11 @@ This module provides custom exception types and error handling utilities
 for consistent error management across all services.
 """
 
+import asyncio
 import logging
 import traceback
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 
 class RegenderError(Exception):
@@ -18,7 +19,7 @@ class RegenderError(Exception):
         self,
         message: str,
         error_code: str = "GENERAL_ERROR",
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
     ):
         """
@@ -36,7 +37,7 @@ class RegenderError(Exception):
         self.details = details or {}
         self.correlation_id = correlation_id or str(uuid.uuid4())
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert error to dictionary for API responses."""
         return {
             "error": self.error_code,
@@ -54,9 +55,7 @@ class ValidationError(RegenderError):
         details = kwargs.pop("details", {})
         if field:
             details["field"] = field
-        super().__init__(
-            message=message, error_code="VALIDATION_ERROR", details=details, **kwargs
-        )
+        super().__init__(message=message, error_code="VALIDATION_ERROR", details=details, **kwargs)
 
 
 class ProviderError(RegenderError):
@@ -67,9 +66,7 @@ class ProviderError(RegenderError):
         details = kwargs.pop("details", {})
         if provider:
             details["provider"] = provider
-        super().__init__(
-            message=message, error_code="PROVIDER_ERROR", details=details, **kwargs
-        )
+        super().__init__(message=message, error_code="PROVIDER_ERROR", details=details, **kwargs)
 
 
 class CharacterExtractionError(RegenderError):
@@ -132,17 +129,19 @@ class RateLimitError(ProviderError):
         super().__init__(message=message, **kwargs)
 
 
-class TimeoutError(RegenderError):
-    """Raised when an operation times out."""
+class OperationTimeoutError(RegenderError):
+    """Raised when an operation times out.
+
+    Deliberately not named TimeoutError: that shadows the builtin, which is
+    what the providers actually raise on a timed-out API call.
+    """
 
     def __init__(self, message: str, operation: Optional[str] = None, **kwargs):
-        """Initialize TimeoutError with operation information."""
+        """Initialize OperationTimeoutError with operation information."""
         details = kwargs.pop("details", {})
         if operation:
             details["operation"] = operation
-        super().__init__(
-            message=message, error_code="TIMEOUT_ERROR", details=details, **kwargs
-        )
+        super().__init__(message=message, error_code="TIMEOUT_ERROR", details=details, **kwargs)
 
 
 class ErrorHandler:
@@ -152,9 +151,7 @@ class ErrorHandler:
         """Initialize ErrorHandler with optional logger."""
         self.logger = logger or logging.getLogger(__name__)
 
-    def handle_error(
-        self, error: Exception, correlation_id: Optional[str] = None
-    ) -> RegenderError:
+    def handle_error(self, error: Exception, correlation_id: Optional[str] = None) -> RegenderError:
         """
         Convert any exception to a RegenderError.
 
@@ -176,8 +173,14 @@ class ErrorHandler:
                 correlation_id=correlation_id,
             )
 
-        if isinstance(error, TimeoutError):
-            return TimeoutError(
+        # The builtin TimeoutError — what the providers raise, and what
+        # asyncio.TimeoutError aliases on Python 3.11+. Previously this branch
+        # tested against the custom class above, which shadowed the builtin, so
+        # a provider timeout fell through and was reported as INTERNAL_ERROR.
+        # Before 3.11 asyncio.TimeoutError is a separate class, so name it too
+        # rather than relying on the alias.
+        if isinstance(error, (TimeoutError, asyncio.TimeoutError)):
+            return OperationTimeoutError(
                 message=str(error),
                 details={"original_type": type(error).__name__},
                 correlation_id=correlation_id,
@@ -214,7 +217,7 @@ class ErrorHandler:
 
     def create_error_response(
         self, error: RegenderError, include_details: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create standardized error response.
 
@@ -303,8 +306,7 @@ class CircuitBreaker:
         import time
 
         return (
-            self.last_failure_time
-            and time.time() - self.last_failure_time >= self.recovery_timeout
+            self.last_failure_time and time.time() - self.last_failure_time >= self.recovery_timeout
         )
 
     def _on_success(self):

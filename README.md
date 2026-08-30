@@ -11,7 +11,7 @@ Download the latest **Regender.dmg** from [Releases](https://github.com/jsnhff/r
 ### From the terminal
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jsnhff/regender-xyz/master/start.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jsnhff/regender-xyz/main/start.sh | bash
 ```
 
 The script installs everything and walks you through setup.
@@ -138,7 +138,7 @@ python -m pytest tests/
 
 # Key tests
 python -m pytest tests/test_timeout_retry.py   # timeout resilience
-python -m pytest tests/test_end_to_end.py      # full pipeline
+python -m pytest tests/test_qc_service.py      # chapter-by-chapter QC
 ```
 
 ## License
