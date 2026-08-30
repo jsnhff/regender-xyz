@@ -307,6 +307,25 @@ class Application:
             characters = await self._get_or_analyze_characters(file_path, book)
             self.logger.info(f"Using {len(characters.characters)} characters")
 
+            # Decide every character rename ONCE, before any chapter is
+            # transformed. Renames used to be improvised by the LLM chunk by
+            # chunk, so one character could end up with several targets in the
+            # same book (Elizabeth -> Elliot in one chapter, Edward in another).
+            # User-supplied entries win; the engine fills in the rest.
+            from src.services.name_engine import NameEngine
+
+            engine = NameEngine(provider=self.get_service("transform").provider, logger=self.logger)
+            name_map, name_report = await engine.build_name_map(
+                characters,
+                TransformType(transform_type),
+                base_map=name_map,
+                selected_characters=selected_characters,
+            )
+            self.logger.info(
+                f"Name map: {name_report['entries']} entries "
+                f"({name_report['accepted']} characters renamed)"
+            )
+
             # Save character analysis immediately if we have output path and it's not already saved
             if output_dir:
                 char_file = output_dir / "characters.json"
@@ -322,6 +341,8 @@ class Application:
                     with open(map_file, "w") as f:
                         json.dump(name_map, f, indent=2)
                     self.logger.info(f"Saved name map to {map_file}")
+                with open(output_dir / "name_report.json", "w") as f:
+                    json.dump(name_report, f, indent=2)
 
             # Transform the book
             transformer = self.get_service("transform")
