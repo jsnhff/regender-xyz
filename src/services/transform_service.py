@@ -1296,13 +1296,16 @@ class TransformService(BaseService):
             "ladies": "nobles",
             "ladylike": "genteel",
             "lords": "nobles",
-            "ma'am": "Mx.",
+            # "sir"/"madam"/"ma'am" as a bare vocative ("Indeed, sir,") has
+            # no neutral equivalent: "Mx." is a title and needs a surname,
+            # so mapping it here produced "Indeed, Mx.,". The title form
+            # ("Sir William") is handled in _CASE_SENSITIVE_FIXES; the bare
+            # vocative is reported by QC for a decision instead.
             "mama": "parent",
             "mamma": "parent",
             "men": "people",
             "mothers": "parents",
             "papa": "parent",
-            "sir": "Mx.",
             "sisters": "siblings",
             "sons": "children",
             "they acknowledges": "they acknowledge",
@@ -1454,7 +1457,6 @@ class TransformService(BaseService):
             "bride": "betrothed",
             "groom": "betrothed",
             # Occupational / address
-            "madam": "Mx.",
             # Both halves go to a neutral word. Mapping mistress->master
             # neutralised the female word by making it the male one.
             # "mistress" and "master" are deliberately NOT mapped here. Both
@@ -1522,12 +1524,26 @@ class TransformService(BaseService):
         # "Miss Name" (title form — capital following word). Safe because:
         # - Verb "miss" is always lowercase in flowing prose
         # - Title "Miss" precedes a capital proper name
+        #
+        # The name may open with a lowercase nobiliary particle, which is why
+        # the lookahead allows one: "Miss de Bourgh" kept its title through
+        # every run until this was added.
         "nonbinary": [
-            (re.compile(r"Miss (?=[A-Z])"), "Mx. "),
+            (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mx. \1"),
+            # A capitalised title before a proper name is always a title, so
+            # these are safe to apply whatever the source said. The model keeps
+            # reintroducing them on characters it renamed, where the residual
+            # mask cannot see them as misses.
+            (re.compile(r"\bMr\. (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
+            (
+                re.compile(r"\bMrs\. (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"),
+                "Mx. ",
+            ),
+            (re.compile(r"\bSir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
         ],
         "all_male": [
-            (re.compile(r"Miss (?=[A-Z])"), "Mr. "),
+            (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mr. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
         ],
         "all_female": [

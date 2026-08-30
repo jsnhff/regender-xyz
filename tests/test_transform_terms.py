@@ -213,8 +213,22 @@ class TestCasePreservation:
         assert apply(service, source, source, TransformType.GENDER_SWAP) == expected
 
     def test_honorific_replacement_keeps_its_own_case(self, service):
-        """ "madam" -> "Mx." must not be lowercased into "mx."."""
-        assert "Mx." in apply(service, "madam", "madam", TransformType.NONBINARY)
+        """A title becoming "Mx." must not be lowercased into "mx."."""
+        assert "Mx." in apply(service, "Miss Bennet", "Miss Bennet", TransformType.NONBINARY)
+
+    def test_a_bare_vocative_is_left_for_review(self, service):
+        """ "Indeed, sir," has no neutral form: "Mx." is a title wanting a surname.
+
+        Mapping it produced "Indeed, Mx.,". The title form still converts; the
+        bare vocative is reported by QC instead of guessed at.
+        """
+        assert (
+            apply(service, "Indeed, sir, I agree", "Indeed, sir, I agree", TransformType.NONBINARY)
+            == "Indeed, sir, I agree"
+        )
+        assert "Mx." in apply(
+            service, "Sir William paused", "Sir William paused", TransformType.NONBINARY
+        )
 
 
 class TestNameMap:

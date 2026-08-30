@@ -47,7 +47,7 @@ _REPEATED_WORD = re.compile(r"\b(\w+)(?:\s+\1\b){1,}", re.IGNORECASE)
 # surrounding words; anything left over is reported for a human to decide
 # rather than guessed at.
 _POLYSEMOUS: dict[str, frozenset] = {
-    "nonbinary": frozenset({"master", "mistress"}),
+    "nonbinary": frozenset({"master", "mistress", "sir", "madam"}),
 }
 
 _COORDINATED_TITLES = re.compile(
