@@ -397,3 +397,31 @@ class TestCoordination:
         assert not [
             f for c in report.chapters for f in c.findings if f.kind == "dropped_coordination"
         ]
+
+
+class TestPolysemy:
+    """What the sense rules could not decide is surfaced, not guessed at."""
+
+    def test_an_undecidable_master_is_reported(self):
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(["He is a liberal master, I suppose."]),
+            book(["They are a liberal master, I suppose."]),
+        )
+        findings = [f for c in report.chapters for f in c.findings if f.kind == "polysemous_term"]
+        assert len(findings) == 1
+        assert findings[0].severity == NEEDS_REVIEW
+
+    def test_a_resolved_sense_is_not_reported(self):
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(["He asked his master."]),
+            book(["They asked their employer."]),
+        )
+        assert not [f for c in report.chapters for f in c.findings if f.kind == "polysemous_term"]
+
+    def test_other_variants_are_unaffected(self):
+        """Only nonbinary has to neutralise these; a swap just swaps them."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(book(["She was mistress here."]), book(["He was master here."]))
+        assert not [f for c in report.chapters for f in c.findings if f.kind == "polysemous_term"]

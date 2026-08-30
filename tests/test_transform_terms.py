@@ -315,3 +315,51 @@ class TestProtectedPhrases:
             )
             == "Lord Catherine was indignant"
         )
+
+
+class TestSenseRules:
+    """Words whose sense has to be read off the words beside them.
+
+    "master" is an employer, a teacher, a household head, a proprietor, and
+    half of the "his own master" idiom. A blanket mapping to "owner" produced
+    "they are their own owner" and "a London owner" in the nonbinary book.
+    """
+
+    @pytest.mark.parametrize(
+        "text,expected",
+        [
+            ("they are their own master", "they are their own person"),
+            ("a London music master", "a London music teacher"),
+            ("I asked my master", "I asked my employer"),
+            ("your master is absent", "your employer is absent"),
+            ("Netherfield and its master", "Netherfield and its owner"),
+            ("made them master of this fortune", "made them owner of this fortune"),
+            ("mistress of the house", "head of the house"),
+        ],
+    )
+    def test_sense_is_read_from_the_collocation(self, service, text, expected):
+        assert service._apply_term_map(text, TransformType.NONBINARY, source_text=text) == expected
+
+    def test_a_sense_rule_applies_even_when_the_model_already_moved_the_word(self):
+        """The source said "mistress"; the model wrote "master". Still wrong."""
+        assert (
+            service_nb()._apply_term_map(
+                "they are their own master",
+                TransformType.NONBINARY,
+                source_text="she is her own mistress",
+            )
+            == "they are their own person"
+        )
+
+    def test_verb_agreement_applies_against_a_source(self):
+        """The 100 agreement entries were dead: "they" never matches "she"."""
+        assert (
+            service_nb()._apply_term_map(
+                "They was glad.", TransformType.NONBINARY, source_text="She was glad."
+            )
+            == "They were glad."
+        )
+
+
+def service_nb():
+    return TransformService.__new__(TransformService)
