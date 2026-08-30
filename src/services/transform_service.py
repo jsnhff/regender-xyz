@@ -933,7 +933,14 @@ class TransformService(BaseService):
             "london master": "london teacher",
             "masters": "teachers",
             "mistresses": "teachers",
-            # the employer of a servant
+            # self-command, not ownership
+            "master enough of": "command enough of",
+            # the employer of a servant, in the frames a servant actually uses
+            "best master": "best employer",
+            "liberal master": "liberal employer",
+            "kind master": "kind employer",
+            "good master": "good employer",
+            "master and mistress": "employers",
             "my master": "my employer",
             "your master": "your employer",
             "their master": "their employer",
