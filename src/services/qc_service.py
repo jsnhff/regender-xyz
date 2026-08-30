@@ -33,6 +33,13 @@ from src.models.transformation import TransformType
 from src.services.transform_service import TransformService
 
 # Severity buckets, ordered worst first for reporting.
+# Quote characters the exporter normalises; not evidence of corruption.
+_EXPORT_PUNCTUATION = "\"'"
+
+# The same word twice or more with nothing but space between it. Austen repeats
+# words for effect ("very, very"), but always with punctuation between them.
+_REPEATED_WORD = re.compile(r"\b(\w+)(?:\s+\1\b){1,}", re.IGNORECASE)
+
 AUTO_FIXABLE = "auto_fixable"
 NEEDS_REVIEW = "needs_review"
 STRUCTURAL = "structural"
@@ -182,6 +189,7 @@ class QCService:
         report = QCReport(transform_type=self.key)
         source_chapters = source.get("chapters", [])
         output_chapters = transformed.get("chapters", [])
+        self._source_charset = self._charset(source_chapters)
 
         if len(source_chapters) != len(output_chapters):
             report.findings.append(
@@ -264,6 +272,80 @@ class QCService:
         self._check_pair_gender(chapter, number, position, source, output)
         self._check_names(chapter, number, position, source, output)
         self._check_residual_terms(chapter, number, position, output, residual)
+        self._check_text_integrity(chapter, number, position, source, output)
+
+    def _degenerate_repeat(self, source: str, output: str):
+        """A word repeated back to back that the source does not repeat.
+
+        Two different source words can legitimately collapse onto one target --
+        a gender_swap turns "got him his commission" into "got her her
+        commission" -- so a repeat of anything this transform writes is not
+        evidence of anything. Only repeats of ordinary words are.
+        """
+        targets = {t.lower() for t in self._term_map.values()}
+        for pair in self._contextual.values():
+            targets.update(t.lower() for t in pair)
+        for match in _REPEATED_WORD.finditer(output):
+            word = match.group(1).lower()
+            if word in targets:
+                continue
+            if re.search(
+                r"\b" + re.escape(word) + r"(?:\s+" + re.escape(word) + r")\b", source, re.I
+            ):
+                continue
+            return match
+        return None
+
+    @staticmethod
+    def _charset(chapters: list) -> frozenset:
+        """Every character the source book uses."""
+        seen: set = set()
+        for chapter in chapters:
+            for paragraph in chapter.get("paragraphs", []):
+                seen.update(_text_of(paragraph))
+        return frozenset(seen)
+
+    def _check_text_integrity(
+        self, chapter: ChapterReport, number: int, position: int, source: str, output: str
+    ) -> None:
+        """Characters and repetition the model invented — corruption, not gender.
+
+        A transform rewrites words; it has no reason to introduce a character
+        the source never used. The printed all_male Pride and Prejudice carries
+        a paragraph where the model fell into a repetition loop and emitted CJK
+        (`when when I when I tell 当 ...`), and every gender-aware gate passed
+        it, because nothing in it is gendered. This is the gate that catches it.
+        """
+        charset = getattr(self, "_source_charset", None)
+        if charset is not None:
+            # Straight quotes are a deliberate export choice, not corruption.
+            allowed = charset | set(_EXPORT_PUNCTUATION)
+            alien = {c for c in output if c not in allowed and not c.isascii()}
+            if alien:
+                shown = " ".join(f"{c!r} (U+{ord(c):04X})" for c in sorted(alien)[:5])
+                chapter.findings.append(
+                    Finding(
+                        STRUCTURAL,
+                        "alien_character",
+                        number,
+                        position,
+                        f"character(s) absent from the source: {shown}",
+                        _excerpt(output, output.index(sorted(alien)[0])),
+                    )
+                )
+
+        repeat = self._degenerate_repeat(source, output)
+        if repeat:
+            chapter.findings.append(
+                Finding(
+                    STRUCTURAL,
+                    "repetition_loop",
+                    number,
+                    position,
+                    f"{repeat.group(1)!r} repeated back to back, and not in the source",
+                    _excerpt(output, repeat.start()),
+                )
+            )
 
     def _check_continuity(self, chapter: ChapterReport, number: int, paragraphs: list) -> None:
         """Paragraphs that are really one sentence cut in half.

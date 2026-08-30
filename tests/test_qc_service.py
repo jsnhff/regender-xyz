@@ -291,3 +291,58 @@ class TestParagraphContinuity:
     def test_lower_case_opening_after_a_full_stop_is_fine(self, qc):
         source = book(["He came down on Monday.", "mid-sentence looking, but preceded by a stop."])
         assert "split_sentence" not in kinds(qc.check_book(source, source))
+
+
+class TestTextIntegrity:
+    """Corruption the model invented, which no gender-aware gate would notice.
+
+    The printed all_male Pride and Prejudice shipped with two of these: a
+    paragraph that fell into a repetition loop and emitted CJK, and another
+    that duplicated a phrase. Nothing in either is gendered, so every other
+    check passed them.
+    """
+
+    def test_character_absent_from_the_source_is_reported(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["It is settled between us already."]),
+            book(["It is settled between us 当 already."]),
+        )
+        findings = [f for c in report.chapters for f in c.findings if f.kind == "alien_character"]
+        assert len(findings) == 1
+        assert findings[0].severity == STRUCTURAL
+
+    def test_repetition_loop_is_reported(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["It is settled between us already."]),
+            book(["It is settled settled between us already."]),
+        )
+        findings = [f for c in report.chapters for f in c.findings if f.kind == "repetition_loop"]
+        assert len(findings) == 1
+
+    def test_repetition_the_source_also_has_is_left_alone(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["He had had no compassion."]),
+            book(["He had had no compassion."]),
+        )
+        assert not [f for c in report.chapters for f in c.findings if f.kind == "repetition_loop"]
+
+    def test_two_words_collapsing_onto_one_target_is_not_a_repeat(self):
+        """A swap turns "got him his commission" into "got her her commission"."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(
+            book(["Darcy got him his commission."]),
+            book(["Darcy got her her commission."]),
+        )
+        assert not [f for c in report.chapters for f in c.findings if f.kind == "repetition_loop"]
+
+    def test_clean_text_reports_nothing(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["She was his sister."]),
+            book(["He was his brother."]),
+        )
+        kinds = {f.kind for c in report.chapters for f in c.findings}
+        assert "alien_character" not in kinds and "repetition_loop" not in kinds
