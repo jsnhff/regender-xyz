@@ -97,6 +97,49 @@ Identical in the source parse, so they affect all four:
 - `src/services/text_export_service.py:248` calls `self.process_async`, which
   does not exist — `export_to_file` raises. The text export path is broken.
 
+## Ported from `worktree-transform-hardening` (2026-08-29)
+
+Landed here, so that branch is now only a historical reference:
+
+- **`src/services/name_engine.py`** — decides every character rename ONCE before
+  any chapter is transformed, then applies it deterministically. Renames used to
+  be improvised chunk by chunk, so one character could end up with several
+  targets in the same book (Elizabeth → Elliot in one chapter, Edward in
+  another). Also handles rank titles (never inflected — the `Colonella` bug),
+  collision detection, and invented-name rejection. Wired into `app.py`; it
+  needed no changes, because `transform_book` already took a `name_map`.
+- **148 term-map entries** — plurals (`sisters`, `daughters`, `nephews`),
+  familiar forms (`mamma`, `papa`, `ma'am`), and ~100 singular-they verb
+  agreement phrases. `nonbinary` goes from 85 entries to 205, which is aimed
+  squarely at its 305 auto-fixable findings.
+  - **Not** ported: hardening's `"gender_swap": {}`. It emptied that map to dodge
+    the sequential-pass collapse; main fixes the collapse properly with a single
+    simultaneous pass, so main's 128 entries are the better answer.
+  - **Not** ported: flat `her → them` / `his → their` for nonbinary. Main
+    deliberately leaves those out of the term map and resolves them by role in
+    `_CONTEXTUAL_PRONOUNS` (`her` → `their` possessive, `them` objective). The
+    flat entries would render "her book" as "them book".
+- **`parse_only` / `character_analysis` CLI fix** — they called the `_sync`
+  wrappers, which spin a nested event loop inside the already-running one and
+  raise "Cannot run the event loop while another loop is running". Now awaited
+  directly. `parse_only` was broken on main until this.
+- **8 NameEngine tests** as `tests/test_name_engine.py`.
+
+### Still on that branch, worth taking next
+
+`src/services/qc_gates.py` has three checks `qc_service.py` has no equivalent
+for, and all three matter for the remaining variants:
+
+| gate | catches | matters for |
+|---|---|---|
+| `verb_agreement_gate` | "they was", "they has" | **nonbinary** |
+| `immutability_gate` | surnames and places mutated — `Mary King` → `Mary Monarch`, `St. James's` | all |
+| `title_atomicity_gate` | half-transformed title+name units | all |
+
+They are book-level and take `engine_flags` from the name engine, where
+`qc_service` is chapter-level, so this is an adaptation rather than a copy. Do
+it with the nonbinary run, which is the variant that needs the verb gate.
+
 ## Branches
 
 Three lines of work solve overlapping problems and have diverged.
