@@ -42,6 +42,14 @@ _REPEATED_WORD = re.compile(r"\b(\w+)(?:\s+\1\b){1,}", re.IGNORECASE)
 
 # "Mr. and Mrs. Gardiner" -- two titled people sharing one surname. The model
 # drops the first half and leaves one person where the source had a couple.
+# Words carrying more than one sense, only one of which is about gender.
+# TransformService._SENSE_RULES resolves the frames that can be read off the
+# surrounding words; anything left over is reported for a human to decide
+# rather than guessed at.
+_POLYSEMOUS: dict[str, frozenset] = {
+    "nonbinary": frozenset({"master", "mistress", "sir", "madam"}),
+}
+
 _COORDINATED_TITLES = re.compile(
     r"\b(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+and\s+(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+([A-Z]\w+)"
 )
@@ -280,6 +288,36 @@ class QCService:
         self._check_residual_terms(chapter, number, position, output, residual)
         self._check_text_integrity(chapter, number, position, source, output)
         self._check_coordination(chapter, number, position, source, output)
+        self._check_polysemy(chapter, number, position, output)
+
+    def _check_polysemy(
+        self, chapter: ChapterReport, number: int, position: int, output: str
+    ) -> None:
+        """A word whose sense the rules could not determine, left for a person.
+
+        "master" is an employer, a teacher, a household head, a proprietor, and
+        half of the "his own master" idiom. Mapping it blindly produced "they
+        are their own owner" and "a London owner". So the sense-scoped rules
+        take the frames they can read, and whatever survives is surfaced here
+        instead of being silently rewritten.
+        """
+        terms = _POLYSEMOUS.get(self.key)
+        if not terms:
+            return
+        for match in re.finditer(r"\b[A-Za-z]+\b", output):
+            word = match.group(0).lower()
+            if word not in terms:
+                continue
+            chapter.findings.append(
+                Finding(
+                    NEEDS_REVIEW,
+                    "polysemous_term",
+                    number,
+                    position,
+                    f"{word!r} has senses the rules cannot tell apart — decide by hand",
+                    _excerpt(output, match.start()),
+                )
+            )
 
     def _check_coordination(
         self, chapter: ChapterReport, number: int, position: int, source: str, output: str

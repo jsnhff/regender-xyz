@@ -33,6 +33,10 @@ from src.utils.token_manager import TokenManager
 
 from .character_service import CharacterService
 
+# "they was", "themself is" -- a neutral pronoun followed by a verb that has not
+# been re-conjugated. Always safe to fix, whatever the source said.
+_AGREEMENT_PHRASE = re.compile(r"^(?:they|themself)\s+\w+$", re.IGNORECASE)
+
 
 class TransformService(BaseService):
     """
@@ -906,6 +910,59 @@ class TransformService(BaseService):
 
     # Gendered terms that the LLM occasionally misses — keyed by transform type.
     # ALL_MALE maps female→male; ALL_FEMALE maps male→female; GENDER_SWAP includes both.
+    # Sense-scoped rules. Some words carry several senses and only one of them
+    # is about gender: "master" is an employer, a teacher, a household head, a
+    # proprietor, and half of the "his own master" idiom. A blanket mapping is
+    # silently wrong in four of those five, so the sense is read off the words
+    # beside it. Longest-key-first matching means these beat the bare word.
+    #
+    # These apply whatever the source said, because the target is right either
+    # way -- "music teacher" is correct whether the model left "music master"
+    # alone or produced it from "music mistress". Anything not covered here is
+    # left alone and reported by QC rather than guessed at.
+    _SENSE_RULES: dict[str, dict[str, str]] = {
+        "nonbinary": {
+            # the idiom: self-command, not ownership
+            "own master": "own person",
+            "own mistress": "own person",
+            # a teacher
+            "music master": "music teacher",
+            "dancing master": "dancing teacher",
+            "drawing master": "drawing teacher",
+            "writing master": "writing teacher",
+            "london master": "london teacher",
+            "masters": "teachers",
+            "mistresses": "teachers",
+            # self-command, not ownership
+            "master enough of": "command enough of",
+            # the employer of a servant, in the frames a servant actually uses
+            "best master": "best employer",
+            "liberal master": "liberal employer",
+            "kind master": "kind employer",
+            "good master": "good employer",
+            "master and mistress": "employers",
+            "my master": "my employer",
+            "your master": "your employer",
+            "their master": "their employer",
+            "the master": "the employer",
+            "a master": "an employer",
+            "late master": "late employer",
+            # a house and its proprietor
+            "its master": "its owner",
+            "its mistress": "its owner",
+            # whoever runs the household
+            "master of this house": "head of this house",
+            "mistress of this house": "head of this house",
+            "master of the house": "head of the house",
+            "mistress of the house": "head of the house",
+            "master of the family": "head of the family",
+            "mistress of the family": "head of the family",
+            # actual possession
+            "master of this fortune": "owner of this fortune",
+            "mistress of this fortune": "owner of this fortune",
+        },
+    }
+
     _TERM_MAPS: dict[str, dict[str, str]] = {
         "all_male": {
             # Ported from the Aug-2026 transform hardening: plurals,
@@ -1246,13 +1303,16 @@ class TransformService(BaseService):
             "ladies": "nobles",
             "ladylike": "genteel",
             "lords": "nobles",
-            "ma'am": "Mx.",
+            # "sir"/"madam"/"ma'am" as a bare vocative ("Indeed, sir,") has
+            # no neutral equivalent: "Mx." is a title and needs a surname,
+            # so mapping it here produced "Indeed, Mx.,". The title form
+            # ("Sir William") is handled in _CASE_SENSITIVE_FIXES; the bare
+            # vocative is reported by QC for a decision instead.
             "mama": "parent",
             "mamma": "parent",
             "men": "people",
             "mothers": "parents",
             "papa": "parent",
-            "sir": "Mx.",
             "sisters": "siblings",
             "sons": "children",
             "they acknowledges": "they acknowledge",
@@ -1404,12 +1464,21 @@ class TransformService(BaseService):
             "bride": "betrothed",
             "groom": "betrothed",
             # Occupational / address
-            "madam": "Mx.",
-            "mistress": "master",
+            # Both halves go to a neutral word. Mapping mistress->master
+            # neutralised the female word by making it the male one.
+            # "mistress" and "master" are deliberately NOT mapped here. Both
+            # carry senses a blanket rule gets wrong -- teacher, employer,
+            # household head, and the "his own master" idiom. _SENSE_RULES
+            # covers the frames that can be read off the surrounding words;
+            # whatever is left is reported by QC instead of guessed at.
             "maid": "attendant",
             "governess": "tutor",
-            "housekeeper": "steward",
-            "landlady": "landlord",
+            # "housekeeper" is left alone: unlike mistress/master it has no
+            # male counterpart, so it is already neutral. Mapping it to
+            # "steward" replaced a neutral word with a male-coded one and
+            # changed the job while it was at it.
+            "landlady": "proprietor",
+            "landlord": "proprietor",
             "actress": "actor",
             "hostess": "host",
             "waitress": "server",
@@ -1462,12 +1531,26 @@ class TransformService(BaseService):
         # "Miss Name" (title form — capital following word). Safe because:
         # - Verb "miss" is always lowercase in flowing prose
         # - Title "Miss" precedes a capital proper name
+        #
+        # The name may open with a lowercase nobiliary particle, which is why
+        # the lookahead allows one: "Miss de Bourgh" kept its title through
+        # every run until this was added.
         "nonbinary": [
-            (re.compile(r"Miss (?=[A-Z])"), "Mx. "),
+            (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mx. \1"),
+            # A capitalised title before a proper name is always a title, so
+            # these are safe to apply whatever the source said. The model keeps
+            # reintroducing them on characters it renamed, where the residual
+            # mask cannot see them as misses.
+            (re.compile(r"\bMr\. (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
+            (
+                re.compile(r"\bMrs\. (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"),
+                "Mx. ",
+            ),
+            (re.compile(r"\bSir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
         ],
         "all_male": [
-            (re.compile(r"Miss (?=[A-Z])"), "Mr. "),
+            (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mr. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
         ],
         "all_female": [
@@ -1736,6 +1819,28 @@ class TransformService(BaseService):
             return word[:-1] + "ies"
         return word + "s"
 
+    _UNCONDITIONAL_TERMS: dict[str, frozenset] = {}
+
+    @classmethod
+    def _unconditional_terms(cls, key: str) -> frozenset:
+        """Keys applied whatever the source said.
+
+        The residual mask exists to stop the net undoing correct LLM work, and
+        for a gendered swap that is essential. But some rules are right either
+        way: "they was" is never grammatical, and "music teacher" is correct
+        whether the model wrote "music master" or produced it from "music
+        mistress". Holding those to the mask silently disables them -- "they"
+        never matches the "she" it replaced, so every one of the 100 verb
+        agreement entries was dead in production.
+        """
+        cached = cls._UNCONDITIONAL_TERMS.get(key)
+        if cached is not None:
+            return cached
+        terms = {t.lower() for t in cls._SENSE_RULES.get(key, {})}
+        terms.update(t.lower() for t in cls._effective_term_map(key) if _AGREEMENT_PHRASE.match(t))
+        cls._UNCONDITIONAL_TERMS[key] = frozenset(terms)
+        return cls._UNCONDITIONAL_TERMS[key]
+
     @classmethod
     def _effective_term_map(cls, key: str) -> dict[str, str]:
         """Term map for a transform, extended with plural forms.
@@ -1749,6 +1854,7 @@ class TransformService(BaseService):
 
         base = cls._TERM_MAPS.get(key, {})
         effective = dict(base)
+        effective.update(cls._SENSE_RULES.get(key, {}))
         for original, replacement in base.items():
             if (
                 original.lower() in cls._NO_PLURAL
@@ -2040,13 +2146,20 @@ class TransformService(BaseService):
             mask = self._residual_mask(source_text, text, key) if source_text is not None else None
             current = text
             protected = self.protected_spans(text)
+            unconditional = self._unconditional_terms(key)
 
             def _replace(match: "re.Match") -> str:
                 term = match.group("term")
                 start, end = match.span("term")
                 if self._in_protected(protected, start, end):
                     return match.group(0)
-                if not self._is_residual(mask, current, start, end):
+                # Verb agreement after singular "they" is a grammar repair, not a
+                # gender decision: "they was" is never right. The residual mask
+                # would suppress every one of them, because "they" does not match
+                # the "she" it replaced, so the whole phrase reads as LLM work.
+                if term.lower() not in unconditional and not self._is_residual(
+                    mask, current, start, end
+                ):
                     return match.group(0)
                 return self._match_case(term, lookup[term.lower()]) + (match.group("clitic") or "")
 
