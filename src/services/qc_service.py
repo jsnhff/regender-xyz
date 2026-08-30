@@ -40,6 +40,12 @@ _EXPORT_PUNCTUATION = "\"'"
 # words for effect ("very, very"), but always with punctuation between them.
 _REPEATED_WORD = re.compile(r"\b(\w+)(?:\s+\1\b){1,}", re.IGNORECASE)
 
+# "Mr. and Mrs. Gardiner" -- two titled people sharing one surname. The model
+# drops the first half and leaves one person where the source had a couple.
+_COORDINATED_TITLES = re.compile(
+    r"\b(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+and\s+(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+([A-Z]\w+)"
+)
+
 AUTO_FIXABLE = "auto_fixable"
 NEEDS_REVIEW = "needs_review"
 STRUCTURAL = "structural"
@@ -273,6 +279,36 @@ class QCService:
         self._check_names(chapter, number, position, source, output)
         self._check_residual_terms(chapter, number, position, output, residual)
         self._check_text_integrity(chapter, number, position, source, output)
+        self._check_coordination(chapter, number, position, source, output)
+
+    def _check_coordination(
+        self, chapter: ChapterReport, number: int, position: int, source: str, output: str
+    ) -> None:
+        """A coordinated pair of titled people collapsed into one.
+
+        "go after Mr. and Mrs. Gardiner" came back as "go after Mr. Gardiner"
+        in the gender_swap, all_male and all_female editions -- three separate
+        runs, the same sentence, a couple turned into one person each time. The
+        honorifics that remain are all correct, so no gender-aware check sees
+        anything wrong; only the missing person is wrong.
+        """
+        expected = _COORDINATED_TITLES.findall(source)
+        if not expected:
+            return
+        actual = _COORDINATED_TITLES.findall(output)
+        lost = Counter(expected) - Counter(actual)
+        for surname, count in lost.items():
+            chapter.findings.append(
+                Finding(
+                    STRUCTURAL,
+                    "dropped_coordination",
+                    number,
+                    position,
+                    f"source pairs two titled people as '... and ... {surname}'; "
+                    f"the transform leaves one ({count} lost)",
+                    _excerpt(output, max(0, output.find(surname))),
+                )
+            )
 
     def _degenerate_repeat(self, source: str, output: str):
         """A word repeated back to back that the source does not repeat.
