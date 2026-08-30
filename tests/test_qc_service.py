@@ -346,3 +346,54 @@ class TestTextIntegrity:
         )
         kinds = {f.kind for c in report.chapters for f in c.findings}
         assert "alien_character" not in kinds and "repetition_loop" not in kinds
+
+
+class TestCoordination:
+    """A couple collapsed into one person.
+
+    "go after Mr. and Mrs. Gardiner" came back as "go after Mr. Gardiner" in
+    the gender_swap, all_male and all_female editions -- three separate runs,
+    the same sentence. Every honorific left behind is correct, so no
+    gender-aware check notices; only the missing person is wrong.
+    """
+
+    def test_dropped_half_of_a_pair_is_reported(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["Go after Mr. and Mrs. Gardiner."]),
+            book(["Go after Mr. Gardiner."]),
+        )
+        findings = [
+            f for c in report.chapters for f in c.findings if f.kind == "dropped_coordination"
+        ]
+        assert len(findings) == 1
+        assert findings[0].severity == STRUCTURAL
+        assert "Gardiner" in findings[0].detail
+
+    def test_a_pair_that_survives_is_not_reported(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(
+            book(["Go after Mr. and Mrs. Gardiner."]),
+            book(["Go after Mr. and Mr. Gardiner."]),
+        )
+        assert not [
+            f for c in report.chapters for f in c.findings if f.kind == "dropped_coordination"
+        ]
+
+    def test_swapped_pair_survives(self):
+        """A gender_swap reverses the two titles; the pair is still a pair."""
+        qc = QCService(TransformType.GENDER_SWAP)
+        report = qc.check_book(
+            book(["Go after Mr. and Mrs. Gardiner."]),
+            book(["Go after Ms. and Mr. Gardiner."]),
+        )
+        assert not [
+            f for c in report.chapters for f in c.findings if f.kind == "dropped_coordination"
+        ]
+
+    def test_a_lone_title_is_not_a_pair(self):
+        qc = QCService(TransformType.ALL_MALE)
+        report = qc.check_book(book(["Go after Mrs. Gardiner."]), book(["Go after Mr. Gardiner."]))
+        assert not [
+            f for c in report.chapters for f in c.findings if f.kind == "dropped_coordination"
+        ]
