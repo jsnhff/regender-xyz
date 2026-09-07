@@ -349,6 +349,11 @@ class TestSenseRules:
             ("Netherfield and its master", "Netherfield and its owner"),
             ("made them master of this fortune", "made them owner of this fortune"),
             ("mistress of the house", "head of the house"),
+            # "widow" is a noun, "bereaved" an adjective: the article goes too.
+            # The pronoun and verb arrive already neutral from the model; the
+            # net makes one pass, so it does not re-read its own output.
+            ("I think you said they were a widow", "I think you said they were bereaved"),
+            ("they were a widower", "they were bereaved"),
         ],
     )
     def test_sense_is_read_from_the_collocation(self, service, text, expected):

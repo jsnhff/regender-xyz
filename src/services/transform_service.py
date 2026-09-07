@@ -962,6 +962,11 @@ class TransformService(BaseService):
     # left alone and reported by QC rather than guessed at.
     _SENSE_RULES: dict[str, dict[str, str]] = {
         "nonbinary": {
+            # "widow" is a noun but "bereaved" is an adjective, so the article
+            # has to go with it. Mapping the word alone produced "they were a
+            # bereaved"; the frame carries the determiner out.
+            "a widow": "bereaved",
+            "a widower": "bereaved",
             # the idiom: self-command, not ownership
             "own master": "own person",
             "own mistress": "own person",
