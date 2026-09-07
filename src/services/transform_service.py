@@ -33,9 +33,25 @@ from src.utils.token_manager import TokenManager
 
 from .character_service import CharacterService
 
-# "they was", "themself is" -- a neutral pronoun followed by a verb that has not
-# been re-conjugated. Always safe to fix, whatever the source said.
-_AGREEMENT_PHRASE = re.compile(r"^(?:they|themself)\s+\w+$", re.IGNORECASE)
+# A neutral pronoun beside a verb that has not been re-conjugated. Always safe
+# to fix, whatever the source said.
+#
+# Two shapes, because English inverts the auxiliary in questions and in fronted
+# clauses. "they was" is the straight order; "was they" is the same error in
+# "has they any family?" and "deeply was they vexed". Matching only the straight
+# order left every inverted instance in the text.
+#
+# \w+ cannot match "wasn't", so the verb is spelled out with its optional
+# contracted tail; without that the contracted entries never counted as
+# unconditional and the residual mask suppressed them.
+_AGREEMENT_AUX = r"is|was|has|does|isn['’]t|wasn['’]t|hasn['’]t|doesn['’]t"
+_AGREEMENT_PHRASE = re.compile(
+    r"^(?:"
+    r"(?:they|themself)\s+[A-Za-z]+(?:['’][A-Za-z]+)?"
+    r"|(?:" + _AGREEMENT_AUX + r")\s+(?:they|themself)"
+    r")$",
+    re.IGNORECASE,
+)
 
 
 class TransformService(BaseService):
@@ -887,6 +903,30 @@ class TransformService(BaseService):
     # a miss as a success.
     _CLITIC_RE = re.compile(r"['’]s$")
 
+    # A bare vocative: an address with no name attached ("Indeed, sir,").
+    #
+    # "Mx." is a title and needs a surname, so a bare "Mx." is not English --
+    # "Dear mx.," and "quite enough, mx.." both shipped. The term map no longer
+    # produces them, but the model is told to use "Mx." for titles and applies
+    # it to bare "madam" on its own, which nothing downstream could see.
+    #
+    # Matched only when punctuation or end of text follows, so "Mx. Bennet",
+    # "Mx. and Mx. Gardiner" and "Mx. de Bourgh" are all left alone.
+    _BARE_HONORIFIC = re.compile(r"(?<![A-Za-z])[Mm]x\.(?=\s*(?:[,.;:!?\"'”’)\]]|$))")
+
+    # The same slot in the source. "Sir" heading a name ("Sir William") is a
+    # title, not a vocative, and is excluded.
+    _BARE_VOCATIVE_SRC = r"(?:sir|madam|ma['’]am)(?!\s+[A-Z])(?![A-Za-z])"
+    _SOURCE_VOCATIVE = re.compile(r"(?<![A-Za-z])" + _BARE_VOCATIVE_SRC, re.IGNORECASE)
+
+    # Every bare-vocative slot in the output, whether the model converted it to
+    # "Mx." or left the gendered word alone. Both have to be counted, or the
+    # positions no longer line up with the source.
+    _OUTPUT_VOCATIVE = re.compile(
+        r"(?<![A-Za-z])(?:[Mm]x\.(?=\s*(?:[,.;:!?\"'”’)\]]|$))|" + _BARE_VOCATIVE_SRC + r")",
+        re.IGNORECASE,
+    )
+
     # Fixed expressions where a gendered word names no one. "Good Lord!" is an
     # exclamation, not a title, and swapping it yields "Good Lady!" — which the
     # printed Pride and Prejudice carries three times.
@@ -1521,6 +1561,19 @@ class TransformService(BaseService):
             "they does": "they do",
             "they doesn't": "they don't",
             "they is": "they are",
+            # The same errors with the auxiliary inverted, which is how they
+            # appear in questions ("has they any family?", "Does they live near
+            # you?") and in fronted clauses ("deeply was they vexed"). Austen
+            # writes none of these four forms anywhere in Pride and Prejudice,
+            # so the repair can never overwrite her own words.
+            "was they": "were they",
+            "wasn't they": "weren't they",
+            "is they": "are they",
+            "isn't they": "aren't they",
+            "has they": "have they",
+            "hasn't they": "haven't they",
+            "does they": "do they",
+            "doesn't they": "don't they",
         },
     }
 
@@ -1836,8 +1889,12 @@ class TransformService(BaseService):
         cached = cls._UNCONDITIONAL_TERMS.get(key)
         if cached is not None:
             return cached
-        terms = {t.lower() for t in cls._SENSE_RULES.get(key, {})}
-        terms.update(t.lower() for t in cls._effective_term_map(key) if _AGREEMENT_PHRASE.match(t))
+        terms = {cls._fold_apostrophe(t.lower()) for t in cls._SENSE_RULES.get(key, {})}
+        terms.update(
+            cls._fold_apostrophe(t.lower())
+            for t in cls._effective_term_map(key)
+            if _AGREEMENT_PHRASE.match(t)
+        )
         cls._UNCONDITIONAL_TERMS[key] = frozenset(terms)
         return cls._UNCONDITIONAL_TERMS[key]
 
@@ -1946,6 +2003,21 @@ class TransformService(BaseService):
             cls._GENDERED_VOCABULARY[key] = cached
         return cached
 
+    @staticmethod
+    def _fold_apostrophe(text: str) -> str:
+        """Curly apostrophe to straight, so one spelling can key the maps."""
+        return text.replace("’", "'")
+
+    @staticmethod
+    def _escape_term(key: str) -> str:
+        """Escape a map key, leaving either apostrophe able to match the other.
+
+        Source texts differ: Project Gutenberg sets a curly apostrophe, our own
+        fixtures a straight one. re.escape freezes whichever the key was written
+        with, so "they wasn't" silently missed every "they wasn’t" in the book.
+        """
+        return re.sub(r"['’]", "['’]", re.escape(key))
+
     @classmethod
     def _compile_substitution(cls, items: tuple) -> tuple:
         """Compile a mapping into one alternation regex plus a lowercase lookup.
@@ -1962,12 +2034,12 @@ class TransformService(BaseService):
         if cached is not None:
             return cached
 
-        lookup = {k.lower(): v for k, v in items}
+        lookup = {cls._fold_apostrophe(k.lower()): v for k, v in items}
         keys = sorted(lookup, key=len, reverse=True)
         pattern = re.compile(
             cls._BOUNDARY_BEFORE
             + r"(?P<term>"
-            + "|".join(re.escape(k) for k in keys)
+            + "|".join(cls._escape_term(k) for k in keys)
             + r")(?P<clitic>['’]s)?"
             + cls._BOUNDARY_AFTER,
             re.IGNORECASE,
@@ -2126,6 +2198,50 @@ class TransformService(BaseService):
 
         return pattern.sub(_replace, text)
 
+    @classmethod
+    def _restore_bare_honorifics(cls, text: str, source_text: Optional[str]) -> str:
+        """Put the source word back wherever a bare "Mx." was left standing.
+
+        A title with no surname is not a word, so the output is wrong however
+        the vocative is finally handled. What it should become -- deleted,
+        renamed, or replaced -- is an editorial decision per instance; putting
+        the source word back is the only repair that needs no such decision,
+        and it hands the site to QC as a bare vocative to be ruled on.
+
+        Alignment is by position: every bare-vocative slot in the output is
+        matched against every one in the source. If the counts disagree the
+        text is left exactly as it is rather than guessed at -- a wrong guess
+        would put "sir" in a place the source said "madam".
+        """
+        if not source_text:
+            return text
+
+        out_slots = list(cls._OUTPUT_VOCATIVE.finditer(text))
+        if not any(cls._BARE_HONORIFIC.fullmatch(m.group(0)) for m in out_slots):
+            return text
+
+        src_slots = cls._SOURCE_VOCATIVE.findall(source_text)
+        if len(src_slots) != len(out_slots):
+            return text
+
+        for slot, source_word in reversed(list(zip(out_slots, src_slots))):
+            if not cls._BARE_HONORIFIC.fullmatch(slot.group(0)):
+                continue
+            # Take the word but not the source's typography. Gutenberg sets a
+            # curly apostrophe and the transformed book a straight one, so
+            # lifting "ma’am" verbatim puts the only curly apostrophe in the
+            # edition next to six straight ones.
+            word = cls._fold_apostrophe(source_word)
+            # "Mx." carries a period the restored word does not. Where that
+            # period was also ending the sentence -- a closing quote or the end
+            # of the paragraph follows, not more punctuation -- dropping it
+            # would leave the sentence unterminated: "No, madam" for "No, mx."
+            following = text[slot.end() :].lstrip()
+            if not following or following[0] not in ",;:!?.":
+                word += "."
+            text = text[: slot.start()] + word + text[slot.end() :]
+        return text
+
     def _apply_term_map(
         self,
         text: str,
@@ -2157,11 +2273,20 @@ class TransformService(BaseService):
                 # gender decision: "they was" is never right. The residual mask
                 # would suppress every one of them, because "they" does not match
                 # the "she" it replaced, so the whole phrase reads as LLM work.
-                if term.lower() not in unconditional and not self._is_residual(
+                # The key is stored with a straight apostrophe but the pattern
+                # matches either, so "they wasn’t" arrives here spelled the way
+                # the book spells it and has to be folded back before lookup.
+                term_key = self._fold_apostrophe(term.lower())
+                if term_key not in unconditional and not self._is_residual(
                     mask, current, start, end
                 ):
                     return match.group(0)
-                return self._match_case(term, lookup[term.lower()]) + (match.group("clitic") or "")
+                replacement = lookup[term_key]
+                # Give the replacement the apostrophe the text already uses, so
+                # a curly-quoted source does not gain a straight one.
+                if "’" in term:
+                    replacement = replacement.replace("'", "’")
+                return self._match_case(term, replacement) + (match.group("clitic") or "")
 
             text = pattern.sub(_replace, text)
 
@@ -2169,6 +2294,11 @@ class TransformService(BaseService):
 
         for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(key, []):
             text = pattern.sub(replacement, text)
+
+        # Last, so it sees whatever the whole pipeline produced. The title fixes
+        # above only ever write "Mx." ahead of a capitalised name, so they never
+        # create the bare form this repairs.
+        text = self._restore_bare_honorifics(text, source_text)
 
         return text
 

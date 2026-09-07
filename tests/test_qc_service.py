@@ -425,3 +425,50 @@ class TestPolysemy:
         qc = QCService(TransformType.GENDER_SWAP)
         report = qc.check_book(book(["She was mistress here."]), book(["He was master here."]))
         assert not [f for c in report.chapters for f in c.findings if f.kind == "polysemous_term"]
+
+
+class TestBareTitle:
+    """A title with no name after it must never ship quietly.
+
+    "Mx." needs a surname. The model applies it to a bare "madam" on its own,
+    and 22 of them reached the printed nonbinary edition because every check
+    read them as a successful title conversion.
+    """
+
+    def test_the_safety_net_repairs_it_and_qc_says_so(self):
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(['"Dear madam," she cried.']),
+            book(['"Dear mx.," they cried.']),
+        )
+        kinds = [f.kind for c in report.chapters for f in c.findings]
+        assert "safety_net_would_change" in kinds
+
+    def test_what_the_net_cannot_align_is_reported_for_a_person(self):
+        """Two source vocatives, one bare title: no safe restoration exists."""
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(['"Indeed, sir, I agree, madam."']),
+            book(['"Indeed, mx., I agree."']),
+        )
+        findings = [f for c in report.chapters for f in c.findings if f.kind == "bare_title"]
+        assert len(findings) == 1
+        assert findings[0].severity == NEEDS_REVIEW
+
+    def test_a_title_with_a_name_is_not_reported(self):
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(["Mr. Bennet and Mrs. Gardiner arrived."]),
+            book(["Mx. Bennet and Mx. Gardiner arrived."]),
+        )
+        assert not [f for c in report.chapters for f in c.findings if f.kind == "bare_title"]
+
+    def test_a_bare_maam_is_surfaced_for_review(self):
+        """\\b[A-Za-z]+\\b split "ma'am" in two, so these were unreachable."""
+        qc = QCService(TransformType.NONBINARY)
+        report = qc.check_book(
+            book(["“think him handsome, ma’am?”"]),
+            book(["“think them handsome, ma’am?”"]),
+        )
+        findings = [f for c in report.chapters for f in c.findings if f.kind == "polysemous_term"]
+        assert len(findings) == 1
