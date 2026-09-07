@@ -890,8 +890,10 @@ class TransformService(BaseService):
             return text
         pattern, lookup = self._compile_substitution(tuple(sorted(name_map.items())))
         return pattern.sub(
-            lambda m: self._match_case(m.group("term"), lookup[m.group("term").lower()])
-            + (m.group("clitic") or ""),
+            lambda m: (
+                self._match_case(m.group("term"), lookup[m.group("term").lower()])
+                + (m.group("clitic") or "")
+            ),
             text,
         )
 
