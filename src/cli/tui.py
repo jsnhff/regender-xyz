@@ -1453,6 +1453,8 @@ class RegenderTUI(App):
             self._handle_analyze_prompt_input(value)
         elif self._stage == "transform":
             self._handle_transform_input(value)
+        elif self._stage == "editorial_notice":
+            self._handle_editorial_notice_input(value)
         elif self._stage == "model":
             self._handle_model_input(value)
         elif self._stage == "options":
@@ -1786,7 +1788,7 @@ class RegenderTUI(App):
                 self._selected_transform = self.TRANSFORM_TYPES[idx][0]
                 self.transform_type = self._selected_transform
                 self.print(f"[#ffffff]✓[/] {self._selected_transform}")
-                self._show_options_menu()
+                self._after_transform_chosen()
                 return
         except ValueError:
             for name, _ in self.TRANSFORM_TYPES:
@@ -1794,10 +1796,93 @@ class RegenderTUI(App):
                     self._selected_transform = name
                     self.transform_type = name
                     self.print(f"[#ffffff]✓[/] {name}")
-                    self._show_options_menu()
+                    self._after_transform_chosen()
                     return
 
         self.print(f"[#ffffff]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
+
+    def _after_transform_chosen(self) -> None:
+        """Nonbinary asks the reader for rulings. Say so before they commit."""
+        if self._selected_transform != "nonbinary":
+            self._show_options_menu()
+            return
+        self._show_editorial_notice()
+
+    def _read_input_text(self) -> str:
+        """Raw text of the chosen book, for the pre-flight count."""
+        import json as _json
+
+        path = self._selected_book
+        if not path or not path.exists():
+            return ""
+        try:
+            raw = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            return ""
+        if path.suffix.lower() != ".json":
+            return raw
+        try:
+            book = _json.loads(raw)
+        except ValueError:
+            return raw
+        return "\n".join(
+            " ".join(p.get("sentences", []))
+            for c in book.get("chapters", [])
+            for p in c.get("paragraphs", [])
+        )
+
+    def _show_editorial_notice(self) -> None:
+        """What nonbinary cannot decide by rule, counted up front."""
+        from src.services.decision_service import DecisionService
+
+        counts = DecisionService("nonbinary").estimate(self._read_input_text())
+        total = sum(counts.values())
+
+        self.print("")
+        self.print("[bold #ffffff]Nonbinary needs your judgement in places[/]")
+        self.print("")
+        self.print("[#aaaaaa]Most of this transform is mechanical. A few words are not:[/]")
+        self.print(
+            "[#aaaaaa]English has no neutral form of[/] [#ffffff]sir[/][#aaaaaa],[/] "
+            "[#ffffff]madam[/][#aaaaaa] or[/] [#ffffff]ma'am[/][#aaaaaa], and[/] "
+            "[#ffffff]master[/][#aaaaaa] means four different things.[/]"
+        )
+        self.print("")
+        if total:
+            self.print(
+                f"[#aaaaaa]In this book, up to[/] [bold #ffffff]{total}[/] "
+                "[#aaaaaa]places may need a ruling:[/]"
+            )
+            self.print("")
+            for word, n in counts.items():
+                self.print(f"     [bold #ffffff]{n:>4}[/]  [#ffffff]{word}[/]")
+            self.print("")
+            self.print(
+                "[#aaaaaa]An upper bound — rules and the model settle many of them in passing.[/]"
+            )
+        else:
+            self.print("[#aaaaaa]No such words found in this book. Nothing to rule on.[/]")
+        self.print("")
+        self.print("[#aaaaaa]When the transform finishes you get a decision sheet listing[/]")
+        self.print("[#aaaaaa]whatever is genuinely left, each one with its options. Fill in[/]")
+        self.print("[#aaaaaa]a ruling per line and re-run to apply them.[/]")
+        self.print("")
+        self.print(
+            "[#ffffff]?[/] [bold #ffffff]Continue with nonbinary?[/] "
+            "[#aaaaaa](Y/n, or 'back' to pick another)[/]"
+        )
+        self._stage = "editorial_notice"
+        self.set_prompt(">  ")
+
+    def _handle_editorial_notice_input(self, value: str) -> None:
+        answer = value.strip().lower()
+        if answer in ("back", "b", "n", "no"):
+            self._show_transform_menu()
+            return
+        if answer in ("", "y", "yes"):
+            self._show_options_menu()
+            return
+        self.print("[#ffffff]Y to continue, n to pick another transform[/]")
 
     def _show_model_menu(self) -> None:
         """Kick off async model detection then render the selection menu."""

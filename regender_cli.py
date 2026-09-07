@@ -14,6 +14,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 # Load environment variables from .env file
 from dotenv import load_dotenv
@@ -133,6 +134,7 @@ async def process_book(args):
             print(f"  Characters: {result['characters']}")
             print(f"  Changes: {result['changes']}")
         print(f"  Output: {result['output_path']}")
+        _write_decision_sheet(args.transform_type, result.get("output_path"))
     else:
         print(f"\n❌ Error: {result['error']}")
         sys.exit(1)
@@ -223,6 +225,22 @@ async def async_main():
         help="Custom title for the output book (overrides the title extracted from the file)",
     )
 
+    parser.add_argument(
+        "--decisions",
+        metavar="FILE",
+        help=(
+            "Apply a filled-in decision sheet to a transformed book. The nonbinary "
+            "transform writes <output>_decisions.json listing every word it could "
+            "not settle by rule; set a ruling on each entry and pass the file here."
+        ),
+    )
+
+    parser.add_argument(
+        "--estimate",
+        action="store_true",
+        help="Count the editorial rulings a transform will need, then exit without running it",
+    )
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -233,8 +251,129 @@ async def async_main():
     # Set up logging
     setup_logging(args.verbose)
 
+    if args.estimate:
+        _report_estimate(args)
+        return
+
+    if args.decisions:
+        _apply_decisions(args)
+        return
+
     # Process the book (Bill's original path)
     await process_book(args)
+
+
+def _write_decision_sheet(transform_type: str, output_path: Optional[str]) -> None:
+    """List what the transform could not settle by rule, beside the book.
+
+    Written every time, so the work is visible in the output directory rather
+    than discovered by reading the finished book.
+    """
+    from src.services.decision_service import DecisionService
+
+    service = DecisionService(transform_type)
+    if transform_type not in service.APPLIES_TO or not output_path:
+        return
+
+    book_path = Path(output_path)
+    if not book_path.exists():
+        return
+    try:
+        book = json.loads(book_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+
+    report = service.scan(book)
+    if not report.total:
+        return
+
+    sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
+    sheet_path.write_text(
+        json.dumps(
+            report.to_dict(book.get("metadata", {}).get("title", "")), ensure_ascii=False, indent=1
+        ),
+        encoding="utf-8",
+    )
+    print(f"\n  {report.total} words need a ruling from you:")
+    for word, number in report.by_word().items():
+        print(f"    {number:>5}  {word}")
+    print(f"\n  Decision sheet: {sheet_path}")
+    print("  Set a ruling on each entry, then:")
+    print(f"    python regender_cli.py {book_path} {transform_type} --decisions {sheet_path.name}")
+
+
+def _load_book_text(path: Path) -> str:
+    """Raw text of a book file, whether it is .txt or canonical JSON."""
+    raw = path.read_text(encoding="utf-8", errors="ignore")
+    if path.suffix.lower() != ".json":
+        return raw
+    try:
+        book = json.loads(raw)
+    except ValueError:
+        return raw
+    return "\n".join(
+        " ".join(p.get("sentences", []))
+        for c in book.get("chapters", [])
+        for p in c.get("paragraphs", [])
+    )
+
+
+def _report_estimate(args) -> None:
+    """Say how much editorial work a transform will ask for, and stop."""
+    from src.services.decision_service import DecisionService
+
+    path = Path(args.input)
+    if not path.exists():
+        print(f"❌ Not found: {path}")
+        return
+
+    counts = DecisionService(args.transform_type).estimate(_load_book_text(path))
+    total = sum(counts.values())
+    if not counts:
+        print(f"{args.transform_type} needs no editorial rulings.")
+        return
+
+    print(f"\n{args.transform_type} — up to {total} places may need a ruling\n")
+    for word, number in counts.items():
+        print(f"  {number:>5}  {word}")
+    print(
+        "\nEnglish has no neutral form of these, so a person decides each one."
+        "\nThis is an upper bound: rules and the model settle many in passing."
+        "\nThe sheet written after the transform lists what is genuinely left.\n"
+    )
+
+
+def _apply_decisions(args) -> None:
+    """Write a filled-in decision sheet into a transformed book."""
+    from src.services.decision_service import DecisionService
+
+    book_path, sheet_path = Path(args.input), Path(args.decisions)
+    for path in (book_path, sheet_path):
+        if not path.exists():
+            print(f"❌ Not found: {path}")
+            return
+
+    book = json.loads(book_path.read_text(encoding="utf-8"))
+    sheet = json.loads(sheet_path.read_text(encoding="utf-8"))
+
+    entries = sheet.get("decisions", [])
+    ruled = [e for e in entries if e.get("ruling")]
+    if not ruled:
+        print(f"No rulings set in {sheet_path.name} — nothing to apply.")
+        return
+
+    service = DecisionService(sheet.get("variant", args.transform_type))
+    book, applied, problems = service.apply(book, sheet)
+
+    out = book_path.with_name(book_path.stem + "_ruled.json")
+    out.write_text(json.dumps(book, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    print(f"\n✅ Applied {applied} of {len(ruled)} rulings")
+    if len(entries) - len(ruled):
+        print(f"   {len(entries) - len(ruled)} left unruled and unchanged")
+    for problem in problems:
+        print(f"   ⚠ {problem}")
+    print(f"   Output: {out}\n")
 
 
 def _launch_tui():
