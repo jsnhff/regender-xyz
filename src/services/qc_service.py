@@ -47,8 +47,21 @@ _REPEATED_WORD = re.compile(r"\b(\w+)(?:\s+\1\b){1,}", re.IGNORECASE)
 # surrounding words; anything left over is reported for a human to decide
 # rather than guessed at.
 _POLYSEMOUS: dict[str, frozenset] = {
-    "nonbinary": frozenset({"master", "mistress", "sir", "madam"}),
+    "nonbinary": frozenset({"master", "mistress", "sir", "madam", "ma'am"}),
 }
+
+# A title left standing with no surname after it. "Mx." needs a name, so this is
+# never valid English however the vocative is finally resolved. The safety net
+# repairs it by restoring the source word, but only where the vocative slots in
+# source and output line up; where they do not it survives, and it must be
+# reported rather than shipped.
+#
+# Case-insensitive on purpose: the model wrote the title in lower case in 19 of
+# the 22 sites that shipped ("Dear mx.,"), which is the worse form of the same
+# error, not a different one.
+_BARE_TITLE = re.compile(
+    r"(?<![A-Za-z])(?:Mx|Mr|Mrs|Ms)\.(?=\s*(?:[,.;:!?\"'”’)\]]|$))", re.IGNORECASE
+)
 
 _COORDINATED_TITLES = re.compile(
     r"\b(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+and\s+(?:Mr|Mrs|Ms|Mx|Miss)\.?\s+([A-Z]\w+)"
@@ -289,6 +302,29 @@ class QCService:
         self._check_text_integrity(chapter, number, position, source, output)
         self._check_coordination(chapter, number, position, source, output)
         self._check_polysemy(chapter, number, position, output)
+        self._check_bare_title(chapter, number, position, repaired)
+
+    def _check_bare_title(
+        self, chapter: ChapterReport, number: int, position: int, repaired: str
+    ) -> None:
+        """A title with no name left after the safety net has run.
+
+        Checked against the repaired text, not the raw output: anything the net
+        can put right is already reported as auto_fixable. What reaches here is
+        what it could not align -- the source and output vocative slots
+        disagreed -- so no rule can decide it and a person has to.
+        """
+        for match in _BARE_TITLE.finditer(repaired):
+            chapter.findings.append(
+                Finding(
+                    NEEDS_REVIEW,
+                    "bare_title",
+                    number,
+                    position,
+                    f"{match.group(0)!r} has no name after it — a title cannot stand alone",
+                    _excerpt(repaired, match.start()),
+                )
+            )
 
     def _check_polysemy(
         self, chapter: ChapterReport, number: int, position: int, output: str
@@ -304,8 +340,10 @@ class QCService:
         terms = _POLYSEMOUS.get(self.key)
         if not terms:
             return
-        for match in re.finditer(r"\b[A-Za-z]+\b", output):
-            word = match.group(0).lower()
+        # Tokenise with the apostrophe inside the word. A plain \b[A-Za-z]+\b
+        # splits "ma'am" into "ma" and "am", so those sites were unreachable.
+        for match in TransformService._WORD_RE.finditer(output):
+            word = match.group(0).lower().replace("’", "'")
             if word not in terms:
                 continue
             chapter.findings.append(

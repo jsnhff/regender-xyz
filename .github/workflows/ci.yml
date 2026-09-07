@@ -50,8 +50,12 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      # Pinned. Unpinned, a new ruff release reformats files nobody touched and
+      # turns main red retroactively: 0.16 began formatting Python inside
+      # Markdown, which failed two files that had been passing for months.
+      # Bump this deliberately, with the reformat in the same commit.
       - name: Install ruff
-        run: pip install ruff
+        run: pip install ruff==0.16.5
 
       # Blocking: the pre-existing lint debt has been paid down, so any new
       # finding is a regression rather than a known backlog item.

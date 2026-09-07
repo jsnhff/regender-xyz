@@ -123,7 +123,7 @@ from src.parsers.parser import IntegratedParser
 parser = IntegratedParser()
 
 # Parse a book
-with open('book.txt', 'r', encoding='utf-8') as f:
+with open("book.txt", "r", encoding="utf-8") as f:
     raw_text = f.read()
 
 result = parser.parse(raw_text)

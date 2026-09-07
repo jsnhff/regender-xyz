@@ -349,6 +349,11 @@ class TestSenseRules:
             ("Netherfield and its master", "Netherfield and its owner"),
             ("made them master of this fortune", "made them owner of this fortune"),
             ("mistress of the house", "head of the house"),
+            # "widow" is a noun, "bereaved" an adjective: the article goes too.
+            # The pronoun and verb arrive already neutral from the model; the
+            # net makes one pass, so it does not re-read its own output.
+            ("I think you said they were a widow", "I think you said they were bereaved"),
+            ("they were a widower", "they were bereaved"),
         ],
     )
     def test_sense_is_read_from_the_collocation(self, service, text, expected):
@@ -377,3 +382,133 @@ class TestSenseRules:
 
 def service_nb():
     return TransformService.__new__(TransformService)
+
+
+class TestInvertedAgreement:
+    """Singular "they" with the auxiliary in front of it.
+
+    English inverts the auxiliary in questions and in fronted clauses, so the
+    same error reads "has they any family?" rather than "they has". The map
+    held only the straight order, and thirteen inverted instances shipped in
+    the nonbinary Pride and Prejudice.
+    """
+
+    @pytest.mark.parametrize(
+        "text,expected",
+        [
+            ("Does they live near you?", "Do they live near you?"),
+            ("has they any family?", "have they any family?"),
+            ("Is they handsome?", "Are they handsome?"),
+            ("and deeply was they vexed", "and deeply were they vexed"),
+            ("Why was they to be the judge?", "Why were they to be the judge?"),
+            ("Has they been presented?", "Have they been presented?"),
+        ],
+    )
+    def test_inverted_order_is_repaired(self, service, text, expected):
+        assert service._apply_term_map(text, TransformType.NONBINARY, source_text=text) == expected
+
+    def test_repair_survives_a_gendered_source(self):
+        """The residual mask must not suppress it: "they" never matches "she"."""
+        assert (
+            service_nb()._apply_term_map(
+                "Does they live near you?",
+                TransformType.NONBINARY,
+                source_text="Does she live near you?",
+            )
+            == "Do they live near you?"
+        )
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "were they at home",
+            "are they handsome",
+            "have they any family",
+            "do they live near you",
+        ],
+    )
+    def test_correct_forms_are_left_alone(self, service, text):
+        assert service._apply_term_map(text, TransformType.NONBINARY, source_text=text) == text
+
+    def test_a_contracted_entry_counts_as_unconditional(self):
+        """\\w+ cannot match "wasn't", so these never bypassed the mask."""
+        unconditional = TransformService._unconditional_terms("nonbinary")
+        assert "they wasn't" in unconditional
+        assert "wasn't they" in unconditional
+
+    def test_either_apostrophe_matches(self, service):
+        """Gutenberg sets a curly apostrophe; re.escape froze the straight one."""
+        assert (
+            service._apply_term_map(
+                "they wasn’t at home", TransformType.NONBINARY, source_text="she wasn’t at home"
+            )
+            == "they weren’t at home"
+        )
+
+
+class TestBareHonorific:
+    """A title left with no name after it.
+
+    The term map no longer maps a bare "madam", but the model is told to use
+    "Mx." for titles and applies it to the bare vocative on its own. "Dear mx.,"
+    and "quite enough, mx.." both shipped. Restoring the source word is the one
+    repair that needs no editorial decision.
+    """
+
+    @pytest.mark.parametrize(
+        "output,source,expected",
+        [
+            ('"Dear mx.," they cried.', '"Dear madam," she cried.', '"Dear madam," they cried.'),
+            (
+                "You have said quite enough, mx..",
+                "You have said quite enough, madam.",
+                "You have said quite enough, madam.",
+            ),
+            ("Thank you, Mx., but no.", "Thank you, sir, but no.", "Thank you, sir, but no."),
+            (
+                "think them handsome, mx.?",
+                "think him handsome, ma'am?",
+                "think them handsome, ma'am?",
+            ),
+        ],
+    )
+    def test_the_source_word_is_put_back(self, service, output, source, expected):
+        assert (
+            service._apply_term_map(output, TransformType.NONBINARY, source_text=source) == expected
+        )
+
+    def test_the_right_word_is_chosen_by_position(self, service):
+        """Two slots in one paragraph: the second must not take the first's word."""
+        assert (
+            service._apply_term_map(
+                'They said, "Yes, mx.," and then, "No, mx."',
+                TransformType.NONBINARY,
+                source_text='He said, "Yes, sir," and then, "No, madam."',
+            )
+            == 'They said, "Yes, sir," and then, "No, madam."'
+        )
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "Mx. Bennet was there.",
+            "Mx. and Mx. Gardiner arrived.",
+            "Mx. de Bourgh was pale.",
+        ],
+    )
+    def test_a_title_with_a_name_is_untouched(self, service, text):
+        assert service._apply_term_map(text, TransformType.NONBINARY, source_text=text) == text
+
+    def test_it_declines_to_guess_when_the_slots_disagree(self, service):
+        """One bare title, two source vocatives: no safe alignment, so no change."""
+        text = "Indeed, mx., I agree."
+        assert (
+            service._apply_term_map(
+                text, TransformType.NONBINARY, source_text="Indeed, sir, I agree, madam."
+            )
+            == text
+        )
+
+    def test_nothing_happens_without_a_source(self, service):
+        text = "Indeed, mx., I agree."
+        assert service._apply_term_map(text, TransformType.NONBINARY) == text
