@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import math
 import os
 import re
@@ -2063,6 +2064,59 @@ class RegenderTUI(App):
         self.print("")
         self.set_prompt(">  ")
 
+    def _write_decision_sheet(self) -> None:
+        """List whatever the transform could not settle by rule, beside the book.
+
+        The notice shown before a nonbinary run promises this sheet. It was
+        only ever written by the command-line path, so in the TUI -- the way
+        the tool is actually used -- the promise went unkept and the sites were
+        left to be found by reading the finished book.
+        """
+        from src.services.decision_service import DecisionService
+
+        service = DecisionService(self._selected_transform or "")
+        if self._selected_transform not in service.APPLIES_TO or not self._json_output_path:
+            return
+
+        book_path = Path(self._json_output_path)
+        try:
+            book = json.loads(book_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return
+
+        report = service.scan(book)
+        if not report.total:
+            self.print("")
+            self.print("  [#aaaaaa]No editorial rulings needed — nothing was left undecided.[/]")
+            return
+
+        sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
+        try:
+            sheet_path.write_text(
+                json.dumps(
+                    report.to_dict(book.get("metadata", {}).get("title", "")),
+                    ensure_ascii=False,
+                    indent=1,
+                ),
+                encoding="utf-8",
+            )
+        except OSError:
+            return
+
+        self.print("")
+        self.print(
+            f"  [bold #ffffff]{report.total}[/] [#aaaaaa]place(s) need a ruling from you:[/]"
+        )
+        for word, number in report.by_word().items():
+            self.print(f"     [bold #ffffff]{number:>4}[/]  [#ffffff]{word}[/]")
+        self.print("")
+        self.print(f"  [#aaaaaa]Decision sheet:[/] [#ffffff]{sheet_path}[/]")
+        self.print("  [#aaaaaa]Set a ruling on each entry, then apply them with:[/]")
+        self.print(
+            f"  [#666666]python regender_cli.py {book_path} "
+            f"{self._selected_transform} --decisions {sheet_path.name}[/]"
+        )
+
     def _warn_about_unpriced_models(self) -> None:
         """Say when the cost table has fallen behind the models on offer.
 
@@ -2584,6 +2638,8 @@ class RegenderTUI(App):
         )
         self.print(f"  [#aaaaaa]Time:[/] [#ffffff]{elapsed:.1f}s[/]")
         self.print(f"  [#aaaaaa]Saved:[/] [#ffffff]{self._json_output_path}[/]")
+
+        self._write_decision_sheet()
 
         # Show export options from FORMATS
         self._stage = "export"
