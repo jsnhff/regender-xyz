@@ -184,10 +184,17 @@ def _is_recommended_model(model_id: str) -> bool:
     return any(model_id.startswith(prefix) for prefix in _RECOMMENDED_MODELS)
 
 
+# Rough throughput per model family. An unlisted model falls through to
+# _DEFAULT_SECS_PER_1K, which is the Haiku rate — so a missing entry makes a slow
+# model advertise itself as the fastest on the menu. Add new families here.
 _MODEL_SECS_PER_1K_TOKENS: dict[str, float] = {
     "claude-haiku": 6.0,
     "claude-sonnet": 12.0,
     "claude-opus": 28.0,
+    # Fable and Mythos think on every request and take longer turns, so they sit
+    # above Opus. Estimated from the tier progression, not measured on a book.
+    "claude-fable": 45.0,
+    "claude-mythos": 45.0,
     "gpt-4o-mini": 7.0,
     "gpt-4o": 13.0,
     "gpt-4-turbo": 20.0,
@@ -195,15 +202,19 @@ _MODEL_SECS_PER_1K_TOKENS: dict[str, float] = {
     "gpt-3.5-turbo": 5.0,
 }
 
+_DEFAULT_SECS_PER_1K = 6.0
+
 
 def _estimate_transform_time(model_id: str, tokens: int) -> str:
     """Return a human-readable time estimate for transforming `tokens` book tokens."""
     if tokens <= 0:
         return ""
-    secs_per_1k = 6.0
-    for prefix, rate in _MODEL_SECS_PER_1K_TOKENS.items():
+    secs_per_1k = _DEFAULT_SECS_PER_1K
+    # Longest prefix wins, so a more specific family entry beats a shorter one
+    # regardless of dict order — same rule as _lookup_model_cost.
+    for prefix in sorted(_MODEL_SECS_PER_1K_TOKENS, key=len, reverse=True):
         if model_id.startswith(prefix):
-            secs_per_1k = rate
+            secs_per_1k = _MODEL_SECS_PER_1K_TOKENS[prefix]
             break
     total_secs = tokens / 1000 * secs_per_1k
     if total_secs < 90:
