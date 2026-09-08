@@ -284,7 +284,15 @@ def _write_decision_sheet(transform_type: str, output_path: Optional[str]) -> No
         return
 
     report = service.scan(book)
+    title = book.get("metadata", {}).get("title", "")
+
+    # Written whether or not anything is open, so the export always carries an
+    # account of what the transform decided and what it could not.
+    note_path = book_path.with_name(book_path.stem + "_TRANSFORM_NOTES.txt")
+    note_path.write_text(report.as_note(title), encoding="utf-8")
+
     if not report.total:
+        print(f"\n  No editorial rulings needed.\n  Notes: {note_path}")
         return
 
     sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
@@ -298,6 +306,7 @@ def _write_decision_sheet(transform_type: str, output_path: Optional[str]) -> No
     for word, number in report.by_word().items():
         print(f"    {number:>5}  {word}")
     print(f"\n  Decision sheet: {sheet_path}")
+    print(f"  Notes for readers: {note_path}")
     print("  Set a ruling on each entry, then:")
     print(f"    python regender_cli.py {book_path} {transform_type} --decisions {sheet_path.name}")
 

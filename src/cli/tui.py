@@ -2085,19 +2085,28 @@ class RegenderTUI(App):
             return
 
         report = service.scan(book)
+        title = book.get("metadata", {}).get("title", "")
+
+        # The note goes out either way. Someone can end up holding the export
+        # without having seen this screen, and the file should say what was
+        # decided for them and what is still open.
+        note_path = book_path.with_name(book_path.stem + "_TRANSFORM_NOTES.txt")
+        try:
+            note_path.write_text(report.as_note(title), encoding="utf-8")
+        except OSError:
+            note_path = None
+
         if not report.total:
             self.print("")
             self.print("  [#aaaaaa]No editorial rulings needed — nothing was left undecided.[/]")
+            if note_path:
+                self.print(f"  [#aaaaaa]Notes:[/] [#666666]{note_path}[/]")
             return
 
         sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
         try:
             sheet_path.write_text(
-                json.dumps(
-                    report.to_dict(book.get("metadata", {}).get("title", "")),
-                    ensure_ascii=False,
-                    indent=1,
-                ),
+                json.dumps(report.to_dict(title), ensure_ascii=False, indent=1),
                 encoding="utf-8",
             )
         except OSError:
@@ -2111,6 +2120,8 @@ class RegenderTUI(App):
             self.print(f"     [bold #ffffff]{number:>4}[/]  [#ffffff]{word}[/]")
         self.print("")
         self.print(f"  [#aaaaaa]Decision sheet:[/] [#ffffff]{sheet_path}[/]")
+        if note_path:
+            self.print(f"  [#aaaaaa]Notes for readers:[/] [#666666]{note_path}[/]")
         self.print("  [#aaaaaa]Set a ruling on each entry, then apply them with:[/]")
         self.print(
             f"  [#666666]python regender_cli.py {book_path} "

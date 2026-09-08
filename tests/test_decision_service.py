@@ -136,3 +136,77 @@ class TestEstimate:
     @pytest.mark.parametrize("key", ["gender_swap", "all_male", "all_female"])
     def test_other_transforms_estimate_nothing(self, key):
         assert DecisionService(key).estimate('"Indeed, sir."') == {}
+
+
+class TestVerbAgreement:
+    """A singular verb reached from an earlier "they", across a coordinator.
+
+    Structurally identical whether it is wrong or right, which is exactly why
+    it is offered as a decision rather than repaired. The safety net only ever
+    matched an adjacent pair, so all of these went through untouched.
+    """
+
+    def test_a_distant_verb_is_surfaced(self, service):
+        report = service.scan(
+            book(["they came down on Monday to see the place, and was much delighted."])
+        )
+        agreement = [d for d in report.decisions if d.frame == "verb agreement"]
+        assert len(agreement) == 1
+        assert agreement[0].word == "was"
+        assert "were" in agreement[0].options
+
+    def test_a_correct_singular_verb_is_offered_too_not_assumed_wrong(self, service):
+        """Jane takes "was" however Jane is pronouned — so keep must be offered."""
+        report = service.scan(
+            book(["Jane was yielding to the preference which they had begun, and was in love."])
+        )
+        agreement = [d for d in report.decisions if d.frame == "verb agreement"]
+        assert len(agreement) == 1
+        assert "keep" in agreement[0].options
+
+    @pytest.mark.parametrize(
+        "verb,plural", [("was", "were"), ("is", "are"), ("has", "have"), ("does", "do")]
+    )
+    def test_each_verb_offers_its_plural(self, service, verb, plural):
+        report = service.scan(book([f"they walked out early, and {verb} very glad of it."]))
+        agreement = [d for d in report.decisions if d.frame == "verb agreement"]
+        assert plural in agreement[0].options
+
+    def test_an_adjacent_pair_is_not_double_reported(self, service):
+        """ "they was" is repaired by the net; only distant ones need a person."""
+        report = service.scan(book(["they was glad."]))
+        assert [d for d in report.decisions if d.frame == "verb agreement"] == []
+
+    def test_the_right_verb_is_edited_when_the_word_repeats(self, service):
+        """ "was" appears three times; the offset picks the one being ruled on."""
+        text = "It was late. They walked home slowly, and was glad. It was over."
+        data = book([text])
+        sheet = service.scan(data).to_dict()
+        entry = next(d for d in sheet["decisions"] if d["frame"] == "verb agreement")
+        entry["ruling"] = "were"
+        data, applied, problems = service.apply(data, sheet)
+        result = data["chapters"][0]["paragraphs"][0]["sentences"][0]
+        assert applied == 1 and not problems
+        assert result == "It was late. They walked home slowly, and were glad. It was over."
+
+
+class TestTransformNotes:
+    """The export has to explain itself to someone who never saw the run."""
+
+    def test_the_note_counts_what_is_open(self, service):
+        report = service.scan(book(['"Indeed, sir, I have not."']))
+        note = report.as_note("Pride and Prejudice")
+        assert "Pride and Prejudice" in note
+        assert "1 place(s) were left" in note
+        assert "UNRESOLVED" in note
+
+    def test_the_note_is_still_written_when_nothing_is_open(self, service):
+        report = service.scan(book(["They walked out early and were glad of it."]))
+        note = report.as_note("A Book")
+        assert "Nothing was left undecided" in note
+        assert "KNOWN LIMITS" in note
+
+    def test_the_note_says_it_is_not_part_of_the_book(self, service):
+        """It sits beside InDesign-bound text; it must not read as content."""
+        note = service.scan(book(['"Indeed, sir."'])).as_note("A Book")
+        assert "not part of the text" in note
