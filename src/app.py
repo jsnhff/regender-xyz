@@ -8,6 +8,7 @@ all services, plugins, and configuration.
 import asyncio
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Optional
 
@@ -346,6 +347,22 @@ class Application:
 
             # Transform the book
             transformer = self.get_service("transform")
+
+            # A surname that is also a gendered noun gets swapped like the noun:
+            # "Miss King" became "Miss Queen" and Mary King, a real character,
+            # was renamed Mary Queen in the printed edition. The cast is the only
+            # thing that knows the difference, so hand it over before starting.
+            # Capitalised forms only — the monarch "king" still swaps.
+            surnames = set()
+            for char in characters.characters:
+                for form in [char.name, *char.aliases]:
+                    surnames.update(
+                        token for token in re.split(r"\s+", form.strip()) if token[:1].isupper()
+                    )
+            transformer.protect_names(surnames, TransformType(transform_type))
+            protected = getattr(transformer, "_protected_names", None)
+            if protected:
+                self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")
 
             # Log selected characters if specified
             if selected_characters:

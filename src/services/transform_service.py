@@ -1255,6 +1255,10 @@ class TransformService(BaseService):
             "mistress": "master",
             "master": "mistress",
             "madam": "sir",
+            # Austen writes both "madam" and "ma'am"; only the first had a rule,
+            # so five spoken "ma'am"s addressed to characters who are men in
+            # this edition survived into the printed swap.
+            "ma'am": "sir",
             "sir": "madam",
             "maid": "manservant",
             "manservant": "maid",
@@ -1950,8 +1954,13 @@ class TransformService(BaseService):
         words = set()
         for original, replacement in term_map.items():
             for word in (original, replacement):
-                lowered = word.lower().rstrip(".")
-                if lowered.isalpha() and lowered not in cls._PRONOUN_FORMS:
+                lowered = cls._fold_apostrophe(word.lower().rstrip("."))
+                # A single word, apostrophe and all. str.isalpha() is False for
+                # "ma'am", which kept it out of the vocabulary, so the alignment
+                # never treated it as a gendered word and the mask never marked
+                # it a miss -- the rule for it could not fire. Multi-word keys
+                # like "they was" are still excluded, having no single-token form.
+                if cls._WORD_RE.fullmatch(lowered) and lowered not in cls._PRONOUN_FORMS:
                     words.add(lowered)
         result = frozenset(words)
         cls._GENDERED_NOUNS[key] = result
@@ -2093,7 +2102,11 @@ class TransformService(BaseService):
             anchors: list[str] = []
             slots: dict[int, list] = {}
             for match in cls._WORD_RE.finditer(raw):
-                word = cls._CLITIC_RE.sub("", match.group(0)).lower()
+                # Fold the apostrophe as well as stripping the clitic: the
+                # source sets "ma’am" and the output writes "ma'am", and
+                # comparing those as different words makes a plain miss look
+                # like successful model work, which the mask then protects.
+                word = cls._fold_apostrophe(cls._CLITIC_RE.sub("", match.group(0)).lower())
                 if word in vocabulary:
                     span = (match.start(), match.start() + len(word))
                     slots.setdefault(len(anchors), []).append((word, span))
@@ -2145,6 +2158,39 @@ class TransformService(BaseService):
     def protected_spans(cls, text: str) -> list:
         """Character ranges holding a fixed expression, which must not be swapped."""
         return [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+
+    # Surnames that are also gendered nouns, compiled per book. A cast is the
+    # only thing that knows "King" in "Miss King" is a family name; without it
+    # the flat map reads it as a monarch and Mary King becomes Mary Queen.
+    _protected_names: Optional["re.Pattern"] = None
+
+    def protect_names(self, names, transform_type) -> None:
+        """Shield cast surnames that collide with this transform's vocabulary.
+
+        Case-sensitive, and only the capitalised form: the surname "King" is
+        protected while the monarch "king" still swaps. In Pride and Prejudice
+        every capitalised "King" in the source is Mary King, so the distinction
+        costs nothing and saves a named character.
+
+        Only colliding names are compiled. Protecting "Darcy" would be a no-op,
+        and a shorter pattern keeps the intent legible.
+        """
+        key = getattr(transform_type, "value", transform_type)
+        vocabulary = self._gendered_vocabulary(key)
+        collisions = sorted(
+            {n for n in names if n and n.lower() in vocabulary},
+            key=len,
+            reverse=True,
+        )
+        self._protected_names = (
+            re.compile(r"(?<![A-Za-z])(?:" + "|".join(re.escape(n) for n in collisions) + r")\b")
+            if collisions
+            else None
+        )
+
+    def _name_spans(self, text: str) -> list:
+        pattern = getattr(self, "_protected_names", None)
+        return [m.span() for m in pattern.finditer(text)] if pattern else []
 
     @staticmethod
     def _in_protected(spans: list, start: int, end: int) -> bool:
@@ -2268,7 +2314,7 @@ class TransformService(BaseService):
             pattern, lookup = self._compile_substitution(tuple(sorted(term_map.items())))
             mask = self._residual_mask(source_text, text, key) if source_text is not None else None
             current = text
-            protected = self.protected_spans(text)
+            protected = self.protected_spans(text) + self._name_spans(text)
             unconditional = self._unconditional_terms(key)
 
             def _replace(match: "re.Match") -> str:
