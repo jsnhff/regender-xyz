@@ -231,6 +231,22 @@ def _price_label(model_id: str) -> str:
     return f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
 
 
+def _estimate_book_cost(model_id: str, tokens: int, token_fraction: float = 1.0) -> str:
+    """What this book actually costs on this model, e.g. "~$0.64".
+
+    A transform writes back about as much as it reads, so the estimate bills the
+    book's tokens once as input and once as output. Returns "" when there is no
+    book yet or the model carries no price, letting callers fall back to the
+    per-1M rate card — the only useful thing to show before a book is chosen.
+    """
+    costs = _lookup_model_cost(model_id)
+    if not costs or tokens <= 0:
+        return ""
+    cost = tokens * token_fraction / 1_000_000 * (costs[0] + costs[1])
+    # Rounding a real charge to "~$0.00" reads as free, which it is not.
+    return "<$0.01" if cost < 0.01 else f"~${cost:.2f}"
+
+
 # Shown when the provider's model list cannot be fetched. Prices come from
 # MODEL_COSTS so this list cannot drift out of step with the table.
 _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
@@ -1589,13 +1605,11 @@ class RegenderTUI(App):
         """Return a formatted cost estimate string for a fraction of the book's tokens."""
         if not self._book_stats:
             return ""
-        tokens = self._book_stats.get("tokens", 0)
-        model = os.environ.get("DEFAULT_MODEL", "")
-        costs = _lookup_model_cost(model)
-        if not costs:
-            return ""
-        cost = tokens * token_fraction / 1_000_000 * (costs[0] + costs[1])
-        return f"~${cost:.2f}"
+        return _estimate_book_cost(
+            os.environ.get("DEFAULT_MODEL", ""),
+            self._book_stats.get("tokens", 0),
+            token_fraction,
+        )
 
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
@@ -2048,10 +2062,13 @@ class RegenderTUI(App):
             is_current = model_id == current or current.startswith(model_id)
             marker = " [#aaaaaa]◄ default[/]" if is_current else ""
             rec = " [bold #ffffff]★ recommended[/]" if _is_recommended_model(model_id) else ""
+            # What this book costs beats a rate card the reader has to do
+            # arithmetic on. Falls back to the rate when no book is loaded yet.
+            cost = _estimate_book_cost(model_id, tokens) or pricing
             time_est = _estimate_transform_time(model_id, tokens)
             time_tag = f"  [#666666]{time_est}[/]" if time_est else ""
             self.print(
-                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{pricing}[/]{time_tag}{rec}{marker}"
+                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{cost:<10}[/]{time_tag}{rec}{marker}"
             )
         if not show_all and len(choices) > 5:
             self.print(
