@@ -360,6 +360,37 @@ class Application:
                         token for token in re.split(r"\s+", form.strip()) if token[:1].isupper()
                     )
             transformer.protect_names(surnames, TransformType(transform_type))
+
+            # Marital status is not a fixed property. Darcy is unmarried for
+            # sixty chapters and married in the sixty-first; Collins marries in
+            # twenty-eight. A swap has to know, because English women's titles
+            # encode it and men's do not, and the answer changes mid-book --
+            # sometimes mid-chapter, so the marker is the paragraph.
+            if TransformType(transform_type) == TransformType.GENDER_SWAP:
+                from src.services.character_state import (
+                    detect_marital_changes,
+                    initial_marital_state,
+                    marital_title_maps,
+                )
+
+                book_dict = book.to_dict() if hasattr(book, "to_dict") else book
+                changes = detect_marital_changes(book_dict, characters.characters)
+                opening = initial_marital_state(characters.characters)
+                title_base, title_timeline = marital_title_maps(
+                    characters.characters, changes, opening
+                )
+                # The engine's own entries win: a rename decided for a character
+                # is more specific than a title derived from their status.
+                name_map = {**title_base, **(name_map or {})}
+                transformer.set_title_timeline(title_timeline)
+                name_report["state_changes"] = [c.to_dict() for c in changes]
+                if changes:
+                    self.logger.info(
+                        "Marital status changes: "
+                        + ", ".join(
+                            f"{c.character} at ch{c.chapter} p{c.paragraph}" for c in changes
+                        )
+                    )
             protected = getattr(transformer, "_protected_names", None)
             if protected:
                 self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")

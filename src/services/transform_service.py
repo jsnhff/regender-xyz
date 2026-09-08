@@ -491,7 +491,11 @@ class TransformService(BaseService):
                     "his": "her/hers by role",
                     "hers": "his",
                 },
-                "titles": {"Mr.": "Ms.", "Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
+                # "Mr." is ambiguous where "Mrs." and "Miss" are not: English
+                # men's titles carry no marital status and women's do. The
+                # per-character map decides between Mrs. and Miss from the
+                # cast, and revises it when someone marries partway through.
+                "titles": {"Mr.": "Mrs. or Miss", "Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
                 "terms": {
                     "father": "mother",
                     "mother": "father",
@@ -811,9 +815,16 @@ class TransformService(BaseService):
                         self.logger.debug(f"Original text: {repr(original_text[:100])}")
                         self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
 
-                    # Apply name substitutions after LLM transform
-                    if name_map:
-                        transformed_text = self._apply_name_map(transformed_text, name_map)
+                    # Apply name substitutions after LLM transform. The map is
+                    # resolved at this paragraph, so a character who marries
+                    # mid-chapter carries the right title on either side of it.
+                    effective_map = self._name_map_at(
+                        getattr(chapter, "number", None) or chapter_index + 1,
+                        para_idx,
+                        name_map,
+                    )
+                    if effective_map:
+                        transformed_text = self._apply_name_map(transformed_text, effective_map)
 
                     # Apply deterministic term substitutions (safety net for LLM misses).
                     # original_text lets the substitution skip words the LLM already
@@ -2188,6 +2199,35 @@ class TransformService(BaseService):
             else None
         )
 
+    # Name-map entries that only take effect from a given chapter onward.
+    # Marital status changes mid-book -- Darcy is unmarried for sixty chapters
+    # and married in the sixty-first -- and a single flat map cannot say so.
+    _title_timeline: Optional[dict] = None
+
+    def set_title_timeline(self, timeline) -> None:
+        """Name-map overrides that take effect at a (chapter, paragraph).
+
+        Accepts a sorted list of ``(chapter, paragraph, entries)``. A wedding
+        does not wait for a chapter break, so the marker is the paragraph.
+        """
+        self._title_timeline = (
+            sorted((int(c), int(p), dict(entries)) for c, p, entries in timeline) or None
+            if timeline
+            else None
+        )
+
+    def _name_map_at(self, chapter_number, paragraph_index, name_map):
+        """The name map as it stands at one paragraph of one chapter."""
+        timeline = getattr(self, "_title_timeline", None)
+        if not timeline or chapter_number is None:
+            return name_map
+        here = (chapter_number, paragraph_index if paragraph_index is not None else 10**9)
+        effective = dict(name_map or {})
+        for chapter, paragraph, entries in timeline:
+            if (chapter, paragraph) <= here:
+                effective.update(entries)
+        return effective
+
     def _name_spans(self, text: str) -> list:
         pattern = getattr(self, "_protected_names", None)
         return [m.span() for m in pattern.finditer(text)] if pattern else []
@@ -2729,7 +2769,7 @@ Each paragraph is preceded by a [[Pn]] marker. Return EXACTLY {batch_size} parag
             examples = """
 Examples of transformations:
 - "He walked to his car" → "She walked to her car"
-- "Mr. Smith entered" → "Ms. Smith entered"
+- "Mr. Smith entered" → "Mrs. Smith entered" (or "Miss Smith" if unmarried)
 - "The father told his son" → "The mother told her daughter"
 - "himself" → "herself"
 """
@@ -2742,7 +2782,11 @@ TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, "value") e
 
 RULES:
 1. Swap ALL gendered pronouns (he→she, him→her, his→hers, himself→herself, etc.)
-2. Swap ALL titles (Mr.→Ms., Sir→Madam, Lord→Lady, etc.)
+2. Swap ALL titles (Mr.→Mrs. or Miss, Mrs./Miss→Mr., Sir→Madam, Lord→Lady, etc.)
+   Use the CHARACTER MAPPINGS above for named characters: they carry the
+   correct title for each one, which depends on whether they are married
+   at this point in the book. Never write "Ms." -- it does not exist in a
+   period novel.
 3. Swap ALL gendered terms (man→woman, boy→girl, father→mother, son→daughter, etc.)
 4. Preserve proper names unchanged
 5. Maintain exact punctuation and formatting
