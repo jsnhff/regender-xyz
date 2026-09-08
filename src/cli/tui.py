@@ -1600,6 +1600,12 @@ class RegenderTUI(App):
 
     def _handle_analyze_prompt_input(self, value: str) -> None:
         """Handle character analysis prompt."""
+        # The stage stays on this prompt for the whole run, so a second Enter
+        # would start another analysis: the worker is exclusive, so the first
+        # run is cancelled mid-flight — already paid for, result thrown away —
+        # and its loader is orphaned and keeps ticking.
+        if self._analysis_running:
+            return
         if value.lower() in ("y", "yes", ""):
             self._analysis_running = True
             self._analysis_start_time = time.time()
