@@ -132,7 +132,9 @@ def _format_model_name(model: str) -> str:
     return model
 
 
-# (input, output) cost per 1M tokens — updated Feb 2026
+# (input, output) cost per 1M tokens — updated Sept 2026.
+# Anthropic first-party API rates. When a model ships, add it here: an unlisted
+# model shows "pricing unknown" in the menu and silently drops the cost hint.
 MODEL_COSTS = {
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
@@ -140,8 +142,18 @@ MODEL_COSTS = {
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (1.00, 2.00),
-    "claude-sonnet-4": (3.00, 15.00),
+    "claude-fable-5-1": (10.00, 50.00),
+    "claude-fable-5": (10.00, 50.00),
+    "claude-mythos-5-1": (10.00, 50.00),
+    "claude-opus-5": (5.00, 25.00),
+    "claude-opus-4-8": (5.00, 25.00),
+    "claude-opus-4-7": (5.00, 25.00),
+    "claude-opus-4-6": (5.00, 25.00),
     "claude-opus-4-5": (5.00, 25.00),
+    "claude-sonnet-5": (2.00, 10.00),
+    "claude-sonnet-4-6": (3.00, 15.00),
+    "claude-sonnet-4": (3.00, 15.00),
+    "claude-haiku-4-5": (1.00, 5.00),
     "claude-3-opus": (15.00, 75.00),
     "claude-3-sonnet": (3.00, 15.00),
     "claude-3-haiku": (0.25, 1.25),
@@ -149,10 +161,15 @@ MODEL_COSTS = {
 
 
 def _lookup_model_cost(model: str) -> tuple[float, float] | None:
-    """Match model string to cost table. Returns None if model is unrecognized."""
+    """Match model string to cost table. Returns None if model is unrecognized.
+
+    Prefixes are tried longest first so a dated or point-release id resolves to
+    the most specific entry — `claude-fable-5-1` must not match `claude-fable-5`,
+    and `claude-sonnet-4-6` must not match `claude-sonnet-4`.
+    """
     if model in MODEL_COSTS:
         return MODEL_COSTS[model]
-    for key in MODEL_COSTS:
+    for key in sorted(MODEL_COSTS, key=len, reverse=True):
         if model.startswith(key):
             return MODEL_COSTS[key]
     return None
@@ -195,15 +212,31 @@ def _estimate_transform_time(model_id: str, tokens: int) -> str:
     return "~1 min" if minutes < 2 else f"~{int(minutes)} min"
 
 
+def _price_label(model_id: str) -> str:
+    """Human-readable per-1M-token pricing, or a plain note when unlisted."""
+    costs = _lookup_model_cost(model_id)
+    if not costs:
+        return "pricing unknown"
+    return f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
+
+
+# Shown when the provider's model list cannot be fetched. Prices come from
+# MODEL_COSTS so this list cannot drift out of step with the table.
 _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
-        ("claude-sonnet-4-6", "Claude Sonnet 4.6", "$3 / $15 per 1M tokens"),
-        ("claude-opus-4-6", "Claude Opus 4.6", "$15 / $75 per 1M tokens"),
-        ("claude-haiku-4-5-20251001", "Claude Haiku 4.5", "$0.80 / $4 per 1M tokens"),
+        (mid, name, _price_label(mid))
+        for mid, name in (
+            ("claude-opus-5", "Claude Opus 5"),
+            ("claude-sonnet-5", "Claude Sonnet 5"),
+            ("claude-haiku-4-5", "Claude Haiku 4.5"),
+        )
     ],
     "openai": [
-        ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
-        ("gpt-4o-mini", "GPT-4o Mini", "$0.15 / $0.60 per 1M tokens"),
+        (mid, name, _price_label(mid))
+        for mid, name in (
+            ("gpt-4o", "GPT-4o"),
+            ("gpt-4o-mini", "GPT-4o Mini"),
+        )
     ],
 }
 
@@ -1940,14 +1973,8 @@ class RegenderTUI(App):
                 page = await client.models.list(limit=50)
                 for m in page.data:
                     if m.id.startswith("claude-"):
-                        costs = _lookup_model_cost(m.id)
-                        pricing = (
-                            f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
-                            if costs
-                            else "pricing unknown"
-                        )
                         display = _versioned_display_name(m.id, getattr(m, "display_name", m.id))
-                        choices.append((m.id, display, pricing))
+                        choices.append((m.id, display, _price_label(m.id)))
             except Exception:
                 choices.extend(_FALLBACK_MODELS.get("anthropic", []))
 
@@ -1963,13 +1990,7 @@ class RegenderTUI(App):
                     if m.id in seen or not _should_show_openai_model(m.id):
                         continue
                     seen.add(m.id)
-                    costs = _lookup_model_cost(m.id)
-                    pricing = (
-                        f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
-                        if costs
-                        else "pricing unknown"
-                    )
-                    openai_models.append((m.id, _openai_display_name(m.id), pricing))
+                    openai_models.append((m.id, _openai_display_name(m.id), _price_label(m.id)))
                 choices.extend(
                     openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
                 )
