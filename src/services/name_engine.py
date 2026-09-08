@@ -350,6 +350,18 @@ class NameEngine:
             if info["surname"]
             for tok in info["surname"].split()
         }
+
+        # Every title+name form the cast already answers to, e.g. "mrs bennet".
+        # Periods are dropped so "Mrs. Bennet" and "Mrs Bennet" compare equal.
+        def _form(text: str) -> str:
+            return re.sub(r"\s+", " ", text.replace(".", "")).strip().lower()
+
+        cast_forms: dict[str, str] = {}
+        for info in index.values():
+            char = info["char"]
+            for form in [char.name, *char.aliases]:
+                cast_forms.setdefault(_form(form), char.name)
+
         name_map: dict[str, str] = {}
         title_map = TITLE_GIVEN_MAP[transform_type.value]
 
@@ -386,7 +398,21 @@ class NameEngine:
                 if first in title_map:
                     titles.add(first)
             for title in titles & set(title_map):
-                name_map[f"{title} {given}"] = f"{title_map[title]} {target}"
+                source_form = f"{title} {given}"
+                new_form = f"{title_map[title]} {target}"
+                # Swapping the title is where collisions are born: in a family
+                # both "Mr. Bennet" and "Mrs. Bennet" are in the cast, so
+                # converting one into the other merges two people. The check in
+                # _validate runs on given names and never sees these pairs,
+                # because they are synthesised here afterwards.
+                owner = cast_forms.get(_form(new_form))
+                if owner and _form(new_form) != _form(source_form):
+                    report["flags"].append(
+                        f"'{source_form}' would become '{new_form}', which is already "
+                        f"{owner} — left unchanged so two characters do not merge"
+                    )
+                    continue
+                name_map[source_form] = new_form
 
         for info in to_rename:
             given = info["given"]
@@ -406,7 +432,29 @@ class NameEngine:
                 if info["given"] and info["given"].lower() == orig.lower():
                     _emit_for(info, info["given"], target, {})
                     break
-        name_map.update(base_map)
+
+        # Supplied entries outrank the engine's own, but not to the point of
+        # merging two people. "Mr. Bennet" -> "Mrs. Bennet" reads as a correct
+        # feminisation and silently makes the father into the mother; the same
+        # happened to Mr. and Mrs. Hurst. Every engine-generated name is checked
+        # against the cast, and these were the one path that was not.
+        for orig, target in base_map.items():
+            owner = cast_forms.get(_form(target))
+            # An exchange is not a merge. In a swap "Mr. Bennet" becomes
+            # "Mrs. Bennet" while "Mrs. Bennet" becomes "Mr. Bennet"; the name
+            # being taken is given up in the same breath, so nobody ends up
+            # sharing one. Only a one-way move onto an occupied name merges.
+            vacated = any(
+                _form(other) == _form(target) and _form(dest) != _form(target)
+                for other, dest in base_map.items()
+            )
+            if owner and not vacated and _form(target) != _form(orig) and _form(orig) in cast_forms:
+                report["flags"].append(
+                    f"'{orig}' would become '{target}', which is already {owner} — "
+                    f"left unchanged so two characters do not merge"
+                )
+                continue
+            name_map[orig] = target
 
         report["accepted"] = len(accepted)
         report["entries"] = len(name_map)

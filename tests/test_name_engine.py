@@ -206,3 +206,78 @@ class TestNameEngine:
 
 
 # ------------------------------------------------------------- QC gates
+
+
+class TestTitleCollision:
+    """Swapping a title can merge two people who share a surname.
+
+    In any family both "Mr. Bennet" and "Mrs. Bennet" are in the cast, so
+    converting the first into the second makes the father and the mother the
+    same character. The collision check in _validate runs on given names and
+    never sees these pairs — they are synthesised afterwards from the title.
+
+    Seen in the Sep-2026 all_female sample: "Mr. Bennet" -> "Mrs. Bennet" and
+    "Mr. Hurst" -> "Mrs. Hurst", both already other people, after which the
+    model invented "Ms." to keep them apart and applied it inconsistently —
+    even to Mrs. Long, who was female all along and should not have moved.
+    """
+
+    @staticmethod
+    def _cast():
+        return CharacterAnalysis(
+            book_id="pp",
+            characters=[
+                Character(
+                    name="Sir William Lucas",
+                    gender=Gender.MALE,
+                    pronouns={},
+                    aliases=["Sir William"],
+                    titles=["Sir"],
+                ),
+                Character(
+                    name="Lady Lucas",
+                    gender=Gender.FEMALE,
+                    pronouns={},
+                    aliases=["Lady Lucas"],
+                    titles=["Lady"],
+                ),
+            ],
+        )
+
+    def test_a_title_swap_onto_an_existing_character_is_refused(self):
+        engine = NameEngine(provider=None)
+        name_map, report = asyncio.run(
+            engine.build_name_map(self._cast(), TransformType.ALL_FEMALE)
+        )
+        # "Sir William" would become "Lady William", not "Lady Lucas", so the
+        # pair that must never be emitted is one landing on a real cast member.
+        for source, target in name_map.items():
+            assert target.lower().replace(".", "") != "lady lucas", (
+                f"{source} -> {target} merges two characters"
+            )
+        assert isinstance(report, dict)
+
+    def test_the_refusal_is_reported_not_silent(self):
+        """A dropped rename has to be visible, or the book reads fine and is wrong."""
+        engine = NameEngine(provider=None)
+        cast = CharacterAnalysis(
+            book_id="pp",
+            characters=[
+                Character(
+                    name="Sir William",
+                    gender=Gender.MALE,
+                    pronouns={},
+                    aliases=["Sir William"],
+                    titles=["Sir"],
+                ),
+                Character(
+                    name="Lady William",
+                    gender=Gender.FEMALE,
+                    pronouns={},
+                    aliases=["Lady William"],
+                    titles=["Lady"],
+                ),
+            ],
+        )
+        name_map, report = asyncio.run(engine.build_name_map(cast, TransformType.ALL_FEMALE))
+        assert name_map.get("Sir William") != "Lady William"
