@@ -2275,6 +2275,71 @@ class TransformService(BaseService):
                 effective.update(entries)
         return effective
 
+    # Every substitution the safety net makes, in order. The change log records
+    # whole-paragraph diffs, so a decision like "pages -> handmaids" was buried
+    # inside a paragraph and nobody could see the net had made it. Keeping the
+    # calls themselves is what makes them auditable, and what tier two reads.
+    _substitution_log: Optional[list] = None
+
+    # A word that opens a sentence is capitalised by grammar, not because it is
+    # a name, so it carries no signal.
+    _SENTENCE_END = re.compile(r"(?:^|[.!?][\'\"”’)\]]*\s+|[\"“(\[]\s*)$")
+
+    def start_substitution_log(self) -> None:
+        """Begin recording what the safety net changes. Off unless asked for."""
+        self._substitution_log = []
+
+    def _record_substitution(self, text, start, before, after, where) -> None:
+        log = getattr(self, "_substitution_log", None)
+        if log is None or before == after:
+            return
+        chapter, paragraph = where if where else (None, None)
+        log.append(
+            {
+                "chapter": chapter,
+                "paragraph": paragraph,
+                "before": before,
+                "after": after,
+                "sentence_initial": bool(self._SENTENCE_END.search(text[:start])),
+                "excerpt": re.sub(
+                    r"\s+", " ", text[max(0, start - 45) : start + len(before) + 45]
+                ).strip(),
+            }
+        )
+
+    @staticmethod
+    def suspicious_substitutions(log) -> list:
+        """Substitutions worth a second look, deduped by the pair itself.
+
+        A capitalised word that does not open a sentence is capitalised because
+        it is a name, and a name has no business being swapped: that is how
+        "Mary King" became "Mary Queen" and "Sir William" became "Madam
+        William" in the printed book.
+
+        Deduping is what makes this usable. On Pride and Prejudice the rule
+        flags 1370 substitutions, which collapse to 17 distinct pairs -- a list
+        a person can read in ten seconds, where the wrong ones stand out
+        against the titles that are obviously right.
+        """
+        pairs: dict = {}
+        for entry in log or []:
+            before = entry.get("before", "")
+            if entry.get("sentence_initial") or not before[:1].isupper():
+                continue
+            key = (before, entry.get("after", ""))
+            found = pairs.setdefault(
+                key,
+                {
+                    "before": key[0],
+                    "after": key[1],
+                    "count": 0,
+                    "example": entry.get("excerpt", ""),
+                    "first_seen": (entry.get("chapter"), entry.get("paragraph")),
+                },
+            )
+            found["count"] += 1
+        return sorted(pairs.values(), key=lambda p: -p["count"])
+
     def _name_spans(self, text: str) -> list:
         pattern = getattr(self, "_protected_names", None)
         return [m.span() for m in pattern.finditer(text)] if pattern else []
@@ -2387,6 +2452,7 @@ class TransformService(BaseService):
         text: str,
         transform_type: "TransformType",
         source_text: Optional[str] = None,
+        where: Optional[tuple] = None,
     ) -> str:
         """Deterministic safety net for gendered terms the LLM left untransformed.
 
@@ -2426,13 +2492,30 @@ class TransformService(BaseService):
                 # a curly-quoted source does not gain a straight one.
                 if "’" in term:
                     replacement = replacement.replace("'", "’")
-                return self._match_case(term, replacement) + (match.group("clitic") or "")
+                result = self._match_case(term, replacement)
+                self._record_substitution(current, start, term, result, where)
+                return result + (match.group("clitic") or "")
 
             text = pattern.sub(_replace, text)
 
         text = self._apply_contextual_pronouns(text, key, source_text)
 
         for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(key, []):
+            # These are substitutions too, and "Sir " -> "Lady " is 47 of them
+            # in one book. An audit trail that omits a whole class of change is
+            # worse than none, because it reads as complete.
+            if getattr(self, "_substitution_log", None) is not None:
+                for match in pattern.finditer(text):
+                    # expand(), not sub(): these patterns end in a lookahead, so
+                    # re-running one against its own match finds nothing and
+                    # silently reports the substitution as a no-op.
+                    self._record_substitution(
+                        text,
+                        match.start(),
+                        match.group(0).strip(),
+                        match.expand(replacement).strip(),
+                        where,
+                    )
             text = pattern.sub(replacement, text)
 
         # Last, so it sees whatever the whole pipeline produced. The title fixes

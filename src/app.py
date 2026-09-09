@@ -399,6 +399,11 @@ class Application:
             if selected_characters:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
 
+            # Record what the safety net changes, so its decisions can be read
+            # afterwards. The change log keeps whole-paragraph diffs, which
+            # buried "pages -> handmaids" inside a paragraph where nobody saw it.
+            transformer.start_substitution_log()
+
             transformation = await transformer.transform_book(
                 book,
                 TransformType(transform_type),
@@ -408,6 +413,26 @@ class Application:
                 on_chapter_complete=on_chapter_complete,
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
+
+            # What the safety net decided, and which of those decisions want a
+            # second look. A capitalised word that does not open a sentence is
+            # capitalised because it is a name, and names have no business
+            # being swapped -- that is how Mary King became Mary Queen.
+            substitutions = getattr(transformer, "_substitution_log", None) or []
+            flagged = transformer.suspicious_substitutions(substitutions)
+            if output_dir and substitutions:
+                with open(output_dir / "substitutions.json", "w") as f:
+                    json.dump({"total": len(substitutions), "entries": substitutions}, f, indent=1)
+                with open(output_dir / "substitutions_to_review.json", "w") as f:
+                    json.dump({"pairs": flagged}, f, indent=1)
+            if flagged:
+                preview = ", ".join(
+                    f"{p['before']}->{p['after']} x{p['count']}" for p in flagged[:8]
+                )
+                self.logger.info(
+                    f"{len(substitutions)} substitutions recorded; "
+                    f"{len(flagged)} distinct pairs to review: {preview}"
+                )
 
             # Quality control removed - transformations are applied directly
 
