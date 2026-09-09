@@ -133,13 +133,9 @@ def _format_model_name(model: str) -> str:
     return model
 
 
-# (input, output) cost per 1M tokens — updated Feb 2026
-# USD per 1M tokens, (input, output). Anthropic first-party rates; Bedrock and
-# Vertex are partner-priced and differ.
-#
-# Keep the current generation listed here. A model missing from this table shows
-# as "pricing unknown" in the menu, which is what every Claude 5 model did until
-# this table caught up with them.
+# (input, output) cost per 1M tokens — updated Sept 2026.
+# Anthropic first-party API rates. When a model ships, add it here: an unlisted
+# model shows "pricing unknown" in the menu and silently drops the cost hint.
 MODEL_COSTS = {
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
@@ -147,21 +143,18 @@ MODEL_COSTS = {
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (1.00, 2.00),
-    # Claude, current generation
     "claude-fable-5-1": (10.00, 50.00),
     "claude-fable-5": (10.00, 50.00),
     "claude-mythos-5-1": (10.00, 50.00),
-    "claude-mythos-5": (10.00, 50.00),
     "claude-opus-5": (5.00, 25.00),
     "claude-opus-4-8": (5.00, 25.00),
     "claude-opus-4-7": (5.00, 25.00),
     "claude-opus-4-6": (5.00, 25.00),
+    "claude-opus-4-5": (5.00, 25.00),
     "claude-sonnet-5": (2.00, 10.00),
     "claude-sonnet-4-6": (3.00, 15.00),
-    "claude-haiku-4-5": (1.00, 5.00),
-    # Older models, still selectable
     "claude-sonnet-4": (3.00, 15.00),
-    "claude-opus-4-5": (5.00, 25.00),
+    "claude-haiku-4-5": (1.00, 5.00),
     "claude-3-opus": (15.00, 75.00),
     "claude-3-sonnet": (3.00, 15.00),
     "claude-3-haiku": (0.25, 1.25),
@@ -176,17 +169,16 @@ _UNPRICED = "pricing unknown"
 def _lookup_model_cost(model: str) -> tuple[float, float] | None:
     """Match model string to cost table. Returns None if model is unrecognized.
 
-    Longest prefix wins. Taking the first match in table order instead would
-    price "gpt-4o-mini-2024-07-18" off the "gpt-4o" row -- more than sixteen
-    times its real cost -- because a dated id misses the exact-match check and
-    "gpt-4o" is listed first.
+    Prefixes are tried longest first so a dated or point-release id resolves to
+    the most specific entry — `claude-fable-5-1` must not match `claude-fable-5`,
+    and `claude-sonnet-4-6` must not match `claude-sonnet-4`.
     """
     if model in MODEL_COSTS:
         return MODEL_COSTS[model]
-    matches = [key for key in MODEL_COSTS if model.startswith(key)]
-    if not matches:
-        return None
-    return MODEL_COSTS[max(matches, key=len)]
+    for key in sorted(MODEL_COSTS, key=len, reverse=True):
+        if model.startswith(key):
+            return MODEL_COSTS[key]
+    return None
 
 
 # Recommended model IDs — best quality/cost balance for literary transforms.
@@ -201,14 +193,17 @@ def _is_recommended_model(model_id: str) -> bool:
     return any(model_id.startswith(prefix) for prefix in _RECOMMENDED_MODELS)
 
 
+# Rough throughput per model family. An unlisted model falls through to
+# _DEFAULT_SECS_PER_1K, which is the Haiku rate — so a missing entry makes a slow
+# model advertise itself as the fastest on the menu. Add new families here.
 _MODEL_SECS_PER_1K_TOKENS: dict[str, float] = {
     "claude-haiku": 6.0,
     "claude-sonnet": 12.0,
     "claude-opus": 28.0,
-    # The most capable tier, and the slowest. Without a row here it fell to the
-    # 6s default and was advertised as the quickest model in the list.
-    "claude-fable": 36.0,
-    "claude-mythos": 36.0,
+    # Fable and Mythos think on every request and take longer turns, so they sit
+    # above Opus. Estimated from the tier progression, not measured on a book.
+    "claude-fable": 45.0,
+    "claude-mythos": 45.0,
     "gpt-4o-mini": 7.0,
     "gpt-4o": 13.0,
     "gpt-4-turbo": 20.0,
@@ -216,15 +211,19 @@ _MODEL_SECS_PER_1K_TOKENS: dict[str, float] = {
     "gpt-3.5-turbo": 5.0,
 }
 
+_DEFAULT_SECS_PER_1K = 6.0
+
 
 def _estimate_transform_time(model_id: str, tokens: int) -> str:
     """Return a human-readable time estimate for transforming `tokens` book tokens."""
     if tokens <= 0:
         return ""
-    secs_per_1k = 6.0
-    for prefix, rate in _MODEL_SECS_PER_1K_TOKENS.items():
+    secs_per_1k = _DEFAULT_SECS_PER_1K
+    # Longest prefix wins, so a more specific family entry beats a shorter one
+    # regardless of dict order — same rule as _lookup_model_cost.
+    for prefix in sorted(_MODEL_SECS_PER_1K_TOKENS, key=len, reverse=True):
         if model_id.startswith(prefix):
-            secs_per_1k = rate
+            secs_per_1k = _MODEL_SECS_PER_1K_TOKENS[prefix]
             break
     total_secs = tokens / 1000 * secs_per_1k
     if total_secs < 90:
@@ -233,15 +232,49 @@ def _estimate_transform_time(model_id: str, tokens: int) -> str:
     return "~1 min" if minutes < 2 else f"~{int(minutes)} min"
 
 
+def _price_label(model_id: str) -> str:
+    """Human-readable per-1M-token pricing, or a plain note when unlisted."""
+    costs = _lookup_model_cost(model_id)
+    if not costs:
+        # The same constant the drift warning compares against, so the two
+        # cannot fall out of step and quietly stop reporting.
+        return _UNPRICED
+    return f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
+
+
+def _estimate_book_cost(model_id: str, tokens: int, token_fraction: float = 1.0) -> str:
+    """What this book actually costs on this model, e.g. "~$0.64".
+
+    A transform writes back about as much as it reads, so the estimate bills the
+    book's tokens once as input and once as output. Returns "" when there is no
+    book yet or the model carries no price, letting callers fall back to the
+    per-1M rate card — the only useful thing to show before a book is chosen.
+    """
+    costs = _lookup_model_cost(model_id)
+    if not costs or tokens <= 0:
+        return ""
+    cost = tokens * token_fraction / 1_000_000 * (costs[0] + costs[1])
+    # Rounding a real charge to "~$0.00" reads as free, which it is not.
+    return "<$0.01" if cost < 0.01 else f"~${cost:.2f}"
+
+
+# Shown when the provider's model list cannot be fetched. Prices come from
+# MODEL_COSTS so this list cannot drift out of step with the table.
 _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
-        ("claude-sonnet-5", "Claude Sonnet 5", "$2.00 / $10.00 per 1M tokens"),
-        ("claude-opus-5", "Claude Opus 5", "$5.00 / $25.00 per 1M tokens"),
-        ("claude-haiku-4-5", "Claude Haiku 4.5", "$1.00 / $5.00 per 1M tokens"),
+        (mid, name, _price_label(mid))
+        for mid, name in (
+            ("claude-opus-5", "Claude Opus 5"),
+            ("claude-sonnet-5", "Claude Sonnet 5"),
+            ("claude-haiku-4-5", "Claude Haiku 4.5"),
+        )
     ],
     "openai": [
-        ("gpt-4o", "GPT-4o", "$2.50 / $10 per 1M tokens"),
-        ("gpt-4o-mini", "GPT-4o Mini", "$0.15 / $0.60 per 1M tokens"),
+        (mid, name, _price_label(mid))
+        for mid, name in (
+            ("gpt-4o", "GPT-4o"),
+            ("gpt-4o-mini", "GPT-4o Mini"),
+        )
     ],
 }
 
@@ -1583,13 +1616,11 @@ class RegenderTUI(App):
         """Return a formatted cost estimate string for a fraction of the book's tokens."""
         if not self._book_stats:
             return ""
-        tokens = self._book_stats.get("tokens", 0)
-        model = os.environ.get("DEFAULT_MODEL", "")
-        costs = _lookup_model_cost(model)
-        if not costs:
-            return ""
-        cost = tokens * token_fraction / 1_000_000 * (costs[0] + costs[1])
-        return f"~${cost:.2f}"
+        return _estimate_book_cost(
+            os.environ.get("DEFAULT_MODEL", ""),
+            self._book_stats.get("tokens", 0),
+            token_fraction,
+        )
 
     def _show_character_analysis_prompt(self) -> None:
         """Ask if user wants to analyze characters first."""
@@ -1605,6 +1636,12 @@ class RegenderTUI(App):
 
     def _handle_analyze_prompt_input(self, value: str) -> None:
         """Handle character analysis prompt."""
+        # The stage stays on this prompt for the whole run, so a second Enter
+        # would start another analysis: the worker is exclusive, so the first
+        # run is cancelled mid-flight — already paid for, result thrown away —
+        # and its loader is orphaned and keeps ticking.
+        if self._analysis_running:
+            return
         if value.lower() in ("y", "yes", ""):
             self._analysis_running = True
             self._analysis_start_time = time.time()
@@ -1978,14 +2015,8 @@ class RegenderTUI(App):
                 page = await client.models.list(limit=50)
                 for m in page.data:
                     if m.id.startswith("claude-"):
-                        costs = _lookup_model_cost(m.id)
-                        pricing = (
-                            f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
-                            if costs
-                            else _UNPRICED
-                        )
                         display = _versioned_display_name(m.id, getattr(m, "display_name", m.id))
-                        choices.append((m.id, display, pricing))
+                        choices.append((m.id, display, _price_label(m.id)))
             except Exception:
                 choices.extend(_FALLBACK_MODELS.get("anthropic", []))
 
@@ -2001,11 +2032,7 @@ class RegenderTUI(App):
                     if m.id in seen or not _should_show_openai_model(m.id):
                         continue
                     seen.add(m.id)
-                    costs = _lookup_model_cost(m.id)
-                    pricing = (
-                        f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens" if costs else _UNPRICED
-                    )
-                    openai_models.append((m.id, _openai_display_name(m.id), pricing))
+                    openai_models.append((m.id, _openai_display_name(m.id), _price_label(m.id)))
                 choices.extend(
                     openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
                 )
@@ -2046,10 +2073,13 @@ class RegenderTUI(App):
             is_current = model_id == current or current.startswith(model_id)
             marker = " [#aaaaaa]◄ default[/]" if is_current else ""
             rec = " [bold #ffffff]★ recommended[/]" if _is_recommended_model(model_id) else ""
+            # What this book costs beats a rate card the reader has to do
+            # arithmetic on. Falls back to the rate when no book is loaded yet.
+            cost = _estimate_book_cost(model_id, tokens) or pricing
             time_est = _estimate_transform_time(model_id, tokens)
             time_tag = f"  [#666666]{time_est}[/]" if time_est else ""
             self.print(
-                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{pricing}[/]{time_tag}{rec}{marker}"
+                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{cost:<10}[/]{time_tag}{rec}{marker}"
             )
         if not show_all and len(choices) > 5:
             self.print(
