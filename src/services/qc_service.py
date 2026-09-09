@@ -98,6 +98,11 @@ class Finding:
     # The exact word the finding is about, where there is one. A person
     # reviewing this needs something to act on, and the detail line is prose.
     term: str = ""
+    # The same passage in the source. Without it a reader cannot tell a name
+    # the transform correctly produced from one it failed to change: the last
+    # chapter's "Mr. Darcy" is right because the source said "Mrs. Darcy", and
+    # shown alone it looks exactly like a miss.
+    source_excerpt: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -108,6 +113,7 @@ class Finding:
             "detail": self.detail,
             "excerpt": self.excerpt,
             "term": self.term,
+            "source_excerpt": self.source_excerpt,
         }
 
 
@@ -439,7 +445,7 @@ class QCService:
         self._check_auto_fixable(chapter, number, position, output, repaired)
         self._check_pair_gender(chapter, number, position, source, output)
         self._check_names(chapter, number, position, source, output)
-        self._check_residual_terms(chapter, number, position, output, residual)
+        self._check_residual_terms(chapter, number, position, output, residual, source)
         self._check_text_integrity(chapter, number, position, source, output)
         self._check_coordination(chapter, number, position, source, output)
         self._check_polysemy(chapter, number, position, output)
@@ -795,10 +801,21 @@ class QCService:
         100% on gendered words while still calling a renamed character by their
         original name.
         """
-        if self._name_pattern is None or not self._name_pattern.search(source):
+        if self._name_pattern is None:
+            return
+        present = {m.group(0) for m in self._name_pattern.finditer(source)}
+        if not present:
             return
         for match in self._name_pattern.finditer(output):
             name = match.group(0)
+            # This exact name has to have been in the source. Asking only
+            # whether *some* mapped name was there flags a name the transform
+            # correctly produced: the last chapter reads "talked of Mrs.
+            # Darcy" of Elizabeth, a swap turns her into Mr. Darcy, and Mr.
+            # Darcy is also a map key -- so a correct sentence was reported as
+            # an un-renamed one, and acting on it would have been an error.
+            if name not in present:
+                continue
             # "Mrs. Bennet" in the output of a swap is not a missed rename: it
             # is what "Mr. Bennet" became. A name that is somebody's target
             # belongs in the text, and only the paragraph's other checks can
@@ -814,15 +831,22 @@ class QCService:
                     f"{name!r} was not renamed to {self.name_map[name]!r}",
                     _excerpt(output, match.start()),
                     term=name,
+                    source_excerpt=_excerpt(source, source.find(name)),
                 )
             )
 
     def _check_residual_terms(
-        self, chapter: ChapterReport, number: int, position: int, output: str, residual: list
+        self,
+        chapter: ChapterReport,
+        number: int,
+        position: int,
+        output: str,
+        residual: list,
+        source: str = "",
     ) -> None:
         """Gendered words the LLM missed and the safety net declined to guess at."""
         protected = TransformService.protected_spans(output)
-        for _source_word, word, span, _source_span in residual:
+        for _source_word, word, span, source_span in residual:
             if word in _REVIEW_IGNORE:
                 continue
             if any(a <= span[0] and span[1] <= b for a, b in protected):
@@ -838,6 +862,9 @@ class QCService:
                     f"{word!r} left untransformed",
                     _excerpt(output, span[0]),
                     term=word,
+                    source_excerpt=(
+                        _excerpt(source, source_span[0]) if source and source_span else ""
+                    ),
                 )
             )
 
