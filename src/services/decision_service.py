@@ -44,6 +44,24 @@ def _resolved_frames(key: str) -> re.Pattern | None:
     return re.compile("|".join(re.escape(f) for f in frames), re.IGNORECASE)
 
 
+# A singular-agreeing verb reached from an earlier "they" across a coordinator:
+# "they came down ... and was so much delighted". Sometimes the verb's subject
+# really is that "they" and it has to become "were"; sometimes a noun subject
+# stands closer -- "Jane was yielding ... and was in a way to be very much in
+# love" -- and the singular verb is correct as it stands. The two are
+# structurally identical, so this is offered as a decision, never repaired.
+#
+# The safety net only ever matched an adjacent pair ("they was"), so every one
+# of these went through untouched.
+_LOOSE_AGREEMENT = re.compile(
+    r"\bthey\b(?:(?!\bthey\b)[^.!?;])*?"
+    r"(?:,\s*(?:and|but)|\band\b|\bbut\b)\s+"
+    r"(?P<verb>was|is|has|does)\b",
+    re.IGNORECASE,
+)
+
+_PLURAL_FORM = {"was": "were", "is": "are", "has": "have", "does": "do"}
+
 _SALUTATION = re.compile(r"(?:^|[\"“(])\s*(?:my\s+)?dear\s+$", re.IGNORECASE)
 _CLOSE = re.compile(r"\bI\s+(?:am|remain)\b[^.?!]*$", re.IGNORECASE)
 _SHORT_REPLY = re.compile(r"(?:yes|no|never|indeed|certainly|ay|oh)[,!]?", re.IGNORECASE)
@@ -56,6 +74,7 @@ FRAME_HELP = {
     "clause-final tag": "closes the sentence",
     "clause-medial": "sits inside the sentence, between clauses",
     "word sense": "employer, teacher, household head, or the 'own master' idiom",
+    "verb agreement": "a singular verb reached from an earlier 'they' — whose subject is it?",
 }
 
 
@@ -68,6 +87,7 @@ class Decision:
     word: str
     frame: str
     excerpt: str
+    offset: int = -1
     options: dict[str, str] = field(default_factory=dict)
     ruling: str | None = None
 
@@ -83,6 +103,7 @@ class Decision:
             "word": self.word,
             "frame": self.frame,
             "why": FRAME_HELP.get(self.frame, ""),
+            "offset": self.offset,
             "excerpt": self.excerpt,
             "options": self.options,
             "ruling": self.ruling,
@@ -127,6 +148,70 @@ class DecisionReport:
             ),
             "decisions": [d.to_dict() for d in self.decisions],
         }
+
+    def as_note(self, book_title: str = "") -> str:
+        """A plain-text account of what the transform could and could not settle.
+
+        Written beside the book rather than into it. These exports feed
+        InDesign, where a header would simply become the first paragraph of the
+        printed text, so the note travels as its own file.
+
+        Anyone can end up holding the output without having seen the run that
+        produced it. This is what tells them the neutral edition involved
+        judgement, where that judgement was needed, and what is still open.
+        """
+        title = book_title or "this book"
+        lines = [
+            "TRANSFORMATION NOTES",
+            "=" * 20,
+            "",
+            f"Book:      {title}",
+            f"Transform: {self.transform_type}",
+            "",
+            "WHAT THIS TRANSFORM DOES NOT DO BY ITSELF",
+            "",
+            "Neutralising a text is not a find-and-replace. Most of it is",
+            "mechanical, but English has no neutral form of some words, and",
+            "others mean different things in different sentences. Those are",
+            "editorial judgements, and no rule settles them.",
+            "",
+        ]
+        if not self.decisions:
+            lines += [
+                "Nothing was left undecided in this book. Every word the rules",
+                "could not read on its own turned out not to occur here.",
+                "",
+            ]
+        else:
+            lines += [f"{self.total} place(s) were left for a person to decide:", ""]
+            for frame, count in self.by_frame().items():
+                why = FRAME_HELP.get(frame, "")
+                lines.append(f"  {count:>4}  {frame} — {why}")
+            lines += [
+                "",
+                "Unless a decision sheet was applied, these are UNRESOLVED in the",
+                "text you are holding: the word was left as the source had it.",
+                "The accompanying *_decisions.json lists every one with its",
+                "options; filling in a ruling and re-running applies them.",
+                "",
+            ]
+        lines += [
+            "KNOWN LIMITS",
+            "",
+            "  - A singular 'they' far from its verb can leave the verb",
+            "    unconjugated. Where the subject is unambiguous these are",
+            "    listed above; where a noun subject stands closer, the singular",
+            "    verb is correct and is left alone.",
+            "  - Titles are converted only where a name follows. A bare address",
+            "    has no neutral equivalent and is reported, not guessed at.",
+            "  - Character names are preserved. Gender read into a name itself",
+            "    is not something the transform changes.",
+            "",
+            "This file describes the transformation, not the book. It is safe to",
+            "delete and is not part of the text.",
+            "",
+        ]
+        return "\n".join(lines)
 
 
 class DecisionService:
@@ -187,6 +272,7 @@ class DecisionService:
                             paragraph=position,
                             word=match.group(0),
                             frame=frame,
+                            offset=match.start(),
                             excerpt=_excerpt(text, match.start(), match.end()),
                             options=self._options(text, match, frame),
                         )
@@ -202,12 +288,33 @@ class DecisionService:
                             paragraph=position,
                             word=match.group(0),
                             frame="word sense",
+                            offset=match.start(),
                             excerpt=_excerpt(text, match.start(), match.end()),
                             options={
                                 "employer": "employer",
                                 "teacher": "teacher",
                                 "head of the house": "head of the house",
                                 "keep": match.group(0),
+                            },
+                        )
+                    )
+                for match in _LOOSE_AGREEMENT.finditer(text):
+                    verb = match.group("verb")
+                    plural = _PLURAL_FORM[verb.lower()]
+                    report.decisions.append(
+                        Decision(
+                            chapter=number,
+                            paragraph=position,
+                            word=verb,
+                            frame="verb agreement",
+                            offset=match.start("verb"),
+                            excerpt=_excerpt(text, *match.span("verb")),
+                            options={
+                                plural: _preview(
+                                    _replaced(text, *match.span("verb"), plural),
+                                    match.start("verb"),
+                                ),
+                                "keep": _preview(text, match.start("verb")),
                             },
                         )
                     )
@@ -285,7 +392,7 @@ class DecisionService:
                     if not ruling or ruling == "keep":
                         continue
 
-                    span = _nth(text, word, ordinal)
+                    span = _locate(text, word, entry.get("offset", -1), ordinal)
                     if span is None:
                         problems.append(f"{entry.get('ref', '?')}: {word!r} not found")
                         continue
@@ -323,6 +430,22 @@ def _deleted(text: str, start: int, end: int) -> str:
     joined = before + after
     joined = re.sub(r"\s+([,.;:!?])", r"\1", joined)
     return re.sub(r"(?<=\S) {2,}(?=\S)", " ", joined)
+
+
+def _locate(text: str, word: str, offset: int, ordinal: int):
+    """Where this decision's own word sits, preferring the recorded offset.
+
+    Counting occurrences is enough for a vocative -- a paragraph holds one or
+    two. It is not enough for a verb: "was" can appear six times in a
+    paragraph and only one of them is the site being ruled on. The scan records
+    the exact offset, so use it when the text there still matches, and fall
+    back to counting for a sheet written before offsets existed.
+    """
+    if offset is not None and offset >= 0:
+        end = offset + len(word)
+        if text[offset:end].lower() == word.lower():
+            return (offset, end)
+    return _nth(text, word, ordinal)
 
 
 def _nth(text: str, word: str, ordinal: int):

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import math
 import os
 import re
@@ -160,6 +161,11 @@ MODEL_COSTS = {
 }
 
 
+# Shown when a model is not in MODEL_COSTS. Compared against, so it lives in
+# one place rather than being retyped at each call site.
+_UNPRICED = "pricing unknown"
+
+
 def _lookup_model_cost(model: str) -> tuple[float, float] | None:
     """Match model string to cost table. Returns None if model is unrecognized.
 
@@ -175,8 +181,11 @@ def _lookup_model_cost(model: str) -> tuple[float, float] | None:
     return None
 
 
-# Recommended model IDs — best quality/cost balance for literary transforms
-_RECOMMENDED_MODELS = ("claude-sonnet-4-6", "claude-sonnet-4", "gpt-4o")
+# Recommended model IDs — best quality/cost balance for literary transforms.
+# Every entry here was a generation behind, so the ★ never appeared beside any
+# model actually on offer. Sonnet 5 is the current balance: cheaper than
+# Sonnet 4.6 it replaces ($2/$10 against $3/$15) and considerably stronger.
+_RECOMMENDED_MODELS = ("claude-sonnet-5", "claude-sonnet-4-6", "gpt-4o")
 
 
 def _is_recommended_model(model_id: str) -> bool:
@@ -227,7 +236,9 @@ def _price_label(model_id: str) -> str:
     """Human-readable per-1M-token pricing, or a plain note when unlisted."""
     costs = _lookup_model_cost(model_id)
     if not costs:
-        return "pricing unknown"
+        # The same constant the drift warning compares against, so the two
+        # cannot fall out of step and quietly stop reporting.
+        return _UNPRICED
     return f"${costs[0]:.2f} / ${costs[1]:.2f} per 1M tokens"
 
 
@@ -642,6 +653,11 @@ class ContentArea(ScrollableContainer):
     }
 
     ContentArea .log-line {
+        /* Labels size to their content by default, and the container hides
+           overflow-x, so a line longer than the terminal was clipped rather
+           than wrapped -- the end of the sentence simply vanished. Taking the
+           full width lets it wrap. */
+        width: 1fr;
         height: auto;
         margin: 0;
         padding: 0;
@@ -1464,35 +1480,30 @@ class RegenderTUI(App):
         if not self._selected_book or not self._selected_transform:
             return
 
+        from src.utils.paths import keep_source, run_directory
+
         input_file = self._selected_book
-        book_name = input_file.stem
-
-        # Remove common prefixes like pg12- or pg43-
-        if book_name.startswith("pg") and "-" in book_name:
-            book_name = book_name.split("-", 1)[1]
-
-        # Convert to lowercase and replace spaces/underscores with hyphens
-        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
 
         if self._selected_transform == "parse_only":
-            # For parsing: keep in books/json/ with same name
+            # Parsing is not a run: it produces the canonical JSON runs read.
             if "texts" in str(input_file.parent):
                 output_dir = Path(str(input_file.parent).replace("texts", "json"))
             else:
                 output_dir = input_file.parent
+            output_dir.mkdir(parents=True, exist_ok=True)
             self._output_path = output_dir / f"{input_file.stem}.json"
-        elif self._selected_transform == "character_analysis":
-            # For character analysis: save to book's output folder
-            output_dir = Path("books/output") / book_folder
-            output_dir.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
-            self._output_path = output_dir / f"characters_{ts}.json"
+            return
+
+        # One folder per run, with the source copied in beside its output. The
+        # TUI used to share a folder per book while the CLI used its own
+        # scheme, so two runs overwrote each other's name map and neither
+        # folder described the book sitting in it.
+        output_dir = run_directory(input_file, self._selected_transform)
+        keep_source(input_file, output_dir)
+        if self._selected_transform == "character_analysis":
+            self._output_path = output_dir / "characters.json"
         else:
-            # For transformations: save to book's output folder with transformation type + timestamp
-            output_dir = Path("books/output") / book_folder
-            output_dir.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
-            self._output_path = output_dir / f"{self._selected_transform}_{ts}.json"
+            self._output_path = output_dir / f"{self._selected_transform}.json"
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle input."""
@@ -2074,8 +2085,97 @@ class RegenderTUI(App):
             self.print(
                 f"  [bold #ffffff]M[/]  [#aaaaaa]More models ({len(choices) - 5} additional)...[/]"
             )
+        self._warn_about_unpriced_models()
         self.print("")
         self.set_prompt(">  ")
+
+    def _write_decision_sheet(self) -> None:
+        """List whatever the transform could not settle by rule, beside the book.
+
+        The notice shown before a nonbinary run promises this sheet. It was
+        only ever written by the command-line path, so in the TUI -- the way
+        the tool is actually used -- the promise went unkept and the sites were
+        left to be found by reading the finished book.
+        """
+        from src.services.decision_service import DecisionService
+
+        service = DecisionService(self._selected_transform or "")
+        if self._selected_transform not in service.APPLIES_TO or not self._json_output_path:
+            return
+
+        book_path = Path(self._json_output_path)
+        try:
+            book = json.loads(book_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return
+
+        report = service.scan(book)
+        title = book.get("metadata", {}).get("title", "")
+
+        # The note goes out either way. Someone can end up holding the export
+        # without having seen this screen, and the file should say what was
+        # decided for them and what is still open.
+        note_path = book_path.with_name(book_path.stem + "_TRANSFORM_NOTES.txt")
+        try:
+            note_path.write_text(report.as_note(title), encoding="utf-8")
+        except OSError:
+            note_path = None
+
+        if not report.total:
+            self.print("")
+            self.print("  [#aaaaaa]No editorial rulings needed — nothing was left undecided.[/]")
+            if note_path:
+                self.print(f"  [#aaaaaa]Notes:[/] [#666666]{note_path}[/]")
+            return
+
+        sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
+        try:
+            sheet_path.write_text(
+                json.dumps(report.to_dict(title), ensure_ascii=False, indent=1),
+                encoding="utf-8",
+            )
+        except OSError:
+            return
+
+        self.print("")
+        self.print(
+            f"  [bold #ffffff]{report.total}[/] [#aaaaaa]place(s) need a ruling from you:[/]"
+        )
+        for word, number in report.by_word().items():
+            self.print(f"     [bold #ffffff]{number:>4}[/]  [#ffffff]{word}[/]")
+        self.print("")
+        self.print(f"  [#aaaaaa]Decision sheet:[/] [#ffffff]{sheet_path}[/]")
+        if note_path:
+            self.print(f"  [#aaaaaa]Notes for readers:[/] [#666666]{note_path}[/]")
+        self.print("  [#aaaaaa]Set a ruling on each entry, then apply them with:[/]")
+        self.print(
+            f"  [#666666]python regender_cli.py {book_path} "
+            f"{self._selected_transform} --decisions {sheet_path.name}[/]"
+        )
+
+    def _warn_about_unpriced_models(self) -> None:
+        """Say when the cost table has fallen behind the models on offer.
+
+        There is no pricing endpoint — the Models API returns ids, context
+        windows and capabilities, never a price — so the table is maintained by
+        hand and drifts silently every time a model ships. The list is already
+        fetched to build this menu, so comparing the two costs nothing and
+        turns a bland "pricing unknown" into something actionable.
+        """
+        unpriced = [
+            model_id
+            for model_id, _display, pricing in self._model_choices
+            if pricing == _UNPRICED and _lookup_model_cost(model_id) is None
+        ]
+        if not unpriced:
+            return
+        shown = ", ".join(unpriced[:3]) + ("…" if len(unpriced) > 3 else "")
+        self.print("")
+        self.print(f"  [#666666]{len(unpriced)} model(s) have no price in the table ({shown}).[/]")
+        self.print(
+            "  [#666666]Costs shown elsewhere will be wrong for them — "
+            "update MODEL_COSTS in src/cli/tui.py.[/]"
+        )
 
     def _handle_model_input(self, value: str) -> None:
         """Handle model selection."""
@@ -2574,6 +2674,8 @@ class RegenderTUI(App):
         )
         self.print(f"  [#aaaaaa]Time:[/] [#ffffff]{elapsed:.1f}s[/]")
         self.print(f"  [#aaaaaa]Saved:[/] [#ffffff]{self._json_output_path}[/]")
+
+        self._write_decision_sheet()
 
         # Show export options from FORMATS
         self._stage = "export"

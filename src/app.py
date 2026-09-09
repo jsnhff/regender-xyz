@@ -8,6 +8,7 @@ all services, plugins, and configuration.
 import asyncio
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any, Optional
 
@@ -206,6 +207,72 @@ class Application:
             except Exception as e:
                 self.logger.error(f"Failed to register service {service_name}: {e}")
 
+    def _run_quality_control(
+        self, book, transformation, transform_type, output_path, partial
+    ) -> Optional[dict]:
+        """Check the transformed book against its source, and say what it found.
+
+        Reports everything, blocks on nothing but structural findings. Those
+        mean the book is broken -- a chapter or paragraph count that no longer
+        matches the source -- rather than merely arguable. needs_review is
+        expected in normal work and must never gate: the nonbinary edition
+        legitimately produces dozens.
+
+        A PASS here means no gendered word survived unchanged, the structure
+        holds, and nothing looks like a repetition loop. It does not mean the
+        transformation is right, and the summary says so.
+        """
+        try:
+            from src.services.qc_service import STRUCTURAL, QCService
+
+            source = book.to_dict() if hasattr(book, "to_dict") else book
+            if not hasattr(transformation, "get_transformed_book"):
+                return None
+            transformed = transformation.get_transformed_book().to_dict()
+
+            # QCService wants the enum; process_book carries the string. Passing
+            # the string raises inside the try below and reports as "QC did not
+            # run", which is exactly the kind of quiet skip this gate exists to
+            # stop happening.
+            key = (
+                transform_type
+                if isinstance(transform_type, TransformType)
+                else TransformType(transform_type)
+            )
+            report = QCService(key).check_book(source, transformed)
+            summary = report.to_dict()
+
+            path = Path(output_path).with_name(Path(output_path).stem + "_qc.json")
+            path.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
+
+            totals = summary.get("totals", {})
+            structural = totals.get(STRUCTURAL, 0)
+            self.logger.info(
+                f"QC: {structural} structural, "
+                f"{totals.get('auto_fixable', 0)} auto-fixable, "
+                f"{totals.get('needs_review', 0)} needing review -> {path.name}"
+            )
+            if structural:
+                self.logger.error(
+                    f"QC found {structural} structural problem(s): the book does not match "
+                    "its source in shape. Do not print this until they are understood."
+                )
+            if partial:
+                self.logger.error(
+                    "QC cannot vouch for chapters that kept their original text: "
+                    + ", ".join(str(n) for n in partial)
+                )
+            return {
+                "structural": structural,
+                "auto_fixable": totals.get("auto_fixable", 0),
+                "needs_review": totals.get("needs_review", 0),
+                "report": str(path),
+                "blocked": bool(structural),
+            }
+        except Exception as error:  # QC must never be the reason a run is lost
+            self.logger.warning(f"Quality control did not run: {error}")
+            return None
+
     def get_service(self, name: str):
         """
         Get a service from the container.
@@ -230,19 +297,19 @@ class Application:
             Character analysis
         """
         # Check for existing character analysis file
+        from src.utils.paths import OUTPUT_ROOT, book_slug
+
         input_path = Path(file_path)
+        slug = book_slug(input_path)
 
-        # Determine book name for output folder
-        book_name = input_path.stem
-        # Remove common prefixes like pg12- or pg43-
-        if book_name.startswith("pg") and "-" in book_name:
-            book_name = book_name.split("-", 1)[1]
-        # Convert to lowercase and replace spaces/underscores with hyphens
-        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
-
-        # Check for most recent character analysis in timestamped folders
-        output_base = Path("books/output")
-        matching_folders = sorted(output_base.glob(f"{book_folder}-*"))
+        # Reuse a cast already worked out for this book. Runs now live one
+        # folder deep under the book, so look inside those as well as at the
+        # older flat "<book>-<timestamp>" folders, or every previous analysis
+        # becomes invisible and gets paid for again.
+        candidates = sorted(OUTPUT_ROOT.glob(f"{slug}-*")) + sorted(
+            (OUTPUT_ROOT / slug).glob("*") if (OUTPUT_ROOT / slug).is_dir() else []
+        )
+        matching_folders = [p for p in candidates if p.is_dir()]
 
         for folder in reversed(matching_folders):  # Check newest first
             char_file = folder / "characters.json"
@@ -347,9 +414,61 @@ class Application:
             # Transform the book
             transformer = self.get_service("transform")
 
+            # A surname that is also a gendered noun gets swapped like the noun:
+            # "Miss King" became "Miss Queen" and Mary King, a real character,
+            # was renamed Mary Queen in the printed edition. The cast is the only
+            # thing that knows the difference, so hand it over before starting.
+            # Capitalised forms only — the monarch "king" still swaps.
+            surnames = set()
+            for char in characters.characters:
+                for form in [char.name, *char.aliases]:
+                    surnames.update(
+                        token for token in re.split(r"\s+", form.strip()) if token[:1].isupper()
+                    )
+            transformer.protect_names(surnames, TransformType(transform_type))
+
+            # Marital status is not a fixed property. Darcy is unmarried for
+            # sixty chapters and married in the sixty-first; Collins marries in
+            # twenty-eight. A swap has to know, because English women's titles
+            # encode it and men's do not, and the answer changes mid-book --
+            # sometimes mid-chapter, so the marker is the paragraph.
+            if TransformType(transform_type) == TransformType.GENDER_SWAP:
+                from src.services.character_state import (
+                    detect_marital_changes,
+                    initial_marital_state,
+                    marital_title_maps,
+                )
+
+                book_dict = book.to_dict() if hasattr(book, "to_dict") else book
+                changes = detect_marital_changes(book_dict, characters.characters)
+                opening = initial_marital_state(characters.characters)
+                title_base, title_timeline = marital_title_maps(
+                    characters.characters, changes, opening
+                )
+                # The engine's own entries win: a rename decided for a character
+                # is more specific than a title derived from their status.
+                name_map = {**title_base, **(name_map or {})}
+                transformer.set_title_timeline(title_timeline)
+                name_report["state_changes"] = [c.to_dict() for c in changes]
+                if changes:
+                    self.logger.info(
+                        "Marital status changes: "
+                        + ", ".join(
+                            f"{c.character} at ch{c.chapter} p{c.paragraph}" for c in changes
+                        )
+                    )
+            protected = getattr(transformer, "_protected_names", None)
+            if protected:
+                self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")
+
             # Log selected characters if specified
             if selected_characters:
                 self.logger.info(f"Selective transformation for: {', '.join(selected_characters)}")
+
+            # Record what the safety net changes, so its decisions can be read
+            # afterwards. The change log keeps whole-paragraph diffs, which
+            # buried "pages -> handmaids" inside a paragraph where nobody saw it.
+            transformer.start_substitution_log()
 
             transformation = await transformer.transform_book(
                 book,
@@ -361,13 +480,57 @@ class Application:
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
-            # Quality control removed - transformations are applied directly
+            # A chapter that raised kept its source text so the book stays whole
+            # and the counts line up. That is a partial book, and it must not
+            # read as a complete one.
+            qc_summary = None
+            partial = list(getattr(transformer, "failed_chapters", []) or [])
+            if partial:
+                self.logger.error(
+                    f"{len(partial)} chapter(s) kept their original, untransformed text: "
+                    + ", ".join(str(n) for n in partial)
+                )
+
+            # What the safety net decided, and which of those decisions want a
+            # second look. A capitalised word that does not open a sentence is
+            # capitalised because it is a name, and names have no business
+            # being swapped -- that is how Mary King became Mary Queen.
+            substitutions = getattr(transformer, "_substitution_log", None) or []
+            flagged = transformer.suspicious_substitutions(substitutions)
+            if output_dir and substitutions:
+                with open(output_dir / "substitutions.json", "w") as f:
+                    json.dump({"total": len(substitutions), "entries": substitutions}, f, indent=1)
+                with open(output_dir / "substitutions_to_review.json", "w") as f:
+                    json.dump({"pairs": flagged}, f, indent=1)
+            if flagged:
+                preview = ", ".join(
+                    f"{p['before']}->{p['after']} x{p['count']}" for p in flagged[:8]
+                )
+                self.logger.info(
+                    f"{len(substitutions)} substitutions recorded; "
+                    f"{len(flagged)} distinct pairs to review: {preview}"
+                )
 
             # Save output if requested
             if output_path:
                 # Save JSON transformation immediately
                 await self._save_output(transformation, output_path)
                 self.logger.info(f"Saved transformation JSON to {output_path}")
+
+                # Quality control. It used to be skipped entirely, so the only
+                # QC these books ever had was somebody running the script by
+                # hand -- which is how a book containing "Mary Queen" and "read
+                # three handmaids" was called clean.
+                #
+                # It reports everything and blocks on nothing except structural
+                # findings. Those are unambiguous corruption: a chapter or
+                # paragraph count that no longer matches the source means the
+                # book is broken, not merely arguable. needs_review must never
+                # block -- the nonbinary book legitimately produces dozens, and
+                # a gate that cries wolf gets switched off.
+                qc_summary = self._run_quality_control(
+                    book, transformation, transform_type, output_path, partial
+                )
 
                 # Export as text file (this could fail, but JSON is already saved)
                 output_dir = Path(output_path).parent
@@ -384,6 +547,9 @@ class Application:
                 "characters": len(characters.characters),
                 "changes": len(transformation.changes),
                 "output_path": output_path,
+                "untransformed_chapters": partial,
+                "quality_control": qc_summary,
+                "substitutions_to_review": len(flagged),
             }
 
         except Exception as e:

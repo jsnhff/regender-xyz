@@ -491,7 +491,11 @@ class TransformService(BaseService):
                     "his": "her/hers by role",
                     "hers": "his",
                 },
-                "titles": {"Mr.": "Ms.", "Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
+                # "Mr." is ambiguous where "Mrs." and "Miss" are not: English
+                # men's titles carry no marital status and women's do. The
+                # per-character map decides between Mrs. and Miss from the
+                # cast, and revises it when someone marries partway through.
+                "titles": {"Mr.": "Mrs. or Miss", "Mrs.": "Mr.", "Ms.": "Mr.", "Miss": "Mr."},
                 "terms": {
                     "father": "mother",
                     "mother": "father",
@@ -633,9 +637,23 @@ class TransformService(BaseService):
 
             self.logger.debug(f"Transforming chapter {i + 1}/{total}")
 
-            transformed_chapter, changes = await self._transform_single_chapter(
-                chapter, i, context, name_map=name_map
-            )
+            try:
+                transformed_chapter, changes = await self._transform_single_chapter(
+                    chapter, i, context, name_map=name_map
+                )
+            except Exception as error:
+                # Same bargain as the parallel path: one bad chapter must not
+                # cost the other sixty. Keep the source so the book stays whole
+                # and the paragraph counts line up, and say so loudly.
+                self.logger.error(
+                    f"Chapter {i + 1} failed to transform ({error}); "
+                    "keeping the original text for it"
+                )
+                self.failed_chapters = [*getattr(self, "failed_chapters", []), i + 1]
+                transformed_chapters.append(chapter)
+                if on_chapter_complete:
+                    on_chapter_complete(i + 1, total, chapter.title or f"Chapter {i + 1}")
+                continue
 
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
@@ -681,13 +699,40 @@ class TransformService(BaseService):
             async with semaphore:
                 return await run_chapter(chapter, i)
 
-        results = await asyncio.gather(*[limited_task(ch, i) for i, ch in enumerate(chapters)])
+        # return_exceptions, because the alternative is losing the book. Without
+        # it one chapter raising propagates immediately, the other sixty are
+        # discarded mid-flight, and nothing is written to disk -- two hours of
+        # work and the whole spend gone to a single bad chapter.
+        results = await asyncio.gather(
+            *[limited_task(ch, i) for i, ch in enumerate(chapters)],
+            return_exceptions=True,
+        )
 
         transformed_chapters = []
         all_changes = []
-        for transformed_chapter, changes in results:
+        failed: list[tuple[int, BaseException]] = []
+        for index, result in enumerate(results):
+            if isinstance(result, BaseException):
+                # Keep the source chapter so the book stays whole and the
+                # paragraph counts still line up; QC reports it as untransformed
+                # rather than the reader finding a hole.
+                failed.append((index, result))
+                self.logger.error(
+                    f"Chapter {index + 1} failed to transform ({result}); "
+                    "keeping the original text for it"
+                )
+                transformed_chapters.append(chapters[index])
+                continue
+            transformed_chapter, changes = result
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
+
+        if failed:
+            self.failed_chapters = [index + 1 for index, _ in failed]
+            self.logger.error(
+                f"{len(failed)} of {total} chapters kept their original text: "
+                + ", ".join(str(n) for n in self.failed_chapters)
+            )
 
         return transformed_chapters, all_changes
 
@@ -811,9 +856,16 @@ class TransformService(BaseService):
                         self.logger.debug(f"Original text: {repr(original_text[:100])}")
                         self.logger.debug(f"Transformed text: {repr(transformed_text[:100])}")
 
-                    # Apply name substitutions after LLM transform
-                    if name_map:
-                        transformed_text = self._apply_name_map(transformed_text, name_map)
+                    # Apply name substitutions after LLM transform. The map is
+                    # resolved at this paragraph, so a character who marries
+                    # mid-chapter carries the right title on either side of it.
+                    effective_map = self._name_map_at(
+                        getattr(chapter, "number", None) or chapter_index + 1,
+                        para_idx,
+                        name_map,
+                    )
+                    if effective_map:
+                        transformed_text = self._apply_name_map(transformed_text, effective_map)
 
                     # Apply deterministic term substitutions (safety net for LLM misses).
                     # original_text lets the substitution skip words the LLM already
@@ -1255,6 +1307,10 @@ class TransformService(BaseService):
             "mistress": "master",
             "master": "mistress",
             "madam": "sir",
+            # Austen writes both "madam" and "ma'am"; only the first had a rule,
+            # so five spoken "ma'am"s addressed to characters who are men in
+            # this edition survived into the printed swap.
+            "ma'am": "sir",
             "sir": "madam",
             "maid": "manservant",
             "manservant": "maid",
@@ -1588,6 +1644,24 @@ class TransformService(BaseService):
     # Keyed by transform type value. Used for patterns where re.IGNORECASE
     # would cause false positives (e.g. "Miss" verb vs title).
     _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
+        # "Sir" before a name swaps to "Lady", not to "Madam". The flat map
+        # gives the vocative answer -- right for "Yes, sir" and wrong for
+        # "Sir William Lucas", which the printed edition renders "Madam William
+        # Lucas". The frame guard holds it back from the map; this converts it.
+        "gender_swap": [
+            (
+                re.compile(
+                    r"(?<![A-Za-z])Sir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"
+                ),
+                "Lady ",
+            ),
+            (
+                re.compile(
+                    r"(?<![A-Za-z])Madam (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"
+                ),
+                "Sir ",
+            ),
+        ],
         # "Miss Name" (title form — capital following word). Safe because:
         # - Verb "miss" is always lowercase in flowing prose
         # - Title "Miss" precedes a capital proper name
@@ -1950,8 +2024,13 @@ class TransformService(BaseService):
         words = set()
         for original, replacement in term_map.items():
             for word in (original, replacement):
-                lowered = word.lower().rstrip(".")
-                if lowered.isalpha() and lowered not in cls._PRONOUN_FORMS:
+                lowered = cls._fold_apostrophe(word.lower().rstrip("."))
+                # A single word, apostrophe and all. str.isalpha() is False for
+                # "ma'am", which kept it out of the vocabulary, so the alignment
+                # never treated it as a gendered word and the mask never marked
+                # it a miss -- the rule for it could not fire. Multi-word keys
+                # like "they was" are still excluded, having no single-token form.
+                if cls._WORD_RE.fullmatch(lowered) and lowered not in cls._PRONOUN_FORMS:
                     words.add(lowered)
         result = frozenset(words)
         cls._GENDERED_NOUNS[key] = result
@@ -2093,7 +2172,11 @@ class TransformService(BaseService):
             anchors: list[str] = []
             slots: dict[int, list] = {}
             for match in cls._WORD_RE.finditer(raw):
-                word = cls._CLITIC_RE.sub("", match.group(0)).lower()
+                # Fold the apostrophe as well as stripping the clitic: the
+                # source sets "ma’am" and the output writes "ma'am", and
+                # comparing those as different words makes a plain miss look
+                # like successful model work, which the mask then protects.
+                word = cls._fold_apostrophe(cls._CLITIC_RE.sub("", match.group(0)).lower())
                 if word in vocabulary:
                     span = (match.start(), match.start() + len(word))
                     slots.setdefault(len(anchors), []).append((word, span))
@@ -2141,10 +2224,170 @@ class TransformService(BaseService):
                 mask[start:end] = b"\x01" * (end - start)
         return mask
 
+    # Frames where a word in the map is not the person it usually names. The
+    # swap map is flat and case-insensitive -- nonbinary has thirty sense rules
+    # and this had none -- so "read three pages" became "read three handmaids"
+    # and "Sir William Lucas" became "Madam William Lucas" in the printed book.
+    #
+    # "Sir" before a name must not become "Madam": Lady/Lord swap cleanly before
+    # a name, but "Madam" never precedes one in English, which is how the
+    # printed book got "Madam William Lucas". Held here so the flat map cannot
+    # touch it, then converted to "Lady" by the case-sensitive fixes below.
+    _PROTECTED_FRAMES: dict[str, "re.Pattern"] = {
+        "gender_swap": re.compile(
+            r"(?<![A-Za-z])(?:Sir|Madam)\s+(?=[A-Z])"
+            # a page of a book, not a page in livery. All three uses in Austen
+            # are the reading kind, and the servant sense is vanishingly rare.
+            r"|(?<![A-Za-z])pages?(?![A-Za-z])"
+            # "a host of friends" is a multitude; "count on" is a verb; a rake
+            # is a garden tool. None of the three appears as a person in Austen,
+            # and all three were live in the map.
+            r"|(?<![A-Za-z])host\s+of(?![A-Za-z])"
+            r"|(?<![A-Za-z])counts?\s+(?:on|upon)(?![A-Za-z])"
+            r"|(?<![A-Za-z])(?:a|the|his|her|their)\s+rakes?(?![A-Za-z])",
+            re.IGNORECASE,
+        ),
+    }
+
     @classmethod
-    def protected_spans(cls, text: str) -> list:
+    def protected_spans(cls, text: str, key: str = "") -> list:
         """Character ranges holding a fixed expression, which must not be swapped."""
-        return [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+        spans = [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+        frames = cls._PROTECTED_FRAMES.get(key)
+        if frames:
+            spans += [m.span() for m in frames.finditer(text)]
+        return spans
+
+    # Surnames that are also gendered nouns, compiled per book. A cast is the
+    # only thing that knows "King" in "Miss King" is a family name; without it
+    # the flat map reads it as a monarch and Mary King becomes Mary Queen.
+    _protected_names: Optional["re.Pattern"] = None
+
+    def protect_names(self, names, transform_type) -> None:
+        """Shield cast surnames that collide with this transform's vocabulary.
+
+        Case-sensitive, and only the capitalised form: the surname "King" is
+        protected while the monarch "king" still swaps. In Pride and Prejudice
+        every capitalised "King" in the source is Mary King, so the distinction
+        costs nothing and saves a named character.
+
+        Only colliding names are compiled. Protecting "Darcy" would be a no-op,
+        and a shorter pattern keeps the intent legible.
+        """
+        key = getattr(transform_type, "value", transform_type)
+        vocabulary = self._gendered_vocabulary(key)
+        collisions = sorted(
+            {n for n in names if n and n.lower() in vocabulary},
+            key=len,
+            reverse=True,
+        )
+        self._protected_names = (
+            re.compile(r"(?<![A-Za-z])(?:" + "|".join(re.escape(n) for n in collisions) + r")\b")
+            if collisions
+            else None
+        )
+
+    # Name-map entries that only take effect from a given chapter onward.
+    # Marital status changes mid-book -- Darcy is unmarried for sixty chapters
+    # and married in the sixty-first -- and a single flat map cannot say so.
+    _title_timeline: Optional[dict] = None
+
+    def set_title_timeline(self, timeline) -> None:
+        """Name-map overrides that take effect at a (chapter, paragraph).
+
+        Accepts a sorted list of ``(chapter, paragraph, entries)``. A wedding
+        does not wait for a chapter break, so the marker is the paragraph.
+        """
+        self._title_timeline = (
+            sorted((int(c), int(p), dict(entries)) for c, p, entries in timeline) or None
+            if timeline
+            else None
+        )
+
+    def _name_map_at(self, chapter_number, paragraph_index, name_map):
+        """The name map as it stands at one paragraph of one chapter."""
+        timeline = getattr(self, "_title_timeline", None)
+        if not timeline or chapter_number is None:
+            return name_map
+        here = (chapter_number, paragraph_index if paragraph_index is not None else 10**9)
+        effective = dict(name_map or {})
+        for chapter, paragraph, entries in timeline:
+            if (chapter, paragraph) <= here:
+                effective.update(entries)
+        return effective
+
+    # Every substitution the safety net makes, in order. The change log records
+    # whole-paragraph diffs, so a decision like "pages -> handmaids" was buried
+    # inside a paragraph and nobody could see the net had made it. Keeping the
+    # calls themselves is what makes them auditable, and what tier two reads.
+    _substitution_log: Optional[list] = None
+
+    # Chapters that raised and kept their source text. Read by the caller so a
+    # partial book is reported rather than shipped looking complete.
+    failed_chapters: list = []
+
+    # A word that opens a sentence is capitalised by grammar, not because it is
+    # a name, so it carries no signal.
+    _SENTENCE_END = re.compile(r"(?:^|[.!?][\'\"”’)\]]*\s+|[\"“(\[]\s*)$")
+
+    def start_substitution_log(self) -> None:
+        """Begin recording what the safety net changes. Off unless asked for."""
+        self._substitution_log = []
+
+    def _record_substitution(self, text, start, before, after, where) -> None:
+        log = getattr(self, "_substitution_log", None)
+        if log is None or before == after:
+            return
+        chapter, paragraph = where if where else (None, None)
+        log.append(
+            {
+                "chapter": chapter,
+                "paragraph": paragraph,
+                "before": before,
+                "after": after,
+                "sentence_initial": bool(self._SENTENCE_END.search(text[:start])),
+                "excerpt": re.sub(
+                    r"\s+", " ", text[max(0, start - 45) : start + len(before) + 45]
+                ).strip(),
+            }
+        )
+
+    @staticmethod
+    def suspicious_substitutions(log) -> list:
+        """Substitutions worth a second look, deduped by the pair itself.
+
+        A capitalised word that does not open a sentence is capitalised because
+        it is a name, and a name has no business being swapped: that is how
+        "Mary King" became "Mary Queen" and "Sir William" became "Madam
+        William" in the printed book.
+
+        Deduping is what makes this usable. On Pride and Prejudice the rule
+        flags 1370 substitutions, which collapse to 17 distinct pairs -- a list
+        a person can read in ten seconds, where the wrong ones stand out
+        against the titles that are obviously right.
+        """
+        pairs: dict = {}
+        for entry in log or []:
+            before = entry.get("before", "")
+            if entry.get("sentence_initial") or not before[:1].isupper():
+                continue
+            key = (before, entry.get("after", ""))
+            found = pairs.setdefault(
+                key,
+                {
+                    "before": key[0],
+                    "after": key[1],
+                    "count": 0,
+                    "example": entry.get("excerpt", ""),
+                    "first_seen": (entry.get("chapter"), entry.get("paragraph")),
+                },
+            )
+            found["count"] += 1
+        return sorted(pairs.values(), key=lambda p: -p["count"])
+
+    def _name_spans(self, text: str) -> list:
+        pattern = getattr(self, "_protected_names", None)
+        return [m.span() for m in pattern.finditer(text)] if pattern else []
 
     @staticmethod
     def _in_protected(spans: list, start: int, end: int) -> bool:
@@ -2254,6 +2497,7 @@ class TransformService(BaseService):
         text: str,
         transform_type: "TransformType",
         source_text: Optional[str] = None,
+        where: Optional[tuple] = None,
     ) -> str:
         """Deterministic safety net for gendered terms the LLM left untransformed.
 
@@ -2268,7 +2512,7 @@ class TransformService(BaseService):
             pattern, lookup = self._compile_substitution(tuple(sorted(term_map.items())))
             mask = self._residual_mask(source_text, text, key) if source_text is not None else None
             current = text
-            protected = self.protected_spans(text)
+            protected = self.protected_spans(text, key) + self._name_spans(text)
             unconditional = self._unconditional_terms(key)
 
             def _replace(match: "re.Match") -> str:
@@ -2293,13 +2537,30 @@ class TransformService(BaseService):
                 # a curly-quoted source does not gain a straight one.
                 if "’" in term:
                     replacement = replacement.replace("'", "’")
-                return self._match_case(term, replacement) + (match.group("clitic") or "")
+                result = self._match_case(term, replacement)
+                self._record_substitution(current, start, term, result, where)
+                return result + (match.group("clitic") or "")
 
             text = pattern.sub(_replace, text)
 
         text = self._apply_contextual_pronouns(text, key, source_text)
 
         for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(key, []):
+            # These are substitutions too, and "Sir " -> "Lady " is 47 of them
+            # in one book. An audit trail that omits a whole class of change is
+            # worse than none, because it reads as complete.
+            if getattr(self, "_substitution_log", None) is not None:
+                for match in pattern.finditer(text):
+                    # expand(), not sub(): these patterns end in a lookahead, so
+                    # re-running one against its own match finds nothing and
+                    # silently reports the substitution as a no-op.
+                    self._record_substitution(
+                        text,
+                        match.start(),
+                        match.group(0).strip(),
+                        match.expand(replacement).strip(),
+                        where,
+                    )
             text = pattern.sub(replacement, text)
 
         # Last, so it sees whatever the whole pipeline produced. The title fixes
@@ -2683,7 +2944,7 @@ Each paragraph is preceded by a [[Pn]] marker. Return EXACTLY {batch_size} parag
             examples = """
 Examples of transformations:
 - "He walked to his car" → "She walked to her car"
-- "Mr. Smith entered" → "Ms. Smith entered"
+- "Mr. Smith entered" → "Mrs. Smith entered" (or "Miss Smith" if unmarried)
 - "The father told his son" → "The mother told her daughter"
 - "himself" → "herself"
 """
@@ -2696,7 +2957,11 @@ TRANSFORMATION TYPE: {transform_type.value if hasattr(transform_type, "value") e
 
 RULES:
 1. Swap ALL gendered pronouns (he→she, him→her, his→hers, himself→herself, etc.)
-2. Swap ALL titles (Mr.→Ms., Sir→Madam, Lord→Lady, etc.)
+2. Swap ALL titles (Mr.→Mrs. or Miss, Mrs./Miss→Mr., Sir→Madam, Lord→Lady, etc.)
+   Use the CHARACTER MAPPINGS above for named characters: they carry the
+   correct title for each one, which depends on whether they are married
+   at this point in the book. Never write "Ms." -- it does not exist in a
+   period novel.
 3. Swap ALL gendered terms (man→woman, boy→girl, father→mother, son→daughter, etc.)
 4. Preserve proper names unchanged
 5. Maintain exact punctuation and formatting

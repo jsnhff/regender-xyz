@@ -144,29 +144,29 @@ async def process_book(args):
 
 
 def _calc_output_path(input_path: str, transform_type: str) -> Path:
-    """Calculate output path from input path and transform type."""
+    """Calculate output path from input path and transform type.
+
+    Everything a run produces lands in one folder it owns, with the source it
+    started from copied in beside it. See src/utils/paths.py.
+    """
+    from src.utils.paths import keep_source, run_directory
+
     input_file = Path(input_path)
-    book_name = input_file.stem
-    if book_name.startswith("pg") and "-" in book_name:
-        book_name = book_name.split("-", 1)[1]
-    book_base = book_name.lower().replace("_", "-").replace(" ", "-")
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    book_folder = f"{book_base}-{timestamp}"
 
     if transform_type == "parse_only":
+        # Parsing is not a run: it produces the canonical JSON other runs read.
         if "texts" in str(input_file.parent):
             output_dir = Path(str(input_file.parent).replace("texts", "json"))
         else:
             output_dir = input_file.parent
+        output_dir.mkdir(parents=True, exist_ok=True)
         return output_dir / f"{input_file.stem}.json"
-    elif transform_type == "character_analysis":
-        output_dir = Path("books/output") / book_folder
-        output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_dir = run_directory(input_file, transform_type)
+    keep_source(input_file, output_dir)
+    if transform_type == "character_analysis":
         return output_dir / "characters.json"
-    else:
-        output_dir = Path("books/output") / book_folder
-        output_dir.mkdir(parents=True, exist_ok=True)
-        return output_dir / f"{transform_type}.json"
+    return output_dir / f"{transform_type}.json"
 
 
 async def async_main():
@@ -284,7 +284,15 @@ def _write_decision_sheet(transform_type: str, output_path: Optional[str]) -> No
         return
 
     report = service.scan(book)
+    title = book.get("metadata", {}).get("title", "")
+
+    # Written whether or not anything is open, so the export always carries an
+    # account of what the transform decided and what it could not.
+    note_path = book_path.with_name(book_path.stem + "_TRANSFORM_NOTES.txt")
+    note_path.write_text(report.as_note(title), encoding="utf-8")
+
     if not report.total:
+        print(f"\n  No editorial rulings needed.\n  Notes: {note_path}")
         return
 
     sheet_path = book_path.with_name(book_path.stem + "_decisions.json")
@@ -298,6 +306,7 @@ def _write_decision_sheet(transform_type: str, output_path: Optional[str]) -> No
     for word, number in report.by_word().items():
         print(f"    {number:>5}  {word}")
     print(f"\n  Decision sheet: {sheet_path}")
+    print(f"  Notes for readers: {note_path}")
     print("  Set a ruling on each entry, then:")
     print(f"    python regender_cli.py {book_path} {transform_type} --decisions {sheet_path.name}")
 
