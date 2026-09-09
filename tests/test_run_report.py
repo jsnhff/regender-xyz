@@ -210,3 +210,28 @@ class TestTheTransformationItself:
         tui._show_run_report(RESULT, 62.0)
         for line in plain(tui._lines):
             assert len(line) <= 78, f"too wide: {line!r}"
+
+
+class TestNamingIsCalledOut:
+    """The failure that reads as success: right words, two names for one person."""
+
+    def test_naming_problems_get_their_own_row(self, tui):
+        result = {**RESULT, "quality_control": {**RESULT["quality_control"], "naming_problems": 5}}
+        tui._show_run_report(result, 62.0)
+        assert any("5 character(s)" in line for line in plain(tui._lines))
+
+    def test_the_row_does_not_read_like_a_clean_run(self, tui):
+        result = {**RESULT, "quality_control": {**RESULT["quality_control"], "naming_problems": 5}}
+        tui._show_run_report(result, 62.0)
+        line = next(line for line in tui._lines if "Naming" in line)
+        assert "#ffffff" not in line
+
+    def test_a_clean_run_shows_no_naming_row(self, tui):
+        tui._show_run_report(RESULT, 62.0)
+        assert not any("Naming" in line for line in plain(tui._lines))
+
+    def test_it_still_fits(self, tui):
+        result = {**RESULT, "quality_control": {**RESULT["quality_control"], "naming_problems": 5}}
+        tui._show_run_report(result, 62.0)
+        for line in plain(tui._lines):
+            assert len(line) <= 78, f"too wide: {line!r}"

@@ -235,7 +235,7 @@ class Application:
                 self.logger.error(f"Failed to register service {service_name}: {e}")
 
     def _run_quality_control(
-        self, book, transformation, transform_type, output_path, partial
+        self, book, transformation, transform_type, output_path, partial, name_map=None
     ) -> Optional[dict]:
         """Check the transformed book against its source, and say what it found.
 
@@ -266,7 +266,10 @@ class Application:
                 if isinstance(transform_type, TransformType)
                 else TransformType(transform_type)
             )
-            report = QCService(key).check_book(source, transformed)
+            # Without the map QC cannot see renaming at all: it has no idea
+            # what any character was supposed to be called, so a book naming
+            # its protagonist two different ways scored 99.7% and passed.
+            report = QCService(key, name_map=name_map).check_book(source, transformed)
             summary = report.to_dict()
 
             path = Path(output_path).with_name(Path(output_path).stem + "_qc.json")
@@ -294,7 +297,21 @@ class Application:
             # and then only the coverage fraction survived -- which hides the
             # scale of what a run did behind a percentage.
             chapters = summary.get("chapters", [])
+            # Both kinds say the same thing to a reader -- a character is being
+            # called something the engine never chose -- and they are found two
+            # different ways, so they are counted together.
+            naming = [
+                f
+                for f in summary.get("book_findings", [])
+                if f.get("kind") in ("invented_name", "rename_lost")
+            ]
+            if naming:
+                self.logger.error(
+                    f"{len(naming)} character(s) are called a name the map never chose: "
+                    + "; ".join(f["detail"] for f in naming[:5])
+                )
             return {
+                "naming_problems": len(naming),
                 "structural": structural,
                 "auto_fixable": totals.get("auto_fixable", 0),
                 "needs_review": totals.get("needs_review", 0),
@@ -563,7 +580,12 @@ class Application:
                 # block -- the nonbinary book legitimately produces dozens, and
                 # a gate that cries wolf gets switched off.
                 qc_summary = self._run_quality_control(
-                    book, transformation, transform_type, output_path, partial
+                    book,
+                    transformation,
+                    transform_type,
+                    output_path,
+                    partial,
+                    getattr(transformer, "effective_name_map", None) or name_map,
                 )
 
                 # Export as text file (this could fail, but JSON is already saved)

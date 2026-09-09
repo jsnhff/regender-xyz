@@ -2201,6 +2201,17 @@ class RegenderTUI(App):
                 colour="#e5c07b",
             )
 
+        # Naming gets its own line. It is the failure that reads as success:
+        # every gendered word can be right while the book calls one character
+        # by two different names, and buried in a QC tally nobody sees it.
+        naming = qc.get("naming_problems")
+        if naming:
+            row(
+                "Naming",
+                f"{naming} character(s) called a name the map never chose",
+                colour="#e5c07b",
+            )
+
         if qc:
             note = (
                 f"{qc.get('structural', 0)} structural, "

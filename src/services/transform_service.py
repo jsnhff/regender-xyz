@@ -254,11 +254,10 @@ class TransformService(BaseService):
                 self.logger.info("Analyzing characters...")
                 characters = await self.character_service.process(book)
 
-            # Create transformation context
-            context = self._create_context(characters, transform_type, selected_characters)
-
             # Auto-expand name_map with character aliases so nicknames are caught.
             # Best-effort: depends on the character service detecting aliases consistently.
+            # This runs before the context is built: the prompt has to carry the
+            # finished map, or the model is told about a name it will never see.
             if name_map and characters:
                 expanded = self._expand_name_map_with_aliases(name_map, characters)
                 if len(expanded) > len(name_map):
@@ -266,6 +265,15 @@ class TransformService(BaseService):
                         f"Expanded name_map with {len(expanded) - len(name_map)} character aliases"
                     )
                 name_map = expanded
+            # QC has to judge the run against the map the run used. Handing it
+            # the pre-expansion map leaves it blind to every alias, which is
+            # most of the names that actually appear in prose.
+            self.effective_name_map = dict(name_map or {})
+
+            # Create transformation context
+            context = self._create_context(
+                characters, transform_type, selected_characters, name_map
+            )
 
             # Transform chapters
             self.logger.info(f"Transforming {len(book.chapters)} chapters...")
@@ -315,6 +323,7 @@ class TransformService(BaseService):
         characters: CharacterAnalysis,
         transform_type: TransformType,
         selected_characters: Optional[list[str]] = None,
+        name_map: Optional[dict[str, str]] = None,
     ) -> dict[str, Any]:
         """
         Create transformation context.
@@ -367,6 +376,7 @@ class TransformService(BaseService):
             "rules": rules,
             "characters": characters,
             "character_mappings": character_mappings,
+            "name_map": name_map or {},
             "character_context": character_context,
             "characters_to_transform": characters_to_transform,
             "characters_to_preserve": characters_to_preserve,
@@ -377,11 +387,23 @@ class TransformService(BaseService):
         characters: Optional[CharacterAnalysis],
         transform_type: TransformType,
         character_mappings: dict,
+        name_map: Optional[dict[str, str]] = None,
     ) -> str:
-        """Build character context for LLM transformation."""
+        """Build character context for LLM transformation.
+
+        The new name belongs here. The engine decides each character's name
+        once, before any chapter is transformed, precisely so the whole book
+        agrees -- and then this told the model only the direction of the
+        change, never the name. So the model invented one per batch, and the
+        deterministic map that runs afterwards found nothing left to rename:
+        Elizabeth came out of a five-chapter run as "Elliot" thirty-four times
+        and "Edward Bennet" three times, which is the exact failure the engine
+        exists to prevent.
+        """
         if not characters:
             return ""
 
+        name_map = name_map or {}
         lines = ["\nKNOWN CHARACTERS:"]
 
         # Build compact character list with their transformations
@@ -413,11 +435,15 @@ class TransformService(BaseService):
             else:
                 target = "→transform"
 
-            # Compact format: Name (aliases) [current→target]
+            # Compact format: Name (aliases) [current→target], then the name
+            # the engine already chose. Without that last part the model has to
+            # invent one, and it invents a different one each batch.
             name_str = char.name
             if char.aliases:
                 name_str += f" (aka {', '.join(char.aliases[:3])})"  # Limit to 3 aliases
-            lines.append(f"- {name_str}: {current_gender}{target}")
+            new_name = name_map.get(char.name)
+            renamed = f' — always call them "{new_name}"' if new_name else ""
+            lines.append(f"- {name_str}: {current_gender}{target}{renamed}")
 
         lines.append(
             "\nApply these specific character transformations consistently throughout the text."
@@ -865,7 +891,9 @@ class TransformService(BaseService):
                         name_map,
                     )
                     if effective_map:
-                        transformed_text = self._apply_name_map(transformed_text, effective_map)
+                        transformed_text = self._apply_name_map(
+                            transformed_text, effective_map, source_text=original_text
+                        )
 
                     # Apply deterministic term substitutions (safety net for LLM misses).
                     # original_text lets the substitution skip words the LLM already
@@ -930,24 +958,55 @@ class TransformService(BaseService):
 
         return transformed_chapter, changes
 
-    def _apply_name_map(self, text: str, name_map: dict[str, str]) -> str:
+    @classmethod
+    def _name_vocabulary(cls, name_map: dict[str, str]) -> frozenset:
+        """Every word appearing in a name map, either side."""
+        words = set()
+        for term in list(name_map) + list(name_map.values()):
+            for match in cls._WORD_RE.finditer(term):
+                words.add(cls._fold_apostrophe(match.group(0).lower()))
+        return frozenset(words)
+
+    def _apply_name_map(
+        self, text: str, name_map: dict[str, str], source_text: Optional[str] = None
+    ) -> str:
         """Apply case-aware name substitutions in a single simultaneous pass.
 
         Single-pass matters for two reasons: name maps can contain cycles
         (Elizabeth->Elias, Elias->Elizabeth) that sequential replacement would
         collapse onto one name, and word boundaries stop "Ann" from rewriting
         the inside of "Anne".
+
+        Pass `source_text` wherever it is available. A name map holds exchange
+        pairs -- Mr. Bennet <-> Mrs. Bennet -- so it is not idempotent, exactly
+        like the term map. Without the source there is no way to tell a name
+        the model left alone from one it already renamed correctly, and the
+        second kind gets swapped straight back: the model wrote "Mrs. Philips"
+        for "my uncle Philips" and this turned it into "Mr. Philips", restoring
+        the very gender the swap had just removed.
         """
         if not name_map:
             return text
         pattern, lookup = self._compile_substitution(tuple(sorted(name_map.items())))
-        return pattern.sub(
-            lambda m: (
-                self._match_case(m.group("term"), lookup[m.group("term").lower()])
-                + (m.group("clitic") or "")
-            ),
-            text,
+        mask = (
+            self._residual_mask_for(source_text, text, self._name_vocabulary(name_map))
+            if source_text is not None
+            else None
         )
+
+        def _replace(match: "re.Match") -> str:
+            term = match.group("term")
+            start, end = match.span("term")
+            # Only rewrite a name the model left in its source form. Anything
+            # else here is the model's own rename, and renaming that again is
+            # how one character ends up with two names.
+            if not self._is_residual(mask, text, start, end):
+                return match.group(0)
+            return self._match_case(term, lookup[self._fold_apostrophe(term.lower())]) + (
+                match.group("clitic") or ""
+            )
+
+        return pattern.sub(_replace, text)
 
     _WORD_RE = re.compile(r"[A-Za-z]+(?:['’][A-Za-z]+)*")
 
@@ -2150,7 +2209,12 @@ class TransformService(BaseService):
 
     @classmethod
     def align_gendered_words(cls, source_text: str, text: str, key: str) -> list[tuple]:
-        """Pair each gendered word in `text` with the source word it came from.
+        """Pair each gendered word in `text` with the source word it came from."""
+        return cls.align_vocabulary(source_text, text, cls._gendered_vocabulary(key))
+
+    @classmethod
+    def align_vocabulary(cls, source_text: str, text: str, vocabulary: frozenset) -> list[tuple]:
+        """Pair each word of `vocabulary` in `text` with the source word it came from.
 
         Returns ``(source_word, output_word, output_span, source_span)`` tuples,
         where ``source_word`` and ``source_span`` are None when no confident
@@ -2165,7 +2229,6 @@ class TransformService(BaseService):
         reports both words as unchanged -- and the safety net would undo the very
         swap it exists to complete.
         """
-        vocabulary = cls._gendered_vocabulary(key)
 
         def split(raw: str) -> tuple[list, dict]:
             """Split into anchor words and the gendered words sitting between them."""
@@ -2208,6 +2271,10 @@ class TransformService(BaseService):
 
     @classmethod
     def _residual_mask(cls, source_text: str, text: str, key: str) -> bytearray:
+        return cls._residual_mask_for(source_text, text, cls._gendered_vocabulary(key))
+
+    @classmethod
+    def _residual_mask_for(cls, source_text: str, text: str, vocabulary: frozenset) -> bytearray:
         """Mark the characters of `text` holding gendered words the LLM left alone.
 
         A swap map is not idempotent: applying "mother->father, father->mother"
@@ -2217,8 +2284,8 @@ class TransformService(BaseService):
         genuine misses and safe to substitute.
         """
         mask = bytearray(len(text))
-        for source_word, output_word, (start, end), _source_span in cls.align_gendered_words(
-            source_text, text, key
+        for source_word, output_word, (start, end), _source_span in cls.align_vocabulary(
+            source_text, text, vocabulary
         ):
             if source_word == output_word:
                 mask[start:end] = b"\x01" * (end - start)
@@ -2589,9 +2656,12 @@ class TransformService(BaseService):
         )
         texts = self._parse_batch_response(response, 1)
         transformed_text = texts[0] if texts else para.get_text()
+        source_text = para.get_text()
         if name_map:
-            transformed_text = self._apply_name_map(transformed_text, name_map)
-        return self._apply_term_map(transformed_text, transform_type, source_text=para.get_text())
+            transformed_text = self._apply_name_map(
+                transformed_text, name_map, source_text=source_text
+            )
+        return self._apply_term_map(transformed_text, transform_type, source_text=source_text)
 
     async def _retry_at_sentence_level(
         self,
@@ -2648,16 +2718,89 @@ class TransformService(BaseService):
         If any name for a character is in the map, all other aliases are added automatically.
         e.g. name_map has 'Elizabeth'; character 'Elizabeth Bennet' has aliases ['Lizzy','Eliza']
         → 'Lizzy' and 'Eliza' are added pointing to the same target.
+
+        An alias is matched to the target at its own scale. Sending every alias
+        to the full formal name is how "No, Lizzy, that is what I do not
+        choose" became "No, Edward Bennet, that is what I do not choose" -- a
+        father addressing his child by surname. A one-word alias takes the
+        target's given name; only a multi-word alias takes the whole thing.
         """
         expanded = dict(name_map)
+
+        # Prose calls people by their given name. "Elizabeth" is the commonest
+        # form of her name in the book and was in neither the map nor the alias
+        # list, so the one word that mattered most had no mapping at all --
+        # 35 mentions with nothing deterministic to catch them.
+        #
+        # Only where it is unambiguous: this book holds both Elizabeth's sister
+        # Catherine Bennet and Lady Catherine de Bourgh, and a bare "Catherine"
+        # cannot be assigned to either without guessing.
+        # A title hides a given name without making it unavailable: "Lady
+        # Catherine de Bourgh" is a second claim on "Catherine", so counting
+        # only the untitled names would hand the bare word to Kitty Bennet and
+        # quietly rename every mention of Lady Catherine along with her.
+        given_counts: dict[str, int] = {}
+        for char in characters.characters:
+            claim = self._claimed_given_name(char.name)
+            if claim:
+                given_counts[claim.lower()] = given_counts.get(claim.lower(), 0) + 1
+
         for char in characters.characters:
             all_names = [char.name] + list(char.aliases)
             matched_target = next((name_map[n] for n in all_names if n in name_map), None)
-            if matched_target:
-                for name in all_names:
-                    if name not in expanded:
-                        expanded[name] = matched_target
+            if not matched_target:
+                continue
+            short = self._given_name(matched_target)
+            bare = self._bare_given_name(char.name)
+            if bare and given_counts.get(bare.lower(), 0) == 1:
+                all_names = all_names + [bare]
+            for name in all_names:
+                if name not in expanded:
+                    single = len(self._WORD_RE.findall(name)) == 1
+                    expanded[name] = short if single else matched_target
         return expanded
+
+    @classmethod
+    def _claimed_given_name(cls, full: str) -> Optional[str]:
+        """The given name inside a name, title or no title.
+
+        Used only to decide whether a bare first name is unambiguous, never to
+        rename: "Sir William Lucas" and "William Collins" both answer to
+        "William", so neither may claim it.
+        """
+        words = [w for w in cls._WORD_RE.findall(full) if w.lower() not in cls._HONORIFICS]
+        return words[0] if len(words) > 1 else None
+
+    @classmethod
+    def _bare_given_name(cls, full: str) -> Optional[str]:
+        """The first name of a multi-word name, when there is one to take.
+
+        None for a single word (already bare) and for anything opening with an
+        honorific, where the first word is a title and the rest is a surname.
+        """
+        words = cls._WORD_RE.findall(full)
+        if len(words) < 2 or words[0].lower() in cls._HONORIFICS:
+            return None
+        return words[0]
+
+    # Honorifics sit in front of a name rather than being part of it.
+    _HONORIFICS = frozenset(
+        {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam"}
+    )
+
+    @classmethod
+    def _given_name(cls, full: str) -> str:
+        """The part of a name someone would be called by in conversation.
+
+        "Edward Bennet" -> "Edward"; "Mr. King" -> "Mr. King", because an
+        honorific is not a first name and stripping it leaves a bare surname.
+        """
+        words = cls._WORD_RE.findall(full)
+        if not words:
+            return full
+        if words[0].lower() in cls._HONORIFICS:
+            return full
+        return words[0]
 
     # Paragraph delimiter the model is asked to echo back. Blank lines alone are
     # not a safe protocol: a merged pair, an added preamble, or a paragraph
@@ -2908,7 +3051,7 @@ class TransformService(BaseService):
 
         # Build character-specific transformation instructions
         character_instructions = self._build_character_instructions(
-            characters, transform_type, character_mappings
+            characters, transform_type, character_mappings, context.get("name_map")
         )
 
         plural = "" if batch_size == 1 else "s"
