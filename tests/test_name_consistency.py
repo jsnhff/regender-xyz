@@ -264,3 +264,52 @@ class TestQCDoesNotCryWolf:
             {"chapters": [chapter(1, "Mrs. Bennet spoke to Mr. Bennet.")]},
         )
         assert not [f for f in report.all_findings if f.kind == "residual_name"]
+
+
+class TestAnAliasMustBeAName:
+    """A real cast list offered "her husband" and "Wickham" as aliases.
+
+    Mapping the first to "Mrs. Bennet" would put a name where a relationship
+    belongs; the second to "Miss Wickham" produced "Miss Miss Wickham" twice in
+    one book. Between them they accounted for 23 of 24 review findings.
+    """
+
+    @pytest.mark.parametrize(
+        "alias",
+        ["her husband", "his wife", "the old lady", "her friend", "my aunt", "their father"],
+    )
+    def test_a_relationship_is_not_a_name(self, svc, alias):
+        assert svc._unsafe_alias(alias, "Mrs. Bennet")
+
+    def test_a_proper_noun_inside_one_does_not_rescue_it(self, svc):
+        """'my uncle Philips' is better served by the term map."""
+        assert svc._unsafe_alias("my uncle Philips", "Mrs. Philips")
+
+    def test_a_name_must_not_contain_itself(self, svc):
+        """'Wickham' -> 'Miss Wickham' adds a title, and doubles an existing one."""
+        assert svc._unsafe_alias("Wickham", "Miss Wickham")
+        assert svc._unsafe_alias("Darcy", "Mrs. Darcy")
+
+    @pytest.mark.parametrize(
+        ("alias", "target"),
+        [("Lizzy", "Edmund"), ("Mrs. Collins", "Charles Collins"), ("Kitty", "Charles")],
+    )
+    def test_a_real_name_is_kept(self, svc, alias, target):
+        assert not svc._unsafe_alias(alias, target)
+
+    def test_the_kinship_aliases_never_reach_the_map(self, svc):
+        characters = cast(("Mr. Bennet", Gender.MALE, ["her husband", "their father"]))
+        expanded = svc._expand_name_map_with_aliases({"Mr. Bennet": "Mrs. Bennet"}, characters)
+        assert "her husband" not in expanded
+        assert "their father" not in expanded
+
+
+class TestNoDoubledTitle:
+    def test_a_replacement_never_repeats_the_word_before_it(self, svc):
+        """Belt and braces: even a bad map entry must not reach the page."""
+        out = svc._apply_name_map(
+            "between himself and Miss Wickham was",
+            {"Wickham": "Miss Wickham"},
+            source_text="between herself and Mr. Wickham was",
+        )
+        assert "Miss Miss" not in out

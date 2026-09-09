@@ -95,6 +95,9 @@ class Finding:
     paragraph: int
     detail: str
     excerpt: str = ""
+    # The exact word the finding is about, where there is one. A person
+    # reviewing this needs something to act on, and the detail line is prose.
+    term: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -104,6 +107,7 @@ class Finding:
             "paragraph": self.paragraph,
             "detail": self.detail,
             "excerpt": self.excerpt,
+            "term": self.term,
         }
 
 
@@ -809,6 +813,7 @@ class QCService:
                     position,
                     f"{name!r} was not renamed to {self.name_map[name]!r}",
                     _excerpt(output, match.start()),
+                    term=name,
                 )
             )
 
@@ -832,6 +837,7 @@ class QCService:
                     position,
                     f"{word!r} left untransformed",
                     _excerpt(output, span[0]),
+                    term=word,
                 )
             )
 

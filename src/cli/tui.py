@@ -975,6 +975,11 @@ class RegenderTUI(App):
         super().__init__(**kwargs)
         self._process_callback = process_callback
         self._ran_application = None
+        # What this session has spent, gathered before each application is shut
+        # down. Reading it afterwards returned nothing: shutdown clears the
+        # container, so the completion report asked a closed service and
+        # silently showed no cost at all.
+        self._session_usage = {"tokens_in": 0, "tokens_out": 0, "calls": 0}
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
@@ -983,6 +988,8 @@ class RegenderTUI(App):
         self._pending_characters = None
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
+        self._review_items: list = []
+        self._review_edit_idx = None
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._custom_title: str = ""
@@ -1548,6 +1555,8 @@ class RegenderTUI(App):
             self._handle_retitle_input(value)
         elif self._stage == "name_review":
             self._handle_name_review_input(value)
+        elif self._stage == "qc_review":
+            self._handle_review_input(value)
         elif self._stage == "export":
             self._handle_export_input(value)
         elif self._stage == "done":
@@ -1761,6 +1770,7 @@ class RegenderTUI(App):
             }
             debug_log.info(f"Analysis complete: {result}")
 
+            self._capture_usage(app)
             app.shutdown()
             debug_log.info("App shutdown OK")
 
@@ -2108,6 +2118,25 @@ class RegenderTUI(App):
         self.print("")
         self.set_prompt(">  ")
 
+    def _capture_usage(self, app) -> None:
+        """Add one application's token usage to the session total.
+
+        Called before shutdown, and for every application the run creates --
+        character analysis builds its own, and its tokens are as real as the
+        transform's.
+        """
+        for service in ("transform", "character"):
+            with contextlib.suppress(Exception):
+                provider = app.get_service(service).provider
+                if provider is None or getattr(provider, "_counted", False):
+                    continue
+                # One provider instance is shared by both services; counting it
+                # once per service would double the bill.
+                provider._counted = True
+                self._session_usage["tokens_in"] += getattr(provider, "tokens_in", 0) or 0
+                self._session_usage["tokens_out"] += getattr(provider, "tokens_out", 0) or 0
+                self._session_usage["calls"] += getattr(provider, "calls", 0) or 0
+
     def _actual_cost(self):
         """What the run really spent, from the tokens the API reported.
 
@@ -2116,13 +2145,9 @@ class RegenderTUI(App):
         this is the real number -- and it stays None rather than guessing when
         the model has no price or nothing was recorded.
         """
-        provider = None
-        with contextlib.suppress(Exception):
-            provider = self._ran_application.get_service("transform").provider
-        if provider is None:
-            return None
-        tokens_in = getattr(provider, "tokens_in", 0) or 0
-        tokens_out = getattr(provider, "tokens_out", 0) or 0
+        usage = self._session_usage
+        tokens_in = usage.get("tokens_in", 0)
+        tokens_out = usage.get("tokens_out", 0)
         if not (tokens_in or tokens_out):
             return None
         # An unpriced model still used tokens. Reporting nothing there hides
@@ -2136,7 +2161,7 @@ class RegenderTUI(App):
             "spend": spend,
             "tokens_in": tokens_in,
             "tokens_out": tokens_out,
-            "calls": getattr(provider, "calls", 0) or 0,
+            "calls": usage.get("calls", 0),
         }
 
     def _show_run_report(self, result: dict, elapsed: float) -> None:
@@ -2405,6 +2430,7 @@ class RegenderTUI(App):
                 self._pending_characters,
                 self._selected_transform or "",
             )
+            self._capture_usage(app)
             app.shutdown()
         except Exception:
             suggestions = []
@@ -2415,6 +2441,159 @@ class RegenderTUI(App):
 
         self._name_suggestions = suggestions
         self._show_name_review_menu()
+
+    # ------------------------------------------------------------ QC review
+
+    def _show_review_menu(self) -> None:
+        """Put what QC could not settle in front of the person who can."""
+        self._stage = "qc_review"
+        self._review_edit_idx = None
+        items = self._review_items
+        n = len(items)
+        thing = "call" if n == 1 else "calls"
+
+        self.print("")
+        self.print(f"[#ffffff]?[/] [bold #ffffff]{n} editorial {thing} to make[/]")
+        self.print("")
+        self.print("  [#666666]A gendered word the transform would not guess at.[/]")
+        self.print("  [#666666]Leave it, or say what it should be.[/]")
+        self.print("")
+        for i, item in enumerate(items, 1):
+            decision = item.get("decision")
+            mark = f"[#98c379]{decision}[/]" if decision else f"[#e5c07b]{item.get('term', '')}[/]"
+            self.print(
+                f"  [bold #ffffff]{i}[/]  ch{item.get('chapter')} p{item.get('paragraph')}  {mark}"
+            )
+            excerpt = (item.get("excerpt") or "").strip().replace("\n", " ")
+            if excerpt:
+                self.print(f"     [#666666]{excerpt[:66]}[/]")
+        self.print("")
+        self.print(
+            f"  [#aaaaaa]1-{n}[/] change one   [#aaaaaa]K[/] keep them all   [#aaaaaa]Enter[/] done"
+        )
+        self.print("")
+        self.status_text = "Review?"
+        self.set_prompt(">  ")
+
+    def _handle_review_input(self, value: str) -> None:
+        """Handle a number, a replacement word, or K/Enter on the review menu."""
+        if self._review_edit_idx is not None:
+            index = self._review_edit_idx
+            item = self._review_items[index]
+            replacement = value.strip()
+            self._review_edit_idx = None
+            if replacement:
+                item["decision"] = replacement
+                self._apply_review_decision(item)
+                self.print(
+                    f"[#ffffff]✓[/] {item.get('term')} → {replacement} "
+                    f"[#666666](ch{item.get('chapter')} p{item.get('paragraph')})[/]"
+                )
+            else:
+                item["decision"] = None
+                self.print("[#555555]Left as it is[/]")
+            self.print("")
+            self._show_review_menu()
+            return
+
+        raw = value.strip().lower()
+        if raw in ("", "k", "d"):
+            kept = sum(1 for i in self._review_items if not i.get("decision"))
+            changed = len(self._review_items) - kept
+            if changed:
+                self.print(f"[#ffffff]✓[/] {changed} changed, {kept} left as they are")
+            else:
+                self.print(f"[#555555]All {kept} left as they are[/]")
+            self._write_review_sheet()
+            self.print("")
+            self._show_export_menu()
+            return
+
+        if raw.isdigit() and 1 <= int(raw) <= len(self._review_items):
+            index = int(raw) - 1
+            item = self._review_items[index]
+            self._review_edit_idx = index
+            self.print("")
+            self.print(f"  [#aaaaaa]{(item.get('excerpt') or '').strip()[:70]}[/]")
+            self.print(
+                f"[#aaaaaa]Replace [#ffffff]{item.get('term')}[/] with (blank to leave it):[/]"
+            )
+            self.set_prompt(">  ")
+            return
+
+        self.print("[#555555]Enter a number, K to keep all, or Enter when done[/]")
+        self.set_prompt(">  ")
+
+    def _apply_review_decision(self, item: dict) -> None:
+        """Write one decision into the saved book, JSON and text alike.
+
+        The edit is made where the finding is, not everywhere the word appears:
+        "pages" is wrong in one sentence and right in another, which is the
+        whole reason a person is being asked.
+        """
+        import json as _json
+
+        path = self._json_output_path
+        if not path:
+            return
+        term, replacement = item.get("term"), item.get("decision")
+        chapter_number, position = item.get("chapter"), item.get("paragraph")
+        if not term or not replacement:
+            return
+        try:
+            with open(path, encoding="utf-8") as handle:
+                book = _json.load(handle)
+            pattern = re.compile(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])")
+            for chapter in book.get("chapters", []):
+                if chapter.get("number") != chapter_number:
+                    continue
+                paragraphs = chapter.get("paragraphs", [])
+                if not 0 <= position < len(paragraphs):
+                    continue
+                sentences = paragraphs[position].get("sentences", [])
+                paragraphs[position]["sentences"] = [
+                    pattern.sub(replacement, sentence) for sentence in sentences
+                ]
+            with open(path, "w", encoding="utf-8") as handle:
+                _json.dump(book, handle, indent=2, ensure_ascii=False)
+            self._rewrite_text_export(book)
+        except Exception as error:  # a failed edit must not lose the run
+            self.print(f"[#e06c75]Could not apply that change: {error}[/]")
+
+    def _rewrite_text_export(self, book: dict) -> None:
+        """Keep the .txt beside the JSON in step with an accepted decision."""
+        path = Path(self._json_output_path).with_suffix(".txt")
+        if not path.exists():
+            return
+        lines = [book.get("title", ""), ""]
+        for chapter in book.get("chapters", []):
+            lines.append("")
+            lines.append(f"CHAPTER {chapter.get('number')}")
+            lines.append("")
+            for paragraph in chapter.get("paragraphs", []):
+                lines.append(" ".join(paragraph.get("sentences", [])))
+                lines.append("")
+        path.write_text("\n".join(lines), encoding="utf-8")
+
+    def _write_review_sheet(self) -> None:
+        """Record what was decided, beside the book it was decided about."""
+        import json as _json
+
+        if not self._json_output_path or not self._review_items:
+            return
+        path = Path(self._json_output_path).with_name("review_decisions.json")
+        with contextlib.suppress(Exception):
+            path.write_text(
+                _json.dumps(
+                    {
+                        "decided": [i for i in self._review_items if i.get("decision")],
+                        "kept": [i for i in self._review_items if not i.get("decision")],
+                    },
+                    indent=1,
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
 
     def _show_name_review_menu(self) -> None:
         """Show numbered list of suggested name changes."""
@@ -2654,6 +2833,7 @@ class RegenderTUI(App):
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
+            self._capture_usage(app)
             app.shutdown()
             debug_log.info("App shutdown OK")
             self._show_complete(result)
@@ -2824,6 +3004,19 @@ class RegenderTUI(App):
 
         self._write_decision_sheet()
 
+        # A count of things to review, with no way to review them, leaves the
+        # last fraction of a percent to whoever happens to read the book. These
+        # are the calls a person makes better than any rule: "read three pages"
+        # is a book's pages, and no amount of context tells the safety net that.
+        self._review_items = list((result.get("quality_control") or {}).get("reviewable") or [])
+        if self._review_items:
+            self._show_review_menu()
+            return
+
+        self._show_export_menu()
+
+    def _show_export_menu(self) -> None:
+        """Ask for an export format."""
         # Show export options from FORMATS
         self._stage = "export"
         self._export_format_list = list(FORMATS.keys())

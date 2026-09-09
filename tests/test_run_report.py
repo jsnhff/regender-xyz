@@ -35,7 +35,7 @@ class _App:
 @pytest.fixture
 def tui():
     app = RegenderTUI.__new__(RegenderTUI)
-    app._ran_application = _App(_Provider())
+    app._session_usage = {"tokens_in": 100_000, "tokens_out": 50_000, "calls": 12}
     app._book_stats = {"chapters": 5}
     app._json_output_path = "books/output/book/gender_swap_2026-09-08_21-58/gender_swap.json"
     app._lines = []
@@ -124,12 +124,12 @@ class TestWhenSomethingWentWrong:
 
 class TestCostIsHonest:
     def test_no_cost_line_when_nothing_was_recorded(self, tui):
-        tui._ran_application = _App(_Provider(0, 0, 0))
+        tui._session_usage = {"tokens_in": 0, "tokens_out": 0, "calls": 0}
         tui._show_run_report(RESULT, 62.0)
         assert not any("Cost" in line for line in plain(tui._lines))
 
     def test_no_cost_line_without_a_provider(self, tui):
-        tui._ran_application = None
+        tui._session_usage = {}
         tui._show_run_report(RESULT, 62.0)
         assert not any("Cost" in line for line in plain(tui._lines))
         assert any("Time" in line for line in plain(tui._lines))
@@ -235,3 +235,43 @@ class TestNamingIsCalledOut:
         tui._show_run_report(result, 62.0)
         for line in plain(tui._lines):
             assert len(line) <= 78, f"too wide: {line!r}"
+
+
+class TestUsageSurvivesShutdown:
+    """The report ran after app.shutdown(), which empties the container.
+
+    Reading the provider then raised, the caller suppressed it, and a run that
+    cost real money showed no cost line at all.
+    """
+
+    def make(self):
+        app = RegenderTUI.__new__(RegenderTUI)
+        app._session_usage = {"tokens_in": 0, "tokens_out": 0, "calls": 0}
+        return app
+
+    def test_usage_is_taken_before_the_container_closes(self):
+        app = self.make()
+        app._capture_usage(_App(_Provider(1000, 500, 3)))
+        assert app._session_usage == {"tokens_in": 1000, "tokens_out": 500, "calls": 3}
+
+    def test_a_closed_application_cannot_lose_what_was_captured(self):
+        class Closed:
+            def get_service(self, _name):
+                raise ValueError("Service 'llm_provider' not registered")
+
+        app = self.make()
+        app._capture_usage(_App(_Provider(1000, 500, 3)))
+        app._capture_usage(Closed())
+        assert app._session_usage["tokens_in"] == 1000
+
+    def test_every_application_in_a_run_is_counted(self):
+        """Character analysis builds its own; its tokens are real too."""
+        app = self.make()
+        app._capture_usage(_App(_Provider(100, 50, 1)))
+        app._capture_usage(_App(_Provider(900, 450, 5)))
+        assert app._session_usage == {"tokens_in": 1000, "tokens_out": 500, "calls": 6}
+
+    def test_one_provider_shared_by_two_services_is_billed_once(self):
+        app = self.make()
+        app._capture_usage(_App(_Provider(100, 50, 1)))
+        assert app._session_usage["calls"] == 1
