@@ -317,6 +317,16 @@ class Application:
                 "needs_review": totals.get("needs_review", 0),
                 "gendered_words": sum(c.get("gendered_words", 0) for c in chapters),
                 "transformed_words": sum(c.get("transformed_words", 0) for c in chapters),
+                # The findings a person can actually settle, carried up so the
+                # interface can put them in front of one. Reporting a count and
+                # then offering no way to act on it leaves the last few percent
+                # to whoever happens to read the book.
+                "reviewable": [
+                    f
+                    for c in chapters
+                    for f in c.get("findings", [])
+                    if f.get("severity") == "needs_review" and f.get("term")
+                ],
                 "report": str(path),
                 "blocked": bool(structural),
             }

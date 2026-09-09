@@ -1002,9 +1002,18 @@ class TransformService(BaseService):
             # how one character ends up with two names.
             if not self._is_residual(mask, text, start, end):
                 return match.group(0)
-            return self._match_case(term, lookup[self._fold_apostrophe(term.lower())]) + (
-                match.group("clitic") or ""
-            )
+            replacement = self._match_case(term, lookup[self._fold_apostrophe(term.lower())])
+            # A replacement must not repeat the word already in front of it.
+            # "Wickham" -> "Miss Wickham" applied where the model had already
+            # written "Miss Wickham" produced "Miss Miss Wickham" twice in one
+            # book. The map should not hold such an entry, and if one gets in
+            # it must not reach the page.
+            leading = self._WORD_RE.match(replacement)
+            if leading:
+                before = self._WORD_RE.findall(text[:start])
+                if before and before[-1].lower() == leading.group(0).lower():
+                    return match.group(0)
+            return replacement + (match.group("clitic") or "")
 
         return pattern.sub(_replace, text)
 
@@ -2755,10 +2764,46 @@ class TransformService(BaseService):
             if bare and given_counts.get(bare.lower(), 0) == 1:
                 all_names = all_names + [bare]
             for name in all_names:
-                if name not in expanded:
-                    single = len(self._WORD_RE.findall(name)) == 1
-                    expanded[name] = short if single else matched_target
+                if name in expanded:
+                    continue
+                single = len(self._WORD_RE.findall(name)) == 1
+                target = short if single else matched_target
+                if self._unsafe_alias(name, target):
+                    continue
+                expanded[name] = target
         return expanded
+
+    # A possessive or article opening an alias marks it as a description of a
+    # person rather than a name for one.
+    _RELATIONAL_OPENERS = frozenset({"my", "his", "her", "their", "our", "your", "the", "a", "an"})
+
+    @classmethod
+    def _unsafe_alias(cls, alias: str, target: str) -> bool:
+        """Aliases that must never become renames.
+
+        Two kinds, both found in one real cast list.
+
+        A description is not a name. Character analysis offers "her husband",
+        "his wife", "the old lady", "her friend" as aliases, and mapping those
+        to "Mrs. Bennet" would replace a relationship with a name mid-sentence
+        and wreck the prose. They are the term map's business -- "her husband"
+        becomes "his wife" -- and here they only ever produced false findings.
+        A proper noun inside one changes nothing: "my uncle Philips" is better
+        served by the term map and a protected surname, which gives "my aunt
+        Philips", than by a rename that throws the kinship away.
+
+        A name must not contain itself. "Wickham" -> "Miss Wickham" reads as a
+        rename but is really a title being added, and applying it to text that
+        already says "Miss Wickham" yields "Miss Miss Wickham". The surname is
+        unchanged; only the title moves, and that is the term map's job too.
+        """
+        words = cls._WORD_RE.findall(alias)
+        if not words:
+            return True
+        if words[0].lower() in cls._RELATIONAL_OPENERS:
+            return True
+        target_words = {w.lower() for w in cls._WORD_RE.findall(target)}
+        return len(words) == 1 and words[0].lower() in target_words
 
     @classmethod
     def _claimed_given_name(cls, full: str) -> Optional[str]:
