@@ -197,6 +197,37 @@ class QCService:
             if self.name_map
             else None
         )
+        # The map read one word at a time. "Elizabeth Bennet" -> "Edward Bennet"
+        # says Elizabeth becomes Edward and Bennet stays Bennet, and that is
+        # what makes it possible to see the model calling her something else.
+        # Only same-length pairs line up word for word; the rest are skipped.
+        self._expected_word: dict[str, set] = {}
+        for original, replacement in self.name_map.items():
+            before = TransformService._WORD_RE.findall(original)
+            after = TransformService._WORD_RE.findall(replacement)
+            if len(before) != len(after) or not before:
+                continue
+            # Only proper nouns, and only entries free of honorifics on both
+            # sides. An entry like "Miss Elizabeth" -> "Edward Bennet" has the
+            # same word count and still does not line up word for word: it
+            # pairs Elizabeth with Bennet and teaches this that her name is
+            # supposed to become her surname. Aliases like "her sister" bring
+            # pronouns and kinship nouns in the same way, which is the term
+            # map's territory, not a question of identity.
+            words = [w.lower() for w in before + after]
+            if any(w in TransformService._HONORIFICS for w in words):
+                continue
+            if not all(w[:1].isupper() for w in before + after):
+                continue
+            for source_word, target_word in zip(before, after):
+                self._expected_word.setdefault(source_word.lower(), set()).add(target_word.lower())
+        self._exchange_targets = {
+            name for name in self.name_map if name in set(self.name_map.values())
+        }
+        self._name_words = frozenset(self._expected_word) | {
+            word for words in self._expected_word.values() for word in words
+        }
+
         # Borrowed rather than duplicated: QC must judge the transform against
         # the same vocabulary the transform itself uses, or the two drift apart.
         self._transform = TransformService.__new__(TransformService)
@@ -234,7 +265,113 @@ class QCService:
             zip(source_chapters, output_chapters)
         ):
             report.chapters.append(self.check_chapter(index, source_chapter, output_chapter))
+
+        self._check_invented_names(report, source_chapters, output_chapters)
+        self._check_renames_landed(report, source_chapters, output_chapters)
         return report
+
+    @staticmethod
+    def _word_count(text: str, word: str) -> int:
+        return len(
+            re.findall(rf"(?<![A-Za-z']){re.escape(word)}(?![A-Za-z'])", text, re.IGNORECASE)
+        )
+
+    def _check_renames_landed(self, report: QCReport, source_chapters, output_chapters) -> None:
+        """A character the book stopped calling anything the map recognises.
+
+        _check_invented_names can only see a substitute name that happens to
+        belong to some other character. When the model coins a brand new one it
+        is not in any vocabulary, so nothing aligns to it and the paragraph
+        checks stay silent: Elizabeth became "Elliot" 34 times without a single
+        finding. Counting catches it -- 35 mentions in the source, 3 of the
+        agreed "Edward" in the transform, 2 left as "Elizabeth", and 30 gone
+        somewhere with no name at all.
+
+        A name legitimately gives way to a pronoun sometimes, so this wants a
+        real shortfall rather than any shortfall.
+        """
+        if not self._expected_word:
+            return
+        source_text = "\n".join(
+            _text_of(p) for c in source_chapters for p in c.get("paragraphs", [])
+        )
+        output_text = "\n".join(
+            _text_of(p) for c in output_chapters for p in c.get("paragraphs", [])
+        )
+        for word, targets in sorted(self._expected_word.items()):
+            if word in targets:
+                continue  # a surname that does not change
+            in_source = self._word_count(source_text, word)
+            if in_source < 3:
+                continue
+            landed = max(self._word_count(output_text, target) for target in targets)
+            survived = self._word_count(output_text, word)
+            missing = in_source - (landed + survived)
+            if missing >= 3 and missing >= in_source * 0.3:
+                agreed = "/".join(sorted(targets))
+                report.findings.append(
+                    Finding(
+                        STRUCTURAL,
+                        "rename_lost",
+                        0,
+                        0,
+                        f"{word!r} appears {in_source}x in the source, but the agreed "
+                        f"{agreed!r} appears only {landed}x and {word!r} {survived}x: "
+                        f"{missing} mentions are called something else",
+                    )
+                )
+
+    def _check_invented_names(self, report: QCReport, source_chapters, output_chapters) -> None:
+        """A character called by a name the engine never chose.
+
+        The engine settles each character's new name once, before any chapter
+        is transformed, so that the whole book agrees. When the model renames
+        on its own instead, the deterministic map that runs afterwards finds
+        nothing left to rewrite, and the book ends up with two names for one
+        person -- Elizabeth came out of a five-chapter run as "Elliot" 34 times
+        and "Edward Bennet" 3 times. Coverage was 99.7%: every gendered word
+        was correct, and the protagonist still had two names.
+
+        Reported once per pair rather than once per occurrence, because 34
+        findings that say the same thing bury the other 3.
+        """
+        if not self._expected_word:
+            return
+        counts: dict[tuple, int] = {}
+        where: dict[tuple, tuple] = {}
+        for source_chapter, output_chapter in zip(source_chapters, output_chapters):
+            number = output_chapter.get("number", 0)
+            for position, (source_paragraph, output_paragraph) in enumerate(
+                zip(source_chapter.get("paragraphs", []), output_chapter.get("paragraphs", []))
+            ):
+                source = _text_of(source_paragraph)
+                output = _text_of(output_paragraph)
+                for source_word, output_word, span, _ in TransformService.align_vocabulary(
+                    source, output, self._name_words
+                ):
+                    if source_word is None or source_word not in self._expected_word:
+                        continue
+                    expected = self._expected_word[source_word]
+                    if output_word in expected or output_word == source_word:
+                        continue
+                    pair = (source_word, output_word)
+                    counts[pair] = counts.get(pair, 0) + 1
+                    where.setdefault(pair, (number, position, _excerpt(output, span[0])))
+
+        for (source_word, output_word), count in sorted(counts.items(), key=lambda kv: -kv[1]):
+            number, position, excerpt = where[(source_word, output_word)]
+            agreed = "/".join(sorted(self._expected_word[source_word]))
+            report.findings.append(
+                Finding(
+                    STRUCTURAL,
+                    "invented_name",
+                    number,
+                    position,
+                    f"{source_word!r} became {output_word!r} {count}x, "
+                    f"but the name map says {agreed!r}",
+                    excerpt,
+                )
+            )
 
     def check_chapter(self, index: int, source: dict, transformed: dict) -> ChapterReport:
         """Run every check over one chapter."""
@@ -658,6 +795,12 @@ class QCService:
             return
         for match in self._name_pattern.finditer(output):
             name = match.group(0)
+            # "Mrs. Bennet" in the output of a swap is not a missed rename: it
+            # is what "Mr. Bennet" became. A name that is somebody's target
+            # belongs in the text, and only the paragraph's other checks can
+            # say whether it landed on the right person.
+            if name in self._exchange_targets:
+                continue
             chapter.findings.append(
                 Finding(
                     NEEDS_REVIEW,

@@ -129,6 +129,26 @@ def _is_invented(original: str, target: str) -> bool:
     return any(t == o + s for s in _INVENTED_SUFFIXES)
 
 
+def target_gender(gender: Gender, transform_type: TransformType) -> Optional[Gender]:
+    """What a character of this gender becomes, or None if they are untouched.
+
+    The rule was written into the rename check, where only the engine could
+    read it. It is also the answer to "how many characters did this actually
+    regender", which is the whole point of a run, so it lives on its own now.
+    """
+    if gender not in (Gender.MALE, Gender.FEMALE):
+        return None
+    if transform_type == TransformType.ALL_MALE:
+        return Gender.MALE if gender == Gender.FEMALE else None
+    if transform_type == TransformType.ALL_FEMALE:
+        return Gender.FEMALE if gender == Gender.MALE else None
+    if transform_type == TransformType.NONBINARY:
+        return Gender.NONBINARY
+    if transform_type == TransformType.GENDER_SWAP:
+        return Gender.FEMALE if gender == Gender.MALE else Gender.MALE
+    return None
+
+
 class NameEngine:
     """Builds a deterministic, collision-checked rename map for one book."""
 
@@ -181,13 +201,7 @@ class NameEngine:
     def _needs_rename(self, char, transform_type: TransformType, selected: Optional[set]) -> bool:
         if selected is not None and char.name not in selected:
             return False
-        if char.gender not in (Gender.MALE, Gender.FEMALE):
-            return False
-        if transform_type == TransformType.ALL_MALE:
-            return char.gender == Gender.FEMALE
-        if transform_type == TransformType.ALL_FEMALE:
-            return char.gender == Gender.MALE
-        return transform_type in (TransformType.GENDER_SWAP, TransformType.NONBINARY)
+        return target_gender(char.gender, transform_type) is not None
 
     # -------------------------------------------------------------- proposal
 

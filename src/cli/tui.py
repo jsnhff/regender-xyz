@@ -586,6 +586,15 @@ class HeaderBar(Container):
             yield Label(f"[#aaaaaa]model:[/] [#ffffff]{self._model}[/]", id="model-label")
             yield Label(f"[#aaaaaa]total cost:[/] [#ffffff]{self._cost}[/]")
 
+    def set_actual_cost(self, spend: float) -> None:
+        """Replace the estimate with what the run actually spent.
+
+        The estimate is prefixed "~"; this is not, so the two read differently
+        at a glance and nobody mistakes a guess for a receipt.
+        """
+        self._cost = f"${spend:.2f}"
+        self._refresh()
+
     def update_status(self, book: str = None, transform: str = None, status: str = None) -> None:
         """Update book and transform fields."""
         if book is not None:
@@ -599,7 +608,11 @@ class HeaderBar(Container):
         if stats:
             self._pages = str(stats.get("pages", "—"))
             self._chapters = str(stats.get("chapters", "—"))
-            self._cost = f"${stats.get('estimated_cost', 0):.2f}"
+            # None means the model has no price, not zero. Formatting it
+            # raised, and the caller suppresses that, so an unpriced model
+            # silently stopped the whole row from updating.
+            estimate = stats.get("estimated_cost")
+            self._cost = f"~${estimate:.2f}" if estimate is not None else "—"
             self._model = _format_model_name(stats.get("model", "—"))
 
         if char_count is not None:
@@ -961,6 +974,7 @@ class RegenderTUI(App):
     def __init__(self, process_callback: Callable | None = None, **kwargs):
         super().__init__(**kwargs)
         self._process_callback = process_callback
+        self._ran_application = None
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
@@ -2094,6 +2108,132 @@ class RegenderTUI(App):
         self.print("")
         self.set_prompt(">  ")
 
+    def _actual_cost(self):
+        """What the run really spent, from the tokens the API reported.
+
+        The header could only ever show an estimate made before the run from a
+        token guess. The provider now counts what each call actually used, so
+        this is the real number -- and it stays None rather than guessing when
+        the model has no price or nothing was recorded.
+        """
+        provider = None
+        with contextlib.suppress(Exception):
+            provider = self._ran_application.get_service("transform").provider
+        if provider is None:
+            return None
+        tokens_in = getattr(provider, "tokens_in", 0) or 0
+        tokens_out = getattr(provider, "tokens_out", 0) or 0
+        if not (tokens_in or tokens_out):
+            return None
+        # An unpriced model still used tokens. Reporting nothing there hides
+        # real usage behind a missing price, so spend stays None and the
+        # counts are reported on their own.
+        costs = _lookup_model_cost(_get_resolved_model())
+        spend = (
+            tokens_in / 1_000_000 * costs[0] + tokens_out / 1_000_000 * costs[1] if costs else None
+        )
+        return {
+            "spend": spend,
+            "tokens_in": tokens_in,
+            "tokens_out": tokens_out,
+            "calls": getattr(provider, "calls", 0) or 0,
+        }
+
+    def _show_run_report(self, result: dict, elapsed: float) -> None:
+        """A short account of what the run did, not just that it finished.
+
+        "Complete" and a path is the least a finished run can say. What a
+        reader needs before opening the book is what it cost, whether every
+        chapter made it, what QC found, and how much is waiting on them.
+        """
+
+        def row(label, value, colour="#ffffff"):
+            self.print(f"  [#aaaaaa]{label:<13}[/] [{colour}]{value}[/]")
+
+        self.print("")
+        row("Time", f"{elapsed:.1f}s")
+
+        cost = self._actual_cost()
+        if cost:
+            used = (
+                f"[#666666]{cost['tokens_in']:,} in / {cost['tokens_out']:,} out, "
+                f"{cost['calls']} calls[/]"
+            )
+            if cost["spend"] is None:
+                row("Usage", used)
+            else:
+                row("Cost", f"${cost['spend']:.2f}   {used}")
+                with contextlib.suppress(Exception):
+                    self.query_one(HeaderBar).set_actual_cost(cost["spend"])
+
+        # What the run was for. Everything else here is bookkeeping about a
+        # process; these two lines are the transformation itself.
+        cast = result.get("cast") or {}
+        if cast.get("regendered"):
+            row("Regendered", f"{cast['regendered']} of {cast['total']} characters")
+            for change in cast.get("changes", []):
+                self.print(
+                    f"  {'':<13} [#666666]{change['count']} "
+                    f"{change['from']} \u2192 {change['to']}[/]"
+                )
+
+        qc = result.get("quality_control") or {}
+        changed, gendered = qc.get("transformed_words"), qc.get("gendered_words")
+        if gendered:
+            row(
+                "Gender words",
+                f"{changed:,} of {gendered:,} changed  [#666666]({changed / gendered:.1%})[/]",
+            )
+
+        stats = self._book_stats or {}
+        if stats.get("chapters"):
+            row("Chapters", stats["chapters"])
+        if result.get("changes") is not None:
+            row("Changes", f"{result['changes']:,} paragraphs rewritten")
+
+        # A chapter that failed kept its source text, so the book is whole and
+        # silently partial. That has to be the loudest line here.
+        partial = result.get("untransformed_chapters") or []
+        if partial:
+            row(
+                "Untransformed",
+                f"chapters {', '.join(str(n) for n in partial)} kept their original text",
+                colour="#e5c07b",
+            )
+
+        # Naming gets its own line. It is the failure that reads as success:
+        # every gendered word can be right while the book calls one character
+        # by two different names, and buried in a QC tally nobody sees it.
+        naming = qc.get("naming_problems")
+        if naming:
+            row(
+                "Naming",
+                f"{naming} character(s) called a name the map never chose",
+                colour="#e5c07b",
+            )
+
+        if qc:
+            note = (
+                f"{qc.get('structural', 0)} structural, "
+                f"{qc.get('auto_fixable', 0)} auto-fixable, "
+                f"{qc.get('needs_review', 0)} to review"
+            )
+            row("QC", note, colour="#e5c07b" if qc.get("structural") else "#ffffff")
+
+        flagged = result.get("substitutions_to_review")
+        if flagged:
+            row("To review", f"{flagged} substitution pairs")
+
+        # The path on its own line, relative where possible: the run folder is
+        # long enough to wrap mid-word beside a label.
+        path = Path(self._json_output_path)
+        with contextlib.suppress(ValueError):
+            path = path.relative_to(Path.cwd())
+        self.print("")
+        self.print("  [#aaaaaa]Saved to[/]")
+        self.print(f"    [#ffffff]{path.parent}/[/]")
+        self.print(f"      [#aaaaaa]{path.name}[/]")
+
     def _write_decision_sheet(self) -> None:
         """List whatever the transform could not settle by rule, beside the book.
 
@@ -2493,6 +2633,9 @@ class RegenderTUI(App):
             from src.app import Application
 
             app = Application("src/config.json")
+            # Held so the completion report can read what the run actually
+            # spent, rather than the estimate made before it started.
+            self._ran_application = app
             debug_log.info("Application created OK")
 
             debug_log.info("Calling process_book (await)...")
@@ -2677,8 +2820,7 @@ class RegenderTUI(App):
         self.print(
             f"[#ffffff]✓[/] {gradient_text('Transformation complete!', ['#ffffff', '#aaaaaa'])}"
         )
-        self.print(f"  [#aaaaaa]Time:[/] [#ffffff]{elapsed:.1f}s[/]")
-        self.print(f"  [#aaaaaa]Saved:[/] [#ffffff]{self._json_output_path}[/]")
+        self._show_run_report(result, elapsed)
 
         self._write_decision_sheet()
 
