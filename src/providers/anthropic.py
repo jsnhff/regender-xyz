@@ -11,6 +11,11 @@ from typing import Any
 from src.providers.base_provider import BaseProviderPlugin
 
 
+def _token_count(value) -> int:
+    """A usage figure as an int, or zero for anything that is not one."""
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
 class AnthropicProvider(BaseProviderPlugin):
     """Anthropic provider plugin implementation."""
 
@@ -18,6 +23,13 @@ class AnthropicProvider(BaseProviderPlugin):
     # before giving up and re-raising. Prevents unbounded recursion when
     # the API is persistently overloaded or rate limited.
     MAX_RETRIES = 3
+
+    # What the run has actually spent so far. Class-level defaults so a
+    # provider built without going through initialize() still reads as zero
+    # rather than raising on the first call.
+    tokens_in = 0
+    tokens_out = 0
+    calls = 0
 
     @property
     def provider_name(self) -> str:
@@ -114,6 +126,18 @@ class AnthropicProvider(BaseProviderPlugin):
             response = await asyncio.wait_for(
                 self.client.messages.create(**request_params), timeout=60.0
             )
+
+            # What the call actually cost. The response already carries it and
+            # nothing was reading it, so the only number the interface could
+            # show was an estimate made before the run from a token guess.
+            #
+            # Counting must never be the reason a call fails, so anything that
+            # is not a plain number is ignored rather than added.
+            usage = getattr(response, "usage", None)
+            if usage is not None:
+                self.tokens_in += _token_count(getattr(usage, "input_tokens", 0))
+                self.tokens_out += _token_count(getattr(usage, "output_tokens", 0))
+                self.calls += 1
 
             # Extract the response text
             content = response.content[0].text
