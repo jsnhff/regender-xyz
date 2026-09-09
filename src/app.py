@@ -297,19 +297,19 @@ class Application:
             Character analysis
         """
         # Check for existing character analysis file
+        from src.utils.paths import OUTPUT_ROOT, book_slug
+
         input_path = Path(file_path)
+        slug = book_slug(input_path)
 
-        # Determine book name for output folder
-        book_name = input_path.stem
-        # Remove common prefixes like pg12- or pg43-
-        if book_name.startswith("pg") and "-" in book_name:
-            book_name = book_name.split("-", 1)[1]
-        # Convert to lowercase and replace spaces/underscores with hyphens
-        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
-
-        # Check for most recent character analysis in timestamped folders
-        output_base = Path("books/output")
-        matching_folders = sorted(output_base.glob(f"{book_folder}-*"))
+        # Reuse a cast already worked out for this book. Runs now live one
+        # folder deep under the book, so look inside those as well as at the
+        # older flat "<book>-<timestamp>" folders, or every previous analysis
+        # becomes invisible and gets paid for again.
+        candidates = sorted(OUTPUT_ROOT.glob(f"{slug}-*")) + sorted(
+            (OUTPUT_ROOT / slug).glob("*") if (OUTPUT_ROOT / slug).is_dir() else []
+        )
+        matching_folders = [p for p in candidates if p.is_dir()]
 
         for folder in reversed(matching_folders):  # Check newest first
             char_file = folder / "characters.json"

@@ -1447,35 +1447,30 @@ class RegenderTUI(App):
         if not self._selected_book or not self._selected_transform:
             return
 
+        from src.utils.paths import keep_source, run_directory
+
         input_file = self._selected_book
-        book_name = input_file.stem
-
-        # Remove common prefixes like pg12- or pg43-
-        if book_name.startswith("pg") and "-" in book_name:
-            book_name = book_name.split("-", 1)[1]
-
-        # Convert to lowercase and replace spaces/underscores with hyphens
-        book_folder = book_name.lower().replace("_", "-").replace(" ", "-")
 
         if self._selected_transform == "parse_only":
-            # For parsing: keep in books/json/ with same name
+            # Parsing is not a run: it produces the canonical JSON runs read.
             if "texts" in str(input_file.parent):
                 output_dir = Path(str(input_file.parent).replace("texts", "json"))
             else:
                 output_dir = input_file.parent
+            output_dir.mkdir(parents=True, exist_ok=True)
             self._output_path = output_dir / f"{input_file.stem}.json"
-        elif self._selected_transform == "character_analysis":
-            # For character analysis: save to book's output folder
-            output_dir = Path("books/output") / book_folder
-            output_dir.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
-            self._output_path = output_dir / f"characters_{ts}.json"
+            return
+
+        # One folder per run, with the source copied in beside its output. The
+        # TUI used to share a folder per book while the CLI used its own
+        # scheme, so two runs overwrote each other's name map and neither
+        # folder described the book sitting in it.
+        output_dir = run_directory(input_file, self._selected_transform)
+        keep_source(input_file, output_dir)
+        if self._selected_transform == "character_analysis":
+            self._output_path = output_dir / "characters.json"
         else:
-            # For transformations: save to book's output folder with transformation type + timestamp
-            output_dir = Path("books/output") / book_folder
-            output_dir.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
-            self._output_path = output_dir / f"{self._selected_transform}_{ts}.json"
+            self._output_path = output_dir / f"{self._selected_transform}.json"
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle input."""
