@@ -46,8 +46,22 @@ def tui():
 
 RESULT = {
     "changes": 312,
+    "cast": {
+        "total": 34,
+        "regendered": 28,
+        "changes": [
+            {"from": "male", "to": "female", "count": 16},
+            {"from": "female", "to": "male", "count": 12},
+        ],
+    },
     "untransformed_chapters": [],
-    "quality_control": {"structural": 0, "auto_fixable": 4, "needs_review": 2},
+    "quality_control": {
+        "structural": 0,
+        "auto_fixable": 4,
+        "needs_review": 2,
+        "gendered_words": 4830,
+        "transformed_words": 4812,
+    },
     "substitutions_to_review": 11,
 }
 
@@ -155,3 +169,44 @@ class TestAnUnpricedModel:
         text = " ".join(plain(tui._lines))
         assert "100,000 in" in text and "12 calls" in text
         assert "$" not in text, "no price means no dollar figure"
+
+
+class TestTheTransformationItself:
+    """A run reported paragraphs touched, which is not what it was for."""
+
+    def test_it_says_how_many_characters_were_regendered(self, tui):
+        tui._show_run_report(RESULT, 62.0)
+        assert any("28 of 34 characters" in line for line in plain(tui._lines))
+
+    def test_it_says_in_which_direction(self, tui):
+        tui._show_run_report(RESULT, 62.0)
+        text = " ".join(plain(tui._lines))
+        assert "16 male \u2192 female" in text
+        assert "12 female \u2192 male" in text
+
+    def test_it_says_how_many_gendered_words_changed(self, tui):
+        tui._show_run_report(RESULT, 62.0)
+        assert any("4,812 of 4,830 changed" in line for line in plain(tui._lines))
+
+    def test_the_share_is_shown_beside_the_count_not_instead_of_it(self, tui):
+        """Coverage alone hides the scale of what a run did."""
+        tui._show_run_report(RESULT, 62.0)
+        line = next(line for line in plain(tui._lines) if "4,812" in line)
+        assert "99.6%" in line
+
+    def test_nothing_regendered_prints_no_row(self, tui):
+        """A custom transform changes no genders; an empty row would be noise."""
+        result = {**RESULT, "cast": {"total": 34, "regendered": 0, "changes": []}}
+        tui._show_run_report(result, 62.0)
+        assert not any("Regendered" in line for line in plain(tui._lines))
+
+    def test_a_run_without_qc_word_counts_omits_that_row(self, tui):
+        result = {**RESULT, "quality_control": {"structural": 0}}
+        tui._show_run_report(result, 62.0)
+        assert not any("changed" in line for line in plain(tui._lines))
+        assert any("Regendered" in line for line in plain(tui._lines))
+
+    def test_these_rows_still_fit_eighty_columns(self, tui):
+        tui._show_run_report(RESULT, 62.0)
+        for line in plain(tui._lines):
+            assert len(line) <= 78, f"too wide: {line!r}"

@@ -2166,6 +2166,25 @@ class RegenderTUI(App):
                 with contextlib.suppress(Exception):
                     self.query_one(HeaderBar).set_actual_cost(cost["spend"])
 
+        # What the run was for. Everything else here is bookkeeping about a
+        # process; these two lines are the transformation itself.
+        cast = result.get("cast") or {}
+        if cast.get("regendered"):
+            row("Regendered", f"{cast['regendered']} of {cast['total']} characters")
+            for change in cast.get("changes", []):
+                self.print(
+                    f"  {'':<13} [#666666]{change['count']} "
+                    f"{change['from']} \u2192 {change['to']}[/]"
+                )
+
+        qc = result.get("quality_control") or {}
+        changed, gendered = qc.get("transformed_words"), qc.get("gendered_words")
+        if gendered:
+            row(
+                "Gender words",
+                f"{changed:,} of {gendered:,} changed  [#666666]({changed / gendered:.1%})[/]",
+            )
+
         stats = self._book_stats or {}
         if stats.get("chapters"):
             row("Chapters", stats["chapters"])
@@ -2182,7 +2201,6 @@ class RegenderTUI(App):
                 colour="#e5c07b",
             )
 
-        qc = result.get("quality_control") or {}
         if qc:
             note = (
                 f"{qc.get('structural', 0)} structural, "
