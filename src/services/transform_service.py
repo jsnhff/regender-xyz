@@ -1603,6 +1603,24 @@ class TransformService(BaseService):
     # Keyed by transform type value. Used for patterns where re.IGNORECASE
     # would cause false positives (e.g. "Miss" verb vs title).
     _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
+        # "Sir" before a name swaps to "Lady", not to "Madam". The flat map
+        # gives the vocative answer -- right for "Yes, sir" and wrong for
+        # "Sir William Lucas", which the printed edition renders "Madam William
+        # Lucas". The frame guard holds it back from the map; this converts it.
+        "gender_swap": [
+            (
+                re.compile(
+                    r"(?<![A-Za-z])Sir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"
+                ),
+                "Lady ",
+            ),
+            (
+                re.compile(
+                    r"(?<![A-Za-z])Madam (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"
+                ),
+                "Sir ",
+            ),
+        ],
         # "Miss Name" (title form — capital following word). Safe because:
         # - Verb "miss" is always lowercase in flowing prose
         # - Title "Miss" precedes a capital proper name
@@ -2165,10 +2183,39 @@ class TransformService(BaseService):
                 mask[start:end] = b"\x01" * (end - start)
         return mask
 
+    # Frames where a word in the map is not the person it usually names. The
+    # swap map is flat and case-insensitive -- nonbinary has thirty sense rules
+    # and this had none -- so "read three pages" became "read three handmaids"
+    # and "Sir William Lucas" became "Madam William Lucas" in the printed book.
+    #
+    # "Sir" before a name must not become "Madam": Lady/Lord swap cleanly before
+    # a name, but "Madam" never precedes one in English, which is how the
+    # printed book got "Madam William Lucas". Held here so the flat map cannot
+    # touch it, then converted to "Lady" by the case-sensitive fixes below.
+    _PROTECTED_FRAMES: dict[str, "re.Pattern"] = {
+        "gender_swap": re.compile(
+            r"(?<![A-Za-z])(?:Sir|Madam)\s+(?=[A-Z])"
+            # a page of a book, not a page in livery. All three uses in Austen
+            # are the reading kind, and the servant sense is vanishingly rare.
+            r"|(?<![A-Za-z])pages?(?![A-Za-z])"
+            # "a host of friends" is a multitude; "count on" is a verb; a rake
+            # is a garden tool. None of the three appears as a person in Austen,
+            # and all three were live in the map.
+            r"|(?<![A-Za-z])host\s+of(?![A-Za-z])"
+            r"|(?<![A-Za-z])counts?\s+(?:on|upon)(?![A-Za-z])"
+            r"|(?<![A-Za-z])(?:a|the|his|her|their)\s+rakes?(?![A-Za-z])",
+            re.IGNORECASE,
+        ),
+    }
+
     @classmethod
-    def protected_spans(cls, text: str) -> list:
+    def protected_spans(cls, text: str, key: str = "") -> list:
         """Character ranges holding a fixed expression, which must not be swapped."""
-        return [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+        spans = [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+        frames = cls._PROTECTED_FRAMES.get(key)
+        if frames:
+            spans += [m.span() for m in frames.finditer(text)]
+        return spans
 
     # Surnames that are also gendered nouns, compiled per book. A cast is the
     # only thing that knows "King" in "Miss King" is a family name; without it
@@ -2354,7 +2401,7 @@ class TransformService(BaseService):
             pattern, lookup = self._compile_substitution(tuple(sorted(term_map.items())))
             mask = self._residual_mask(source_text, text, key) if source_text is not None else None
             current = text
-            protected = self.protected_spans(text) + self._name_spans(text)
+            protected = self.protected_spans(text, key) + self._name_spans(text)
             unconditional = self._unconditional_terms(key)
 
             def _replace(match: "re.Match") -> str:
