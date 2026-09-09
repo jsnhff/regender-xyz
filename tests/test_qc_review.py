@@ -46,6 +46,7 @@ FINDING = {
     "paragraph": 0,
     "detail": "'pages' left untransformed",
     "excerpt": "...read three pages, he interrupted",
+    "source_excerpt": "...read three pages, he interrupted",
     "term": "pages",
 }
 
@@ -183,3 +184,41 @@ class TestBadInput:
         tui._handle_review_input("1")
         tui._handle_review_input("leaves")
         assert any("Could not apply" in line for line in plain(tui._lines))
+
+
+class TestTheContextToDecideWith:
+    """Shown alone, a transformed line cannot be judged.
+
+    "talked of Mr. Darcy" is right where the source said "Mrs. Darcy" and
+    wrong where it said "Mr. Darcy". The menu showed only the second line, and
+    the obvious call on it was the wrong one.
+    """
+
+    def test_the_source_line_is_shown(self, tui):
+        tui._review_items = [
+            {
+                **FINDING,
+                "term": "Mr. Darcy",
+                "source_excerpt": "...visited Mrs. Bingley, and talked of Mrs. Darcy",
+                "excerpt": "...visited Mr. Bingley, and talked of Mr. Darcy",
+            }
+        ]
+        tui._show_review_menu()
+        text = " ".join(plain(tui._lines))
+        assert "Mrs. Darcy" in text, "the source line is what makes the call possible"
+        assert "Mr. Darcy" in text
+
+    def test_the_two_lines_are_labelled(self, tui):
+        tui._show_review_menu()
+        text = " ".join(plain(tui._lines))
+        assert "was" in text and "now" in text
+
+    def test_the_prompt_shows_both_lines_too(self, tui):
+        tui._handle_review_input("1")
+        text = " ".join(plain(tui._lines))
+        assert "was" in text and "now" in text
+
+    def test_a_finding_without_a_source_line_still_renders(self, tui):
+        tui._review_items = [{**FINDING, "source_excerpt": ""}]
+        tui._show_review_menu()
+        assert any("pages" in line for line in plain(tui._lines))
