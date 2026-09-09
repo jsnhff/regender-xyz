@@ -207,6 +207,72 @@ class Application:
             except Exception as e:
                 self.logger.error(f"Failed to register service {service_name}: {e}")
 
+    def _run_quality_control(
+        self, book, transformation, transform_type, output_path, partial
+    ) -> Optional[dict]:
+        """Check the transformed book against its source, and say what it found.
+
+        Reports everything, blocks on nothing but structural findings. Those
+        mean the book is broken -- a chapter or paragraph count that no longer
+        matches the source -- rather than merely arguable. needs_review is
+        expected in normal work and must never gate: the nonbinary edition
+        legitimately produces dozens.
+
+        A PASS here means no gendered word survived unchanged, the structure
+        holds, and nothing looks like a repetition loop. It does not mean the
+        transformation is right, and the summary says so.
+        """
+        try:
+            from src.services.qc_service import STRUCTURAL, QCService
+
+            source = book.to_dict() if hasattr(book, "to_dict") else book
+            if not hasattr(transformation, "get_transformed_book"):
+                return None
+            transformed = transformation.get_transformed_book().to_dict()
+
+            # QCService wants the enum; process_book carries the string. Passing
+            # the string raises inside the try below and reports as "QC did not
+            # run", which is exactly the kind of quiet skip this gate exists to
+            # stop happening.
+            key = (
+                transform_type
+                if isinstance(transform_type, TransformType)
+                else TransformType(transform_type)
+            )
+            report = QCService(key).check_book(source, transformed)
+            summary = report.to_dict()
+
+            path = Path(output_path).with_name(Path(output_path).stem + "_qc.json")
+            path.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
+
+            totals = summary.get("totals", {})
+            structural = totals.get(STRUCTURAL, 0)
+            self.logger.info(
+                f"QC: {structural} structural, "
+                f"{totals.get('auto_fixable', 0)} auto-fixable, "
+                f"{totals.get('needs_review', 0)} needing review -> {path.name}"
+            )
+            if structural:
+                self.logger.error(
+                    f"QC found {structural} structural problem(s): the book does not match "
+                    "its source in shape. Do not print this until they are understood."
+                )
+            if partial:
+                self.logger.error(
+                    "QC cannot vouch for chapters that kept their original text: "
+                    + ", ".join(str(n) for n in partial)
+                )
+            return {
+                "structural": structural,
+                "auto_fixable": totals.get("auto_fixable", 0),
+                "needs_review": totals.get("needs_review", 0),
+                "report": str(path),
+                "blocked": bool(structural),
+            }
+        except Exception as error:  # QC must never be the reason a run is lost
+            self.logger.warning(f"Quality control did not run: {error}")
+            return None
+
     def get_service(self, name: str):
         """
         Get a service from the container.
@@ -414,6 +480,17 @@ class Application:
             )
             self.logger.info(f"Applied {len(transformation.changes)} transformations")
 
+            # A chapter that raised kept its source text so the book stays whole
+            # and the counts line up. That is a partial book, and it must not
+            # read as a complete one.
+            qc_summary = None
+            partial = list(getattr(transformer, "failed_chapters", []) or [])
+            if partial:
+                self.logger.error(
+                    f"{len(partial)} chapter(s) kept their original, untransformed text: "
+                    + ", ".join(str(n) for n in partial)
+                )
+
             # What the safety net decided, and which of those decisions want a
             # second look. A capitalised word that does not open a sentence is
             # capitalised because it is a name, and names have no business
@@ -434,13 +511,26 @@ class Application:
                     f"{len(flagged)} distinct pairs to review: {preview}"
                 )
 
-            # Quality control removed - transformations are applied directly
-
             # Save output if requested
             if output_path:
                 # Save JSON transformation immediately
                 await self._save_output(transformation, output_path)
                 self.logger.info(f"Saved transformation JSON to {output_path}")
+
+                # Quality control. It used to be skipped entirely, so the only
+                # QC these books ever had was somebody running the script by
+                # hand -- which is how a book containing "Mary Queen" and "read
+                # three handmaids" was called clean.
+                #
+                # It reports everything and blocks on nothing except structural
+                # findings. Those are unambiguous corruption: a chapter or
+                # paragraph count that no longer matches the source means the
+                # book is broken, not merely arguable. needs_review must never
+                # block -- the nonbinary book legitimately produces dozens, and
+                # a gate that cries wolf gets switched off.
+                qc_summary = self._run_quality_control(
+                    book, transformation, transform_type, output_path, partial
+                )
 
                 # Export as text file (this could fail, but JSON is already saved)
                 output_dir = Path(output_path).parent
@@ -457,6 +547,9 @@ class Application:
                 "characters": len(characters.characters),
                 "changes": len(transformation.changes),
                 "output_path": output_path,
+                "untransformed_chapters": partial,
+                "quality_control": qc_summary,
+                "substitutions_to_review": len(flagged),
             }
 
         except Exception as e:

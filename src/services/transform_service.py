@@ -637,9 +637,23 @@ class TransformService(BaseService):
 
             self.logger.debug(f"Transforming chapter {i + 1}/{total}")
 
-            transformed_chapter, changes = await self._transform_single_chapter(
-                chapter, i, context, name_map=name_map
-            )
+            try:
+                transformed_chapter, changes = await self._transform_single_chapter(
+                    chapter, i, context, name_map=name_map
+                )
+            except Exception as error:
+                # Same bargain as the parallel path: one bad chapter must not
+                # cost the other sixty. Keep the source so the book stays whole
+                # and the paragraph counts line up, and say so loudly.
+                self.logger.error(
+                    f"Chapter {i + 1} failed to transform ({error}); "
+                    "keeping the original text for it"
+                )
+                self.failed_chapters = [*getattr(self, "failed_chapters", []), i + 1]
+                transformed_chapters.append(chapter)
+                if on_chapter_complete:
+                    on_chapter_complete(i + 1, total, chapter.title or f"Chapter {i + 1}")
+                continue
 
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
@@ -685,13 +699,40 @@ class TransformService(BaseService):
             async with semaphore:
                 return await run_chapter(chapter, i)
 
-        results = await asyncio.gather(*[limited_task(ch, i) for i, ch in enumerate(chapters)])
+        # return_exceptions, because the alternative is losing the book. Without
+        # it one chapter raising propagates immediately, the other sixty are
+        # discarded mid-flight, and nothing is written to disk -- two hours of
+        # work and the whole spend gone to a single bad chapter.
+        results = await asyncio.gather(
+            *[limited_task(ch, i) for i, ch in enumerate(chapters)],
+            return_exceptions=True,
+        )
 
         transformed_chapters = []
         all_changes = []
-        for transformed_chapter, changes in results:
+        failed: list[tuple[int, BaseException]] = []
+        for index, result in enumerate(results):
+            if isinstance(result, BaseException):
+                # Keep the source chapter so the book stays whole and the
+                # paragraph counts still line up; QC reports it as untransformed
+                # rather than the reader finding a hole.
+                failed.append((index, result))
+                self.logger.error(
+                    f"Chapter {index + 1} failed to transform ({result}); "
+                    "keeping the original text for it"
+                )
+                transformed_chapters.append(chapters[index])
+                continue
+            transformed_chapter, changes = result
             transformed_chapters.append(transformed_chapter)
             all_changes.extend(changes)
+
+        if failed:
+            self.failed_chapters = [index + 1 for index, _ in failed]
+            self.logger.error(
+                f"{len(failed)} of {total} chapters kept their original text: "
+                + ", ".join(str(n) for n in self.failed_chapters)
+            )
 
         return transformed_chapters, all_changes
 
@@ -2280,6 +2321,10 @@ class TransformService(BaseService):
     # inside a paragraph and nobody could see the net had made it. Keeping the
     # calls themselves is what makes them auditable, and what tier two reads.
     _substitution_log: Optional[list] = None
+
+    # Chapters that raised and kept their source text. Read by the caller so a
+    # partial book is reported rather than shipped looking complete.
+    failed_chapters: list = []
 
     # A word that opens a sentence is capitalised by grammar, not because it is
     # a name, so it carries no signal.
