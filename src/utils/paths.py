@@ -74,3 +74,41 @@ def keep_source(input_path: str | Path, directory: Path) -> Path | None:
     except OSError:
         return None
     return destination
+
+
+def normalize_dropped_path(text: str) -> str:
+    """Turn what a terminal produces when you drop a file into a usable path.
+
+    Dropping a file does not paste the path -- it pastes the path as a shell
+    would need it written, and every terminal does that slightly differently:
+
+        /Users/me/test books/x.txt      typed by hand
+        /Users/me/test\\ books/x.txt     macOS Terminal, iTerm: escaped spaces
+        '/Users/me/test books/x.txt'    quoted when it contains a space
+        "/Users/me/test books/x.txt"    the same, double-quoted
+        file:///Users/me/test%20books/  some apps drop a URL instead
+
+    None of those open with Path() as written, so dropping a file whose folder
+    has a space in its name -- "regender-xyz test books" -- silently did
+    nothing at all.
+
+    Quotes are unwrapped before backslashes are touched: inside quotes a
+    backslash is a literal character, and unescaping there would corrupt a path
+    that genuinely contains one.
+    """
+    from urllib.parse import unquote, urlparse
+
+    text = text.strip()
+    if not text:
+        return text
+
+    if text.startswith("file://"):
+        return unquote(urlparse(text).path)
+
+    for quote in ("'", '"'):
+        if len(text) > 1 and text.startswith(quote) and text.endswith(quote):
+            return text[1:-1]
+
+    # Unquoted: a backslash escapes the character after it, which is how a
+    # terminal writes a space it does not want the shell to split on.
+    return re.sub(r"\\(.)", r"\1", text)

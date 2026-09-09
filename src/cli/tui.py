@@ -1561,13 +1561,18 @@ class RegenderTUI(App):
         elif value.lower() in ("q", "quit"):
             self.exit()
         else:
-            path = Path(value).expanduser()
+            # A dropped file arrives written the way a shell would need it --
+            # escaped spaces, or wrapped in quotes -- so a path with a space in
+            # it never opened, and the prompt invites you to drop one.
+            from src.utils.paths import normalize_dropped_path
+
+            path = Path(normalize_dropped_path(value)).expanduser()
             if path.exists() and path.is_file():
                 self._select_book(path)
             elif path.exists():
                 self.print("[#ffffff]That's a directory[/]")
             else:
-                self.print("[#ffffff]File not found[/]")
+                self.print(f"[#ffffff]File not found:[/] [#aaaaaa]{path}[/]")
 
     def _easter_egg(self) -> None:
         """Regender the regendering tool."""
