@@ -313,3 +313,38 @@ class TestNoDoubledTitle:
             source_text="between herself and Mr. Wickham was",
         )
         assert "Miss Miss" not in out
+
+
+class TestASwappedNameIsNotAMissedOne:
+    """The last chapter says "talked of Mrs. Darcy", meaning Elizabeth.
+
+    A swap turns her into Mr. Darcy -- which is also a map key, so the correct
+    sentence was reported as an un-renamed one. Acting on that would have put
+    the error in.
+    """
+
+    MAP = {"Mr. Darcy": "Mrs. Darcy", "Mr. Bingley": "Miss Bingley"}
+
+    def findings(self, source, output):
+        report = QCService(TransformType.GENDER_SWAP, name_map=self.MAP).check_book(
+            {"chapters": [chapter(1, source)]}, {"chapters": [chapter(1, output)]}
+        )
+        return [f for f in report.all_findings if f.kind == "residual_name"]
+
+    def test_a_name_the_transform_produced_is_not_flagged(self):
+        assert not self.findings(
+            "she visited Mrs. Bingley, and talked of Mrs. Darcy.",
+            "he visited Mr. Bingley, and talked of Mr. Darcy.",
+        )
+
+    def test_a_name_genuinely_left_alone_is_still_flagged(self):
+        found = self.findings("she saw Mr. Darcy there.", "he saw Mr. Darcy there.")
+        assert len(found) == 1
+        assert "Mr. Darcy" in found[0].detail
+
+    def test_another_name_in_the_paragraph_does_not_implicate_it(self):
+        """The old check asked only whether *some* mapped name was in the source."""
+        assert not self.findings(
+            "she wrote to Mr. Bingley about Mrs. Darcy.",
+            "he wrote to Miss Bingley about Mr. Darcy.",
+        )

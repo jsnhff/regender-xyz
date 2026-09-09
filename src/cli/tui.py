@@ -584,7 +584,7 @@ class HeaderBar(Container):
         with Horizontal(id="stats-row2"):
             yield Label(f"[#aaaaaa]transformation:[/] [#ffffff]{self._transform}[/]")
             yield Label(f"[#aaaaaa]model:[/] [#ffffff]{self._model}[/]", id="model-label")
-            yield Label(f"[#aaaaaa]total cost:[/] [#ffffff]{self._cost}[/]")
+            yield Label(f"[#aaaaaa]cost:[/] [#ffffff]{self._cost}[/]")
 
     def set_actual_cost(self, spend: float) -> None:
         """Replace the estimate with what the run actually spent.
@@ -640,9 +640,7 @@ class HeaderBar(Container):
                     Text.from_markup(f"[#aaaaaa]transformation:[/] [#ffffff]{self._transform}[/]")
                 )
                 labels[1].update(Text.from_markup(f"[#aaaaaa]model:[/] [#ffffff]{self._model}[/]"))
-                labels[2].update(
-                    Text.from_markup(f"[#aaaaaa]total cost:[/] [#ffffff]{self._cost}[/]")
-                )
+                labels[2].update(Text.from_markup(f"[#aaaaaa]cost:[/] [#ffffff]{self._cost}[/]"))
         except Exception:
             pass
 
@@ -2456,7 +2454,8 @@ class RegenderTUI(App):
         self.print(f"[#ffffff]?[/] [bold #ffffff]{n} editorial {thing} to make[/]")
         self.print("")
         self.print("  [#666666]A gendered word the transform would not guess at.[/]")
-        self.print("  [#666666]Leave it, or say what it should be.[/]")
+        self.print("  [#666666]Compare the two lines before deciding: a word can be[/]")
+        self.print("  [#666666]right in one sentence and wrong in the next.[/]")
         self.print("")
         for i, item in enumerate(items, 1):
             decision = item.get("decision")
@@ -2464,15 +2463,23 @@ class RegenderTUI(App):
             self.print(
                 f"  [bold #ffffff]{i}[/]  ch{item.get('chapter')} p{item.get('paragraph')}  {mark}"
             )
-            excerpt = (item.get("excerpt") or "").strip().replace("\n", " ")
-            if excerpt:
-                self.print(f"     [#666666]{excerpt[:66]}[/]")
+            # Both lines, source first. The transformed line alone cannot be
+            # judged: "talked of Mr. Darcy" is correct where the source said
+            # "Mrs. Darcy" and wrong where it said "Mr. Darcy", and the two
+            # look identical on the page.
+            before = (item.get("source_excerpt") or "").strip().replace("\n", " ")
+            after = (item.get("excerpt") or "").strip().replace("\n", " ")
+            if before:
+                self.print(f"     [#666666]was  {before[:61]}[/]")
+            if after:
+                self.print(f"     [#aaaaaa]now  {after[:61]}[/]")
         self.print("")
         self.print(
             f"  [#aaaaaa]1-{n}[/] change one   [#aaaaaa]K[/] keep them all   [#aaaaaa]Enter[/] done"
         )
         self.print("")
         self.status_text = "Review?"
+        self._accept_input()
         self.set_prompt(">  ")
 
     def _handle_review_input(self, value: str) -> None:
@@ -2514,7 +2521,10 @@ class RegenderTUI(App):
             item = self._review_items[index]
             self._review_edit_idx = index
             self.print("")
-            self.print(f"  [#aaaaaa]{(item.get('excerpt') or '').strip()[:70]}[/]")
+            source_line = (item.get("source_excerpt") or "").strip()
+            if source_line:
+                self.print(f"  [#666666]was  {source_line[:66]}[/]")
+            self.print(f"  [#aaaaaa]now  {(item.get('excerpt') or '').strip()[:66]}[/]")
             self.print(
                 f"[#aaaaaa]Replace [#ffffff]{item.get('term')}[/] with (blank to leave it):[/]"
             )
@@ -3031,8 +3041,16 @@ class RegenderTUI(App):
         self.print("")
 
         self.status_text = "Export?"
+        self._accept_input()
 
-        # Re-enable input for export selection
+    def _accept_input(self) -> None:
+        """Hand the keyboard back after a run.
+
+        The transform leaves the input bar disabled and spinning. Only the
+        export menu used to turn it back on, so the review menu -- which comes
+        first and asks a question -- put a prompt on screen that could not be
+        typed into.
+        """
         try:
             input_bar = self.query_one(InputBar)
             input_bar.stop_loading_animation()
