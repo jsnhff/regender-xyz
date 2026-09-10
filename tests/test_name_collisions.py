@@ -1,110 +1,98 @@
-"""A rename must never turn one character into another one.
+"""Two characters must not become one person.
 
-Reproduces the Sep-2026 all_female sample. The map carried
-"Mr. Bennet" -> "Mrs. Bennet" while Mrs. Bennet was already the mother, and
-"Mr. Hurst" -> "Mrs. Hurst" while Mrs. Hurst was already Bingley's sister.
-Both were applied by a bare dict update that skipped every check the engine
-runs on its own proposals.
+A woman known only as "Mrs. Bennet" has no given name of her own, so an
+all_male transform can only swap her title -- and lands her on Mr. Bennet, her
+husband. Nine of Pride and Prejudice's cast do this going one way and five
+going the other. Nothing downstream can separate them afterwards.
 
-Downstream the damage did not look like a rename bug at all: the model
-invented "Ms." to keep the collided pairs apart and then spread it
-inconsistently, so Mrs. Long -- female from the start, and never renamed --
-came out as "Ms. Long" eight times out of ten.
+A gender swap never hits it: names are exchanged, not merged. That is why five
+chapters and a full swap edition ran clean without this ever surfacing.
 """
 
-import asyncio
+import pytest
 
 from src.models.character import Character, CharacterAnalysis, Gender
 from src.models.transformation import TransformType
-from src.services.name_engine import NameEngine
+from src.services.character_service import CharacterService
+
+find = CharacterService._name_collisions
 
 
-def _person(name, gender, title):
-    return Character(name=name, gender=gender, pronouns={}, aliases=[name], titles=[title])
-
-
-def bennets():
+def cast(*specs):
     return CharacterAnalysis(
-        book_id="pp",
-        characters=[
-            _person("Mr. Bennet", Gender.MALE, "Mr."),
-            _person("Mrs. Bennet", Gender.FEMALE, "Mrs."),
-            _person("Elizabeth Bennet", Gender.FEMALE, "Miss"),
-        ],
+        book_id="t",
+        characters=[Character(name=n, gender=g, pronouns={}) for n, g in specs],
     )
 
 
-def build(base_map, cast=None):
-    engine = NameEngine(provider=None)
-    return asyncio.run(
-        engine.build_name_map(cast or bennets(), TransformType.ALL_FEMALE, base_map=base_map)
-    )
+BENNETS = cast(("Mr. Bennet", Gender.MALE), ("Mrs. Bennet", Gender.FEMALE))
 
 
-class TestSuppliedMapCollision:
-    def test_the_father_is_not_turned_into_the_mother(self):
-        name_map, report = build({"Mr. Bennet": "Mrs. Bennet"})
-        assert name_map.get("Mr. Bennet") != "Mrs. Bennet"
-
-    def test_the_refusal_is_reported_not_silent(self):
-        """A dropped rename has to be visible, or the book reads fine and is wrong."""
-        _, report = build({"Mr. Bennet": "Mrs. Bennet"})
-        assert any("already" in flag for flag in report["flags"]), report["flags"]
-
-    def test_a_supplied_rename_with_no_collision_still_wins(self):
-        """Supplied entries outrank the engine everywhere except a merge."""
-        name_map, _ = build({"Mr. Bennet": "Ms. Beaumont"})
-        assert name_map["Mr. Bennet"] == "Ms. Beaumont"
-
-    def test_periods_do_not_hide_a_collision(self):
-        """ "Mrs Bennet" and "Mrs. Bennet" are the same person."""
-        name_map, _ = build({"Mr. Bennet": "Mrs Bennet"})
-        assert name_map.get("Mr. Bennet") != "Mrs Bennet"
-
-    def test_the_hurst_case(self):
-        cast = CharacterAnalysis(
-            book_id="pp",
-            characters=[
-                _person("Mr. Hurst", Gender.MALE, "Mr."),
-                _person("Mrs. Hurst", Gender.FEMALE, "Mrs."),
-            ],
-        )
-        name_map, _ = build({"Mr. Hurst": "Mrs. Hurst"}, cast=cast)
-        assert name_map.get("Mr. Hurst") != "Mrs. Hurst"
-
-    def test_renaming_someone_to_their_own_name_is_not_a_collision(self):
-        """A no-op entry must not be reported as merging a character with itself."""
-        _, report = build({"Mrs. Bennet": "Mrs. Bennet"})
-        assert not any("already" in flag for flag in report["flags"]), report["flags"]
+def women(analysis):
+    return [c for c in analysis.characters if c.gender == Gender.FEMALE]
 
 
-class TestSwapIsNotAMerge:
-    """A swap exchanges two names; nobody ends up sharing one.
+def men(analysis):
+    return [c for c in analysis.characters if c.gender == Gender.MALE]
 
-    The first version of this guard refused both halves of
-    "Mr. Bennet" <-> "Mrs. Bennet" and would have silently disabled every
-    family rename in a gender_swap run.
-    """
 
-    def test_an_exchange_is_allowed(self):
-        engine = NameEngine(provider=None)
-        name_map, report = asyncio.run(
-            engine.build_name_map(
-                bennets(),
-                TransformType.GENDER_SWAP,
-                base_map={"Mr. Bennet": "Mrs. Bennet", "Mrs. Bennet": "Mr. Bennet"},
-            )
-        )
-        assert name_map["Mr. Bennet"] == "Mrs. Bennet"
-        assert name_map["Mrs. Bennet"] == "Mr. Bennet"
-        assert report["flags"] == []
+class TestTheMerge:
+    def test_a_married_couple_collides_going_male(self):
+        found = find(BENNETS, women(BENNETS), TransformType.ALL_MALE)
+        assert found["Mrs. Bennet"]["candidate"] == "Mr. Bennet"
+        assert found["Mrs. Bennet"]["clashes_with"] == "Mr. Bennet"
 
-    def test_a_one_way_move_onto_an_occupied_name_is_still_refused(self):
-        """Only one half supplied: the mother is not vacating, so this merges."""
-        name_map, _ = build({"Mr. Bennet": "Mrs. Bennet"})
-        assert name_map.get("Mr. Bennet") != "Mrs. Bennet"
+    def test_and_going_female(self):
+        found = find(BENNETS, men(BENNETS), TransformType.ALL_FEMALE)
+        assert found["Mr. Bennet"]["candidate"] == "Mrs. Bennet"
 
-    def test_a_no_op_entry_does_not_count_as_vacating(self):
-        """ "Mrs. Bennet" keeping its name means the move still merges."""
-        name_map, _ = build({"Mr. Bennet": "Mrs. Bennet", "Mrs. Bennet": "Mrs. Bennet"})
-        assert name_map.get("Mr. Bennet") != "Mrs. Bennet"
+    def test_a_swap_never_collides(self):
+        """Names are exchanged, not merged — which is why this stayed hidden."""
+        assert find(BENNETS, BENNETS.characters, TransformType.GENDER_SWAP) == {}
+
+    def test_two_women_can_collide_with_each_other(self):
+        """Lady Lucas and Miss Lucas both become Mr. Lucas; no man is involved."""
+        analysis = cast(("Lady Lucas", Gender.FEMALE), ("Miss Lucas", Gender.FEMALE))
+        found = find(analysis, women(analysis), TransformType.ALL_MALE)
+        assert set(found) == {"Lady Lucas", "Miss Lucas"}
+        assert found["Lady Lucas"]["candidate"] == "Mr. Lucas"
+        assert found["Lady Lucas"]["clashes_with"] == "Miss Lucas"
+
+
+class TestWhoIsLeftAlone:
+    def test_a_character_with_a_given_name_is_fine(self):
+        """Elizabeth Bennet can be renamed; she is not a title plus a surname."""
+        analysis = cast(("Elizabeth Bennet", Gender.FEMALE), ("Mr. Bennet", Gender.MALE))
+        assert find(analysis, women(analysis), TransformType.ALL_MALE) == {}
+
+    def test_a_lone_title_with_nobody_to_clash_with_is_fine(self):
+        analysis = cast(("Mrs. Annesley", Gender.FEMALE))
+        assert find(analysis, women(analysis), TransformType.ALL_MALE) == {}
+
+    def test_an_unrelated_surname_is_fine(self):
+        analysis = cast(("Mrs. Bennet", Gender.FEMALE), ("Mr. Darcy", Gender.MALE))
+        assert find(analysis, women(analysis), TransformType.ALL_MALE) == {}
+
+    def test_a_three_word_name_is_not_a_bare_title(self):
+        analysis = cast(("Lady Catherine de Bourgh", Gender.FEMALE), ("Mr. Bourgh", Gender.MALE))
+        assert find(analysis, women(analysis), TransformType.ALL_MALE) == {}
+
+
+class TestEdges:
+    def test_an_empty_cast(self):
+        empty = CharacterAnalysis(book_id="t", characters=[])
+        assert find(empty, [], TransformType.ALL_MALE) == {}
+
+    def test_a_transform_with_no_single_target_title(self):
+        """gender_swap has no one destination title, so there is nothing to test."""
+        assert find(BENNETS, BENNETS.characters, TransformType.GENDER_SWAP) == {}
+
+    def test_a_character_never_clashes_with_themselves(self):
+        analysis = cast(("Mr. Bennet", Gender.MALE))
+        assert find(analysis, men(analysis), TransformType.ALL_MALE) == {}
+
+    @pytest.mark.parametrize("title", ["Mrs.", "Miss", "Lady", "Ms.", "Mx."])
+    def test_every_bare_title_is_recognised(self, title):
+        analysis = cast((f"{title} Bennet", Gender.FEMALE), ("Mr. Bennet", Gender.MALE))
+        found = find(analysis, women(analysis), TransformType.ALL_MALE)
+        assert f"{title} Bennet" in found
