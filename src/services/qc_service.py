@@ -234,9 +234,17 @@ class QCService:
         self._exchange_targets = {
             name for name in self.name_map if name in set(self.name_map.values())
         }
-        self._name_words = frozenset(self._expected_word) | {
-            word for words in self._expected_word.values() for word in words
-        }
+        # Honorifics join the alignment vocabulary even though they carry no
+        # expectation of their own. The aligner anchors on words outside the
+        # vocabulary, and a swap changes "Mr." to "Mrs." -- so leaving them as
+        # anchors shifts the whole stream by one and pairs the wrong names.
+        # That is how a correct "Mr. Darcy / Miss Bingley" -> "Mrs. Darcy /
+        # Mr. Bingley" was reported as Darcy becoming Bingley.
+        self._name_words = (
+            frozenset(self._expected_word)
+            | {word for words in self._expected_word.values() for word in words}
+            | TransformService._HONORIFICS
+        )
 
         # Borrowed rather than duplicated: QC must judge the transform against
         # the same vocabulary the transform itself uses, or the two drift apart.
@@ -356,6 +364,24 @@ class QCService:
             ):
                 source = _text_of(source_paragraph)
                 output = _text_of(output_paragraph)
+                # A name is only missing if it is missing. Word alignment is
+                # fragile exactly here -- titles change length under a swap, so
+                # the streams slip by one and pair the wrong names -- and this
+                # check blocks a book from printing. So the alignment only
+                # nominates a suspect; the paragraph decides. If the source
+                # name is still somewhere in the transformed paragraph, nobody
+                # lost their identity and there is nothing to report.
+                # Normalised the way the aligner normalises, or the two do not
+                # agree on what a word is: "Wickham’s" in the source and
+                # "Wickham's" in the output are one word each to the pattern,
+                # so a bare "wickham" is never found and every possessive reads
+                # as a lost name.
+                present = {
+                    TransformService._fold_apostrophe(
+                        TransformService._CLITIC_RE.sub("", w).lower()
+                    )
+                    for w in TransformService._WORD_RE.findall(output)
+                }
                 for source_word, output_word, span, _ in TransformService.align_vocabulary(
                     source, output, self._name_words
                 ):
@@ -363,6 +389,8 @@ class QCService:
                         continue
                     expected = self._expected_word[source_word]
                     if output_word in expected or output_word == source_word:
+                        continue
+                    if source_word in present or expected & present:
                         continue
                     pair = (source_word, output_word)
                     counts[pair] = counts.get(pair, 0) + 1
@@ -831,7 +859,7 @@ class QCService:
                     f"{name!r} was not renamed to {self.name_map[name]!r}",
                     _excerpt(output, match.start()),
                     term=name,
-                    source_excerpt=_excerpt(source, source.find(name)),
+                    source_excerpt=_excerpt(source, _nearest(source, name, match.start())),
                 )
             )
 
@@ -877,6 +905,21 @@ def _text_of(paragraph: Any) -> str:
     if isinstance(paragraph, str):
         return paragraph
     return " ".join(paragraph.get("sentences", []))
+
+
+def _nearest(text: str, needle: str, position: int) -> int:
+    """Where in `text` to look for `needle`, closest to `position`.
+
+    A name often appears more than once in a paragraph. Taking the first
+    occurrence put the source line and the transformed line at different
+    points in the same paragraph, so the two did not describe the same moment
+    and could not be compared -- which is the only reason a person is shown
+    both.
+    """
+    places = [m.start() for m in re.finditer(re.escape(needle), text)]
+    if not places:
+        return 0
+    return min(places, key=lambda start: abs(start - position))
 
 
 def _excerpt(text: str, position: int, width: int = 70) -> str:
