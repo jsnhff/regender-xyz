@@ -348,3 +348,35 @@ class TestASwappedNameIsNotAMissedOne:
             "she wrote to Mr. Bingley about Mrs. Darcy.",
             "he wrote to Miss Bingley about Mr. Darcy.",
         )
+
+
+class TestThePromptCarriesTheNickname:
+    """Naming only the formal target leaves the pet name to the model."""
+
+    def instructions(self, svc, name_map):
+        characters = cast(("Elizabeth Bennet", Gender.FEMALE, ["Lizzy", "Eliza"]))
+        context = svc._create_context(characters, TransformType.GENDER_SWAP, None, name_map)
+        return svc._build_character_instructions(
+            characters, TransformType.GENDER_SWAP, context["character_mappings"], name_map
+        )
+
+    def test_the_pet_name_is_named(self, svc):
+        text = self.instructions(
+            svc, {"Elizabeth Bennet": "Edward Bennet", "Lizzy": "Ned", "Eliza": "Ned"}
+        )
+        assert "Lizzy" in text and "Ned" in text
+
+    def test_the_formal_name_is_still_named(self, svc):
+        text = self.instructions(svc, {"Elizabeth Bennet": "Edward Bennet", "Lizzy": "Ned"})
+        assert "Edward Bennet" in text
+
+    def test_an_alias_that_matches_the_formal_name_is_not_repeated(self, svc):
+        """No point telling the model twice."""
+        text = self.instructions(
+            svc, {"Elizabeth Bennet": "Edward Bennet", "Lizzy": "Edward Bennet"}
+        )
+        assert text.count("Edward Bennet") == 1
+
+    def test_no_nicknames_leaves_the_line_clean(self, svc):
+        text = self.instructions(svc, {"Elizabeth Bennet": "Edward Bennet"})
+        assert "(" not in text.split("always call them")[1]

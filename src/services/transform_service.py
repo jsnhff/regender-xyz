@@ -443,6 +443,17 @@ class TransformService(BaseService):
                 name_str += f" (aka {', '.join(char.aliases[:3])})"  # Limit to 3 aliases
             new_name = name_map.get(char.name)
             renamed = f' — always call them "{new_name}"' if new_name else ""
+            # And say what the pet names become. Naming only the formal target
+            # leaves the model to invent a short form for "Lizzy", which it
+            # does differently each batch -- the same inconsistency, one
+            # register down.
+            nicknames = [
+                f'"{alias}" → "{name_map[alias]}"'
+                for alias in char.aliases
+                if name_map.get(alias) and name_map[alias] != new_name
+            ]
+            if nicknames:
+                renamed += f" ({', '.join(nicknames[:3])})"
             lines.append(f"- {name_str}: {current_gender}{target}{renamed}")
 
         lines.append(
