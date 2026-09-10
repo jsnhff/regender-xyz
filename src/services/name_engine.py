@@ -75,6 +75,19 @@ Rules:
 Required JSON:
 {{"renames": [{{"original": "Elizabeth", "target": "Elijah", "nicknames": {{"Lizzy": "Eli", "Eliza": "Eli"}}}}]}}"""
 
+_NICKNAME_PROMPT = """These characters have already been renamed. For each nickname the book uses, give the matching nickname of the NEW name, at the same level of familiarity. Return ONLY valid JSON.
+
+{cast_lines}
+
+Rules:
+- Real, period-appropriate nicknames only. NEVER invent one.
+- A nickname must be a plausible short form of the new name: Edward→Ned or Eddie, never Edward→Lizzy.
+- Keep the register: a pet name in the source stays a pet name.
+- If the new name has no natural short form, reuse the new name itself.
+
+Required JSON:
+{{"characters": [{{"name": "Edward", "nicknames": {{"Lizzy": "Ned", "Eliza": "Ned"}}}}]}}"""
+
 _VARIANT_STYLE = {
     "all_male": "traditionally male names",
     "all_female": "traditionally female names",
@@ -239,6 +252,46 @@ class NameEngine:
         data = json.loads(cleaned)
         return {r["original"]: r for r in data.get("renames", []) if r.get("original")}
 
+    async def _propose_nicknames(
+        self, requests: list[tuple[str, str, list]]
+    ) -> dict[str, dict[str, str]]:
+        """Nicknames for names somebody else already chose.
+
+        The proposal path asks for these alongside the name and has done for a
+        while, but it only runs when the engine picks the names itself. Names
+        chosen in the interface skipped it, so every pet name in the book fell
+        back to the formal given name: "No, Lizzy, that is what I do not
+        choose" became "No, Edward". Worse, the model was then free to invent
+        its own short form per batch, which is the inconsistency the engine
+        exists to prevent.
+        """
+        cast_lines = "\n".join(
+            f"- {given} is now {target}; nicknames in the book: {', '.join(aliases)}"
+            for given, target, aliases in requests
+        )
+        response = await self.provider.complete(
+            messages=[{"role": "user", "content": _NICKNAME_PROMPT.format(cast_lines=cast_lines)}],
+            temperature=0.0,
+        )
+        cleaned = re.sub(r"^```(?:json)?|```$", "", response.strip(), flags=re.MULTILINE).strip()
+        data = json.loads(cleaned)
+        return {
+            entry["name"]: entry.get("nicknames") or {}
+            for entry in data.get("characters", [])
+            if entry.get("name")
+        }
+
+    @staticmethod
+    def _nickname_aliases(char, given: str) -> list:
+        """Single-word aliases that are a familiar form rather than the name."""
+        return [
+            alias
+            for alias in char.aliases
+            if not _is_title_led(alias)
+            and len(_strip_titles(alias)) == 1
+            and _strip_titles(alias)[0].lower() != given.lower()
+        ]
+
     # -------------------------------------------------------------- validate
 
     def _validate(
@@ -401,7 +454,14 @@ class NameEngine:
             for alias, nick_target in nicknames.items():
                 if alias.lower() in surnames_lower or _is_title_led(alias):
                     continue
-                if _is_plausible_name(nick_target) and not _is_invented(alias, nick_target):
+                # A nickname that comes back unchanged is not a nickname: the
+                # character would keep the pet name of the gender they no
+                # longer have. Fall back to the formal name instead.
+                if (
+                    _is_plausible_name(nick_target)
+                    and not _is_invented(alias, nick_target)
+                    and nick_target.strip().lower() != alias.strip().lower()
+                ):
                     name_map[alias] = nick_target
                 else:
                     name_map[alias] = target
@@ -441,10 +501,33 @@ class NameEngine:
 
         # User-provided entries win over everything the engine generated, and
         # get the same phrase/title expansion when they name a known character.
+        supplied: list[tuple] = []
         for orig, target in base_map.items():
             for info in index.values():
                 if info["given"] and info["given"].lower() == orig.lower():
-                    _emit_for(info, info["given"], target, {})
+                    aliases = self._nickname_aliases(info["char"], info["given"])
+                    if aliases:
+                        supplied.append((info, orig, target, aliases))
+                    break
+
+        # One call for the whole cast, so the answer is decided once. A failure
+        # here must not cost the run: without nicknames every alias falls back
+        # to the formal name, which is what happened before and is merely flat
+        # rather than wrong.
+        nicknames_for: dict[str, dict[str, str]] = {}
+        if supplied and self.provider:
+            try:
+                nicknames_for = await self._propose_nicknames(
+                    [(orig, target, aliases) for _info, orig, target, aliases in supplied]
+                )
+                report["nicknames"] = sum(len(v) for v in nicknames_for.values())
+            except Exception as error:
+                report["flags"].append(f"nickname proposal failed, using formal names: {error}")
+
+        for orig, target in base_map.items():
+            for info in index.values():
+                if info["given"] and info["given"].lower() == orig.lower():
+                    _emit_for(info, info["given"], target, nicknames_for.get(target, {}))
                     break
 
         # Supplied entries outrank the engine's own, but not to the point of
