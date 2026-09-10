@@ -26,7 +26,7 @@ FINDING = {
 def app_with_review():
     app = RegenderTUI(process_callback=None)
     app._review_items = [dict(FINDING)]
-    app._review_edit_idx = None
+    app._review_idx = 0
     app._json_output_path = ""
     return app
 
@@ -52,9 +52,9 @@ class TestTheKeyboardComesBack:
             await pilot.pause()
             assert app._stage == "qc_review"
 
-            app._handle_review_input("1")
+            app._handle_review_input("")
             await pilot.pause()
-            assert app._review_edit_idx == 0, "choosing an item did not take"
+            assert app._review_idx == 1, "answering did not advance the stepper"
 
     async def test_the_export_menu_is_still_usable(self):
         app = app_with_review()

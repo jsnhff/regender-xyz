@@ -987,7 +987,7 @@ class RegenderTUI(App):
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
         self._review_items: list = []
-        self._review_edit_idx = None
+        self._review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._custom_title: str = ""
@@ -2443,96 +2443,97 @@ class RegenderTUI(App):
     # ------------------------------------------------------------ QC review
 
     def _show_review_menu(self) -> None:
-        """Put what QC could not settle in front of the person who can."""
+        """Ask about one finding at a time.
+
+        The whole list used to be printed, with a number to pick. Sixteen
+        findings at three lines each overflow the screen, the list redrew after
+        every decision, and there was nothing to tell you which numbers you had
+        already done. One at a time needs no bookkeeping: answer, and the next
+        one arrives.
+        """
         self._stage = "qc_review"
-        self._review_edit_idx = None
         items = self._review_items
-        n = len(items)
-        thing = "call" if n == 1 else "calls"
+        if self._review_idx >= len(items):
+            self._finish_review()
+            return
+
+        item = items[self._review_idx]
+        position = f"{self._review_idx + 1} of {len(items)}"
+        where = f"ch{item.get('chapter')} p{item.get('paragraph')}"
 
         self.print("")
-        self.print(f"[#ffffff]?[/] [bold #ffffff]{n} editorial {thing} to make[/]")
-        self.print("")
-        self.print("  [#666666]A gendered word the transform would not guess at.[/]")
-        self.print("  [#666666]Compare the two lines before deciding: a word can be[/]")
-        self.print("  [#666666]right in one sentence and wrong in the next.[/]")
-        self.print("")
-        for i, item in enumerate(items, 1):
-            decision = item.get("decision")
-            mark = f"[#98c379]{decision}[/]" if decision else f"[#e5c07b]{item.get('term', '')}[/]"
-            self.print(
-                f"  [bold #ffffff]{i}[/]  ch{item.get('chapter')} p{item.get('paragraph')}  {mark}"
-            )
-            # Both lines, source first. The transformed line alone cannot be
-            # judged: "talked of Mr. Darcy" is correct where the source said
-            # "Mrs. Darcy" and wrong where it said "Mr. Darcy", and the two
-            # look identical on the page.
-            before = (item.get("source_excerpt") or "").strip().replace("\n", " ")
-            after = (item.get("excerpt") or "").strip().replace("\n", " ")
-            if before:
-                self.print(f"     [#666666]was  {before[:61]}[/]")
-            if after:
-                self.print(f"     [#aaaaaa]now  {after[:61]}[/]")
-        self.print("")
         self.print(
-            f"  [#aaaaaa]1-{n}[/] change one   [#aaaaaa]K[/] keep them all   [#aaaaaa]Enter[/] done"
+            f"[#ffffff]?[/] [bold #ffffff]Editorial call {position}[/]   [#666666]{where}[/]"
         )
         self.print("")
-        self.status_text = "Review?"
+        # Source first. The transformed line alone cannot be judged: "talked of
+        # Mr. Darcy" is right where the source said "Mrs. Darcy" and wrong
+        # where it said "Mr. Darcy", and the two look identical on the page.
+        before = (item.get("source_excerpt") or "").strip().replace("\n", " ")
+        after = (item.get("excerpt") or "").strip().replace("\n", " ")
+        if before:
+            self.print(f"  [#666666]was  {before[:66]}[/]")
+        if after:
+            self.print(f"  [#aaaaaa]now  {after[:66]}[/]")
+        self.print("")
+        self.print(f"  [#e5c07b]{item.get('term', '')}[/]")
+        decision = item.get("decision")
+        if decision:
+            self.print(f"  [#98c379]already changed to {decision}[/]")
+        self.print("")
+        self.print("  [#aaaaaa]Enter[/] keep it   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest")
+        self.print("  [#666666]or type what it should say[/]")
+        self.print("")
+        self.status_text = f"Review {position}"
         self._accept_input()
         self.set_prompt(">  ")
 
+    def _finish_review(self) -> None:
+        """Say what was decided, write it down, and move on."""
+        changed = sum(1 for i in self._review_items if i.get("decision"))
+        kept = len(self._review_items) - changed
+        if changed:
+            self.print(f"[#ffffff]✓[/] {changed} changed, {kept} left as they are")
+        else:
+            self.print(f"[#555555]All {kept} left as they are[/]")
+        self._write_review_sheet()
+        self.print("")
+        self._show_export_menu()
+
     def _handle_review_input(self, value: str) -> None:
-        """Handle a number, a replacement word, or K/Enter on the review menu."""
-        if self._review_edit_idx is not None:
-            index = self._review_edit_idx
-            item = self._review_items[index]
-            replacement = value.strip()
-            self._review_edit_idx = None
-            if replacement:
-                item["decision"] = replacement
-                self._apply_review_decision(item)
-                self.print(
-                    f"[#ffffff]✓[/] {item.get('term')} → {replacement} "
-                    f"[#666666](ch{item.get('chapter')} p{item.get('paragraph')})[/]"
-                )
-            else:
-                item["decision"] = None
-                self.print("[#555555]Left as it is[/]")
-            self.print("")
+        """Keep it, go back, keep the rest, or say what it should say."""
+        raw = value.strip()
+        items = self._review_items
+
+        if raw.lower() == "b":
+            self._review_idx = max(0, self._review_idx - 1)
             self._show_review_menu()
             return
 
-        raw = value.strip().lower()
-        if raw in ("", "k", "d"):
-            kept = sum(1 for i in self._review_items if not i.get("decision"))
-            changed = len(self._review_items) - kept
-            if changed:
-                self.print(f"[#ffffff]✓[/] {changed} changed, {kept} left as they are")
-            else:
-                self.print(f"[#555555]All {kept} left as they are[/]")
-            self._write_review_sheet()
-            self.print("")
-            self._show_export_menu()
+        if raw.lower() == "s":
+            remaining = len(items) - self._review_idx
+            if remaining > 0:
+                self.print(f"[#555555]Kept the remaining {remaining}[/]")
+            self._review_idx = len(items)
+            self._finish_review()
             return
 
-        if raw.isdigit() and 1 <= int(raw) <= len(self._review_items):
-            index = int(raw) - 1
-            item = self._review_items[index]
-            self._review_edit_idx = index
-            self.print("")
-            source_line = (item.get("source_excerpt") or "").strip()
-            if source_line:
-                self.print(f"  [#666666]was  {source_line[:66]}[/]")
-            self.print(f"  [#aaaaaa]now  {(item.get('excerpt') or '').strip()[:66]}[/]")
+        item = items[self._review_idx]
+        if raw:
+            item["decision"] = raw
+            self._apply_review_decision(item)
             self.print(
-                f"[#aaaaaa]Replace [#ffffff]{item.get('term')}[/] with (blank to leave it):[/]"
+                f"[#ffffff]✓[/] {item.get('term')} → {raw} "
+                f"[#666666](ch{item.get('chapter')} p{item.get('paragraph')})[/]"
             )
-            self.set_prompt(">  ")
-            return
+        else:
+            # Enter on an item already changed leaves that change in place;
+            # going back and pressing Enter should not silently undo the work.
+            if not item.get("decision"):
+                item["decision"] = None
 
-        self.print("[#555555]Enter a number, K to keep all, or Enter when done[/]")
-        self.set_prompt(">  ")
+        self._review_idx += 1
+        self._show_review_menu()
 
     def _apply_review_decision(self, item: dict) -> None:
         """Write one decision into the saved book, JSON and text alike.
@@ -3019,6 +3020,7 @@ class RegenderTUI(App):
         # are the calls a person makes better than any rule: "read three pages"
         # is a book's pages, and no amount of context tells the safety net that.
         self._review_items = list((result.get("quality_control") or {}).get("reviewable") or [])
+        self._review_idx = 0
         if self._review_items:
             self._show_review_menu()
             return
