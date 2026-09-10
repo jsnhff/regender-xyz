@@ -876,6 +876,7 @@ class TransformService(BaseService):
                 response = await self.provider.complete(
                     messages=messages,
                     temperature=self.config.llm_temperature,
+                    max_tokens=self._reply_budget(batch_paragraphs),
                 )
 
                 # Split response by paragraph markers
@@ -2673,6 +2674,7 @@ class TransformService(BaseService):
         response = await self.provider.complete(
             messages=messages,
             temperature=self.config.llm_temperature,
+            max_tokens=self._reply_budget([para]),
         )
         texts = self._parse_batch_response(response, 1)
         transformed_text = texts[0] if texts else para.get_text()
@@ -2911,7 +2913,9 @@ class TransformService(BaseService):
             from src.utils.config import config as app_config
 
             batch_size = app_config.transform_batch_size
-            return [paragraphs[i : i + batch_size] for i in range(0, len(paragraphs), batch_size)]
+            return self._cap_batches_by_reply(
+                [paragraphs[i : i + batch_size] for i in range(0, len(paragraphs), batch_size)]
+            )
 
         # Get configuration
         from src.utils.config import config as app_config
@@ -2977,7 +2981,54 @@ class TransformService(BaseService):
         if current_batch:
             batches.append(current_batch)
 
-        return batches
+        return self._cap_batches_by_reply(batches)
+
+    # A transform returns roughly what it was given, so the reply is the binding
+    # constraint, not the context window. Batches were sized against the window
+    # -- 120k tokens, whole chapters at a time -- while the reply is capped at
+    # MAX_OUTPUT_TOKENS. Seven of Pride and Prejudice's chapters exceeded it,
+    # and a truncated reply loses its paragraph markers, so the whole chapter
+    # fell back to one call per paragraph, each re-sending the character
+    # instructions. The five golden chapters never hit it and never showed this.
+    MAX_REPLY_TOKENS = 6000
+
+    @classmethod
+    def _cap_batches_by_reply(cls, batches: list[list]) -> list[list]:
+        """Split any batch that would ask for more reply than it can receive.
+
+        A single paragraph over the budget is left whole: splitting it would
+        break the text, and the provider asks for enough room per call.
+        """
+        capped: list[list] = []
+        for batch in batches:
+            current: list = []
+            total = 0
+            for para in batch:
+                size = cls._rough_tokens(para.get_text())
+                if current and total + size > cls.MAX_REPLY_TOKENS:
+                    capped.append(current)
+                    current, total = [], 0
+                current.append(para)
+                total += size
+            if current:
+                capped.append(current)
+        return capped
+
+    @staticmethod
+    def _rough_tokens(text: str) -> int:
+        """Enough precision to keep a reply inside its limit."""
+        return max(1, len(text) // 4)
+
+    # What one call may be asked to write back. Well inside every current
+    # Claude model's limit, and far enough above MAX_REPLY_TOKENS that a
+    # capped batch plus its markers always fits.
+    MAX_OUTPUT_TOKENS = 16000
+
+    @classmethod
+    def _reply_budget(cls, batch_paragraphs: list) -> int:
+        """Room for this batch's reply: what went in, with margin for markers."""
+        incoming = sum(cls._rough_tokens(p.get_text()) for p in batch_paragraphs)
+        return max(1024, min(cls.MAX_OUTPUT_TOKENS, int(incoming * 1.6) + 512))
 
     def _estimate_batch_tokens(self, batch_paragraphs: list, context: dict[str, Any]) -> int:
         """Estimate total tokens for a batch including prompt."""
