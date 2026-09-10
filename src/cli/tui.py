@@ -2629,6 +2629,11 @@ class RegenderTUI(App):
             self.print(
                 f"  [bold #ffffff]{i}[/]  [#ffffff]{orig:<18}[/] [#aaaaaa]→[/]  [#ffffff]{sugg}[/]"
             )
+            # A suggestion that only avoids a merge is not a matter of taste,
+            # and reads as one unless it says so.
+            reason = suggestion.get("reason")
+            if reason:
+                self.print(f"      [#e5c07b]{reason}[/]")
         self.print("")
         self.print(
             f"  [#aaaaaa]A[/] accept all  [#aaaaaa]K[/] keep originals"

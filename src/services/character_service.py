@@ -971,6 +971,52 @@ class CharacterService(BaseService):
             "by_importance": importance_counts,
         }
 
+    # Titles that stand in place of a given name, so a character called only
+    # "Mrs. Bennet" has no name of their own to carry across.
+    _TITLES = frozenset({"mr.", "mrs.", "ms.", "miss", "mx.", "lady", "lord", "sir", "dame"})
+
+    _TITLE_FOR = {
+        "all_male": "Mr.",
+        "all_female": "Mrs.",
+        "nonbinary": "Mx.",
+    }
+
+    @classmethod
+    def _name_collisions(cls, characters, changing, transform_type) -> dict:
+        """Characters whose transformed name is already somebody else's.
+
+        A woman known only as "Mrs. Bennet" has no given name, so an all_male
+        transform can only swap her title -- and lands her on Mr. Bennet, who
+        is her husband. Eight of Pride and Prejudice's cast do this. Nothing
+        downstream can separate them afterwards: one name, two people.
+        """
+        taken = {c.name.lower(): c.name for c in characters.characters}
+        title = cls._TITLE_FOR.get(getattr(transform_type, "value", ""), "")
+        if not title:
+            return {}
+
+        # Where each title-only character would land.
+        landing: dict[str, str] = {}
+        for char in changing:
+            parts = char.name.split()
+            if len(parts) != 2 or parts[0].lower() not in cls._TITLES:
+                continue  # has a given name of their own, or is not titled
+            landing[char.name] = f"{title} {parts[1]}"
+
+        collisions = {}
+        for name, candidate in landing.items():
+            owner = taken.get(candidate.lower())
+            if owner and owner != name:
+                collisions[name] = {"candidate": candidate, "clashes_with": owner}
+                continue
+            # Two characters can also land on each other rather than on someone
+            # already there: Lady Lucas and Miss Lucas both become Mr. Lucas,
+            # and no existing man is involved.
+            others = [n for n, c in landing.items() if c == candidate and n != name]
+            if others:
+                collisions[name] = {"candidate": candidate, "clashes_with": others[0]}
+        return collisions
+
     async def suggest_name_alternatives(
         self,
         characters: CharacterAnalysis,
@@ -981,6 +1027,10 @@ class CharacterService(BaseService):
 
         Returns list of dicts: [{"original": ..., "suggested": ..., "character_id": ...}]
         Only returns characters whose gender actually changes for this transform type.
+
+        A character with no given name of their own is given one wherever the
+        title swap alone would merge them with somebody else, so the interface
+        can offer it and the reader can change it.
         """
         from src.models.transformation import TransformType
 
@@ -1014,11 +1064,20 @@ class CharacterService(BaseService):
         if not chars_needing_changes:
             return []
 
+        collisions = self._name_collisions(characters, chars_needing_changes, transform_type)
+
         # Build character list for prompt
         char_lines = []
         for char in chars_needing_changes:
             gender_val = char.gender.value if hasattr(char.gender, "value") else str(char.gender)
-            char_lines.append(f'  - name: "{char.name}", gender: {gender_val}')
+            note = ""
+            if char.name in collisions:
+                clash = collisions[char.name]
+                note = (
+                    f" — NEEDS A GIVEN NAME: swapping the title alone gives "
+                    f'"{clash["candidate"]}", which is also {clash["clashes_with"]}'
+                )
+            char_lines.append(f'  - name: "{char.name}", gender: {gender_val}{note}')
         char_list_str = "\n".join(char_lines)
 
         style_note = f"\nStyle context: {style_context}" if style_context else ""
@@ -1035,6 +1094,10 @@ Rules:
 - Keep the era/period appropriate (Victorian names stay Victorian, etc.)
 - For titles like "Sir [Name]": use "Dame [Name]" for female equivalents; for "Mr." use "Ms." or "Mrs."
 - Do NOT change family surnames — only given names and honorific titles
+- A character marked NEEDS A GIVEN NAME has none of their own, so swapping the
+  title would merge them with an existing character. Give them a period-appropriate
+  given name and return the full form, e.g. "Mrs. Bennet" -> "Mr. Thomas Bennet".
+  The given name must not already belong to anyone in the book.
 - For nonbinary transforms: use gender-neutral given names where possible
 - Return a JSON array only, no other text:
 [{{"original": "original name here", "suggested": "suggested name here", "character_id": "original name here"}}]
@@ -1066,9 +1129,18 @@ Return ONLY the JSON array."""
                 suggested = str(item.get("suggested", "")).strip()
                 character_id = str(item.get("character_id", original)).strip()
                 if original and suggested and original != suggested:
-                    result.append(
-                        {"original": original, "suggested": suggested, "character_id": character_id}
-                    )
+                    entry = {
+                        "original": original,
+                        "suggested": suggested,
+                        "character_id": character_id,
+                    }
+                    # Say why, for the ones where it matters. Most suggestions
+                    # are a matter of taste; these are the ones that stop two
+                    # characters becoming one person.
+                    clash = collisions.get(original)
+                    if clash:
+                        entry["reason"] = f"otherwise both are {clash['candidate']}"
+                    result.append(entry)
 
             return result
 
