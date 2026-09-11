@@ -220,6 +220,14 @@ class CharacterService(BaseService):
             final_characters = await self._merge_character_groups(character_groups)
             self.logger.info(f"Final character count: {len(final_characters)}")
 
+            # Phase 4: one person, one entry.
+            final_characters, merged = self._merge_same_person(final_characters)
+            if merged:
+                self.logger.info(
+                    f"Merged {len(merged)} duplicate character entries: "
+                    + "; ".join(f"{b} into {a}" for a, b in merged[:8])
+                )
+
             # Create analysis result
             return CharacterAnalysis(
                 book_id=book.hash(),  # Use book hash as ID
@@ -1016,6 +1024,61 @@ class CharacterService(BaseService):
             if others:
                 collisions[name] = {"candidate": candidate, "clashes_with": others[0]}
         return collisions
+
+    @staticmethod
+    def _merge_same_person(characters: list) -> tuple:
+        """Fold entries that are the same person into one.
+
+        The extraction lists a person once by name and again by title, and a
+        third time under a married surname: "Lydia Bennet", "Lydia Wickham" and
+        "Mrs. Wickham" are one woman. Each entry is then renamed on its own, so
+        she came out of an all_male run as Lionel 182 times and Lyle once. The
+        naming can only be consistent if the cast is.
+
+        Only entries that name each other are merged. Guessing from a shared
+        surname would fold a mother into her daughter.
+        """
+        by_name = {c.name: c for c in characters}
+        parent: dict[str, str] = {}
+
+        def root(name: str) -> str:
+            while parent.get(name, name) != name:
+                name = parent[name]
+            return name
+
+        for char in characters:
+            for alias in getattr(char, "aliases", []) or []:
+                other = by_name.get(alias)
+                if other is None or other.name == char.name:
+                    continue
+                if other.gender != char.gender:
+                    continue  # a different person who happens to be named here
+                a, b = root(char.name), root(other.name)
+                if a != b:
+                    # The entry carrying more aliases is the better-known form
+                    # and makes the better canonical name; ties go alphabetical
+                    # so a run is reproducible.
+                    keep, fold = sorted((a, b), key=lambda n: (-len(by_name[n].aliases or []), n))
+                    parent[fold] = keep
+
+        if not parent:
+            return characters, []
+
+        merged = []
+        out = []
+        for char in characters:
+            target = root(char.name)
+            if target == char.name:
+                out.append(char)
+                continue
+            merged.append((target, char.name))
+            canonical = by_name[target]
+            names = list(canonical.aliases or [])
+            for extra in [char.name, *(char.aliases or [])]:
+                if extra != canonical.name and extra not in names:
+                    names.append(extra)
+            canonical.aliases = names
+        return out, merged
 
     async def suggest_name_alternatives(
         self,

@@ -2779,8 +2779,18 @@ class TransformService(BaseService):
             for name in all_names:
                 if name in expanded:
                     continue
-                single = len(self._WORD_RE.findall(name)) == 1
-                target = short if single else matched_target
+                words = self._WORD_RE.findall(name)
+                if len(words) == 1:
+                    target = short
+                elif words[0].lower() == (self._bare_given_name(char.name) or "").lower():
+                    # The given name changes; the surname the text uses stays.
+                    # Lydia is Lydia Bennet before her marriage and Lydia
+                    # Wickham after, and one entry now covers both -- so
+                    # handing the whole target over would rename her to
+                    # "Lyle Wickham" in scenes set years before the wedding.
+                    target = " ".join([short, *name.split()[1:]])
+                else:
+                    target = matched_target
                 if self._unsafe_alias(name, target):
                     continue
                 expanded[name] = target
