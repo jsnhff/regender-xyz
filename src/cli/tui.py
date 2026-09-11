@@ -2477,11 +2477,18 @@ class RegenderTUI(App):
             self.print(f"  [#aaaaaa]now  {after[:66]}[/]")
         self.print("")
         self.print(f"  [#e5c07b]{item.get('term', '')}[/]")
+        suggestion = item.get("suggestion")
+        if suggestion:
+            self.print(f"  [#98c379]suggested  {suggestion}[/]")
         decision = item.get("decision")
         if decision:
             self.print(f"  [#98c379]already changed to {decision}[/]")
         self.print("")
-        self.print("  [#aaaaaa]Enter[/] keep it   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest")
+        keys = "  [#aaaaaa]Enter[/] keep it"
+        if suggestion:
+            keys += f'   [#aaaaaa]a[/] accept "{suggestion}"'
+        keys += "   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest"
+        self.print(keys)
         self.print("  [#666666]or type what it should say[/]")
         self.print("")
         self.status_text = f"Review {position}"
@@ -2505,6 +2512,19 @@ class RegenderTUI(App):
         raw = value.strip()
         items = self._review_items
 
+        # Accepting the suggested wording. Twenty-eight of thirty-one findings
+        # on a real book had one, and typing each out by hand is both slower
+        # and a chance to mistype.
+        item = items[self._review_idx]
+        if raw.lower() == "a":
+            # A bare "a" is always the accept key, never replacement text.
+            # Taking it as text turned "his uncle and uncle" into "a".
+            if not item.get("suggestion"):
+                self.print("[#555555]Nothing suggested here — Enter keeps it as it is[/]")
+                self.set_prompt(">  ")
+                return
+            raw = item["suggestion"]
+
         if raw.lower() == "b":
             self._review_idx = max(0, self._review_idx - 1)
             self._show_review_menu()
@@ -2518,7 +2538,6 @@ class RegenderTUI(App):
             self._finish_review()
             return
 
-        item = items[self._review_idx]
         if raw:
             item["decision"] = raw
             self._apply_review_decision(item)
@@ -2562,14 +2581,53 @@ class RegenderTUI(App):
                 if not 0 <= position < len(paragraphs):
                     continue
                 sentences = paragraphs[position].get("sentences", [])
-                paragraphs[position]["sentences"] = [
-                    pattern.sub(replacement, sentence) for sentence in sentences
-                ]
+                paragraphs[position]["sentences"] = self._replace_once(
+                    sentences, pattern, replacement, item.get("offset", -1)
+                )
             with open(path, "w", encoding="utf-8") as handle:
                 _json.dump(book, handle, indent=2, ensure_ascii=False)
             self._rewrite_text_export(book)
         except Exception as error:  # a failed edit must not lose the run
             self.print(f"[#e06c75]Could not apply that change: {error}[/]")
+
+    @staticmethod
+    def _replace_once(sentences: list, pattern, replacement: str, offset: int) -> list:
+        """Change the occurrence that was reported, and leave the rest alone.
+
+        Chapter 61 says "his aunt" of Lady Catherine and, much later in the
+        same paragraph, "her uncle and aunt" of the Gardiners. Both arrive as
+        "his uncle". Correcting the second to "his uncles" rewrote the first as
+        well, and turned one aunt into two uncles.
+
+        Without an offset -- an older finding, or one that never had a position
+        -- every occurrence is changed, which is what it always did.
+        """
+        if offset < 0:
+            return [pattern.sub(replacement, sentence) for sentence in sentences]
+
+        out = list(sentences)
+        cursor = 0
+        for index, sentence in enumerate(sentences):
+            # Sentences are joined with one space to make the text QC measured,
+            # so the running total has to allow for the space.
+            end = cursor + len(sentence)
+            if cursor <= offset <= end:
+                local = offset - cursor
+                best = min(
+                    pattern.finditer(sentence),
+                    key=lambda m: abs(m.start() - local),
+                    default=None,
+                )
+                if best:
+                    out[index] = sentence[: best.start()] + replacement + sentence[best.end() :]
+                return out
+            cursor = end + 1
+
+        for index, sentence in enumerate(sentences):
+            if pattern.search(sentence):
+                out[index] = pattern.sub(replacement, sentence, count=1)
+                return out
+        return out
 
     def _rewrite_text_export(self, book: dict) -> None:
         """Keep the .txt beside the JSON in step with an accepted decision."""

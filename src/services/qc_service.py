@@ -103,6 +103,13 @@ class Finding:
     # chapter's "Mr. Darcy" is right because the source said "Mrs. Darcy", and
     # shown alone it looks exactly like a miss.
     source_excerpt: str = ""
+    # Where in the transformed paragraph this is, so a correction lands on
+    # the occurrence that was reported rather than every one that looks
+    # like it.
+    offset: int = -1
+    # What to put there, where the answer is known. A person accepting a
+    # suggestion is faster and less error-prone than one retyping it.
+    suggestion: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -114,6 +121,8 @@ class Finding:
             "excerpt": self.excerpt,
             "term": self.term,
             "source_excerpt": self.source_excerpt,
+            "offset": self.offset,
+            "suggestion": self.suggestion,
         }
 
 
@@ -861,6 +870,7 @@ class QCService:
                     _excerpt(output, match.start()),
                     term=name,
                     source_excerpt=_excerpt(source, _nearest(source, name, match.start())),
+                    offset=match.start(),
                 )
             )
 
@@ -946,19 +956,30 @@ class QCService:
                     f"{owner_a!r} {noun_a!r}, so the two cannot be told apart"
                 )
                 term = f"{owner_a} {noun_a}"
+                suggestion = ""
                 # Where the two sit side by side -- "her uncle and aunt" giving
                 # "his uncle and uncle" -- English has a better answer than
                 # either of them: one plural. Offer the whole phrase as the
                 # thing to replace, so it takes one edit rather than two that
                 # would each rewrite the other.
-                joined = self._COORDINATED_PAIR.search(output, max(0, earlier[1] - 1))
-                if (
-                    joined
-                    and joined.start() <= earlier[1]
-                    and joined.end() >= start_a + len(noun_a)
-                ):
+                # Anchored on the occurrence being reported, not on the first
+                # one in the paragraph. Chapter 61 says "his aunt" of Lady
+                # Catherine early, and "her uncle and aunt" of the Gardiners
+                # much later; searching from the first found nothing, the
+                # phrase was never offered, and correcting the bare word
+                # rewrote Lady Catherine too.
+                joined = next(
+                    (
+                        m
+                        for m in self._COORDINATED_PAIR.finditer(output)
+                        if m.start() <= start_a < m.end()
+                    ),
+                    None,
+                )
+                if joined:
                     term = joined.group(0)
-                    detail += f'; "{owner_a} {noun_a}s" would read better'
+                    suggestion = f"{owner_a} {noun_a}s"
+                    detail += f'; "{suggestion}" would read better'
                 chapter.findings.append(
                     Finding(
                         NEEDS_REVIEW,
@@ -969,6 +990,8 @@ class QCService:
                         _excerpt(output, start_a),
                         term=term,
                         source_excerpt=_excerpt(source, _start_b),
+                        offset=joined.start() if joined else start_a,
+                        suggestion=suggestion,
                     )
                 )
             elif not earlier:
@@ -1004,6 +1027,7 @@ class QCService:
                     source_excerpt=(
                         _excerpt(source, source_span[0]) if source and source_span else ""
                     ),
+                    offset=span[0],
                 )
             )
 
