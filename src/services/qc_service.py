@@ -295,7 +295,66 @@ class QCService:
 
         self._check_invented_names(report, source_chapters, output_chapters)
         self._check_renames_landed(report, source_chapters, output_chapters)
+        self._check_surnames_survive(report, source_chapters, output_chapters)
         return report
+
+    def _check_surnames_survive(self, report: QCReport, source_chapters, output_chapters) -> None:
+        """A family name the book stopped using.
+
+        A rename changes a given name. The surname is the one part that must
+        come through untouched, and nothing else here would notice it going:
+        every gendered word can be correct, every agreed name can have landed,
+        and the book can still have replaced "Come, Darcy" with "Come,
+        Fitzwillia" three hundred times because a surname was listed as an
+        alias and took the given name meant for a nickname.
+
+        Counted rather than aligned. A surname is used too often, in too many
+        shapes, for position to be reliable -- but it cannot quietly lose most
+        of its mentions.
+        """
+        if not self.name_map:
+            return
+        surnames = set()
+        for original in self.name_map:
+            words = TransformService._WORD_RE.findall(original)
+            # Capitalised only. Map keys include phrases like "her father",
+            # and calling "father" a family name reported the whole term map
+            # as a loss.
+            without_title = [
+                w
+                for w in words
+                if w[:1].isupper()
+                and w.lower() not in TransformService._HONORIFICS
+                and w.lower() not in TransformService._RANKS
+            ]
+            if len(without_title) > 1:
+                surnames.add(without_title[-1])
+            elif without_title and len(without_title) < len(words):
+                surnames.add(without_title[0])
+
+        source_text = "\n".join(
+            _text_of(p) for c in source_chapters for p in c.get("paragraphs", [])
+        )
+        output_text = "\n".join(
+            _text_of(p) for c in output_chapters for p in c.get("paragraphs", [])
+        )
+        for surname in sorted(surnames):
+            before = self._word_count(source_text, surname)
+            if before < 10:
+                continue  # too rare to judge by count
+            after = self._word_count(output_text, surname)
+            if after < before * 0.6:
+                report.findings.append(
+                    Finding(
+                        STRUCTURAL,
+                        "surname_lost",
+                        0,
+                        0,
+                        f"{surname!r} is a family name used {before}x in the source and "
+                        f"only {after}x in the transform: a rename changes given names, "
+                        f"never the surname",
+                    )
+                )
 
     @staticmethod
     def _word_count(text: str, word: str) -> int:

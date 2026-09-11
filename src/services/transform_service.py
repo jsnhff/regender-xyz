@@ -2773,6 +2773,7 @@ class TransformService(BaseService):
             if not matched_target:
                 continue
             short = self._given_name(matched_target)
+            surname = self._surname_of(char.name)
             bare = self._bare_given_name(char.name)
             if bare and given_counts.get(bare.lower(), 0) == 1:
                 all_names = all_names + [bare]
@@ -2780,6 +2781,14 @@ class TransformService(BaseService):
                 if name in expanded:
                     continue
                 words = self._WORD_RE.findall(name)
+                if len(words) == 1 and words[0].lower() == (surname or "").lower():
+                    # A surname is not a nickname. "Darcy" is listed as an
+                    # alias of Fitzwilliam Darcy, and sending a single-word
+                    # alias to the target's given name turned every "Come,
+                    # Darcy" into "Come, Fitzwillia" -- three hundred of them
+                    # in one book. Austen's characters address each other by
+                    # surname, and a rename does not touch the surname.
+                    continue
                 if len(words) == 1:
                     target = short
                 elif words[0].lower() == (self._bare_given_name(char.name) or "").lower():
@@ -2829,15 +2838,39 @@ class TransformService(BaseService):
         return len(words) == 1 and words[0].lower() in target_words
 
     @classmethod
+    def _surname_of(cls, full: str) -> Optional[str]:
+        """The family name in a character's name, title or no title.
+
+        "Fitzwilliam Darcy" and "Mr. Darcy" both answer "Darcy". A single word
+        with no title is a given name and has no surname to report.
+        """
+        words = [
+            w
+            for w in cls._WORD_RE.findall(full)
+            if w.lower() not in cls._HONORIFICS and w.lower() not in cls._RANKS
+        ]
+        titled = len(words) < len(cls._WORD_RE.findall(full))
+        if len(words) > 1:
+            return words[-1]
+        return words[0] if words and titled else None
+
+    @classmethod
     def _claimed_given_name(cls, full: str) -> Optional[str]:
         """The given name inside a name, title or no title.
 
         Used only to decide whether a bare first name is unambiguous, never to
         rename: "Sir William Lucas" and "William Collins" both answer to
-        "William", so neither may claim it.
+        "William", so neither may claim it. A single word behind a rank counts
+        too -- Colonel Fitzwilliam answers to "Fitzwilliam" just as surely as
+        Fitzwilliam Darcy does, and letting only one of them claim it sent
+        every bare "Fitzwilliam" to Darcy's new given name.
         """
-        words = [w for w in cls._WORD_RE.findall(full) if w.lower() not in cls._HONORIFICS]
-        return words[0] if len(words) > 1 else None
+        words = [
+            w
+            for w in cls._WORD_RE.findall(full)
+            if w.lower() not in cls._HONORIFICS and w.lower() not in cls._RANKS
+        ]
+        return words[0] if words else None
 
     @classmethod
     def _bare_given_name(cls, full: str) -> Optional[str]:
@@ -2854,6 +2887,26 @@ class TransformService(BaseService):
     # Honorifics sit in front of a name rather than being part of it.
     _HONORIFICS = frozenset(
         {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam"}
+    )
+
+    # Ranks and professions sit in front of a surname the same way a title
+    # does. Without them "Colonel Fitzwilliam" reads as given name "Colonel",
+    # so the Colonel never claims his own surname and Fitzwilliam Darcy's
+    # given name takes it -- which is how "Fitzwilliam" ended up mapped to
+    # "Fitzwillia".
+    _RANKS = frozenset(
+        {
+            "colonel",
+            "captain",
+            "major",
+            "general",
+            "admiral",
+            "lieutenant",
+            "doctor",
+            "dr",
+            "reverend",
+            "professor",
+        }
     )
 
     @classmethod
