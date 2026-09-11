@@ -476,6 +476,7 @@ class QCService:
         self._check_residual_terms(chapter, number, position, output, residual, source)
         self._check_text_integrity(chapter, number, position, source, output)
         self._check_coordination(chapter, number, position, source, output)
+        self._check_collapsed_contrast(chapter, number, position, source, output)
         self._check_polysemy(chapter, number, position, output)
         self._check_bare_title(chapter, number, position, repaired)
 
@@ -862,6 +863,116 @@ class QCService:
                     source_excerpt=_excerpt(source, _nearest(source, name, match.start())),
                 )
             )
+
+    # "my mother" / "your father" -- a possessive and the person it owns.
+    # The trailing guard keeps a noun out of a compound: "my brother-in-law" is
+    # not a possessive and "brother", and reporting it wastes the reader's time.
+    _POSSESSED = re.compile(
+        r"\b(my|your|his|her|their|our)\s+([A-Za-z]+)(?![A-Za-z-])", re.IGNORECASE
+    )
+
+    _SENTENCE_END = re.compile(r"(?<=[.!?\"\u201d]) +")
+
+    # "his uncle and uncle" -- the same relation twice, joined. A plural says
+    # it properly.
+    # " and aunt" following "her uncle": the second half of a shared possessive.
+    _COORDINATED_TAIL = re.compile(r"\s+and\s+([A-Za-z]+)(?![A-Za-z-])", re.IGNORECASE)
+
+    _COORDINATED_PAIR = re.compile(
+        r"\b(my|your|his|her|their|our)\s+([A-Za-z]+)\s+and\s+(?:\1\s+)?\2(?![A-Za-z-])",
+        re.IGNORECASE,
+    )
+
+    def _check_collapsed_contrast(
+        self, chapter: ChapterReport, number: int, position: int, source: str, output: str
+    ) -> None:
+        """Two people the source told apart, that the transform gives one name.
+
+        In an all-male book Elizabeth has two fathers, and "his father" is the
+        right words for each of them -- this is not about that. It is about the
+        sentence that leans on the contrast: "My mother would have no
+        objection, but my father hates London" becomes "My father would have no
+        objection, but my father hates London", and a reader cannot tell which
+        father is meant.
+
+        Both words transformed correctly, so nothing else here has anything to
+        report: there is no residual term, no missed name, no drift in length.
+        Only the collision of the two is wrong, and only a person can settle it.
+
+        Three sentences in Pride and Prejudice, which is why it is worth
+        surfacing and not worth a rule.
+        """
+        nouns = self._nouns
+        if not nouns:
+            return
+
+        def possessed(text):
+            found = []
+            for match in self._POSSESSED.finditer(text):
+                owner, noun = match.group(1).lower(), match.group(2).lower()
+                if noun not in nouns:
+                    continue
+                found.append((owner, noun, match.start()))
+                # A coordination usually states the possessive once: "her uncle
+                # and aunt", not "her uncle and her aunt". The second noun is
+                # owned by the same word and has to be counted, or the pair
+                # that reads worst is the one that goes unreported.
+                tail = self._COORDINATED_TAIL.match(text, match.end())
+                if tail and tail.group(1).lower() in nouns:
+                    found.append((owner, tail.group(1).lower(), tail.start(1)))
+            return found
+
+        before, after = possessed(source), possessed(output)
+        # Without a one-to-one correspondence there is no way to say which
+        # phrase became which, and a guess here would be a false accusation.
+        if len(before) != len(after) or not after:
+            return
+
+        # Which sentence each offset falls in. A reader holds a sentence in
+        # mind, not a paragraph: two mentions pages apart are usually two
+        # different people and read perfectly well.
+        bounds = [m.end() for m in self._SENTENCE_END.finditer(output)]
+
+        def sentence_of(offset: int) -> int:
+            return sum(1 for b in bounds if b <= offset)
+
+        seen: dict[tuple, tuple] = {}
+        for (_owner_b, noun_b, _start_b), (owner_a, noun_a, start_a) in zip(before, after):
+            key = (owner_a, noun_a)
+            earlier = seen.get(key)
+            if earlier and earlier[0] != noun_b and sentence_of(earlier[1]) == sentence_of(start_a):
+                detail = (
+                    f"{earlier[0]!r} and {noun_b!r} both became "
+                    f"{owner_a!r} {noun_a!r}, so the two cannot be told apart"
+                )
+                term = f"{owner_a} {noun_a}"
+                # Where the two sit side by side -- "her uncle and aunt" giving
+                # "his uncle and uncle" -- English has a better answer than
+                # either of them: one plural. Offer the whole phrase as the
+                # thing to replace, so it takes one edit rather than two that
+                # would each rewrite the other.
+                joined = self._COORDINATED_PAIR.search(output, max(0, earlier[1] - 1))
+                if (
+                    joined
+                    and joined.start() <= earlier[1]
+                    and joined.end() >= start_a + len(noun_a)
+                ):
+                    term = joined.group(0)
+                    detail += f'; "{owner_a} {noun_a}s" would read better'
+                chapter.findings.append(
+                    Finding(
+                        NEEDS_REVIEW,
+                        "collapsed_contrast",
+                        number,
+                        position,
+                        detail,
+                        _excerpt(output, start_a),
+                        term=term,
+                        source_excerpt=_excerpt(source, _start_b),
+                    )
+                )
+            elif not earlier:
+                seen[key] = (noun_b, start_a)
 
     def _check_residual_terms(
         self,
