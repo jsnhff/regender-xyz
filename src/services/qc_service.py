@@ -556,8 +556,37 @@ class QCService:
         expected = _COORDINATED_TITLES.findall(source)
         if not expected:
             return
-        actual = _COORDINATED_TITLES.findall(output)
-        lost = Counter(expected) - Counter(actual)
+
+        # Count people, not phrasing. Where a collision was resolved by giving
+        # one of them a name, the pair survives as "Mr. Gardiner and Mr. Edmund
+        # Gardiner" -- which is both of them, correctly, and matches no
+        # "Title and Title Surname" pattern at all. Insisting on the shape
+        # reported eighteen losses in a book that had lost nobody.
+        titles = r"(?:Mr|Mrs|Ms|Mx|Miss|Lady|Lord|Sir|Dame)"
+
+        def titled_mentions(text: str, surname: str) -> int:
+            """How many distinct people the text names with a title.
+
+            Two shapes count. "Mr. Edmund Gardiner" names one outright. And a
+            title handed straight to another title -- "Mr. and Mrs. Gardiner"
+            -- names one more, sharing the surname that follows.
+            """
+            named = len(
+                re.findall(
+                    r"\b" + titles + r"\.?\s+(?:[A-Z]\w+\s+)?" + re.escape(surname) + r"\b",
+                    text,
+                )
+            )
+            sharing = len(
+                re.findall(r"\b" + titles + r"\.?\s+and\s+(?=" + titles + r"\.?\s)", text)
+            )
+            return named + sharing
+
+        lost = Counter()
+        for surname, wanted in Counter(expected).items():
+            # Each coordination in the source names two people.
+            if titled_mentions(output, surname) < wanted * 2:
+                lost[surname] = wanted
         for surname, count in lost.items():
             chapter.findings.append(
                 Finding(
