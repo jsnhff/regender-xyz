@@ -20,7 +20,12 @@ from typing import Any, Optional
 from rapidfuzz import fuzz, process
 
 from src.models.book import Book
-from src.models.character import Character, CharacterAnalysis, Gender
+from src.models.character import (
+    Character,
+    CharacterAnalysis,
+    Gender,
+    normalise_pronouns,
+)
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import EXTRACTION_PROMPT_TEMPLATE, MERGE_PROMPT_TEMPLATE
@@ -142,6 +147,32 @@ _RELATION_WORDS = frozenset(
         "girls",
     }
 )
+
+
+#: How prominent a character is, most prominent first. Used to pick the higher
+#: of two values when merging, and to read whatever word the model offered.
+_IMPORTANCE_RANK = {"main": 3, "major": 3, "supporting": 2, "secondary": 2, "minor": 1}
+
+
+def _importance_of(value: Any) -> str:
+    """One of main/supporting/minor, from whatever the model said.
+
+    This was hard-coded to "supporting" at both construction sites, so all ninety
+    characters came out equally important: get_main_characters() returned nothing
+    on every run, the interface's "Main characters" block never rendered, and the
+    transform prompt described the whole cast in one undifferentiated list.
+    """
+    word = str(value or "").strip().lower()
+    if word in _IMPORTANCE_RANK:
+        return {3: "main", 2: "supporting", 1: "minor"}[_IMPORTANCE_RANK[word]]
+    # A number is how some replies answer "importance"; 8 of 10 is a main part.
+    try:
+        score = float(word)
+    except ValueError:
+        return "supporting"
+    if score >= 8:
+        return "main"
+    return "supporting" if score >= 4 else "minor"
 
 
 def _is_name_form(alias: str) -> bool:
@@ -923,10 +954,23 @@ class CharacterService(BaseService):
                 Character(
                     name=result.get("canonical_name", group[0].get("name", "Unknown")),
                     gender=self._parse_gender(result.get("gender")),
-                    pronouns=result.get("pronouns", ""),
+                    pronouns=normalise_pronouns(result.get("pronouns"))
+                    # The merged reply may omit pronouns; the members had them.
+                    or next(
+                        (p for p in (normalise_pronouns(m.get("pronouns")) for m in group) if p),
+                        {},
+                    ),
+                    titles=result.get("titles") or group[0].get("titles", []),
                     aliases=result.get("aliases", []),
                     description=result.get("description", ""),
-                    importance="supporting",
+                    importance=_importance_of(
+                        result.get("importance")
+                        or max(
+                            (m.get("importance") for m in group if m.get("importance")),
+                            default=None,
+                            key=lambda v: _IMPORTANCE_RANK.get(str(v).lower(), 0),
+                        )
+                    ),
                     confidence=0.8,
                 )
             ]
@@ -1150,10 +1194,11 @@ class CharacterService(BaseService):
         return Character(
             name=char_dict.get("name", "Unknown"),
             gender=self._parse_gender(char_dict.get("gender")),
-            pronouns=char_dict.get("pronouns", ""),
+            pronouns=normalise_pronouns(char_dict.get("pronouns")),
+            titles=char_dict.get("titles", []),
             aliases=char_dict.get("aliases", []),
             description=char_dict.get("description", ""),
-            importance="supporting",
+            importance=_importance_of(char_dict.get("importance")),
             confidence=0.7,
         )
 

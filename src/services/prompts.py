@@ -17,7 +17,8 @@ Required JSON structure:
     {{
       "name": "most complete/formal name",
       "gender": "male/female/neutral/unknown",
-      "pronouns": "he/she/they/etc",
+      "pronouns": "subject/object/possessive, e.g. she/her/hers",
+      "importance": "main, supporting, or minor",
       "description": "brief character role",
       "aliases": ["ALL nicknames", "variations", "what others call them"],
       "titles": ["Mr/Ms/Dr/Lord/etc"]
@@ -28,6 +29,8 @@ Required JSON structure:
 Rules:
 - Must be valid JSON object with "characters" array
 - All fields required (empty arrays/strings if unknown)
+- "pronouns" must give at least subject and object, separated by "/"
+- "main" is for characters the book is about; most characters are not
 - No markdown blocks (no ```json)
 - Extract EVERY character mentioned
 
