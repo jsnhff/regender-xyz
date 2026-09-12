@@ -990,6 +990,8 @@ class RegenderTUI(App):
         self._review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
+        self._name_regen_mode: bool = False
+        self._name_steer: str = ""
         self._custom_title: str = ""
         self._friendly_mode: bool = False
         self._setup_provider: str = ""
@@ -1485,7 +1487,7 @@ class RegenderTUI(App):
             )
         self.print("")
         self._no_qc = True
-        self._run_name_review()
+        self._show_character_analysis_prompt()
 
     def _get_book_title(self, path: Path) -> str:
         """Extract book title from path."""
@@ -1682,7 +1684,7 @@ class RegenderTUI(App):
         else:
             self.print("[#ffffff]✓[/] Skipped")
             self.print("")
-            self._show_transform_menu()
+            self._run_name_review()
 
     @work(exclusive=True)
     async def _run_character_analysis(self) -> None:
@@ -1820,7 +1822,7 @@ class RegenderTUI(App):
                             self.print(f"    [#aaaaaa]... and {len(main_chars) - 5} more[/]")
 
                     self.print("")
-                    self._show_transform_menu()
+                    self._run_name_review()
 
                 show_results()
             else:
@@ -1840,7 +1842,7 @@ class RegenderTUI(App):
                 self.print("[#aaaaaa]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
-                self._show_transform_menu()
+                self._run_name_review()
 
         except Exception as e:
             error_msg = str(e)
@@ -1861,7 +1863,7 @@ class RegenderTUI(App):
             self.print("[#aaaaaa]  See logs/tui_debug.log for full traceback[/]")
             self._show_api_key_help(error_msg)
             self.print("")
-            self._show_transform_menu()
+            self._run_name_review()
 
     def _show_api_key_help(self, error_msg: str) -> None:
         """Show helpful message if error is about missing API keys."""
@@ -1881,7 +1883,7 @@ class RegenderTUI(App):
     def _handle_transform_input(self, value: str) -> None:
         """Handle transform selection."""
         if value.lower() in ("back", "b"):
-            self._show_character_analysis_prompt()
+            self._show_model_menu()
             return
 
         try:
@@ -2001,7 +2003,7 @@ class RegenderTUI(App):
         if not has_openai and not has_anthropic and not has_ollama:
             self.print("[#aaaaaa]No API keys configured — skipping model selection[/]")
             self._model_choices = []
-            self._show_character_analysis_prompt()
+            self._show_transform_menu()
             return
 
         self.print("[#aaaaaa]Detecting available models...[/]")
@@ -2072,7 +2074,7 @@ class RegenderTUI(App):
     def _render_model_menu(self) -> None:
         """Display model selection menu after model list has been fetched."""
         if not self._model_choices:
-            self._show_character_analysis_prompt()
+            self._show_transform_menu()
             return
 
         if len(self._model_choices) == 1:
@@ -2081,7 +2083,7 @@ class RegenderTUI(App):
             self.print(f"[#ffffff]✓[/] Using [bold #ffffff]{display_name}[/]")
             self._recalculate_cost(model_id)
             self.print("")
-            self._show_character_analysis_prompt()
+            self._show_transform_menu()
             return
 
         self._stage = "model"
@@ -2349,7 +2351,7 @@ class RegenderTUI(App):
         """Handle model selection."""
         choices = self._model_choices
         if not choices:
-            self._show_character_analysis_prompt()
+            self._show_transform_menu()
             return
 
         if value.lower() == "m":
@@ -2366,7 +2368,7 @@ class RegenderTUI(App):
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
-                self._show_character_analysis_prompt()
+                self._show_transform_menu()
                 return
         except ValueError:
             pass
@@ -2377,7 +2379,7 @@ class RegenderTUI(App):
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
-                self._show_character_analysis_prompt()
+                self._show_transform_menu()
                 return
 
         limit = len(choices) if self._model_showing_all else min(5, len(choices))
@@ -2427,6 +2429,7 @@ class RegenderTUI(App):
             suggestions = await character_service.suggest_name_alternatives(
                 self._pending_characters,
                 self._selected_transform or "",
+                steer=self._name_steer,
             )
             self._capture_usage(app)
             app.shutdown()
@@ -2696,12 +2699,27 @@ class RegenderTUI(App):
         self.print(
             f"  [#aaaaaa]A[/] accept all  [#aaaaaa]K[/] keep originals"
             f"  [#aaaaaa]1-{n}[/] edit entry  [#aaaaaa]M[/] add custom"
+            f"  [#aaaaaa]R[/] ask again"
         )
         self.print("")
         self.set_prompt(">  ")
 
     def _handle_name_review_input(self, value: str) -> None:
-        """Handle A/K/M/number input on the name review menu."""
+        """Handle A/K/M/R/number input on the name review menu."""
+        if getattr(self, "_name_regen_mode", False):
+            # Regenerating. Their note is kept for any later attempt, so a
+            # second "R" does not quietly forget what they already asked for.
+            self._name_regen_mode = False
+            note = value.strip()
+            if note:
+                self._name_steer = (
+                    f"{self._name_steer} {note}".strip() if self._name_steer else note
+                )
+            self.print(f"[#aaaaaa]Asking again{': ' + note if note else ''}[/]")
+            self.print("")
+            self._run_name_review()
+            return
+
         if self._name_custom_mode:
             # User is entering a custom "Original=Target" mapping
             raw = value.strip()
@@ -2746,6 +2764,12 @@ class RegenderTUI(App):
             self._name_map = None
             self.print("[#555555]Keeping original names[/]")
             self._start_processing()
+        elif v == "r":  # Ask for a different set
+            self._name_regen_mode = True
+            self.print("")
+            self.print("[#aaaaaa]What should be different? (Enter to just try again)[/]")
+            self.print("[#666666]e.g. less masculine, more neutral, plainer[/]")
+            self.set_prompt(">  ")
         elif v == "m":  # Add custom mapping
             self._name_custom_mode = True
             self.print("[#aaaaaa]Enter mapping as Original=Target (e.g. Lizzy=Eddie):[/]")
