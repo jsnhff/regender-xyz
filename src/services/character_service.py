@@ -1382,6 +1382,150 @@ class CharacterService(BaseService):
         return collisions
 
     @staticmethod
+    def possible_duplicates(characters: list) -> list:
+        """Pairs that look like one person but cannot be settled from structure.
+
+        The deterministic merge folds only what it is certain of, because a wrong
+        merge makes two people one and is silent, while a missed one shows as a
+        character with two names. What it declines has to go somewhere, and it
+        went nowhere: five real pairs survived every check in the Pride and
+        Prejudice cast, and only one -- Kitty and Catherine Bennet -- was ever
+        noticed, and then only because their new names happened to collide.
+
+        Each rule below has a signal too weak to act on and too strong to drop,
+        so each becomes a question for a person. The rules are deliberately
+        narrow. A first version asked forty questions of which thirty-five were
+        nonsense -- "The Waiter" against "The Gardener", three separate men named
+        William against each other, all four Bennet sisters against their mother
+        -- and a list that long is one nobody reads.
+
+        Returns dicts of {a, b, reason}.
+        """
+
+        def behind_titles(name: str) -> list:
+            parts = [p for p in name.split() if p]
+            while parts and parts[0].rstrip(".").lower() in _GROUPING_TITLES:
+                parts.pop(0)
+            return parts
+
+        def readable(char) -> bool:
+            """A real personal name, not a collective or a job."""
+            parts = behind_titles(char.name)
+            if not parts or not _is_name_form(char.name):
+                return False
+            return parts[0].lower() not in {"the", "a", "an", "young", "old"}
+
+        people = [c for c in characters if readable(c)]
+
+        def shape(char) -> tuple:
+            parts = behind_titles(char.name)
+            titled = len(parts) < len([p for p in char.name.split() if p])
+            if len(parts) == 1:
+                return (None, parts[0].lower()) if titled else (parts[0].lower(), None)
+            return parts[0].lower(), " ".join(parts[1:]).lower()
+
+        def compatible(a, b) -> bool:
+            """Genders that could belong to one person: equal, or one unknown."""
+            vague = {Gender.UNKNOWN, Gender.NEUTRAL}
+            return a.gender == b.gender or a.gender in vague or b.gender in vague
+
+        # Who carries each surname, so a form of address is only matched where it
+        # is unambiguous. "Mrs. Bennet" could be any of four named Bennet women,
+        # which is exactly why she is a fifth person and not one of them.
+        named_of_surname: dict = {}
+        surname_genders: dict = {}
+        for char in people:
+            given, surname = shape(char)
+            if not surname:
+                continue
+            surname_genders.setdefault(surname, set()).add(char.gender)
+            if given:
+                named_of_surname.setdefault((surname, char.gender), []).append(char.name)
+
+        found: list = []
+        for index, first in enumerate(people):
+            for other in people[index + 1 :]:
+                if not compatible(first, other):
+                    continue
+                a_given, a_surname = shape(first)
+                b_given, b_surname = shape(other)
+                reason = None
+
+                if a_surname and b_surname and a_surname == b_surname:
+                    if (a_given is None) != (b_given is None):
+                        # A form of address beside a full name. Only when one
+                        # named person of that gender carries the surname, or the
+                        # question has no answer.
+                        titled = first if a_given is None else other
+                        full = other if a_given is None else first
+                        if len(named_of_surname.get((a_surname, full.gender), [])) == 1:
+                            reason = "a form of address, and one person it could be"
+                    elif (
+                        a_given
+                        and b_given
+                        and a_given != b_given
+                        and (a_given.startswith(b_given[:3]) or b_given.startswith(a_given[:3]))
+                    ):
+                        reason = "one surname, and given names that may be one name"
+
+                elif (
+                    len(behind_titles(first.name)) == 1
+                    and len(behind_titles(other.name)) == 1
+                    and behind_titles(first.name)[0].lower() != behind_titles(other.name)[0].lower()
+                    and fuzz.ratio(
+                        behind_titles(first.name)[0].lower(),
+                        behind_titles(other.name)[0].lower(),
+                    )
+                    >= 85
+                ):
+                    # One token each, spelled two ways: "Mrs. Nichols" and
+                    # "Nicholls". Whether a lone token reads as a given name or a
+                    # surname depends on whether a title happens to precede it,
+                    # which is not a difference between the people.
+                    reason = "one name, spelled two ways"
+
+                elif (
+                    a_given
+                    and b_given
+                    and a_given == b_given
+                    and a_surname
+                    and b_surname
+                    and a_surname != b_surname
+                    and first.gender == other.gender == Gender.FEMALE
+                ):
+                    # A married name changes the surname and keeps the given
+                    # name. Only worth asking where somebody of another gender
+                    # carries the other surname, which is who she would have
+                    # married.
+                    for surname in (a_surname, b_surname):
+                        if surname_genders.get(surname, set()) - {Gender.FEMALE}:
+                            reason = "one given name, two surnames, as a marriage gives"
+                            break
+
+                # Two entries answering to the same short name, where the given
+                # names differ. The certain merge refuses these on purpose --
+                # Charlotte and Maria Lucas both answer to "Miss Lucas" and are
+                # sisters -- but Kitty and Catherine Bennet both answer to
+                # "Kitty" and are one girl. Nicknames are not prefixes of the
+                # names they shorten, so nothing else here finds that pair.
+                if not reason and a_surname and a_surname == b_surname:
+                    shared = {
+                        alias.lower()
+                        for alias in (getattr(first, "aliases", []) or [])
+                        if _is_name_form(alias)
+                    } & {
+                        alias.lower()
+                        for alias in (getattr(other, "aliases", []) or [])
+                        if _is_name_form(alias)
+                    }
+                    if shared and a_given and b_given and a_given != b_given:
+                        reason = f"both answer to {sorted(shared)[0]!r}, with different given names"
+
+                if reason:
+                    found.append({"a": first.name, "b": other.name, "reason": reason})
+        return found
+
+    @staticmethod
     def _merge_same_person(characters: list) -> tuple:
         """Fold entries that are the same person into one.
 
