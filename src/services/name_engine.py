@@ -132,7 +132,27 @@ def _is_title_led(alias: str) -> bool:
 # Capitalized English words that character extraction sometimes mistakes for
 # given names ("The Archbishop", "Young Lucas"). Renaming one of these would
 # rewrite ordinary words across the whole book.
-_GIVEN_STOPLIST = {"the", "a", "an", "young", "old", "elder", "little", "poor", "dear"}
+_GIVEN_STOPLIST = {
+    "the",
+    "a",
+    "an",
+    "young",
+    "old",
+    "elder",
+    "little",
+    "poor",
+    # Endearments the extraction captures as names. A cast entry called
+    # "Dearest Jane" is not a person, and it does real damage beyond its own
+    # bad rename: read as Given + Surname it teaches the index that "Jane" is a
+    # family name, so the correct rename of the given name Jane then reads as a
+    # destroyed surname.
+    "dear",
+    "dearest",
+    "beloved",
+    "sweet",
+    "good",
+    "my",
+}
 
 
 def _is_descriptive_name(name: str) -> bool:
@@ -180,7 +200,16 @@ def _is_invented(original: str, target: str) -> bool:
     if any(t == o + s for s in _INVENTED_SUFFIXES):
         return True
     stem = o[:-1]
-    return len(stem) >= 3 and any(t == stem + s for s in _INVENTED_SUFFIXES)
+    if len(stem) >= 3 and any(t == stem + s for s in _INVENTED_SUFFIXES):
+        return True
+
+    # Mangling by truncation, which is the same move in the other direction:
+    # "Fitzwilliam" lost its last letter and became "Fitzwillia", a word that is
+    # not a name in any language, and Darcy was called it 222 times in a single
+    # edition. Only for long names -- "Kit" is a prefix of "Kitty" and a real
+    # short form, and so is "Eliza" of "Elizabeth".
+    shorter, longer = sorted((o, t), key=len)
+    return len(shorter) >= 6 and len(longer) - len(shorter) <= 2 and longer.startswith(shorter)
 
 
 #: Particles that belong to a surname rather than standing between names.
@@ -296,7 +325,11 @@ def cast_name_index(characters: Any) -> tuple[frozenset, frozenset, frozenset]:
         forms.extend(getattr(char, "aliases", []) or [])
 
     for form in forms:
-        if not form:
+        # A description is not evidence about anybody's name. "my sweetest
+        # Lizzy" and "Dearest Jane" read as Given + Surname, which filed Lizzy
+        # and Jane as family names -- so the correct rename of the given name
+        # Jane then reported a destroyed surname.
+        if not form or _is_descriptive_name(form):
             continue
         tokens = _strip_titles(form)
         if len(tokens) > 1:
@@ -470,7 +503,7 @@ def check_rename(
         if new_given.lower() == orig_given.lower():
             return f"given name {orig_given!r} unchanged; only the title moved"
         if _is_invented(orig_given, new_given):
-            return f"{new_given!r} looks invented (the original with a suffix)"
+            return f"{new_given!r} looks invented (the original with its ending changed)"
         if not _is_plausible_name(new_given):
             return f"{new_given!r} is not a plausible given name"
         # Somebody else's name is not available. "Elizabeth" -> "Jane" reads as

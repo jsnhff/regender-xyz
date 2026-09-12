@@ -465,6 +465,22 @@ class Application:
                 f"({name_report['accepted']} characters renamed)"
             )
 
+            # Audit the map here, before a single chapter is transformed. Every
+            # naming fault is knowable at this point and costs nothing to fix;
+            # found afterwards it has been written into the book 222 times and
+            # the run has already been paid for. A gender-swap edition shipped
+            # with Darcy called "Fitzwillia" throughout, three women sharing one
+            # man's name, and five characters carrying two names each -- all of
+            # it visible in the map that produced it.
+            from src.services.name_engine import audit_name_map
+
+            name_report["problems"] = audit_name_map(name_map or {}, characters)
+            if name_report["problems"]:
+                self.logger.error(
+                    f"{len(name_report['problems'])} problem(s) in the name map, "
+                    "before transforming: " + "; ".join(name_report["problems"][:6])
+                )
+
             # Save character analysis immediately if we have output path and it's not already saved
             if output_dir:
                 # Written every time, not just when absent: the file beside an
