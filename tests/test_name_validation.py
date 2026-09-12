@@ -185,6 +185,11 @@ class TestAgainstTheShippedMap:
             "Mr. Fitzwilliam Darcy",
             "William Lucas",
             "Anne Darcy",
+            # Both of these lose a given name to a title, and both land on the
+            # same "Noble de Bourgh" -- Lady Catherine and Sir Lewis, one name.
+            # They were invisible while every de Bourgh read as a description.
+            "Catherine de Bourgh",
+            "Lewis de Bourgh",
             "Catherine",
             "Lewis",
         }

@@ -475,13 +475,6 @@ class Application:
                     json.dump(characters.to_dict(), f, indent=2, default=str)
                 self.logger.info(f"Saved character analysis to {char_file}")
 
-                # Persist the name map alongside the output. Without it there is
-                # no way to check afterwards that every rename actually landed.
-                if name_map:
-                    map_file = output_dir / "name_map.json"
-                    with open(map_file, "w") as f:
-                        json.dump(name_map, f, indent=2)
-                    self.logger.info(f"Saved name map to {map_file}")
                 with open(output_dir / "name_report.json", "w") as f:
                     json.dump(name_report, f, indent=2)
 
@@ -602,13 +595,42 @@ class Application:
                 # book is broken, not merely arguable. needs_review must never
                 # block -- the nonbinary book legitimately produces dozens, and
                 # a gate that cries wolf gets switched off.
+                applied_map = getattr(transformer, "effective_name_map", None) or name_map
+
+                # The record is written here, not before the transform, because
+                # the map is not finished until then: the alias expansion adds
+                # entries and a gender_swap prepends marital titles. The file
+                # used to be nineteen entries short for nonbinary and to omit
+                # two entries the swap actually applied, while a comment beside
+                # it called it the record of what produced the edition.
+                if output_dir and applied_map:
+                    map_file = output_dir / "name_map.json"
+                    with open(map_file, "w") as f:
+                        json.dump(applied_map, f, indent=2)
+                    self.logger.info(f"Saved the applied name map to {map_file}")
+
+                # A map can be wrong in ways no single entry shows: one
+                # character with two names, or two characters given one. Only
+                # the whole map answers that, and nothing was asking.
+                from src.services.name_engine import audit_name_map
+
+                map_problems = audit_name_map(applied_map or {}, characters)
+                if map_problems:
+                    self.logger.error(
+                        f"{len(map_problems)} problem(s) in the finished name map: "
+                        + "; ".join(map_problems[:6])
+                    )
+                    if output_dir:
+                        with open(output_dir / "name_map_problems.json", "w") as f:
+                            json.dump(map_problems, f, indent=2)
+
                 qc_summary = self._run_quality_control(
                     book,
                     transformation,
                     transform_type,
                     output_path,
                     partial,
-                    getattr(transformer, "effective_name_map", None) or name_map,
+                    applied_map,
                     characters,
                 )
 

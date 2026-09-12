@@ -141,9 +141,21 @@ def _is_descriptive_name(name: str) -> bool:
     A lowercase token after title-stripping, or a first token that is a common
     English word, means this is a description rather than a Given+Surname name;
     renaming its first token would corrupt ordinary words throughout the book.
+
+    Nobiliary particles are the exception, because they are lowercase by
+    convention and part of the name. Without them every de Bourgh read as a
+    description -- Lady Catherine, Sir Lewis, Anne and Miss Anne -- so the engine
+    never proposed a name for any of them, and their names were settled by the
+    interface instead, unvalidated. That is how Lady Catherine and Sir Lewis both
+    came to be called "Noble de Bourgh" in the nonbinary edition.
     """
     tokens = _strip_titles(name)
-    if any(not t[0].isupper() for t in tokens):
+    for position, token in enumerate(tokens):
+        if token[:1].isupper():
+            continue
+        # A particle belongs to the surname, so it may not lead the name.
+        if position and token.lower() in _SURNAME_PARTICLES:
+            continue
         return True
     return bool(tokens) and tokens[0].lower() in _GIVEN_STOPLIST
 
@@ -261,15 +273,22 @@ def cast_name_index(characters: Any) -> tuple[frozenset, frozenset, frozenset]:
     """(surnames, given names, everything spoken for) for a cast.
 
     Built in one place because the order matters and got it wrong when spread
-    out. Surnames come from the multi-token forms first; only then is a bare
-    single token read as a given name, and only if it is not already a known
-    surname. Taking bare tokens at face value put "Darcy" in both sets, which
-    made every judgement about it ambiguous -- so "Darcy" -> "Darcia" passed as
-    a rename of a name that is nobody's given name.
+    out. Only the multi-token forms are evidence: they say plainly which token is
+    the given name and which the family name. A lone token is not evidence of
+    anything, whatever stands in front of it -- "Miss Eliza" is a given name and
+    "Miss Bennet" a surname, and Austen writes both -- so a lone token is
+    classified only when a multi-token form already settled it, and otherwise
+    left out of both sets for the caller to treat as unknown.
+
+    Guessing here was expensive twice over. Taking bare aliases as given names
+    put "Darcy" in both sets, and a token in both is ambiguous, so every
+    judgement about it was declined and "Darcy" -> "Darcia" passed as a rename of
+    nobody's given name. Taking "Miss Eliza" as a surname then made the correct
+    nickname "Eliza" -> "Eli" look like a destroyed surname.
     """
     surnames: set = set()
-    bare: set = set()
     givens: set = set()
+    lone: set = set()
 
     forms = []
     for char in getattr(characters, "characters", characters):
@@ -285,16 +304,83 @@ def cast_name_index(characters: Any) -> tuple[frozenset, frozenset, frozenset]:
             if given:
                 givens.add(given.lower())
             if surname:
-                surnames.update(part.lower() for part in surname.split())
+                surnames.update(
+                    part.lower()
+                    for part in surname.split()
+                    if part.lower() not in _SURNAME_PARTICLES
+                )
         elif len(tokens) == 1:
-            leading = form.strip().split()[0].rstrip(".")
-            if leading in SURNAME_TITLES or leading in RANK_TITLES:
-                surnames.add(tokens[0].lower())
-            else:
-                bare.add(tokens[0].lower())
+            lone.add(tokens[0].lower())
 
-    givens |= {token for token in bare if token not in surnames}
-    return frozenset(surnames), frozenset(givens), frozenset(surnames | givens)
+    # A lone token that no full name corroborates stays unclassified.
+    givens -= surnames
+    return frozenset(surnames), frozenset(givens), frozenset(surnames | givens | lone)
+
+
+def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
+    """Everything wrong with a finished map that no single entry can show.
+
+    Each entry in the shipped maps is defensible on its own. The damage is in
+    how they sit together, and nothing was looking at that.
+
+    One character, several names. Ten source given names carry two or more
+    targets across the shipped editions: Charlotte is "Courtney" 97 times and
+    "Carol" 71 times in the same book, Mary is "Francis" 42 times and "Morgan"
+    twice, and the all-male edition gives one girl three names -- Catherine to
+    Cuthbert, Kitty to Kit, Catherine Bennet to Christopher Bennet.
+
+    Two characters, one name. Eight target given names are claimed by two
+    different people: "Hilary" is 461 mentions across Mr. Bennet and Mr. Collins,
+    and "Aubrey" makes Elizabeth Bennet and Anne de Bourgh the same person across
+    1057 occurrences.
+
+    Quality control cannot see either, and worse, the first masks the checks that
+    would catch the second: asked whether a rename landed, it takes the best
+    match over all of a name's targets, so a target that is also a common word
+    reports success everywhere.
+    """
+    surnames, givens, _ = (
+        cast_name_index(characters)
+        if characters is not None
+        else (frozenset(), frozenset(), frozenset())
+    )
+
+    problems: list[str] = []
+    by_source: dict[str, set] = {}
+    by_target: dict[str, set] = {}
+
+    for key, value in name_map.items():
+        if _is_descriptive_name(key) or _POSSESSIVE.search(key):
+            continue  # a term substitution, not a person
+        shape = given_and_surname(key, surnames, givens)
+        key_given, _ = shape
+        new_given, _ = given_and_surname(value, surnames, givens, like=shape)
+        if not key_given or not new_given:
+            continue
+        if key_given.lower() == new_given.lower():
+            continue  # no rename here to be inconsistent about
+        by_source.setdefault(key_given.lower(), set()).add(new_given)
+        by_target.setdefault(new_given.lower(), set()).add(key_given)
+
+    for source, targets in sorted(by_source.items()):
+        if len(targets) > 1:
+            problems.append(
+                f"{source!r} is renamed {len(targets)} different ways "
+                f"({', '.join(sorted(targets))}); one character, several names"
+            )
+    for target, sources in sorted(by_target.items()):
+        if len(sources) > 1:
+            problems.append(
+                f"{target!r} is the new name of {len(sources)} different characters "
+                f"({', '.join(sorted(sources))}); two people, one name"
+            )
+
+    for key, value in sorted(name_map.items()):
+        problem = check_rename(key, value, surnames=surnames, givens=givens)
+        if problem:
+            problems.append(f"{key!r} -> {value!r}: {problem}")
+
+    return problems
 
 
 def check_rename(
@@ -346,9 +432,13 @@ def check_rename(
         return f"{suggested!r} is only a title, not a name"
 
     # A suggestion that is not a name at all is a rejection, never a bypass.
+    # Particles are the exception and are lowercase by convention: "Louise de
+    # Bourgh" is a name, and reading its "de" as a defect refused eight correct
+    # renames across the shipped editions.
     for token in new_tokens:
-        if not token[:1].isupper():
-            return f"{suggested!r} is not a name ({token!r} is not capitalised)"
+        if token[:1].isupper() or token.lower() in _SURNAME_PARTICLES:
+            continue
+        return f"{suggested!r} is not a name ({token!r} is not capitalised)"
     # Only the leading token: "Elizabeth Elder" -> "Edmund Elder" is a real
     # surname, and Elder, Younger and Little are all attested ones.
     if new_tokens[0].lower() in _GIVEN_STOPLIST:
