@@ -354,50 +354,44 @@ class Application:
         """
         return self.context.get_service(name)
 
-    async def _get_or_analyze_characters(self, file_path: str, book: Book) -> CharacterAnalysis:
+    async def _get_or_analyze_characters(
+        self, book: Book, output_dir: Optional[Path] = None
+    ) -> CharacterAnalysis:
         """
-        Get existing character analysis or analyze characters.
+        The cast for this run, analysed fresh unless this exact run already has one.
+
+        It used to search every previous run folder for the book and load the
+        first characters.json it found. That looked like thrift and behaved like
+        a cache with no key: the cast was pinned to whichever folder sorted last,
+        so a run could show the reader eighty-two characters, take their renames,
+        and then transform the book against a ninety-entry cast from three days
+        earlier. Whatever the analysis had learned since -- merged duplicates,
+        corrected genders -- was silently discarded.
+
+        A run is now self-contained. The only file consulted is the one in this
+        run's own output folder, which exists just when the same output path is
+        being rebuilt; a sibling run's cast is never borrowed.
 
         Args:
-            file_path: Path to the book file
             book: Parsed book object
+            output_dir: This run's output folder, if it has one
 
         Returns:
             Character analysis
         """
-        # Check for existing character analysis file
-        from src.utils.paths import OUTPUT_ROOT, book_slug
-
-        input_path = Path(file_path)
-        slug = book_slug(input_path)
-
-        # Reuse a cast already worked out for this book. Runs now live one
-        # folder deep under the book, so look inside those as well as at the
-        # older flat "<book>-<timestamp>" folders, or every previous analysis
-        # becomes invisible and gets paid for again.
-        candidates = sorted(OUTPUT_ROOT.glob(f"{slug}-*")) + sorted(
-            (OUTPUT_ROOT / slug).glob("*") if (OUTPUT_ROOT / slug).is_dir() else []
-        )
-        matching_folders = [p for p in candidates if p.is_dir()]
-
-        for folder in reversed(matching_folders):  # Check newest first
-            char_file = folder / "characters.json"
+        if output_dir:
+            char_file = Path(output_dir) / "characters.json"
             if char_file.exists():
-                self.logger.info(f"Loading existing character analysis from {char_file}")
+                self.logger.info(f"Reusing this run's own character analysis: {char_file}")
                 try:
                     with open(char_file) as f:
-                        char_data = json.load(f)
-                    return CharacterAnalysis.from_dict(char_data)
+                        return CharacterAnalysis.from_dict(json.load(f))
                 except Exception as e:
                     self.logger.warning(f"Failed to load character file: {e}")
 
-        # No existing analysis, analyze the book
-        self.logger.info("No existing character analysis found, analyzing book...")
+        self.logger.info("Analyzing characters for this run...")
         character_service = self.get_service("character")
-        characters = await character_service.process(book)
-
-        # Note: Character analysis will be saved by the CLI with a timestamp
-        return characters
+        return await character_service.process(book)
 
     async def process_book(
         self,
@@ -408,6 +402,7 @@ class Application:
         name_map: Optional[dict[str, str]] = None,
         custom_title: Optional[str] = None,
         on_chapter_complete: Optional[Any] = None,
+        characters: Optional[CharacterAnalysis] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -419,6 +414,9 @@ class Application:
             quality_control: Whether to apply quality control
             selected_characters: Optional list of character names to transform
             name_map: Optional mapping of original character names to replacement names
+            characters: The cast this run already analysed. Passing it is how a
+                caller that has shown the reader a cast guarantees the book is
+                transformed against that same cast and no other.
 
         Returns:
             Processing results
@@ -439,8 +437,13 @@ class Application:
                 output_dir = Path(output_path).parent
                 output_dir.mkdir(parents=True, exist_ok=True)
 
-            # Check for existing character analysis or analyze characters
-            characters = await self._get_or_analyze_characters(file_path, book)
+            # The cast. A caller that already analysed one -- the interface does,
+            # and shows the reader the count -- hands it over; otherwise this run
+            # analyses its own.
+            if characters is None:
+                characters = await self._get_or_analyze_characters(book, output_dir)
+            else:
+                self.logger.info("Using the cast supplied by the caller")
             self.logger.info(f"Using {len(characters.characters)} characters")
 
             # Decide every character rename ONCE, before any chapter is
@@ -464,11 +467,13 @@ class Application:
 
             # Save character analysis immediately if we have output path and it's not already saved
             if output_dir:
+                # Written every time, not just when absent: the file beside an
+                # edition is the record of what produced it, and a stale one is
+                # worse than none.
                 char_file = output_dir / "characters.json"
-                if not char_file.exists():
-                    with open(char_file, "w") as f:
-                        json.dump(characters.to_dict(), f, indent=2, default=str)
-                    self.logger.info(f"Saved character analysis to {char_file}")
+                with open(char_file, "w") as f:
+                    json.dump(characters.to_dict(), f, indent=2, default=str)
+                self.logger.info(f"Saved character analysis to {char_file}")
 
                 # Persist the name map alongside the output. Without it there is
                 # no way to check afterwards that every rename actually landed.

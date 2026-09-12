@@ -969,36 +969,70 @@ class RegenderTUI(App):
     transform_type: reactive[str] = reactive("—")
     status_text: reactive[str] = reactive("Ready")
 
+    #: State that outlives a run: how the interface was wired, what the reader
+    #: prefers, and what the session has spent so far. Everything else belongs
+    #: to one book and is declared in _reset_run_state.
+    SESSION_STATE = frozenset(
+        {
+            "_process_callback",
+            "_session_usage",
+            "_friendly_mode",
+            "_setup_provider",
+        }
+    )
+
     def __init__(self, process_callback: Callable | None = None, **kwargs):
         super().__init__(**kwargs)
         self._process_callback = process_callback
-        self._ran_application = None
         # What this session has spent, gathered before each application is shut
         # down. Reading it afterwards returned nothing: shutdown clears the
         # container, so the completion report asked a closed service and
         # silently showed no cost at all.
         self._session_usage = {"tokens_in": 0, "tokens_out": 0, "calls": 0}
+        self._friendly_mode: bool = False
+        self._setup_provider: str = ""
+        self._reset_run_state()
+
+    def _reset_run_state(self) -> None:
+        """Everything that belongs to one book, cleared between books.
+
+        A run must be self-contained. When this list was maintained separately
+        from the restart path, the cast, the renames, the title and the review
+        queue all survived into the next book -- so the reader reviewed one
+        book's characters and transformed another's.
+        """
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
         self._no_qc = False
-        self._name_map: dict[str, str] | None = None
+        self._result: dict | None = None
+        self._ran_application = None
+
+        # The cast, and every decision taken about it. This is the one that bit:
+        # a cast reviewed for the previous book is not this book's cast.
         self._pending_characters = None
+        self._name_map: dict[str, str] | None = None
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
-        self._review_items: list = []
-        self._review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._name_regen_mode: bool = False
         self._name_steer: str = ""
+
+        # The editorial review queue, which is about this book's findings.
+        self._review_items: list = []
+        self._review_idx: int = 0
+
+        # Titles are per book, by definition.
         self._custom_title: str = ""
-        self._friendly_mode: bool = False
-        self._setup_provider: str = ""
+        self._suggested_title: str = ""
+
         self._model_choices: list = []
         self._model_showing_all: bool = False
-        self._result: dict | None = None
+        self._export_format_list: list = []
+
         self._process_start: float | None = None
+        self._analysis_start_time: float | None = None
         self._json_output_path: str | None = None
         self._output_path: Path | None = None
         self._stage_start: float | None = None
@@ -1006,6 +1040,9 @@ class RegenderTUI(App):
         self._last_progress_line_id: str | None = None
         self._book_stats: dict | None = None
         self._analysis_running: bool = False
+        self._transform_loader = None
+        self._stage_loader = None
+        self._analysis_loader = None
 
     def compose(self) -> ComposeResult:
         yield HeaderBar(id="header")
@@ -2929,6 +2966,10 @@ class RegenderTUI(App):
                 if self._transform_loader:
                     self._transform_loader._activity = f"Transforming · Ch {done}/{total}"
 
+            # The cast analysed a few screens ago, whose count the reader saw and
+            # whose names they just approved. Without this the run would analyse
+            # again -- or worse, load some other run's cast -- and the book would
+            # not be the book that was reviewed.
             result = await app.process_book(
                 file_path=self._result["input"],
                 transform_type=self._result["transform_type"],
@@ -2936,6 +2977,7 @@ class RegenderTUI(App):
                 name_map=self._result.get("name_map"),
                 custom_title=self._custom_title or None,
                 on_chapter_complete=on_chapter_complete,
+                characters=self._pending_characters,
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -3244,22 +3286,7 @@ class RegenderTUI(App):
 
     def _restart_flow(self) -> None:
         """Reset state and start a new transformation."""
-        self._selected_book = None
-        self._selected_transform = None
-        self._no_qc = False
-        self._result = None
-        self._process_start = None
-        self._json_output_path = None
-        self._output_path = None
-        self._stage_start = None
-        self._current_stage = None
-        self._last_progress_line_id = None
-        self._book_stats = None
-        self._analysis_running = False
-        self._transform_loader = None
-        self._stage_loader = None
-        self._analysis_loader = None
-        self._model_choices = []
+        self._reset_run_state()
         os.environ.pop("DEFAULT_MODEL", None)
 
         self.book_title = "—"
