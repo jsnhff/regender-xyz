@@ -2488,6 +2488,74 @@ class TransformService(BaseService):
             return True
         return all(mask[i] for i in range(start, end) if text[i].isalpha())
 
+    # Kinship nouns whose plural is not simply "+s".
+    _IRREGULAR_PLURALS = {
+        "wife": "wives",
+        "child": "children",
+        "man": "men",
+        "woman": "women",
+        "person": "people",
+    }
+
+    # "her uncle and aunt" -- a possessive owning two relations, or the same
+    # relation twice once the transform has run.
+    _PAIRED_RELATIONS = re.compile(
+        r"(?<![A-Za-z])(my|your|his|her|their|our)\s+([A-Za-z]+)\s+and\s+(?:\1\s+)?([A-Za-z]+)",
+        re.IGNORECASE,
+    )
+
+    @classmethod
+    def _plural_of(cls, noun: str) -> str:
+        lowered = noun.lower()
+        if lowered in cls._IRREGULAR_PLURALS:
+            plural = cls._IRREGULAR_PLURALS[lowered]
+        elif lowered.endswith(("s", "x", "z", "ch", "sh")):
+            plural = lowered + "es"
+        else:
+            plural = lowered + "s"
+        return cls._match_case(noun, plural)
+
+    def _collapse_coordinated_pair(self, text: str, key: str, source_text: Optional[str]) -> str:
+        """ "her uncle and aunt" becomes "his uncles", not "his uncle and uncle".
+
+        A one-directional transform sends both halves of a coordinated pair to
+        the same word, and English has a better answer than saying it twice.
+        Nine of ten such sentences in a real book took the plural, and the
+        other one was the reader choosing the same thing by hand -- so it is a
+        rule rather than a question now.
+
+        Only where the source had two *different* relations. "his uncle and
+        uncle" arrived that way from "her uncle and aunt"; a source that
+        genuinely repeats a word is left exactly as it is.
+        """
+        if source_text is None:
+            return text
+        nouns = self._gendered_nouns(key)
+        if not nouns:
+            return text
+
+        source_pairs = {
+            (m.group(1).lower(), m.group(2).lower(), m.group(3).lower())
+            for m in self._PAIRED_RELATIONS.finditer(source_text)
+        }
+        differed = {(owner, a, b) for owner, a, b in source_pairs if a != b}
+        if not differed:
+            return text
+
+        def _replace(match: "re.Match") -> str:
+            owner, first, second = match.group(1), match.group(2), match.group(3)
+            if first.lower() != second.lower() or first.lower() not in nouns:
+                return match.group(0)
+            # The source must have had two different relations under the same
+            # possessive, or this is a repetition the author wrote.
+            if not any(o == owner.lower() for o, _a, _b in differed):
+                return match.group(0)
+            result = f"{owner} {self._plural_of(first)}"
+            self._record_substitution(text, match.start(), match.group(0), result, None)
+            return result
+
+        return self._PAIRED_RELATIONS.sub(_replace, text)
+
     def _apply_contextual_pronouns(self, text: str, key: str, source_text: Optional[str]) -> str:
         """Resolve role-dependent pronouns the LLM missed ("her husband" -> "his wife").
 
@@ -2632,6 +2700,7 @@ class TransformService(BaseService):
             text = pattern.sub(_replace, text)
 
         text = self._apply_contextual_pronouns(text, key, source_text)
+        text = self._collapse_coordinated_pair(text, key, source_text)
 
         for pattern, replacement in self._CASE_SENSITIVE_FIXES.get(key, []):
             # These are substitutions too, and "Sir " -> "Lady " is 47 of them
