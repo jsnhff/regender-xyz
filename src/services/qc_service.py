@@ -201,7 +201,12 @@ class QCReport:
 class QCService:
     """Compares a transformed book against its source, chapter by chapter."""
 
-    def __init__(self, transform_type: TransformType, name_map: Optional[dict[str, str]] = None):
+    def __init__(
+        self,
+        transform_type: TransformType,
+        name_map: Optional[dict[str, str]] = None,
+        cast: Optional[list] = None,
+    ):
         self.transform_type = transform_type
         self.key = transform_type.value
         # Renaming is driven by character analysis, not the term map, so QC is
@@ -240,6 +245,33 @@ class QCService:
                 continue
             for source_word, target_word in zip(before, after):
                 self._expected_word.setdefault(source_word.lower(), set()).add(target_word.lower())
+        # The family names in this cast. A capitalised one is a person even
+        # when the word means something else: "Miss King" is Mary King, and
+        # the transform protects her for exactly this reason.
+        # Taken from the cast where it is available, because the map only
+        # holds people who are being renamed -- and Mary King is not, in an
+        # all_female book, so nothing in the map says "King" is anybody's
+        # family name.
+        self._surnames = set()
+        for original in list(cast or []) + list(self.name_map):
+            if "'" in original or "\u2019" in original:
+                continue  # "Elizabeth's Uncle" describes a person, not names one
+            words = TransformService._WORD_RE.findall(original)
+            kept = [
+                w
+                for w in words
+                if w[:1].isupper()
+                and w.lower() not in TransformService._HONORIFICS
+                and w.lower() not in TransformService._RANKS
+            ]
+            # Only a full name tells you which word is the family name. "Mr.
+            # Darcy" and "Sir William" have the same shape and opposite
+            # answers -- Darcy is a surname, William a given name -- so a
+            # titled short form is skipped and the surname comes from
+            # "Fitzwilliam Darcy" or "Sir William Lucas" instead.
+            if len(kept) > 1:
+                self._surnames.add(kept[-1])
+
         self._exchange_targets = {
             name for name in self.name_map if name in set(self.name_map.values())
         }
@@ -314,23 +346,7 @@ class QCService:
         """
         if not self.name_map:
             return
-        surnames = set()
-        for original in self.name_map:
-            words = TransformService._WORD_RE.findall(original)
-            # Capitalised only. Map keys include phrases like "her father",
-            # and calling "father" a family name reported the whole term map
-            # as a loss.
-            without_title = [
-                w
-                for w in words
-                if w[:1].isupper()
-                and w.lower() not in TransformService._HONORIFICS
-                and w.lower() not in TransformService._RANKS
-            ]
-            if len(without_title) > 1:
-                surnames.add(without_title[-1])
-            elif without_title and len(without_title) < len(words):
-                surnames.add(without_title[0])
+        surnames = set(self._surnames)
 
         source_text = "\n".join(
             _text_of(p) for c in source_chapters for p in c.get("paragraphs", [])
@@ -630,9 +646,16 @@ class QCService:
             title handed straight to another title -- "Mr. and Mrs. Gardiner"
             -- names one more, sharing the surname that follows.
             """
+            # "Mr. Gardiner" names one. So does "Winifred Collins": once a
+            # collision is resolved by giving somebody a name, the pair can
+            # survive with no title on either half.
             named = len(
                 re.findall(
-                    r"\b" + titles + r"\.?\s+(?:[A-Z]\w+\s+)?" + re.escape(surname) + r"\b",
+                    r"\b(?:"
+                    + titles
+                    + r"\.?|[A-Z]\w+)\s+(?:[A-Z]\w+\s+)?"
+                    + re.escape(surname)
+                    + r"\b",
                     text,
                 )
             )
@@ -1098,6 +1121,12 @@ class QCService:
         protected = TransformService.protected_spans(output)
         for _source_word, word, span, source_span in residual:
             if word in _REVIEW_IGNORE:
+                continue
+            # A capitalised cast surname is a person, not a gendered word. The
+            # transform already declines to touch "King" while still swapping
+            # "king"; reporting it here asked a reader to rule on a monarch who
+            # is actually Mary King.
+            if output[span[0] : span[1]][:1].isupper() and word.capitalize() in self._surnames:
                 continue
             if any(a <= span[0] and span[1] <= b for a, b in protected):
                 continue
