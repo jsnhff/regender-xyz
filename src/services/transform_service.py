@@ -1243,6 +1243,19 @@ class TransformService(BaseService):
 
     _TERM_MAPS: dict[str, dict[str, str]] = {
         "all_male": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergywoman": "clergyman",
+            "coachwoman": "coachman",
+            "tradeswoman": "tradesman",
+            "footwoman": "footman",
+            "spokeswoman": "spokesman",
+            "sportswoman": "sportsman",
+            "frenchwoman": "frenchman",
+            "horsewoman": "horseman",
+            "patroness": "patron",
+            "sisterly": "brotherly",
+            "housemaid": "manservant",
+            "chambermaid": "manservant",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "aunts": "uncles",
@@ -1336,6 +1349,16 @@ class TransformService(BaseService):
             "Mrs": "Mr",
         },
         "all_female": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergyman": "clergywoman",
+            "coachman": "coachwoman",
+            "tradesman": "tradeswoman",
+            "footman": "footwoman",
+            "spokesman": "spokeswoman",
+            "sportsman": "sportswoman",
+            "frenchman": "frenchwoman",
+            "horseman": "horsewoman",
+            "brotherly": "sisterly",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "boys": "girls",
@@ -1431,6 +1454,26 @@ class TransformService(BaseService):
             "Mr": "Mrs",
         },
         "gender_swap": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergyman": "clergywoman",
+            "clergywoman": "clergyman",
+            "coachman": "coachwoman",
+            "coachwoman": "coachman",
+            "tradesman": "tradeswoman",
+            "tradeswoman": "tradesman",
+            "footman": "footwoman",
+            "footwoman": "footman",
+            "spokesman": "spokeswoman",
+            "spokeswoman": "spokesman",
+            "sportsman": "sportswoman",
+            "sportswoman": "sportsman",
+            "frenchman": "frenchwoman",
+            "frenchwoman": "frenchman",
+            "horseman": "horsewoman",
+            "horsewoman": "horseman",
+            "housemaid": "manservant",
+            "sisterly": "brotherly",
+            "brotherly": "sisterly",
             # Familial / relational (both directions)
             "mother": "father",
             "father": "mother",
@@ -1575,6 +1618,28 @@ class TransformService(BaseService):
             "Mrs": "Mr",
         },
         "nonbinary": {
+            # Occupations and derivations carrying gender in the word itself.
+            # Real English words, not -person coinages: one edition produced
+            # gentleperson, clergyperson, chamberperson, horseperson,
+            # tradesperson, spokesperson and sportspeople.
+            "clergyman": "cleric",
+            "clergywoman": "cleric",
+            "coachman": "driver",
+            "coachwoman": "driver",
+            "tradesman": "trader",
+            "tradeswoman": "trader",
+            "footman": "attendant",
+            "footwoman": "attendant",
+            "spokesman": "speaker",
+            "spokeswoman": "speaker",
+            "sportsman": "sporting sort",
+            "sportswoman": "sporting sort",
+            "horseman": "rider",
+            "horsewoman": "rider",
+            "patroness": "patron",
+            "sisterly": "kindly",
+            "brotherly": "kindly",
+            "manservant": "servant",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "aunts": "relatives",
@@ -1583,8 +1648,8 @@ class TransformService(BaseService):
             "daughters": "children",
             "fathers": "parents",
             "gentlemanlike": "genteel",
-            "gentlemen": "people",
-            "gentlewomen": "people",
+            "gentlemen": "gentlefolk",
+            "gentlewomen": "gentlefolk",
             "girls": "youths",
             "goddaughter": "godchild",
             "godson": "godchild",
@@ -2133,6 +2198,26 @@ class TransformService(BaseService):
         "hero": "heroes",
         "child": "children",
         "person": "people",
+        # Every occupational in -man. Derived regularly these come out
+        # "clergymans" and "sportsmans", so the plural the source actually uses
+        # matches nothing at all.
+        "clergyman": "clergymen",
+        "clergywoman": "clergywomen",
+        "coachman": "coachmen",
+        "coachwoman": "coachwomen",
+        "tradesman": "tradesmen",
+        "tradeswoman": "tradeswomen",
+        "footman": "footmen",
+        "footwoman": "footwomen",
+        "spokesman": "spokesmen",
+        "spokeswoman": "spokeswomen",
+        "sportsman": "sportsmen",
+        "sportswoman": "sportswomen",
+        "frenchman": "frenchmen",
+        "frenchwoman": "frenchwomen",
+        "horseman": "horsemen",
+        "horsewoman": "horsewomen",
+        "manservant": "menservants",
     }
 
     # Every pronoun form the transforms touch. Kept apart from the nouns because
@@ -2863,6 +2948,35 @@ class TransformService(BaseService):
                 return result + (match.group("clitic") or "")
 
             text = pattern.sub(_replace, text)
+
+            # Agreement needs a second look, because the first pass is what
+            # created the disagreement. The substitution is one simultaneous
+            # scan, so where "she" became "they" the scanner had already moved
+            # past and "they was" was never a candidate: the rule fires on
+            # "they was very glad" given to it directly and not on "she was very
+            # glad", which is the only way it ever arrives. Grammar, not gender,
+            # so the mask has no business here either.
+            agreement = {
+                term: replacement
+                for term, replacement in term_map.items()
+                if _AGREEMENT_PHRASE.match(term)
+            }
+            if agreement:
+                second, second_lookup = self._compile_substitution(tuple(sorted(agreement.items())))
+
+                def _fix_agreement(match: "re.Match") -> str:
+                    term = match.group("term")
+                    start, end = match.span("term")
+                    if self._in_protected(protected, start, end):
+                        return match.group(0)
+                    replacement = second_lookup[self._fold_apostrophe(term.lower())]
+                    if "’" in term:
+                        replacement = replacement.replace("'", "’")
+                    result = self._match_case(term, replacement)
+                    self._record_substitution(text, start, term, result, where)
+                    return result + (match.group("clitic") or "")
+
+                text = second.sub(_fix_agreement, text)
 
         text = self._apply_contextual_pronouns(text, key, source_text)
         text = self._collapse_coordinated_pair(text, key, source_text)

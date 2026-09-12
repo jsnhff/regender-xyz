@@ -379,10 +379,19 @@ class CharacterService(BaseService):
                 )
 
             # Create analysis result
+            metadata = self._calculate_metadata(final_characters)
+            # What produced this cast. Every saved analysis recorded provider and
+            # model as null, so a run that found 77 characters could not even be
+            # told apart from one that found 91 by asking which model read the
+            # book. The empty-chunk tally rides along for the same reason.
+            if self.empty_chunks:
+                metadata["empty_chunks"] = list(self.empty_chunks)
             return CharacterAnalysis(
                 book_id=book.hash(),  # Use book hash as ID
                 characters=final_characters,
-                metadata=self._calculate_metadata(final_characters),
+                metadata=metadata,
+                provider=getattr(self.provider, "name", None),
+                model=getattr(self.provider, "model", None),
             )
 
         except (ValidationError, CharacterExtractionError, ConfigurationError):
@@ -1215,15 +1224,34 @@ class CharacterService(BaseService):
         if not gender_str:
             return Gender.UNKNOWN
 
-        gender_str = gender_str.lower()
-        if "female" in gender_str or "woman" in gender_str:
-            return Gender.FEMALE
-        elif "male" in gender_str or "man" in gender_str:
-            return Gender.MALE
-        elif "non" in gender_str or "neutral" in gender_str:
-            return Gender.NEUTRAL
-        else:
+        gender_str = str(gender_str).lower().strip()
+
+        # Nonbinary first, and by its own names. Testing "female" before anything
+        # else made Gender.NONBINARY unreachable: "non-binary" contains neither
+        # "female" nor "male", so it fell to "non" and became NEUTRAL, which
+        # target_gender() skips -- so a character the book already describes as
+        # nonbinary was never transformed at all. "male/female" was read as
+        # FEMALE for the same ordering reason.
+        if any(
+            word in gender_str
+            for word in ("non-binary", "nonbinary", "non binary", "enby", "genderqueer")
+        ):
+            return Gender.NONBINARY
+        if gender_str in ("they", "they/them", "them"):
+            return Gender.NONBINARY
+
+        has_female = "female" in gender_str or "woman" in gender_str
+        has_male = "male" in gender_str or "man" in gender_str
+        # "male/female" names two possibilities, which is not an answer.
+        if has_female and has_male and gender_str not in ("female", "woman"):
             return Gender.UNKNOWN
+        if has_female:
+            return Gender.FEMALE
+        if has_male:
+            return Gender.MALE
+        if "neutral" in gender_str:
+            return Gender.NEUTRAL
+        return Gender.UNKNOWN
 
     def _calculate_metadata(self, characters: list[Character]) -> dict[str, Any]:
         """
