@@ -1064,8 +1064,20 @@ class TransformService(BaseService):
     # Fixed expressions where a gendered word names no one. "Good Lord!" is an
     # exclamation, not a title, and swapping it yields "Good Lady!" — which the
     # printed Pride and Prejudice carries three times.
+    # An oath is not a peerage. "Good Lord!" was already held back here, but the
+    # bare exclamation was not -- so "Lord! how I laughed!" went through the
+    # title map and came out "Noble! how I laughed!" in the nonbinary edition and
+    # would have been "Lady!" in the others. Every one of these is Lydia or Mrs.
+    # Bennet swearing, and none of them is a lord.
+    #
+    # Holding them here only stops the title map. Where a variant wants the oath
+    # itself changed -- a masculine invocation is the one thing left standing in
+    # a book with no men -- _OATH_FIXES converts it afterwards, which is why the
+    # peer forms are excluded: "Lord ----" and "Lord Byron" carry a space, and
+    # every pattern below needs punctuation or a lowercase word straight after.
     _PROTECTED_PHRASES = re.compile(
-        r"[Gg]ood\s+Lord|O\s+Lord|Lord\s+(?:bless|knows|have\s+mercy)"
+        r"[Gg]ood\s+Lord|O\s+Lord|Oh,\s+Lord|Lord\s+(?:bless|knows|have\s+mercy)"
+        r"|Lord[!?]|Lord,(?=\s+[a-z])"
         r"|[Gg]ood\s+God|[Gg]ood\s+[Hh]eavens?"
     )
 
@@ -1139,6 +1151,68 @@ class TransformService(BaseService):
             # actual possession
             "master of this fortune": "owner of this fortune",
             "mistress of this fortune": "owner of this fortune",
+        },
+    }
+
+    # Words the model coined where a term had already been decided.
+    #
+    # These cannot be held to the residual mask, and that is the whole point of
+    # keeping them separate. The mask asks whether a word is identical to its
+    # source counterpart, so that the net never undoes correct model work -- but
+    # a coinage is by definition not identical to its source, so every rule whose
+    # job is to repair one was structurally unable to fire. "nibbling" ->
+    # "nibling" was written and commented as an LLM typo correction and could
+    # never correct an LLM typo: the shipped nonbinary edition has 30 of one
+    # beside 34 of the other.
+    #
+    # The same gap left "Ladyship" in six spellings. The rule Ladyship ->
+    # Nobleship only fires where the model left the word alone, which it did four
+    # times out of forty-two; the rest came back as Nobship (14), Nobility (14),
+    # Noblemajesty (4), Noblesip (1) and Nobleperson (1), none of them dominant
+    # and one of them not a word. Mapping the coinages back to the decided term
+    # is what makes a decision hold.
+    _CANONICAL_FORMS: dict[str, dict[str, str]] = {
+        "nonbinary": {
+            # The honorific, settled on one spelling. "Nobship", "Noblesip",
+            # "Noblemajesty" and "Nobleperson" are not words and are safe to
+            # match bare. "Nobility" is a real one -- the aristocracy as a class
+            # -- so it is matched only in the possessive frame where the model
+            # used it as an honorific, and Austen's own noun is left alone.
+            "nobship": "nobleship",
+            "noblemajesty": "nobleship",
+            "noblesip": "nobleship",
+            "nobleperson": "nobleship",
+            "their nobility": "their nobleship",
+            "your nobility": "your nobleship",
+            # the kinship term, settled likewise
+            "nibbling": "nibling",
+            # -person coinages where a real word was already chosen
+            "gentleperson": "gentlefolk",
+            "gentlepersons": "gentlefolk",
+            "gentlepersonlike": "genteel",
+            "gentlepersonly": "genteel",
+            "clergyperson": "cleric",
+            "chamberperson": "chambermaid",
+            "horseperson": "rider",
+            "tradesperson": "tradesfolk",
+            "spokesperson": "speaker",
+            "sportspeople": "sporting folk",
+            "siblingly": "kindly",
+            "relativeses": "relatives",
+            "siblingses": "siblings",
+        },
+        "all_female": {
+            # "damehood" is not English; the honour keeps its own name.
+            "damehood": "knighthood",
+            "mama": "mamma",
+            "mistresss": "mistresses",
+        },
+        "gender_swap": {
+            "damehood": "knighthood",
+            "mama": "mamma",
+        },
+        "all_male": {
+            "mama": "papa",
         },
     }
 
@@ -1755,6 +1829,27 @@ class TransformService(BaseService):
     # Case-sensitive regex fixes applied after _apply_term_map.
     # Keyed by transform type value. Used for patterns where re.IGNORECASE
     # would cause false positives (e.g. "Miss" verb vs title).
+    # "Oh, Lord!" is an oath, not a peer, and in a book where nobody is a lord
+    # by gender it is the one masculine invocation the transforms left standing.
+    # Austen supplies the replacement herself: "Good gracious" is Mrs. Bennet's
+    # own exclamation, five times in this book, and she stacks them -- "Good
+    # gracious! Lord bless me! only think! dear me!" Every "Lord!" oath in Pride
+    # and Prejudice is spoken by Lydia or Mrs. Bennet, so the register has to
+    # stay loud and unguarded, which "Good gracious!" is and "Oh, no!" is not.
+    # "Heaven" carries the blessing, as Austen uses it seven times.
+    #
+    # Order matters: the framed forms go first, so by the time the bare rule runs
+    # there is no "good Lord!" left for it to touch. The peer is safe throughout
+    # -- "Lord ----" and "Lord Byron" are followed by a space, and every pattern
+    # here demands punctuation or a lowercase word immediately after.
+    _OATH_FIXES: list[tuple] = [
+        (re.compile(r"(?<![A-Za-z])Oh,\s+Lord([!,?])"), r"Good gracious\1"),
+        (re.compile(r"(?<![A-Za-z])([Gg])ood\s+Lord([!,?])"), r"\1ood gracious\2"),
+        (re.compile(r"(?<![A-Za-z])Lord(\s+bless)"), r"Heaven\1"),
+        (re.compile(r"(?<![A-Za-z])Lord([!?])"), r"Good gracious\1"),
+        (re.compile(r"(?<![A-Za-z])Lord,(\s+[a-z])"), r"Good gracious,\1"),
+    ]
+
     _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
         # "Sir" before a name swaps to "Lady", not to "Madam". The flat map
         # gives the vocative answer -- right for "Yes, sir" and wrong for
@@ -1794,14 +1889,18 @@ class TransformService(BaseService):
                 "Mx. ",
             ),
             (re.compile(r"\bSir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
+            *_OATH_FIXES,
         ],
         "all_male": [
             (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mr. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
+            # No oath rule: "Lord" is already the masculine form, so nothing here
+            # is out of place for this variant.
         ],
         "all_female": [
             # "Miss" is already female — only need to catch "Mr." on now-female characters.
-            # Handled by the "Mr" → "Ms" term map entry; no case-sensitive fix needed here.
+            # Handled by the "Mr" → "Mrs" term map entry; no case-sensitive fix needed here.
+            *_OATH_FIXES,
         ],
     }
 
@@ -2091,6 +2190,9 @@ class TransformService(BaseService):
         if cached is not None:
             return cached
         terms = {cls._fold_apostrophe(t.lower()) for t in cls._sense_rules_for(key)}
+        # A repair for a coined word can never match its source, so holding it
+        # to the mask disables it entirely.
+        terms.update(cls._fold_apostrophe(t.lower()) for t in cls._CANONICAL_FORMS.get(key, {}))
         terms.update(
             cls._fold_apostrophe(t.lower())
             for t in cls._effective_term_map(key)
@@ -2120,6 +2222,7 @@ class TransformService(BaseService):
         base = cls._TERM_MAPS.get(key, {})
         effective = dict(base)
         effective.update(cls._sense_rules_for(key))
+        effective.update(cls._CANONICAL_FORMS.get(key, {}))
         for original, replacement in base.items():
             if (
                 original.lower() in cls._NO_PLURAL
