@@ -132,7 +132,27 @@ def _is_title_led(alias: str) -> bool:
 # Capitalized English words that character extraction sometimes mistakes for
 # given names ("The Archbishop", "Young Lucas"). Renaming one of these would
 # rewrite ordinary words across the whole book.
-_GIVEN_STOPLIST = {"the", "a", "an", "young", "old", "elder", "little", "poor", "dear"}
+_GIVEN_STOPLIST = {
+    "the",
+    "a",
+    "an",
+    "young",
+    "old",
+    "elder",
+    "little",
+    "poor",
+    # Endearments the extraction captures as names. A cast entry called
+    # "Dearest Jane" is not a person, and it does real damage beyond its own
+    # bad rename: read as Given + Surname it teaches the index that "Jane" is a
+    # family name, so the correct rename of the given name Jane then reads as a
+    # destroyed surname.
+    "dear",
+    "dearest",
+    "beloved",
+    "sweet",
+    "good",
+    "my",
+}
 
 
 def _is_descriptive_name(name: str) -> bool:
@@ -180,7 +200,16 @@ def _is_invented(original: str, target: str) -> bool:
     if any(t == o + s for s in _INVENTED_SUFFIXES):
         return True
     stem = o[:-1]
-    return len(stem) >= 3 and any(t == stem + s for s in _INVENTED_SUFFIXES)
+    if len(stem) >= 3 and any(t == stem + s for s in _INVENTED_SUFFIXES):
+        return True
+
+    # Mangling by truncation, which is the same move in the other direction:
+    # "Fitzwilliam" lost its last letter and became "Fitzwillia", a word that is
+    # not a name in any language, and Darcy was called it 222 times in a single
+    # edition. Only for long names -- "Kit" is a prefix of "Kitty" and a real
+    # short form, and so is "Eliza" of "Elizabeth".
+    shorter, longer = sorted((o, t), key=len)
+    return len(shorter) >= 6 and len(longer) - len(shorter) <= 2 and longer.startswith(shorter)
 
 
 #: Particles that belong to a surname rather than standing between names.
@@ -296,7 +325,11 @@ def cast_name_index(characters: Any) -> tuple[frozenset, frozenset, frozenset]:
         forms.extend(getattr(char, "aliases", []) or [])
 
     for form in forms:
-        if not form:
+        # A description is not evidence about anybody's name. "my sweetest
+        # Lizzy" and "Dearest Jane" read as Given + Surname, which filed Lizzy
+        # and Jane as family names -- so the correct rename of the given name
+        # Jane then reported a destroyed surname.
+        if not form or _is_descriptive_name(form):
             continue
         tokens = _strip_titles(form)
         if len(tokens) > 1:
@@ -345,35 +378,80 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
         else (frozenset(), frozenset(), frozenset())
     )
 
+    # Which cast member each name belongs to. Two map keys for one person --
+    # "Kitty Bennet" and "Catherine Bennet", or the nicknames "Eliza" and
+    # "Lizzy" -- must share a target, and reporting that as two people given one
+    # name is the opposite of the truth.
+    owner: dict[str, str] = {}
+    for char in getattr(characters, "characters", characters) or []:
+        canonical = getattr(char, "name", "")
+        for form in [canonical, *(getattr(char, "aliases", []) or [])]:
+            if not form:
+                continue
+            owner.setdefault(form.lower(), canonical)
+            # And without the title, because the map holds both "Lady Anne
+            # Darcy" and "Anne Darcy" and they are one woman.
+            bare = " ".join(_strip_titles(form)).lower()
+            if bare:
+                owner.setdefault(bare, canonical)
+
+    def whose(name: str) -> str:
+        """The cast member a map key is about, or the key itself.
+
+        Titles are tried both ways, or "Lady Anne Darcy" and "Anne Darcy" count
+        as two people and the report says so twice with the same name.
+        """
+        key = name.lower()
+        if key in owner:
+            return owner[key]
+        stripped = " ".join(_strip_titles(name)).lower()
+        return owner.get(stripped, stripped or key)
+
     problems: list[str] = []
-    by_source: dict[str, set] = {}
-    by_target: dict[str, set] = {}
+    # Keyed by the whole source name, not its given name alone: two different
+    # Annes are two people and may have two names.
+    by_character: dict[tuple, set] = {}
+    by_target: dict[tuple, set] = {}
 
     for key, value in name_map.items():
         if _is_descriptive_name(key) or _POSSESSIVE.search(key):
             continue  # a term substitution, not a person
         shape = given_and_surname(key, surnames, givens)
-        key_given, _ = shape
-        new_given, _ = given_and_surname(value, surnames, givens, like=shape)
+        key_given, key_surname = shape
+        new_given, new_surname = given_and_surname(value, surnames, givens, like=shape)
         if not key_given or not new_given:
             continue
         if key_given.lower() == new_given.lower():
             continue  # no rename here to be inconsistent about
-        by_source.setdefault(key_given.lower(), set()).add(new_given)
-        by_target.setdefault(new_given.lower(), set()).add(key_given)
+        person = whose(key)
+        # Only full forms. A lone given name is how a nickname enters the map,
+        # and "Kitty" -> "Kit" beside "Kitty Bennet" -> "Christopher Bennet" is
+        # one girl with a formal name and a short one, not two names for her.
+        if key_surname:
+            by_character.setdefault(person, set()).add(new_given)
+        by_target.setdefault((new_given.lower(), (new_surname or "").lower()), set()).add(
+            (person, key_given, key_surname or "")
+        )
 
-    for source, targets in sorted(by_source.items()):
-        if len(targets) > 1:
-            problems.append(
-                f"{source!r} is renamed {len(targets)} different ways "
-                f"({', '.join(sorted(targets))}); one character, several names"
-            )
-    for target, sources in sorted(by_target.items()):
-        if len(sources) > 1:
-            problems.append(
-                f"{target!r} is the new name of {len(sources)} different characters "
-                f"({', '.join(sorted(sources))}); two people, one name"
-            )
+    for person, targets in sorted(by_character.items()):
+        if len(targets) < 2:
+            continue
+        ordered = sorted(targets)
+        problems.append(
+            f"{person!r} is renamed {len(targets)} different ways "
+            f"({', '.join(ordered)}); one character, several names"
+        )
+
+    for (given, surname), sources in sorted(by_target.items()):
+        if len({person for person, _g, _s in sources}) < 2:
+            continue
+        # Two people may share a given name, as Austen's own cast does; they are
+        # only confusable when the surname matches too.
+        who = ", ".join(sorted(f"{g} {s}".strip() for _p, g, s in sources))
+        problems.append(
+            f"{given!r} {('' if not surname else surname + ' ')}is the new name of "
+            f"{len(sources)} different characters ({who}); two people, one name"
+        )
 
     for key, value in sorted(name_map.items()):
         problem = check_rename(key, value, surnames=surnames, givens=givens)
@@ -470,7 +548,7 @@ def check_rename(
         if new_given.lower() == orig_given.lower():
             return f"given name {orig_given!r} unchanged; only the title moved"
         if _is_invented(orig_given, new_given):
-            return f"{new_given!r} looks invented (the original with a suffix)"
+            return f"{new_given!r} looks invented (the original with its ending changed)"
         if not _is_plausible_name(new_given):
             return f"{new_given!r} is not a plausible given name"
         # Somebody else's name is not available. "Elizabeth" -> "Jane" reads as

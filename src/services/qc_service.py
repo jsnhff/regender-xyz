@@ -29,6 +29,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
+from rapidfuzz import fuzz
+
 from src.models.transformation import TransformType
 from src.services.transform_service import TransformService
 
@@ -980,7 +982,9 @@ class QCService:
                     f"{name!r} was not renamed to {self.name_map[name]!r}",
                     _excerpt(output, match.start()),
                     term=name,
-                    source_excerpt=_excerpt(source, _nearest(source, name, match.start())),
+                    source_excerpt=_excerpt(
+                        source, _source_anchor(source, output, name, match.start())
+                    ),
                     offset=match.start(),
                 )
             )
@@ -1172,6 +1176,50 @@ def _nearest(text: str, needle: str, position: int) -> int:
     if not places:
         return 0
     return min(places, key=lambda start: abs(start - position))
+
+
+def _aligned_position(source: str, output: str, position: int, width: int = 60) -> int:
+    """The place in `source` that the text around `position` in `output` came from.
+
+    Anchoring on the term itself is not enough, and the way it fails is
+    invisible until a reader sees it. In one paragraph "Mrs. Hurst" correctly
+    became "Mr. Hurst" while a real "Mr. Hurst" was missed, so the output holds
+    the phrase twice and the source holds it once: both findings anchored on
+    that single occurrence and were shown the same "was" line, one of them
+    beside a "now" line from four hundred characters away. The word diff then
+    lit up almost every word, because the two lines were not the same sentence.
+
+    So anchor on the surrounding words instead, which mostly did not change.
+    The window around the output position is located in the source by best
+    match, and the offset within it carried across. A weak match means the
+    passage was rewritten rather than adjusted, and then the term itself is the
+    better guess.
+    """
+    if not source or not output:
+        return 0
+    start = max(0, position - width // 2)
+    window = output[start : start + width]
+    if not window.strip():
+        return 0
+    try:
+        found = fuzz.partial_ratio_alignment(window, source)
+    except Exception:
+        return 0
+    if not found or found.score < 60:
+        return -1
+    return max(0, found.dest_start + (position - start) - found.src_start)
+
+
+def _source_anchor(source: str, output: str, needle: str, position: int) -> int:
+    """Where the source says what the output says at `position`.
+
+    The surrounding words first, because they are what did not change; the term
+    itself only where the passage was rewritten too heavily to match.
+    """
+    aligned = _aligned_position(source, output, position)
+    if aligned >= 0:
+        return aligned
+    return _nearest(source, needle, position)
 
 
 def _excerpt(text: str, position: int, width: int = 70) -> str:
