@@ -1222,7 +1222,12 @@ Return ONLY the JSON array.{steer_note}"""
                 return []
 
             # Validate and clean each entry
-            from src.services.name_engine import check_rename
+            from src.services.name_engine import cast_name_index, check_rename
+
+            # What the cast already is. Without it the check has to guess from
+            # the shape of a name whether "Sir William" names a man called
+            # William or the Lucas family, and whether "Jane" is free.
+            cast_surnames, cast_givens, reserved = cast_name_index(characters)
 
             result = []
             for item in parsed:
@@ -1240,7 +1245,13 @@ Return ONLY the JSON array.{steer_note}"""
                     # nonbinary name. A suggestion that fails here is not shown;
                     # the character falls through to the engine, which has the
                     # period-attested pool and will choose.
-                    problem = check_rename(original, suggested)
+                    problem = check_rename(
+                        original,
+                        suggested,
+                        surnames=cast_surnames,
+                        givens=cast_givens,
+                        reserved=reserved,
+                    )
                     if problem:
                         self.logger.warning(
                             f"Dropped name suggestion {original!r} -> {suggested!r}: {problem}"

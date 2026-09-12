@@ -85,9 +85,10 @@ class TestTheReportedFailures:
         ],
     )
     def test_a_given_name_may_not_simply_vanish(self, original, suggested):
-        problem = check_rename(original, suggested)
-        assert problem, f"{original!r} -> {suggested!r} was accepted"
-        assert "lost" in problem
+        assert check_rename(original, suggested), f"{original!r} -> {suggested!r} was accepted"
+
+    def test_a_bare_title_is_named_as_such(self):
+        assert check_rename("Catherine", "Noble") == "'Noble' is only a title, not a name"
 
 
 class TestSurnamesAreFamilyNotGender:
@@ -180,3 +181,156 @@ class TestAgainstTheShippedMap:
             "Catherine",
             "Lewis",
         }
+
+
+class TestTheAuditsWrongAnswers:
+    """Twenty-one answers an adversarial audit found wrong, kept as a class.
+
+    The first version of this gate guessed a name's shape from its punctuation
+    and its title, and guessed wrong in both directions. It rejected correct
+    renames -- dropping the suggestion so the reader never saw it -- and it
+    accepted renames that merge two characters into one.
+
+    The fix was to stop guessing: the cast says which tokens are surnames and
+    which are given names, and a proposed name (which by definition is not in
+    the cast) is read against the shape of the name it replaces.
+    """
+
+    @pytest.fixture(scope="class")
+    def cast(self):
+        """The real P&P cast, so the checks have the knowledge they need."""
+        import json
+        import pathlib
+
+        from src.models.character import CharacterAnalysis
+        from src.services.name_engine import cast_name_index
+
+        path = pathlib.Path(
+            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
+            "nonbinary_2026-09-11_23-16/characters.json"
+        )
+        if not path.exists():
+            pytest.skip("the real cast is not on this machine")
+        return cast_name_index(CharacterAnalysis.from_dict(json.loads(path.read_text())))
+
+    def judge(self, cast, original, suggested):
+        surnames, givens, reserved = cast
+        return check_rename(
+            original, suggested, surnames=surnames, givens=givens, reserved=reserved
+        )
+
+    @pytest.mark.parametrize(
+        "original,suggested,why",
+        [
+            # Sir/Lady/Lord take a GIVEN name. Read as a surname, a correct
+            # rename looked like a destroyed surname and was dropped.
+            ("Sir William", "Noble Vivian", "Sir takes a given name"),
+            ("Sir William", "Dame Wilhelmina", "the same, for all_female"),
+            ("Lady Catherine", "Noble Sydney", "Lady takes a given name"),
+            ("Lord Byron", "Noble Beverly", "Lord takes a given name"),
+            # Elder and Younger are attested English surnames. Treating them as
+            # surname qualifiers wherever they appeared rejected these.
+            ("Elizabeth Elder", "Edmund Elder", "Elder is a surname"),
+            ("Mary Younger", "Morgan Younger", "Younger is a surname"),
+        ],
+    )
+    def test_the_false_positives_are_accepted(self, cast, original, suggested, why):
+        problem = self.judge(cast, original, suggested)
+        assert problem is None, f"{why}: wrongly refused with {problem!r}"
+
+    @pytest.mark.parametrize(
+        "original,suggested,why",
+        [
+            ("Elizabeth", "Jane", "Jane is another character: this merges them"),
+            ("Elizabeth", "Bennet", "a live surname used as a given name"),
+            ("Darcy", "Darcia", "invented, with the last letter traded"),
+            # Malformed suggestions used to switch the whole check off, because
+            # lowercase made them look like term substitutions.
+            ("Elizabeth", "edward", "lowercase is not an exemption"),
+            ("Elizabeth Bennet", "edward jones", "a surname destroyed in silence"),
+            ("Catherine Bennet", "Young Meredith Bennet", "a stoplist word"),
+            ("Elizabeth Bennet", "The Bennet child", "not a name"),
+            ("Elizabeth Bennet", "Edward O'Hara", "an apostrophe is not an exemption"),
+            ("Elizabeth Bennet", "O'Neill", "the surname is gone"),
+            ("Lizzy", "teh", "a typo, applied to the whole book"),
+            # A title or rank standing in for a name.
+            ("Catherine", "Noble", "132 occurrences became a bare title"),
+            ("Lewis", "Noble", "the same"),
+        ],
+    )
+    def test_the_false_negatives_are_refused(self, cast, original, suggested, why):
+        problem = self.judge(cast, original, suggested)
+        assert problem is not None, f"{why}: wrongly accepted"
+
+    @pytest.mark.parametrize(
+        "original,suggested",
+        [
+            ("Sir William Lucas", "Noble William Lucas"),
+            ("Mr. Fitzwilliam Darcy", "Mx. Fitzwilliam Darcy"),
+            ("Mr. Jones", "Mx. Jones"),
+            ("Mrs. Bennet", "Mx. Hilary Bennet"),
+            ("Lady Anne Darcy", "Noble Dana Darcy"),
+            ("Sir Lewis de Bourgh", "Noble Laurie de Bourgh"),
+            ("Lady Lucas", "Noble Lucas"),
+        ],
+    )
+    def test_the_cast_does_not_change_the_earlier_verdicts(self, cast, original, suggested):
+        """Adding cast knowledge must not flip an answer that was already right."""
+        assert (self.judge(cast, original, suggested) is None) == (
+            check_rename(original, suggested) is None
+        )
+
+
+class TestTheCastIndex:
+    """Surnames are settled before a bare token is read as a given name.
+
+    Taking bare aliases at face value put "Darcy" in both sets, and a token that
+    is both is ambiguous -- so every judgement about it was declined, and
+    "Darcy" -> "Darcia" passed as a rename of nobody's given name.
+    """
+
+    def test_a_bare_alias_does_not_claim_a_known_surname(self):
+        from src.models.character import Character, CharacterAnalysis, Gender
+        from src.services.name_engine import cast_name_index
+
+        cast = CharacterAnalysis(
+            book_id="t",
+            characters=[
+                Character(
+                    name="Fitzwilliam Darcy",
+                    gender=Gender.MALE,
+                    pronouns={},
+                    aliases=["Darcy", "Mr. Darcy"],
+                )
+            ],
+        )
+        surnames, givens, _ = cast_name_index(cast)
+        assert "darcy" in surnames
+        assert "darcy" not in givens
+        assert "fitzwilliam" in givens
+
+
+class TestWhatThisGateCannotKnow:
+    """An honest boundary, recorded so nobody mistakes it for cover.
+
+    Pratt and Chamberlayne are officers the book names only by surname. They
+    look exactly like a character named only by a given name, and the cast
+    cannot tell them apart: a lone token that never appears beside a surname is
+    either one.
+
+    The engine has the answer, because it asks -- a proposal can come back as
+    {"original": "Pratt", "is_surname": true} and the name is then left alone.
+    This function has no such signal, so it must not pretend to. Protection for
+    those names lives on the engine side, which is why a suggestion rejected
+    here falls through to the engine rather than being dropped outright.
+    """
+
+    def test_a_surname_only_character_is_not_caught_here(self):
+        assert check_rename("Pratt", "Perry") is None
+        assert check_rename("Chamberlayne", "Clare") is None
+
+    def test_but_it_is_caught_once_the_cast_knows_it_is_a_surname(self):
+        """Told the token is a surname, the gate does hold."""
+        assert check_rename("Pratt", "Perry", surnames=frozenset({"pratt"}), givens=frozenset()), (
+            "a known surname must not be renamed"
+        )
