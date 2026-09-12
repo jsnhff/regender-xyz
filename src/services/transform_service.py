@@ -2887,8 +2887,78 @@ class TransformService(BaseService):
         return expanded
 
     # A possessive or article opening an alias marks it as a description of a
-    # person rather than a name for one.
-    _RELATIONAL_OPENERS = frozenset({"my", "his", "her", "their", "our", "your", "the", "a", "an"})
+    # person rather than a name for one. "old" and "young" do the same work:
+    # "old Wickham" is a description, and mapping it renamed the description.
+    _RELATIONAL_OPENERS = frozenset(
+        {
+            "my",
+            "his",
+            "her",
+            "their",
+            "our",
+            "your",
+            "the",
+            "a",
+            "an",
+            "old",
+            "young",
+            "elder",
+            "eldest",
+            "younger",
+            "youngest",
+            "little",
+            "poor",
+            "dear",
+            "good",
+        }
+    )
+
+    # Words for a relation. Anywhere in an alias, these make it a description of
+    # somebody rather than a name for them: "mamma", "sister-in-law", "brother
+    # Gardiner". The term map owns these words -- "her husband" becomes "his
+    # wife" -- and a rename map that claims them replaces a relationship with a
+    # proper name mid-sentence.
+    _RELATION_WORDS = frozenset(
+        {
+            "mother",
+            "father",
+            "mamma",
+            "mama",
+            "papa",
+            "mummy",
+            "mother-in-law",
+            "father-in-law",
+            "parent",
+            "son",
+            "daughter",
+            "child",
+            "children",
+            "brother",
+            "sister",
+            "sibling",
+            "brother-in-law",
+            "sister-in-law",
+            "husband",
+            "wife",
+            "spouse",
+            "uncle",
+            "aunt",
+            "niece",
+            "nephew",
+            "cousin",
+            "grandmother",
+            "grandfather",
+            "grandson",
+            "granddaughter",
+            "widow",
+            "widower",
+            "bride",
+            "bridegroom",
+            "friend",
+            "ladyship",
+            "lordship",
+        }
+    )
 
     @classmethod
     def _unsafe_alias(cls, alias: str, target: str) -> bool:
@@ -2909,11 +2979,42 @@ class TransformService(BaseService):
         rename but is really a title being added, and applying it to text that
         already says "Miss Wickham" yields "Miss Miss Wickham". The surname is
         unchanged; only the title moves, and that is the term map's job too.
+
+        A title with a SURNAME is a form of address, not a nickname. "Miss
+        Bennet", "Mrs. Hurst" and "Mr. Collins" were mapped to bare given names
+        and the book lost its register: "Miss Bennet" fell from 59 occurrences
+        to 0, "Mr. Collins" from 145 to 0, and "danced only once with Mrs.
+        Hurst" became "once with Leslie Hurst". The title is the term map's to
+        change and the surname survives, so there is nothing here to rename.
+        The name engine has always refused these; this side had no equivalent,
+        which also let it write renames the engine had explicitly declined --
+        three hundred and thirteen occurrences in the all-female edition, past a
+        refusal recorded in the report, with no flag.
+
+        A title with a GIVEN name needs no entry either, and giving it one is
+        how a maiden name acquired a husband: "Miss Eliza" and "Miss Elizabeth
+        Bennet" were both mapped to "Elijah Bennet Darcy", putting Darcy's name
+        on her in chapters set years before the wedding, and "Miss Lucas" was
+        mapped to "Chester Collins", changing Charlotte's maiden surname to her
+        married one. Nothing needs to reach inside the phrase, because the
+        entry for the name itself already does: "Elizabeth" -> "Edmund" fires
+        within "Miss Elizabeth", and the term map moves the honorific, so the
+        phrase becomes "Mr. Edmund" with no entry of its own.
+
+        A relation is not a name either, whatever it stands next to. "mamma"
+        was mapped to "Mx. Hilary Bennet", so five passages have children
+        addressing their mother as '"Oh, Mx. Hilary Bennet,"'. "sister-in-law"
+        and "brother Gardiner" were armed the same way.
         """
         words = cls._WORD_RE.findall(alias)
         if not words:
             return True
-        if words[0].lower() in cls._RELATIONAL_OPENERS:
+        lowered = [w.lower() for w in words]
+        if lowered[0] in cls._RELATIONAL_OPENERS:
+            return True
+        if any(word in cls._RELATION_WORDS for word in lowered):
+            return True
+        if lowered[0] in cls._HONORIFICS or lowered[0] in cls._RANKS:
             return True
         target_words = {w.lower() for w in cls._WORD_RE.findall(target)}
         return len(words) == 1 and words[0].lower() in target_words
@@ -2966,9 +3067,16 @@ class TransformService(BaseService):
         return words[0]
 
     # Honorifics sit in front of a name rather than being part of it.
+    # "noble" belongs here: it is what the nonbinary variant writes for Sir and
+    # Lady, so leaving it out made "Noble Sydney de Bourgh" read as the given
+    # name "Noble" and sent bare aliases to the title instead of the name.
     _HONORIFICS = frozenset(
-        {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam"}
+        {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam", "noble"}
     )
+
+    # Particles belong to the surname they precede, so nothing behind them is a
+    # given name: "Noble de Bourgh" offers none.
+    _PARTICLES = frozenset({"de", "van", "von", "du", "del", "della", "di", "da", "la", "le"})
 
     # Ranks and professions sit in front of a surname the same way a title
     # does. Without them "Colonel Fitzwilliam" reads as given name "Colonel",
@@ -2996,13 +3104,24 @@ class TransformService(BaseService):
 
         "Edward Bennet" -> "Edward"; "Mr. King" -> "Mr. King", because an
         honorific is not a first name and stripping it leaves a bare surname.
+
+        A title in front of a full name used to make this return the whole
+        thing, which is how a nickname became a formal address: with the target
+        "Dame Louisa de Bourgh", the alias "Lew" turned '"Come, Lew, you must
+        dance."' into '"Come, Dame Louisa de Bourgh, you must dance."' The
+        title is skipped when there is a given name behind it, and only then.
         """
         words = cls._WORD_RE.findall(full)
         if not words:
             return full
-        if words[0].lower() in cls._HONORIFICS:
+        rest = [
+            w for w in words if w.lower() not in cls._HONORIFICS and w.lower() not in cls._RANKS
+        ]
+        # Fewer than two words left is a bare surname, and a particle in front
+        # of one says the same thing: there is no given name here to take.
+        if len(rest) < 2 or rest[0].lower() in cls._PARTICLES:
             return full
-        return words[0]
+        return rest[0]
 
     # Paragraph delimiter the model is asked to echo back. Blank lines alone are
     # not a safe protocol: a merged pair, an added preamble, or a paragraph

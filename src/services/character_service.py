@@ -989,6 +989,38 @@ class CharacterService(BaseService):
         "nonbinary": "Mx.",
     }
 
+    #: For gender_swap there is no single destination title: each one crosses to
+    #: the other side. Leaving this out returned no collisions at all for the
+    #: swap -- 73 characters changing, nothing checked -- which is how "Miss
+    #: Darcy" came to be renamed onto her own brother's form.
+    _SWAPPED_TITLE = {
+        "mr.": "Mrs.",
+        "mrs.": "Mr.",
+        "miss": "Mr.",
+        "ms.": "Mr.",
+        "mx.": "Mx.",
+        "lady": "Lord",
+        "lord": "Lady",
+        "sir": "Lady",
+        "dame": "Sir",
+    }
+
+    @classmethod
+    def _landing_for(cls, form: str, transform_type) -> Optional[str]:
+        """Where a title-and-surname form lands, or None if it is not one."""
+        parts = form.split()
+        if len(parts) != 2 or parts[0].lower() not in cls._TITLES:
+            return None
+        variant = getattr(transform_type, "value", "")
+        title = cls._TITLE_FOR.get(variant)
+        if title is None:
+            if variant != "gender_swap":
+                return None
+            title = cls._SWAPPED_TITLE.get(parts[0].lower())
+            if title is None:
+                return None
+        return f"{title} {parts[1]}"
+
     @classmethod
     def _name_collisions(cls, characters, changing, transform_type) -> dict:
         """Characters whose transformed name is already somebody else's.
@@ -997,32 +1029,55 @@ class CharacterService(BaseService):
         transform can only swap her title -- and lands her on Mr. Bennet, who
         is her husband. Eight of Pride and Prejudice's cast do this. Nothing
         downstream can separate them afterwards: one name, two people.
-        """
-        taken = {c.name.lower(): c.name for c in characters.characters}
-        title = cls._TITLE_FOR.get(getattr(transform_type, "value", ""), "")
-        if not title:
-            return {}
 
-        # Where each title-only character would land.
+        Forms of address are counted as well as cast names, because that is
+        where most of these live. Charlotte Collins is listed under her full
+        name, so nothing titled was ever examined for her -- yet the book calls
+        her "Mrs. Collins" forty times, and in an all-male edition that lands
+        exactly on her husband. The alias expansion used to paper over this by
+        quietly renaming "Mrs. Collins" to a bare given name, which cost the
+        book its honorifics; the collision belongs here, where it can be put to
+        the reader and answered once.
+        """
+        taken: dict[str, str] = {}
+        for char in characters.characters:
+            for form in [char.name, *(char.aliases or [])]:
+                taken.setdefault(form.lower(), char.name)
+
+        # Where each title-and-surname form would land, by the character it
+        # belongs to. A character may own several: "Mrs. Collins" and "Miss
+        # Lucas" are both Charlotte.
         landing: dict[str, str] = {}
         for char in changing:
-            parts = char.name.split()
-            if len(parts) != 2 or parts[0].lower() not in cls._TITLES:
-                continue  # has a given name of their own, or is not titled
-            landing[char.name] = f"{title} {parts[1]}"
+            for form in [char.name, *(char.aliases or [])]:
+                destination = cls._landing_for(form, transform_type)
+                if destination and form not in landing:
+                    landing[form] = destination
+
+        # A form whose owner is also changing is not a clash: both move.
+        changing_names = {c.name for c in changing}
 
         collisions = {}
-        for name, candidate in landing.items():
+        for form, candidate in landing.items():
             owner = taken.get(candidate.lower())
-            if owner and owner != name:
-                collisions[name] = {"candidate": candidate, "clashes_with": owner}
+            if owner and owner not in (taken.get(form.lower()), form) and owner in changing_names:
+                # The owner is moving too, so ask where they land instead.
+                owner_forms = [f for f, d in landing.items() if taken.get(f.lower()) == owner]
+                if any(landing[f] != candidate for f in owner_forms):
+                    owner = None
+            if owner and owner != taken.get(form.lower()) and owner != form:
+                collisions[form] = {"candidate": candidate, "clashes_with": owner}
                 continue
             # Two characters can also land on each other rather than on someone
             # already there: Lady Lucas and Miss Lucas both become Mr. Lucas,
             # and no existing man is involved.
-            others = [n for n, c in landing.items() if c == candidate and n != name]
+            others = [
+                f
+                for f, d in landing.items()
+                if d == candidate and taken.get(f.lower()) != taken.get(form.lower())
+            ]
             if others:
-                collisions[name] = {"candidate": candidate, "clashes_with": others[0]}
+                collisions[form] = {"candidate": candidate, "clashes_with": others[0]}
         return collisions
 
     @staticmethod

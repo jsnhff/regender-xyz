@@ -14,10 +14,17 @@ That is how these shipped:
     'Mr. Fitzwilliam Darcy' -> 'Mx. Fitzwilliam Darcy'
 
 The honorific changed and the man's given name stayed, in a nonbinary edition,
-and nothing anywhere objected. The same gap let the alias expansion put a bare
-title where a given name had been -- 'Catherine' -> 'Noble' -- which removed the
-name from all 132 places the book used it and left sentences reading
-'"Certainly, Noble; and it has the advantage..."'.
+and nothing anywhere objected.
+
+Checking that turned up a second mechanism, in the engine rather than in the
+suggestions. Deriving sub-entries from a supplied name took the first token
+after the titles as the given name -- and "Noble", the word the nonbinary
+variant itself introduces for Sir and Lady, was not in the title set. So
+"Lady Catherine de Bourgh" -> "Noble Sydney de Bourgh" was read as the given
+name "Noble", and emitted 'Catherine' -> 'Noble'. That removed the name from
+all 132 places the book used it and left dialogue reading '"Certainly, Noble;
+and it has the advantage..."'. Putting "Noble" in the title set fixes it at
+source; the entries below keep the symptom from passing a gate again.
 
 check_rename is the shared bar. The hard part is not catching the failures; it
 is staying silent on the entries that are correct, because a name map also
