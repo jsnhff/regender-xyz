@@ -31,14 +31,35 @@ class MockLLMProvider:
         # Extract the user message
         user_msg = messages[-1]["content"] if messages else ""
 
-        # Simple mock transformations based on content
-        if "analyze characters" in user_msg.lower():
+        # Simple mock transformations based on content.
+        #
+        # "extract all characters" is what the real extraction prompt opens
+        # with; the older "analyze characters" matched nothing it ever sent, so
+        # extraction fell through to "Mocked response", the parser returned its
+        # empty fallback, and the integration tests ran the whole pipeline
+        # against a cast of nobody -- with a comment saying that was fine.
+        lowered = user_msg.lower()
+        if "extract all characters" in lowered or "analyze characters" in lowered:
             # Return mock character analysis
             return json.dumps(
                 {
                     "characters": [
-                        {"name": "James Wilson", "gender": "male", "importance": 10},
-                        {"name": "Sarah Chen", "gender": "female", "importance": 8},
+                        {
+                            "name": "James Wilson",
+                            "gender": "male",
+                            "pronouns": "he/him",
+                            "description": "a man in a story",
+                            "aliases": ["James"],
+                            "titles": ["Mr"],
+                        },
+                        {
+                            "name": "Sarah Chen",
+                            "gender": "female",
+                            "pronouns": "she/her",
+                            "description": "a woman in a story",
+                            "aliases": ["Sarah"],
+                            "titles": [],
+                        },
                     ]
                 }
             )

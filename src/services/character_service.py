@@ -104,7 +104,14 @@ class CharacterService(BaseService):
             "chunk_size": char_config.get("chunk_size_tokens", 32000),
             "temperature": char_config.get("temperature", 0.3),
             "max_retries": 3,
+            "retry_backoff": char_config.get("retry_backoff_seconds", 1.0),
         }
+
+        # Chunks that named nobody even after every retry. A short cast used to
+        # be indistinguishable from a short book, so the analysis could return
+        # 77 characters one run and 91 the next with nothing anywhere saying a
+        # chunk had been lost. Recorded so the run can say so.
+        self.empty_chunks: list[int] = []
 
         # Validate chunk size
         if self.extraction_config["chunk_size"] <= 0:
@@ -209,8 +216,17 @@ class CharacterService(BaseService):
             self.logger.info(f"Starting character analysis for book: {book.title or 'Unknown'}")
 
             # Phase 1: Extract all character mentions
+            self.empty_chunks = []
             raw_characters = await self._extract_all_characters(book_text)
             self.logger.info(f"Extracted {len(raw_characters)} raw character mentions")
+            if self.empty_chunks:
+                # Say it plainly. A cast short by a chunk used to look exactly
+                # like a book with fewer people in it.
+                self.logger.error(
+                    f"{len(self.empty_chunks)} chunk(s) named nobody after every retry "
+                    f"(chunk {', '.join(str(n) for n in self.empty_chunks)}); this cast is "
+                    "incomplete and the run is not comparable to one that is"
+                )
 
             # Phase 2: Group similar characters efficiently
             character_groups = self._group_similar_characters(raw_characters)
@@ -442,13 +458,14 @@ class CharacterService(BaseService):
         """
         prompt = EXTRACTION_PROMPT_TEMPLATE.format(text=chunk)
 
-        for attempt in range(self.extraction_config["max_retries"]):
+        attempts = max(1, self.extraction_config["max_retries"])
+        for attempt in range(attempts):
             try:
                 response = await self._complete_with_retry(
                     prompt, temperature=self.extraction_config["temperature"]
                 )
 
-                characters = self._parse_json_response(response)
+                characters = self._parse_json_response(response, strict=True)
 
                 # Handle different response formats
                 if isinstance(characters, dict):
@@ -472,13 +489,27 @@ class CharacterService(BaseService):
                         char["chunk_index"] = chunk_index
                         valid_chars.append(char)
 
+                # A chunk of a novel holds people. Coming back with none is a
+                # reply that went wrong -- a refusal, a preamble, a truncation --
+                # and it used to end the loop as a success.
+                if not valid_chars:
+                    raise ValueError("parsed, but named no characters")
+
                 return valid_chars
 
             except Exception as e:
-                if attempt == self.extraction_config["max_retries"] - 1:
-                    self.logger.error(f"Failed to extract from chunk {chunk_index}: {e}")
+                if attempt == attempts - 1:
+                    self.logger.error(
+                        f"Chunk {chunk_index} named no characters after {attempts} "
+                        f"attempts: {e}. The cast for this run is short by whoever "
+                        f"first appears in it."
+                    )
+                    self.empty_chunks.append(chunk_index)
                     return []
-                await asyncio.sleep(2**attempt)  # Exponential backoff
+                # Exponential backoff. Scaled by a configured factor so a test
+                # exercising the retry path does not have to wait out the real
+                # one; three seconds a case is how a fast suite stops being run.
+                await asyncio.sleep(self.extraction_config.get("retry_backoff", 1.0) * 2**attempt)
 
     # === GROUPING METHODS ===
 
@@ -669,12 +700,11 @@ class CharacterService(BaseService):
                 final_characters.append(self._dict_to_character(group[0]))
             else:
                 # Need LLM to determine if these are the same character
-                merged = await self._merge_group_with_llm(group)
-                final_characters.append(merged)
+                final_characters.extend(await self._merge_group_with_llm(group))
 
         return final_characters
 
-    async def _merge_group_with_llm(self, group: list[dict]) -> Character:
+    async def _merge_group_with_llm(self, group: list[dict]) -> list[Character]:
         """
         Use LLM to merge a group of potentially similar characters.
 
@@ -696,23 +726,42 @@ class CharacterService(BaseService):
 
             result = self._parse_json_response(response)
 
+            # Every path that is not a merge keeps the whole group. Returning
+            # only the first member deleted the rest of the cast: asked whether
+            # Jane Bennet and Lydia Bennet are the same person, a correct "no"
+            # removed Lydia from the book. So did a 529 from the provider, and
+            # so did a reply in a shape this code did not expect. Not merging is
+            # the safe answer to an uncertain question; deleting is not.
+            unmerged = [self._dict_to_character(member) for member in group]
+
             # Handle both object and array responses
             if isinstance(result, list):
                 # If LLM returned an array, take the first item
                 if result:
                     result = result[0]
                 else:
-                    # Empty array, use first from group
-                    return self._dict_to_character(group[0])
+                    return unmerged
 
             # Ensure result is a dict
             if not isinstance(result, dict):
                 self.logger.warning(f"Unexpected result type: {type(result)}")
-                return self._dict_to_character(group[0])
+                return unmerged
 
-            if result.get("is_same_person", True):
-                # Merge into single character
-                return Character(
+            # Absent means unanswered, and an unanswered question must not
+            # collapse a group. This defaulted to True, so a reply that omitted
+            # the field merged people the model had not said were one.
+            if result.get("is_same_person") is not True:
+                if "is_same_person" not in result:
+                    self.logger.warning(
+                        "Merge reply did not say whether these are one person; "
+                        f"keeping all {len(group)} separate: "
+                        + ", ".join(m.get("name", "?") for m in group)
+                    )
+                return unmerged
+
+            # Merge into single character
+            return [
+                Character(
                     name=result.get("canonical_name", group[0].get("name", "Unknown")),
                     gender=self._parse_gender(result.get("gender")),
                     pronouns=result.get("pronouns", ""),
@@ -721,14 +770,11 @@ class CharacterService(BaseService):
                     importance="supporting",
                     confidence=0.8,
                 )
-            else:
-                # Just return the first one (shouldn't happen often)
-                return self._dict_to_character(group[0])
+            ]
 
         except Exception as e:
-            self.logger.warning(f"Failed to merge group: {e}")
-            # Fallback: return the first character
-            return self._dict_to_character(group[0])
+            self.logger.warning(f"Failed to merge group, keeping all members separate: {e}")
+            return [self._dict_to_character(member) for member in group]
 
     # === UTILITY METHODS ===
 
@@ -777,18 +823,31 @@ class CharacterService(BaseService):
                 self.logger.warning(f"Retry {attempt + 1} after {wait_time}s: {e}")
                 await asyncio.sleep(wait_time)
 
-    def _parse_json_response(self, response: str) -> Any:
+    def _parse_json_response(self, response: str, strict: bool = False) -> Any:
         """
         Parse JSON response with multiple fallback strategies.
 
         Args:
             response: Response text to parse
+            strict: Raise instead of returning an empty structure when nothing
+                could be parsed. Character extraction needs this: the empty
+                fallback is indistinguishable from a chunk that really held no
+                characters, so a refusal, a truncated reply or a paragraph of
+                prose all read as a successful extraction of nobody -- and the
+                retry loop above never ran, because a fallback is not an
+                exception. One silent chunk out of eighteen costs three to eight
+                characters, which is the whole of the run-to-run spread.
 
         Returns:
             Parsed JSON object
+
+        Raises:
+            ValueError: only when strict and no strategy could parse the reply.
         """
         if not response or not response.strip():
             self.logger.warning("Empty response received")
+            if strict:
+                raise ValueError("empty response")
             return {"characters": []}
 
         # Strategy 1: Direct parse
@@ -857,6 +916,8 @@ class CharacterService(BaseService):
 
         # Final fallback: Return empty structure with proper format
         self.logger.warning(f"Could not parse JSON from response: {response[:200]}...")
+        if strict:
+            raise ValueError(f"could not parse a reply of {len(response)} characters")
         return {"characters": []}
 
     def _clean_json_text(self, text: str) -> str:
