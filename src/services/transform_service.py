@@ -1142,6 +1142,31 @@ class TransformService(BaseService):
         },
     }
 
+    # A "master" who teaches is not a man being described; he is a profession,
+    # and the word for a woman doing it is not "mistress" in the sense the swap
+    # produces. Austen's two uses of the plural both mean teachers -- "for the
+    # benefit of masters" -- and with sense rules defined for the nonbinary
+    # variant alone, the gender-swap and all-female editions read "for the
+    # benefit of mistresses", which says something else entirely. These frames
+    # are about the sense of the word rather than the gender of anyone, so they
+    # hold for every variant. The idioms are deliberately not shared: "her own
+    # mistress" really does become "his own master", and "mistress of the house"
+    # really does become "master of the house".
+    _SENSE_RULES_EVERY_VARIANT: dict[str, str] = {
+        "music master": "music teacher",
+        "music mistress": "music teacher",
+        "dancing master": "dancing teacher",
+        "dancing mistress": "dancing teacher",
+        "drawing master": "drawing teacher",
+        "drawing mistress": "drawing teacher",
+        "writing master": "writing teacher",
+        "writing mistress": "writing teacher",
+        "london master": "london teacher",
+        "london mistress": "london teacher",
+        "masters": "teachers",
+        "mistresses": "teachers",
+    }
+
     _TERM_MAPS: dict[str, dict[str, str]] = {
         "all_male": {
             # Ported from the Aug-2026 transform hardening: plurals,
@@ -1321,8 +1346,15 @@ class TransformService(BaseService):
             "he": "she",
             "him": "her",
             "himself": "herself",
-            # Title safety nets — LLM sometimes leaves gendered titles on character names
-            "Mr": "Ms",
+            # Title safety nets — LLM sometimes leaves gendered titles on character names.
+            #
+            # "Mrs", not "Ms": the name map, which knows the cast, already
+            # decides "Mrs." and used it 551 times in the shipped edition while
+            # this line produced "Ms." 202 times -- the same honorific written
+            # two ways, near half and half, one of them a word that did not
+            # exist in 1813. The net is the residual for names the map does not
+            # cover, so it has to agree with the map.
+            "Mr": "Mrs",
         },
         "gender_swap": {
             # Familial / relational (both directions)
@@ -1983,6 +2015,14 @@ class TransformService(BaseService):
     # Irregular plurals for the gendered nouns in the term maps. Everything else
     # is derived by _pluralize so that "her sisters" is covered as well as
     # "her sister" -- a bare \b<singular>\b pattern never matches the plural.
+    #
+    # There was a second, shorter copy of this dictionary further down the class
+    # body, and being later it silently won -- taking gentleman, gentlewoman,
+    # kinsman, kinswoman and hero out of every lookup. So "gentlemen" was never
+    # in a term map at all: the gender-swap edition has 74 of them unswapped,
+    # more than the 40 in the source, because nothing touched the word. The same
+    # shadowing made _pluralize answer "gentlemans", "heros", "monarches" and
+    # "grandchilds".
     _IRREGULAR_PLURALS: dict[str, str] = {
         "man": "men",
         "woman": "women",
@@ -2050,7 +2090,7 @@ class TransformService(BaseService):
         cached = cls._UNCONDITIONAL_TERMS.get(key)
         if cached is not None:
             return cached
-        terms = {cls._fold_apostrophe(t.lower()) for t in cls._SENSE_RULES.get(key, {})}
+        terms = {cls._fold_apostrophe(t.lower()) for t in cls._sense_rules_for(key)}
         terms.update(
             cls._fold_apostrophe(t.lower())
             for t in cls._effective_term_map(key)
@@ -2058,6 +2098,13 @@ class TransformService(BaseService):
         )
         cls._UNCONDITIONAL_TERMS[key] = frozenset(terms)
         return cls._UNCONDITIONAL_TERMS[key]
+
+    @classmethod
+    def _sense_rules_for(cls, key: str) -> dict[str, str]:
+        """Sense rules in force for a variant: the shared ones, then its own."""
+        rules = dict(cls._SENSE_RULES_EVERY_VARIANT)
+        rules.update(cls._SENSE_RULES.get(key, {}))
+        return rules
 
     @classmethod
     def _effective_term_map(cls, key: str) -> dict[str, str]:
@@ -2072,7 +2119,7 @@ class TransformService(BaseService):
 
         base = cls._TERM_MAPS.get(key, {})
         effective = dict(base)
-        effective.update(cls._SENSE_RULES.get(key, {}))
+        effective.update(cls._sense_rules_for(key))
         for original, replacement in base.items():
             if (
                 original.lower() in cls._NO_PLURAL
@@ -2488,15 +2535,6 @@ class TransformService(BaseService):
             return True
         return all(mask[i] for i in range(start, end) if text[i].isalpha())
 
-    # Kinship nouns whose plural is not simply "+s".
-    _IRREGULAR_PLURALS = {
-        "wife": "wives",
-        "child": "children",
-        "man": "men",
-        "woman": "women",
-        "person": "people",
-    }
-
     # "her uncle and aunt" -- a possessive owning two relations, or the same
     # relation twice once the transform has run.
     _PAIRED_RELATIONS = re.compile(
@@ -2506,9 +2544,21 @@ class TransformService(BaseService):
 
     @classmethod
     def _plural_of(cls, noun: str) -> str:
+        """The plural of a noun that may already be one.
+
+        A coordinated pair is collapsed by pluralising the word both halves map
+        to, and some of those words are plural before they arrive -- nonbinary
+        sends "uncle and aunt" to "relatives", not "relative". Pluralising again
+        put "Who are your relativeses?" into Lady Catherine's interrogation of
+        Elizabeth, and would have done "siblingses" and "childrens" as readily.
+        """
         lowered = noun.lower()
         if lowered in cls._IRREGULAR_PLURALS:
             plural = cls._IRREGULAR_PLURALS[lowered]
+        elif lowered in cls._IRREGULAR_PLURALS.values():
+            plural = lowered  # already the irregular plural: children, people
+        elif lowered.endswith("s") and not lowered.endswith(("ss", "us", "is")):
+            plural = lowered  # already plural: relatives, siblings, parents
         elif lowered.endswith(("s", "x", "z", "ch", "sh")):
             plural = lowered + "es"
         else:
