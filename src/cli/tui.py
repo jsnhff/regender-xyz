@@ -317,6 +317,121 @@ def _version_from_model_id(model_id: str) -> str:
     return f"{m.group(1)}.{m.group(2)}" if m else ""
 
 
+#: The colour the review stepper already uses for the term under discussion.
+_CHANGED = "#e5c07b"
+
+#: The marker an excerpt carries where it was cut, at either end.
+_TRUNCATED = re.compile(r"^(?:\.\.\.|…)|(?:\.\.\.|…)$")
+
+
+def _mark_changes(before: str, after: str, width: int = 66) -> tuple[str, str]:
+    """The was/now pair with the word that changed picked out, and in view.
+
+    Two problems with printing the excerpts plainly. The reader had to find the
+    difference themselves, in two nearly identical lines of Regency prose. And
+    both lines were cut at the width from their start, so a change past that
+    column was simply not on screen -- the one word the question is about.
+
+    So: diff by word, window around the first difference rather than the start,
+    and emphasise what moved. When the two lines have little in common there is
+    no single changed word to point at, and highlighting most of the sentence
+    tells the reader nothing, so the emphasis is dropped and the text stands.
+    """
+    import difflib
+
+    b_words, a_words = before.split(), after.split()
+
+    # The excerpts arrive cut to length, mid-word, with "..." on the cut end.
+    # Those markers are not content, and treating them as words made a line
+    # look more changed than it was: "...ry becoming" against "...becoming"
+    # counts two differences where there are none, the tail does the same at
+    # the other end, and four real changes in eleven words came to six -- over
+    # the threshold, so the emphasis was dropped on the William lines, which
+    # are the ones being asked about. Compare without the markers, and never
+    # point at a word that is only half itself.
+    b_plain = [_TRUNCATED.sub("", w) for w in b_words]
+    a_plain = [_TRUNCATED.sub("", w) for w in a_words]
+
+    def cut_ends(words: list) -> tuple[bool, bool]:
+        if not words:
+            return False, False
+        return bool(_TRUNCATED.match(words[0])), bool(_TRUNCATED.search(words[-1]))
+
+    b_head, b_tail = cut_ends(b_words)
+    a_head, a_tail = cut_ends(a_words)
+    # A cut on either side makes that end unreliable on both.
+    head_cut, tail_cut = b_head or a_head, b_tail or a_tail
+
+    def unreliable(words: list) -> set:
+        edges = set()
+        if words and head_cut:
+            edges.add(0)
+        if words and tail_cut:
+            edges.add(len(words) - 1)
+        return edges
+
+    b_skip, a_skip = unreliable(b_words), unreliable(a_words)
+
+    b_changed = [False] * len(b_words)
+    a_changed = [False] * len(a_words)
+    anchored = False
+    matcher = difflib.SequenceMatcher(a=b_plain, b=a_plain, autojunk=False)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            anchored = True
+            continue
+        for i in range(i1, i2):
+            b_changed[i] = i not in b_skip
+        for j in range(j1, j2):
+            a_changed[j] = j not in a_skip
+
+    # With no word in common there is nothing to point at, and lighting the
+    # whole line tells the reader less than leaving it alone.
+    if not anchored:
+        b_changed = [False] * len(b_words)
+        a_changed = [False] * len(a_words)
+
+    return (
+        _render_excerpt(b_words, b_changed, "#666666", width),
+        _render_excerpt(a_words, a_changed, "#aaaaaa", width),
+    )
+
+
+def _render_excerpt(words: list, changed: list, base: str, width: int) -> str:
+    """One excerpt, windowed on its change and marked up word by word."""
+    if not words:
+        return ""
+
+    focus = next((i for i, flag in enumerate(changed) if flag), 0)
+    low = high = focus
+    total = len(words[focus])
+    while True:
+        grew = False
+        if high + 1 < len(words) and total + 1 + len(words[high + 1]) <= width:
+            high += 1
+            total += 1 + len(words[high])
+            grew = True
+        if low - 1 >= 0 and total + 1 + len(words[low - 1]) <= width:
+            low -= 1
+            total += 1 + len(words[low])
+            grew = True
+        if not grew:
+            break
+
+    # Each word carries its own colour: nesting a highlight inside an outer tag
+    # relies on the renderer restoring the outer one, and this does not.
+    parts = [
+        f"[bold {_CHANGED}]{word}[/]" if flag else f"[{base}]{word}[/]"
+        for word, flag in zip(words[low : high + 1], changed[low : high + 1])
+    ]
+    body = " ".join(parts)
+    if low > 0:
+        body = f"[{base}]…[/] " + body
+    if high < len(words) - 1:
+        body = body + f" [{base}]…[/]"
+    return body
+
+
 def _friendly_model_name(model: str) -> str:
     """Convert API model ID to a short display name."""
     all_models = [m for models in _FALLBACK_MODELS.values() for m in models]
@@ -2519,10 +2634,11 @@ class RegenderTUI(App):
         # where it said "Mr. Darcy", and the two look identical on the page.
         before = (item.get("source_excerpt") or "").strip().replace("\n", " ")
         after = (item.get("excerpt") or "").strip().replace("\n", " ")
+        was_line, now_line = _mark_changes(before, after)
         if before:
-            self.print(f"  [#666666]was  {before[:66]}[/]")
+            self.print(f"  [#666666]was[/]  {was_line}")
         if after:
-            self.print(f"  [#aaaaaa]now  {after[:66]}[/]")
+            self.print(f"  [#aaaaaa]now[/]  {now_line}")
         self.print("")
         self.print(f"  [#e5c07b]{item.get('term', '')}[/]")
         suggestion = item.get("suggestion")
