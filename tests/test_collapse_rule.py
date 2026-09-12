@@ -107,3 +107,47 @@ class TestInContext:
 @pytest.mark.parametrize("key", ["all_female", "all_male", "gender_swap"])
 def test_every_transform_gets_the_rule(svc, key):
     assert collapse(svc, "her aunt and aunt", "her uncle and aunt", key) == "her aunts"
+
+
+class TestNonbinaryChangesEveryPossessive:
+    """ "her" and "his" both become "their", so the possessive cannot anchor it.
+
+    Matching on the possessive made the rule fire for "their mother and
+    father" — where the source already said "their" — and never for "her uncle
+    and aunt", which is the case it exists for. All 22 real decisions came from
+    an all_female run, where "her" stays "her", so they all passed.
+    """
+
+    def test_a_changed_possessive_still_collapses(self, svc):
+        assert (
+            collapse(svc, "their relative and relative", "her uncle and aunt", "nonbinary")
+            == "their relatives"
+        )
+
+    def test_an_unchanged_possessive_still_collapses(self, svc):
+        assert (
+            collapse(svc, "their parent and parent", "their mother and father", "nonbinary")
+            == "their parents"
+        )
+
+    def test_siblings(self, svc):
+        assert (
+            collapse(svc, "their sibling and sibling", "her sister and brother", "nonbinary")
+            == "their siblings"
+        )
+
+    def test_the_authors_own_repeat_is_still_safe(self, svc):
+        """Even though the possessive changed, the source said it twice."""
+        text = "their sibling and sibling"
+        assert collapse(svc, text, "her sister and sister", "nonbinary") == text
+
+    def test_pairs_are_matched_by_position(self, svc):
+        """The first pair repeats in the source; the second does not."""
+        out = collapse(
+            svc,
+            "their sibling and sibling met their relative and relative",
+            "her sister and sister met her uncle and aunt",
+            "nonbinary",
+        )
+        assert "their sibling and sibling" in out
+        assert "their relatives" in out

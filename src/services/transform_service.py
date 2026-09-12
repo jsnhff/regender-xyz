@@ -2534,21 +2534,33 @@ class TransformService(BaseService):
         if not nouns:
             return text
 
-        source_pairs = {
-            (m.group(1).lower(), m.group(2).lower(), m.group(3).lower())
+        # Paired by position, not by possessive. A nonbinary transform sends
+        # every "her" and "his" to "their", so matching the possessive meant
+        # the rule fired for "their mother and father" and never for "her
+        # uncle and aunt" -- the whole point of it.
+        source_pairs = [
+            (m.group(2).lower(), m.group(3).lower())
             for m in self._PAIRED_RELATIONS.finditer(source_text)
-        }
-        differed = {(owner, a, b) for owner, a, b in source_pairs if a != b}
-        if not differed:
+        ]
+        if not any(a != b for a, b in source_pairs):
             return text
 
+        index = [0]
+
         def _replace(match: "re.Match") -> str:
+            position = index[0]
+            index[0] += 1
             owner, first, second = match.group(1), match.group(2), match.group(3)
             if first.lower() != second.lower() or first.lower() not in nouns:
                 return match.group(0)
-            # The source must have had two different relations under the same
-            # possessive, or this is a repetition the author wrote.
-            if not any(o == owner.lower() for o, _a, _b in differed):
+            # The pair at this position must have been two different relations
+            # in the source. A sentence that genuinely repeats a word is the
+            # author's, and the counts line up because the transform rewrites
+            # words in place rather than adding or removing pairs.
+            if position >= len(source_pairs):
+                return match.group(0)
+            before_a, before_b = source_pairs[position]
+            if before_a == before_b:
                 return match.group(0)
             result = f"{owner} {self._plural_of(first)}"
             self._record_substitution(text, match.start(), match.group(0), result, None)
