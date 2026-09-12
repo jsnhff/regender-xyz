@@ -317,6 +317,38 @@ def _version_from_model_id(model_id: str) -> str:
     return f"{m.group(1)}.{m.group(2)}" if m else ""
 
 
+#: Titles that stand in front of a name without being part of it.
+_ADDRESS_TITLES = frozenset(
+    {"mr", "mrs", "ms", "mx", "miss", "madam", "lady", "lord", "sir", "dame", "noble"}
+)
+
+
+def _surviving_name(first: str, second: str) -> str:
+    """Which of two names for one person to keep.
+
+    A name is more use than a form of address: "Miss King" and "Mary King" are
+    one woman, and she is Mary King. With nothing to choose between them the
+    first stands, so the answer does not depend on which order they were found.
+    """
+
+    def is_full_name(name: str) -> bool:
+        parts = [p for p in name.split() if p]
+        return len(parts) > 1 and parts[0].rstrip(".").lower() not in _ADDRESS_TITLES
+
+    if is_full_name(first) != is_full_name(second):
+        return first if is_full_name(first) else second
+
+    def is_titled(name: str) -> bool:
+        parts = [p for p in name.split() if p]
+        return bool(parts) and parts[0].rstrip(".").lower() in _ADDRESS_TITLES
+
+    # Neither is a full name: prefer the bare one. The Netherfield housekeeper
+    # appears as "Mrs. Nichols" and as "Nicholls", and Austen spells her Nicholls.
+    if is_titled(first) != is_titled(second):
+        return second if is_titled(first) else first
+    return first
+
+
 #: The colour the review stepper already uses for the term under discussion.
 _CHANGED = "#e5c07b"
 
@@ -1138,6 +1170,11 @@ class RegenderTUI(App):
         self._review_items: list = []
         self._review_idx: int = 0
 
+        # Cast entries that may be one person, which only a reader can settle.
+        self._cast_candidates: list = []
+        self._cast_idx: int = 0
+        self._cast_merges: list = []
+
         # Titles are per book, by definition.
         self._custom_title: str = ""
         self._suggested_title: str = ""
@@ -1705,6 +1742,8 @@ class RegenderTUI(App):
             self._handle_options_input(value)
         elif self._stage == "retitle":
             self._handle_retitle_input(value)
+        elif self._stage == "cast_review":
+            self._handle_cast_review_input(value)
         elif self._stage == "name_review":
             self._handle_name_review_input(value)
         elif self._stage == "qc_review":
@@ -1844,7 +1883,7 @@ class RegenderTUI(App):
         else:
             self.print("[#ffffff]✓[/] Skipped")
             self.print("")
-            self._run_name_review()
+            self._start_cast_review()
 
     @work(exclusive=True)
     async def _run_character_analysis(self) -> None:
@@ -1982,7 +2021,7 @@ class RegenderTUI(App):
                             self.print(f"    [#aaaaaa]... and {len(main_chars) - 5} more[/]")
 
                     self.print("")
-                    self._run_name_review()
+                    self._start_cast_review()
 
                 show_results()
             else:
@@ -2002,7 +2041,7 @@ class RegenderTUI(App):
                 self.print("[#aaaaaa]  See logs/tui_debug.log for details[/]")
                 self._show_api_key_help(error_msg)
                 self.print("")
-                self._run_name_review()
+                self._start_cast_review()
 
         except Exception as e:
             error_msg = str(e)
@@ -2023,7 +2062,7 @@ class RegenderTUI(App):
             self.print("[#aaaaaa]  See logs/tui_debug.log for full traceback[/]")
             self._show_api_key_help(error_msg)
             self.print("")
-            self._run_name_review()
+            self._start_cast_review()
 
     def _show_api_key_help(self, error_msg: str) -> None:
         """Show helpful message if error is about missing API keys."""
@@ -2603,6 +2642,185 @@ class RegenderTUI(App):
         self._name_suggestions = suggestions
         self._show_name_review_menu()
 
+    # ---------------------------------------------------------- cast review
+
+    def _start_cast_review(self) -> None:
+        """Ask about cast entries that may be one person, then choose names.
+
+        The deterministic merge folds only what it is certain of, because a wrong
+        merge makes two people one and says nothing, while a missed one shows up
+        as a character with two names. In Pride and Prejudice five pairs survived
+        every check -- Mrs. Collins and Charlotte Collins, Miss King and Mary
+        King, Mrs. Nichols and Nicholls, Kitty and Catherine Bennet, Jane Bennet
+        and Jane Bingley -- and nothing asked about any of them. Only one was
+        ever noticed, afterwards, and then only because the two names it produced
+        happened to collide.
+
+        This runs before naming, because the answer decides how many names there
+        are to choose.
+        """
+        self._cast_candidates = []
+        self._cast_idx = 0
+        self._cast_merges = []
+
+        characters = getattr(self._pending_characters, "characters", None)
+        if characters:
+            try:
+                from src.services.character_service import CharacterService
+
+                self._cast_candidates = CharacterService.possible_duplicates(list(characters))
+            except Exception:
+                self._cast_candidates = []
+
+        if not self._cast_candidates:
+            self._run_name_review()
+            return
+
+        self.print("")
+        self.print(
+            f"[#ffffff]◆[/] [bold #ffffff]{len(self._cast_candidates)} "
+            f"possible duplicate{'s' if len(self._cast_candidates) > 1 else ''} in the cast[/]"
+        )
+        self.print(
+            "  [#aaaaaa]One entry per person, or one person is renamed twice. "
+            "These could not be settled automatically.[/]"
+        )
+        self._show_cast_candidate()
+
+    def _show_cast_candidate(self) -> None:
+        """Ask about one pair."""
+        self._stage = "cast_review"
+        if self._cast_idx >= len(self._cast_candidates):
+            self._finish_cast_review()
+            return
+
+        item = self._cast_candidates[self._cast_idx]
+        position = f"{self._cast_idx + 1} of {len(self._cast_candidates)}"
+
+        self.print("")
+        self.print(f"[#ffffff]?[/] [bold #ffffff]Same person? {position}[/]")
+        self.print("")
+        self.print(f"  [#e5c07b]{item['a']}[/]")
+        self.print(f"  [#e5c07b]{item['b']}[/]")
+        self.print("")
+        self.print(f"  [#aaaaaa]{item['reason']}[/]")
+        self.print("")
+        self.print(
+            "  [#aaaaaa]y[/] one person   [#aaaaaa]Enter[/] two people"
+            "   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest separate"
+        )
+        self.print("")
+        self.status_text = f"Cast {position}"
+        self._accept_input()
+        self.set_prompt(">  ")
+
+    def _handle_cast_review_input(self, value: str) -> None:
+        """y merges, Enter keeps them apart, b goes back, s ends the review."""
+        answer = value.strip().lower()
+
+        if answer in ("b", "back"):
+            self._cast_idx = max(0, self._cast_idx - 1)
+            if self._cast_merges and self._cast_merges[-1][2] >= self._cast_idx:
+                self._cast_merges.pop()
+            self._show_cast_candidate()
+            return
+
+        if answer in ("s", "skip"):
+            remaining = len(self._cast_candidates) - self._cast_idx
+            self.print(f"  [#aaaaaa]Left {remaining} as separate people[/]")
+            self._cast_idx = len(self._cast_candidates)
+            self._show_cast_candidate()
+            return
+
+        item = self._cast_candidates[self._cast_idx]
+        if answer in ("y", "yes"):
+            self._cast_merges.append((item["a"], item["b"], self._cast_idx))
+            # Say which name survives, which is not always the one listed first:
+            # "Miss King" and "Mary King" are one woman and she is Mary King.
+            keeps = _surviving_name(item["a"], item["b"])
+            self.print(f"  [#98c379]✓[/] [#aaaaaa]one person, kept as {keeps}[/]")
+
+        self._cast_idx += 1
+        self._show_cast_candidate()
+
+    def _finish_cast_review(self) -> None:
+        """Apply what was decided, write it down, and go on to the names."""
+        if self._cast_merges:
+            self._apply_cast_merges()
+        self.print("")
+        kept = len(self._cast_candidates) - len(self._cast_merges)
+        self.print(
+            f"[#ffffff]✓[/] [#aaaaaa]{len(self._cast_merges)} merged, "
+            f"{kept} left as separate people[/]"
+        )
+        self._write_cast_decisions()
+        self._run_name_review()
+
+    def _apply_cast_merges(self) -> None:
+        """Fold each accepted pair into one entry of the cast.
+
+        The entry with a given name is kept, because a name is more use than a
+        form of address; the other's name and aliases join it so nothing the book
+        calls them is lost.
+        """
+        characters = getattr(self._pending_characters, "characters", None)
+        if not characters:
+            return
+
+        by_name = {c.name: c for c in characters}
+        drop: set = set()
+        for first, second, _index in self._cast_merges:
+            a, b = by_name.get(first), by_name.get(second)
+            if a is None or b is None or a is b:
+                continue
+
+            keeper = _surviving_name(a.name, b.name)
+            keep, fold = (a, b) if a.name == keeper else (b, a)
+            aliases = list(keep.aliases or [])
+            for extra in [fold.name, *(fold.aliases or [])]:
+                if extra != keep.name and extra not in aliases:
+                    aliases.append(extra)
+            keep.aliases = aliases
+            if keep.gender.value in ("unknown", "neutral") and fold.gender.value in (
+                "male",
+                "female",
+            ):
+                keep.gender = fold.gender
+            drop.add(fold.name)
+
+        if drop:
+            self._pending_characters.characters = [c for c in characters if c.name not in drop]
+
+    def _write_cast_decisions(self) -> None:
+        """Record the rulings beside the book they are about."""
+        if not self._cast_candidates:
+            return
+        try:
+            import json
+
+            path = self._output_path or self._json_output_path
+            if not path:
+                return
+            folder = Path(path).parent
+            folder.mkdir(parents=True, exist_ok=True)
+            merged = {(a, b) for a, b, _ in self._cast_merges}
+            (folder / "cast_decisions.json").write_text(
+                json.dumps(
+                    [
+                        {
+                            "a": item["a"],
+                            "b": item["b"],
+                            "reason": item["reason"],
+                            "same_person": (item["a"], item["b"]) in merged,
+                        }
+                        for item in self._cast_candidates
+                    ],
+                    indent=2,
+                )
+            )
+        except Exception:
+            pass
+
     # ------------------------------------------------------------ QC review
 
     def _show_review_menu(self) -> None:
@@ -2878,7 +3096,7 @@ class RegenderTUI(App):
                 )
             self.print(f"[#aaaaaa]Asking again{': ' + note if note else ''}[/]")
             self.print("")
-            self._run_name_review()
+            self._start_cast_review()
             return
 
         if self._name_custom_mode:
