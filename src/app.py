@@ -235,7 +235,14 @@ class Application:
                 self.logger.error(f"Failed to register service {service_name}: {e}")
 
     def _run_quality_control(
-        self, book, transformation, transform_type, output_path, partial, name_map=None
+        self,
+        book,
+        transformation,
+        transform_type,
+        output_path,
+        partial,
+        name_map=None,
+        characters=None,
     ) -> Optional[dict]:
         """Check the transformed book against its source, and say what it found.
 
@@ -269,7 +276,8 @@ class Application:
             # Without the map QC cannot see renaming at all: it has no idea
             # what any character was supposed to be called, so a book naming
             # its protagonist two different ways scored 99.7% and passed.
-            report = QCService(key, name_map=name_map).check_book(source, transformed)
+            cast = [c.name for c in getattr(characters, "characters", [])]
+            report = QCService(key, name_map=name_map, cast=cast).check_book(source, transformed)
             summary = report.to_dict()
 
             path = Path(output_path).with_name(Path(output_path).stem + "_qc.json")
@@ -596,6 +604,7 @@ class Application:
                     output_path,
                     partial,
                     getattr(transformer, "effective_name_map", None) or name_map,
+                    characters,
                 )
 
                 # Export as text file (this could fail, but JSON is already saved)
