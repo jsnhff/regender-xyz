@@ -21,6 +21,32 @@ class Gender(Enum):
     NEUTRAL = "neutral"
 
 
+def normalise_pronouns(value: Any) -> dict:
+    """A pronoun set as a dict, from whatever the model actually sent.
+
+    The extraction prompt asks for a string -- "he/him" -- and the field holds a
+    dict, so the character built straight from the reply carried a string where
+    every reader expects a mapping. Only the reload path converted it, so the
+    cast a run analysed had pronouns a run could not read, and every one of the
+    ninety entries reached the transform prompt as they/them. Converting in one
+    place is the point: this was three implementations, two of which were a
+    default.
+    """
+    if isinstance(value, dict):
+        return {k: v for k, v in value.items() if v}
+    if not isinstance(value, str) or not value.strip():
+        return {}
+
+    parts = [p.strip() for p in value.replace(",", "/").split("/") if p.strip()]
+    if len(parts) < 2:
+        return {}
+    return {
+        "subject": parts[0],
+        "object": parts[1],
+        "possessive": parts[2] if len(parts) > 2 else parts[1],
+    }
+
+
 @dataclass
 class Character:
     """Represents a character in a book."""
@@ -50,21 +76,7 @@ class Character:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Character":
         """Create from dictionary representation."""
-        # Handle pronouns as either dict or string
-        pronouns = data.get("pronouns", {})
-        if isinstance(pronouns, str):
-            # Convert "she/her/hers" or "she/her" format to dict
-            parts = pronouns.split("/") if pronouns else []
-            if len(parts) >= 2:
-                pronouns = {
-                    "subject": parts[0],
-                    "object": parts[1],
-                    "possessive": parts[2] if len(parts) > 2 else parts[1],
-                }
-            else:
-                pronouns = {}
-        elif pronouns is None:
-            pronouns = {}
+        pronouns = normalise_pronouns(data.get("pronouns"))
 
         return cls(
             name=data["name"],

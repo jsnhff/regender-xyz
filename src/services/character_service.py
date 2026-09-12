@@ -20,7 +20,12 @@ from typing import Any, Optional
 from rapidfuzz import fuzz, process
 
 from src.models.book import Book
-from src.models.character import Character, CharacterAnalysis, Gender
+from src.models.character import (
+    Character,
+    CharacterAnalysis,
+    Gender,
+    normalise_pronouns,
+)
 from src.providers.base import LLMProvider
 from src.services.base import BaseService, ServiceConfig
 from src.services.prompts import EXTRACTION_PROMPT_TEMPLATE, MERGE_PROMPT_TEMPLATE
@@ -67,6 +72,131 @@ class UnionFind:
         return list(groups.values())
 
 
+#: Words that stand in front of a name without being part of it, lowercased and
+#: without the period, for reading a cast entry's shape.
+_GROUPING_TITLES = frozenset(
+    {
+        "mr",
+        "mrs",
+        "ms",
+        "mx",
+        "miss",
+        "madam",
+        "sir",
+        "lady",
+        "lord",
+        "dame",
+        "noble",
+        "colonel",
+        "captain",
+        "major",
+        "general",
+        "admiral",
+        "lieutenant",
+        "dr",
+        "doctor",
+        "reverend",
+        "professor",
+    }
+)
+
+
+#: Words that make a phrase a description of somebody rather than a name for
+#: them. An alias containing one of these identifies nobody in particular:
+#: "his wife" belongs to three women in the Pride and Prejudice cast.
+_RELATION_WORDS = frozenset(
+    {
+        "mother",
+        "father",
+        "mamma",
+        "mama",
+        "papa",
+        "parent",
+        "son",
+        "daughter",
+        "child",
+        "children",
+        "brother",
+        "sister",
+        "sibling",
+        "husband",
+        "wife",
+        "spouse",
+        "uncle",
+        "aunt",
+        "niece",
+        "nephew",
+        "cousin",
+        "widow",
+        "bride",
+        "friend",
+        "eldest",
+        "youngest",
+        "elder",
+        "younger",
+        "ladyship",
+        "lordship",
+        "housekeeper",
+        "butler",
+        "waiter",
+        "gardener",
+        "chambermaid",
+        "boy",
+        "boys",
+        "girl",
+        "girls",
+    }
+)
+
+
+#: How prominent a character is, most prominent first. Used to pick the higher
+#: of two values when merging, and to read whatever word the model offered.
+_IMPORTANCE_RANK = {"main": 3, "major": 3, "supporting": 2, "secondary": 2, "minor": 1}
+
+
+def _importance_of(value: Any) -> str:
+    """One of main/supporting/minor, from whatever the model said.
+
+    This was hard-coded to "supporting" at both construction sites, so all ninety
+    characters came out equally important: get_main_characters() returned nothing
+    on every run, the interface's "Main characters" block never rendered, and the
+    transform prompt described the whole cast in one undifferentiated list.
+    """
+    word = str(value or "").strip().lower()
+    if word in _IMPORTANCE_RANK:
+        return {3: "main", 2: "supporting", 1: "minor"}[_IMPORTANCE_RANK[word]]
+    # A number is how some replies answer "importance"; 8 of 10 is a main part.
+    try:
+        score = float(word)
+    except ValueError:
+        return "supporting"
+    if score >= 8:
+        return "main"
+    return "supporting" if score >= 4 else "minor"
+
+
+def _is_name_form(alias: str) -> bool:
+    """True when an alias names a person rather than describing one.
+
+    Every token capitalised (titles and nobiliary particles excepted) and no
+    relation word anywhere. "Darcy" and "Miss Lucas" qualify; "his wife", "her
+    mother", "mamma" and "the eldest Miss Bennet" do not.
+    """
+    tokens = [t for t in alias.split() if t]
+    if not tokens:
+        return False
+    for position, token in enumerate(tokens):
+        bare = token.rstrip(".").lower()
+        if bare in _RELATION_WORDS:
+            return False
+        if token[:1].isupper():
+            continue
+        if position and bare in {"de", "van", "von", "du", "del", "della", "di", "da", "la", "le"}:
+            continue
+        return False
+    return True
+
+
 class CharacterService(BaseService):
     """
     Refactored character analysis service.
@@ -102,9 +232,20 @@ class CharacterService(BaseService):
         # Set up configuration with defaults and validation
         self.extraction_config = {
             "chunk_size": char_config.get("chunk_size_tokens", 32000),
-            "temperature": char_config.get("temperature", 0.3),
+            "temperature": char_config.get("temperature", 0.0),
             "max_retries": 3,
+            "retry_backoff": char_config.get("retry_backoff_seconds", 1.0),
         }
+
+        # Chunks that named nobody even after every retry. A short cast used to
+        # be indistinguishable from a short book, so the analysis could return
+        # 77 characters one run and 91 the next with nothing anywhere saying a
+        # chunk had been lost. Recorded so the run can say so.
+        self.empty_chunks: list[int] = []
+
+        # Said once per run, not once per call: a chunked book would otherwise
+        # repeat it eighteen times.
+        self._warned_forced_temperature = False
 
         # Validate chunk size
         if self.extraction_config["chunk_size"] <= 0:
@@ -138,7 +279,7 @@ class CharacterService(BaseService):
             )
 
         self.merging_config = {
-            "temperature": char_config.get("temperature", 0.3),
+            "temperature": char_config.get("temperature", 0.0),
             "timeout": 30,
             "batch_size": 50,
         }
@@ -209,8 +350,17 @@ class CharacterService(BaseService):
             self.logger.info(f"Starting character analysis for book: {book.title or 'Unknown'}")
 
             # Phase 1: Extract all character mentions
+            self.empty_chunks = []
             raw_characters = await self._extract_all_characters(book_text)
             self.logger.info(f"Extracted {len(raw_characters)} raw character mentions")
+            if self.empty_chunks:
+                # Say it plainly. A cast short by a chunk used to look exactly
+                # like a book with fewer people in it.
+                self.logger.error(
+                    f"{len(self.empty_chunks)} chunk(s) named nobody after every retry "
+                    f"(chunk {', '.join(str(n) for n in self.empty_chunks)}); this cast is "
+                    "incomplete and the run is not comparable to one that is"
+                )
 
             # Phase 2: Group similar characters efficiently
             character_groups = self._group_similar_characters(raw_characters)
@@ -229,10 +379,19 @@ class CharacterService(BaseService):
                 )
 
             # Create analysis result
+            metadata = self._calculate_metadata(final_characters)
+            # What produced this cast. Every saved analysis recorded provider and
+            # model as null, so a run that found 77 characters could not even be
+            # told apart from one that found 91 by asking which model read the
+            # book. The empty-chunk tally rides along for the same reason.
+            if self.empty_chunks:
+                metadata["empty_chunks"] = list(self.empty_chunks)
             return CharacterAnalysis(
                 book_id=book.hash(),  # Use book hash as ID
                 characters=final_characters,
-                metadata=self._calculate_metadata(final_characters),
+                metadata=metadata,
+                provider=getattr(self.provider, "name", None),
+                model=getattr(self.provider, "model", None),
             )
 
         except (ValidationError, CharacterExtractionError, ConfigurationError):
@@ -442,13 +601,14 @@ class CharacterService(BaseService):
         """
         prompt = EXTRACTION_PROMPT_TEMPLATE.format(text=chunk)
 
-        for attempt in range(self.extraction_config["max_retries"]):
+        attempts = max(1, self.extraction_config["max_retries"])
+        for attempt in range(attempts):
             try:
                 response = await self._complete_with_retry(
                     prompt, temperature=self.extraction_config["temperature"]
                 )
 
-                characters = self._parse_json_response(response)
+                characters = self._parse_json_response(response, strict=True)
 
                 # Handle different response formats
                 if isinstance(characters, dict):
@@ -472,13 +632,27 @@ class CharacterService(BaseService):
                         char["chunk_index"] = chunk_index
                         valid_chars.append(char)
 
+                # A chunk of a novel holds people. Coming back with none is a
+                # reply that went wrong -- a refusal, a preamble, a truncation --
+                # and it used to end the loop as a success.
+                if not valid_chars:
+                    raise ValueError("parsed, but named no characters")
+
                 return valid_chars
 
             except Exception as e:
-                if attempt == self.extraction_config["max_retries"] - 1:
-                    self.logger.error(f"Failed to extract from chunk {chunk_index}: {e}")
+                if attempt == attempts - 1:
+                    self.logger.error(
+                        f"Chunk {chunk_index} named no characters after {attempts} "
+                        f"attempts: {e}. The cast for this run is short by whoever "
+                        f"first appears in it."
+                    )
+                    self.empty_chunks.append(chunk_index)
                     return []
-                await asyncio.sleep(2**attempt)  # Exponential backoff
+                # Exponential backoff. Scaled by a configured factor so a test
+                # exercising the retry path does not have to wait out the real
+                # one; three seconds a case is how a fast suite stops being run.
+                await asyncio.sleep(self.extraction_config.get("retry_backoff", 1.0) * 2**attempt)
 
     # === GROUPING METHODS ===
 
@@ -613,12 +787,68 @@ class CharacterService(BaseService):
             last1 = parts1[-1].lower()
             last2 = parts2[-1].lower()
 
-            # Skip titles when comparing (Dr, Mr, Mrs, Ms, etc.)
-            titles = {"dr", "mr", "mrs", "ms", "prof", "sir", "lady", "lord"}
-            if first1 in titles:
-                first1 = parts1[1].lower() if len(parts1) > 2 else first1
-            if first2 in titles:
-                first2 = parts2[1].lower() if len(parts2) > 2 else first2
+            # Skip titles when comparing. Two gaps here made this guard reject
+            # every duplicate in the book. "miss" was missing from the set, and
+            # Pride and Prejudice's cast is full of Miss Bennets; and the skip
+            # only applied when a name had three tokens, so for the two-token
+            # "Mr. Darcy" the title itself was compared as the first name --
+            # against "Fitzwilliam", which differs, with the same surname, which
+            # reads as a sibling. On the real 90-entry cast this produced 90
+            # groups and not one pair, so the merge phase after it had nothing to
+            # do. "Anne de Bourgh" against "Miss Anne de Bourgh" scored a perfect
+            # 100 and was still rejected.
+            titles = {
+                "dr",
+                "mr",
+                "mrs",
+                "ms",
+                "mx",
+                "miss",
+                "prof",
+                "sir",
+                "lady",
+                "lord",
+                "dame",
+                "madam",
+                "colonel",
+                "captain",
+                "major",
+                "general",
+                "reverend",
+            }
+            titled1 = first1 in titles
+            titled2 = first2 in titles
+            behind1 = parts1[1:] if titled1 else parts1
+            behind2 = parts2[1:] if titled2 else parts2
+
+            # Two titled forms of one surname, with different titles, are two
+            # people: Mr. and Mrs. Bennet are husband and wife, and so are the
+            # Hursts, the Gardiners, the Philipses and the Wickhams. Grouping
+            # them asks the merge step a question it should never be asked.
+            if (
+                titled1
+                and titled2
+                and len(behind1) == 1
+                and len(behind2) == 1
+                and behind1[0].lower() == behind2[0].lower()
+                and first1 != first2
+            ):
+                self.logger.debug(f"Not grouping a married pair: {name1} vs {name2}")
+                return False
+
+            # "Mr. Darcy" and "Fitzwilliam Darcy" are one man, but they are NOT
+            # grouped here, deliberately. Grouping is transitive, so calling that
+            # pair similar also pulls in every other Darcy through the title
+            # form, and the whole Bennet family arrives in one group -- seven
+            # people the merge step is then asked about as a single question,
+            # with a wrong "yes" collapsing a family. That pair is settled
+            # deterministically instead, in _merge_same_person, where a title
+            # form is folded into a given name only when exactly one person of
+            # that gender carries the surname.
+            if titled1 and len(parts1) > 1:
+                first1 = parts1[1].lower()
+            if titled2 and len(parts2) > 1:
+                first2 = parts2[1].lower()
 
             if first1 != first2 and last1 == last2:
                 # Different first names, same last name - likely family members
@@ -669,12 +899,11 @@ class CharacterService(BaseService):
                 final_characters.append(self._dict_to_character(group[0]))
             else:
                 # Need LLM to determine if these are the same character
-                merged = await self._merge_group_with_llm(group)
-                final_characters.append(merged)
+                final_characters.extend(await self._merge_group_with_llm(group))
 
         return final_characters
 
-    async def _merge_group_with_llm(self, group: list[dict]) -> Character:
+    async def _merge_group_with_llm(self, group: list[dict]) -> list[Character]:
         """
         Use LLM to merge a group of potentially similar characters.
 
@@ -696,39 +925,68 @@ class CharacterService(BaseService):
 
             result = self._parse_json_response(response)
 
+            # Every path that is not a merge keeps the whole group. Returning
+            # only the first member deleted the rest of the cast: asked whether
+            # Jane Bennet and Lydia Bennet are the same person, a correct "no"
+            # removed Lydia from the book. So did a 529 from the provider, and
+            # so did a reply in a shape this code did not expect. Not merging is
+            # the safe answer to an uncertain question; deleting is not.
+            unmerged = [self._dict_to_character(member) for member in group]
+
             # Handle both object and array responses
             if isinstance(result, list):
                 # If LLM returned an array, take the first item
                 if result:
                     result = result[0]
                 else:
-                    # Empty array, use first from group
-                    return self._dict_to_character(group[0])
+                    return unmerged
 
             # Ensure result is a dict
             if not isinstance(result, dict):
                 self.logger.warning(f"Unexpected result type: {type(result)}")
-                return self._dict_to_character(group[0])
+                return unmerged
 
-            if result.get("is_same_person", True):
-                # Merge into single character
-                return Character(
+            # Absent means unanswered, and an unanswered question must not
+            # collapse a group. This defaulted to True, so a reply that omitted
+            # the field merged people the model had not said were one.
+            if result.get("is_same_person") is not True:
+                if "is_same_person" not in result:
+                    self.logger.warning(
+                        "Merge reply did not say whether these are one person; "
+                        f"keeping all {len(group)} separate: "
+                        + ", ".join(m.get("name", "?") for m in group)
+                    )
+                return unmerged
+
+            # Merge into single character
+            return [
+                Character(
                     name=result.get("canonical_name", group[0].get("name", "Unknown")),
                     gender=self._parse_gender(result.get("gender")),
-                    pronouns=result.get("pronouns", ""),
+                    pronouns=normalise_pronouns(result.get("pronouns"))
+                    # The merged reply may omit pronouns; the members had them.
+                    or next(
+                        (p for p in (normalise_pronouns(m.get("pronouns")) for m in group) if p),
+                        {},
+                    ),
+                    titles=result.get("titles") or group[0].get("titles", []),
                     aliases=result.get("aliases", []),
                     description=result.get("description", ""),
-                    importance="supporting",
+                    importance=_importance_of(
+                        result.get("importance")
+                        or max(
+                            (m.get("importance") for m in group if m.get("importance")),
+                            default=None,
+                            key=lambda v: _IMPORTANCE_RANK.get(str(v).lower(), 0),
+                        )
+                    ),
                     confidence=0.8,
                 )
-            else:
-                # Just return the first one (shouldn't happen often)
-                return self._dict_to_character(group[0])
+            ]
 
         except Exception as e:
-            self.logger.warning(f"Failed to merge group: {e}")
-            # Fallback: return the first character
-            return self._dict_to_character(group[0])
+            self.logger.warning(f"Failed to merge group, keeping all members separate: {e}")
+            return [self._dict_to_character(member) for member in group]
 
     # === UTILITY METHODS ===
 
@@ -754,11 +1012,19 @@ class CharacterService(BaseService):
                 # Our new prompts already explicitly request JSON
                 kwargs = {}
 
-                # Some models like gpt-5-mini only support temperature=1.0
-                # Check if the model has this limitation
+                # Some models like gpt-5-mini only support temperature=1.0.
+                # Say so rather than substituting in silence: reading a cast is
+                # a task that wants no sampling at all, and a run that could not
+                # have it should not look like a run that did.
                 model_name = getattr(self.provider, "model", "")
                 if "gpt-5-mini" in model_name or "gpt-5-nano" in model_name:
-                    # These models only support temperature=1.0
+                    if temperature != 1.0 and not self._warned_forced_temperature:
+                        self._warned_forced_temperature = True
+                        self.logger.warning(
+                            f"{model_name} accepts only temperature 1.0, so the configured "
+                            f"{temperature} cannot be used. This cast will vary between runs; "
+                            "a model that honours temperature 0 will not."
+                        )
                     kwargs["temperature"] = 1.0
                 else:
                     kwargs["temperature"] = temperature
@@ -777,18 +1043,31 @@ class CharacterService(BaseService):
                 self.logger.warning(f"Retry {attempt + 1} after {wait_time}s: {e}")
                 await asyncio.sleep(wait_time)
 
-    def _parse_json_response(self, response: str) -> Any:
+    def _parse_json_response(self, response: str, strict: bool = False) -> Any:
         """
         Parse JSON response with multiple fallback strategies.
 
         Args:
             response: Response text to parse
+            strict: Raise instead of returning an empty structure when nothing
+                could be parsed. Character extraction needs this: the empty
+                fallback is indistinguishable from a chunk that really held no
+                characters, so a refusal, a truncated reply or a paragraph of
+                prose all read as a successful extraction of nobody -- and the
+                retry loop above never ran, because a fallback is not an
+                exception. One silent chunk out of eighteen costs three to eight
+                characters, which is the whole of the run-to-run spread.
 
         Returns:
             Parsed JSON object
+
+        Raises:
+            ValueError: only when strict and no strategy could parse the reply.
         """
         if not response or not response.strip():
             self.logger.warning("Empty response received")
+            if strict:
+                raise ValueError("empty response")
             return {"characters": []}
 
         # Strategy 1: Direct parse
@@ -857,6 +1136,8 @@ class CharacterService(BaseService):
 
         # Final fallback: Return empty structure with proper format
         self.logger.warning(f"Could not parse JSON from response: {response[:200]}...")
+        if strict:
+            raise ValueError(f"could not parse a reply of {len(response)} characters")
         return {"characters": []}
 
     def _clean_json_text(self, text: str) -> str:
@@ -922,10 +1203,11 @@ class CharacterService(BaseService):
         return Character(
             name=char_dict.get("name", "Unknown"),
             gender=self._parse_gender(char_dict.get("gender")),
-            pronouns=char_dict.get("pronouns", ""),
+            pronouns=normalise_pronouns(char_dict.get("pronouns")),
+            titles=char_dict.get("titles", []),
             aliases=char_dict.get("aliases", []),
             description=char_dict.get("description", ""),
-            importance="supporting",
+            importance=_importance_of(char_dict.get("importance")),
             confidence=0.7,
         )
 
@@ -942,15 +1224,34 @@ class CharacterService(BaseService):
         if not gender_str:
             return Gender.UNKNOWN
 
-        gender_str = gender_str.lower()
-        if "female" in gender_str or "woman" in gender_str:
-            return Gender.FEMALE
-        elif "male" in gender_str or "man" in gender_str:
-            return Gender.MALE
-        elif "non" in gender_str or "neutral" in gender_str:
-            return Gender.NEUTRAL
-        else:
+        gender_str = str(gender_str).lower().strip()
+
+        # Nonbinary first, and by its own names. Testing "female" before anything
+        # else made Gender.NONBINARY unreachable: "non-binary" contains neither
+        # "female" nor "male", so it fell to "non" and became NEUTRAL, which
+        # target_gender() skips -- so a character the book already describes as
+        # nonbinary was never transformed at all. "male/female" was read as
+        # FEMALE for the same ordering reason.
+        if any(
+            word in gender_str
+            for word in ("non-binary", "nonbinary", "non binary", "enby", "genderqueer")
+        ):
+            return Gender.NONBINARY
+        if gender_str in ("they", "they/them", "them"):
+            return Gender.NONBINARY
+
+        has_female = "female" in gender_str or "woman" in gender_str
+        has_male = "male" in gender_str or "man" in gender_str
+        # "male/female" names two possibilities, which is not an answer.
+        if has_female and has_male and gender_str not in ("female", "woman"):
             return Gender.UNKNOWN
+        if has_female:
+            return Gender.FEMALE
+        if has_male:
+            return Gender.MALE
+        if "neutral" in gender_str:
+            return Gender.NEUTRAL
+        return Gender.UNKNOWN
 
     def _calculate_metadata(self, characters: list[Character]) -> dict[str, Any]:
         """
@@ -989,6 +1290,38 @@ class CharacterService(BaseService):
         "nonbinary": "Mx.",
     }
 
+    #: For gender_swap there is no single destination title: each one crosses to
+    #: the other side. Leaving this out returned no collisions at all for the
+    #: swap -- 73 characters changing, nothing checked -- which is how "Miss
+    #: Darcy" came to be renamed onto her own brother's form.
+    _SWAPPED_TITLE = {
+        "mr.": "Mrs.",
+        "mrs.": "Mr.",
+        "miss": "Mr.",
+        "ms.": "Mr.",
+        "mx.": "Mx.",
+        "lady": "Lord",
+        "lord": "Lady",
+        "sir": "Lady",
+        "dame": "Sir",
+    }
+
+    @classmethod
+    def _landing_for(cls, form: str, transform_type) -> Optional[str]:
+        """Where a title-and-surname form lands, or None if it is not one."""
+        parts = form.split()
+        if len(parts) != 2 or parts[0].lower() not in cls._TITLES:
+            return None
+        variant = getattr(transform_type, "value", "")
+        title = cls._TITLE_FOR.get(variant)
+        if title is None:
+            if variant != "gender_swap":
+                return None
+            title = cls._SWAPPED_TITLE.get(parts[0].lower())
+            if title is None:
+                return None
+        return f"{title} {parts[1]}"
+
     @classmethod
     def _name_collisions(cls, characters, changing, transform_type) -> dict:
         """Characters whose transformed name is already somebody else's.
@@ -997,32 +1330,55 @@ class CharacterService(BaseService):
         transform can only swap her title -- and lands her on Mr. Bennet, who
         is her husband. Eight of Pride and Prejudice's cast do this. Nothing
         downstream can separate them afterwards: one name, two people.
-        """
-        taken = {c.name.lower(): c.name for c in characters.characters}
-        title = cls._TITLE_FOR.get(getattr(transform_type, "value", ""), "")
-        if not title:
-            return {}
 
-        # Where each title-only character would land.
+        Forms of address are counted as well as cast names, because that is
+        where most of these live. Charlotte Collins is listed under her full
+        name, so nothing titled was ever examined for her -- yet the book calls
+        her "Mrs. Collins" forty times, and in an all-male edition that lands
+        exactly on her husband. The alias expansion used to paper over this by
+        quietly renaming "Mrs. Collins" to a bare given name, which cost the
+        book its honorifics; the collision belongs here, where it can be put to
+        the reader and answered once.
+        """
+        taken: dict[str, str] = {}
+        for char in characters.characters:
+            for form in [char.name, *(char.aliases or [])]:
+                taken.setdefault(form.lower(), char.name)
+
+        # Where each title-and-surname form would land, by the character it
+        # belongs to. A character may own several: "Mrs. Collins" and "Miss
+        # Lucas" are both Charlotte.
         landing: dict[str, str] = {}
         for char in changing:
-            parts = char.name.split()
-            if len(parts) != 2 or parts[0].lower() not in cls._TITLES:
-                continue  # has a given name of their own, or is not titled
-            landing[char.name] = f"{title} {parts[1]}"
+            for form in [char.name, *(char.aliases or [])]:
+                destination = cls._landing_for(form, transform_type)
+                if destination and form not in landing:
+                    landing[form] = destination
+
+        # A form whose owner is also changing is not a clash: both move.
+        changing_names = {c.name for c in changing}
 
         collisions = {}
-        for name, candidate in landing.items():
+        for form, candidate in landing.items():
             owner = taken.get(candidate.lower())
-            if owner and owner != name:
-                collisions[name] = {"candidate": candidate, "clashes_with": owner}
+            if owner and owner not in (taken.get(form.lower()), form) and owner in changing_names:
+                # The owner is moving too, so ask where they land instead.
+                owner_forms = [f for f, d in landing.items() if taken.get(f.lower()) == owner]
+                if any(landing[f] != candidate for f in owner_forms):
+                    owner = None
+            if owner and owner != taken.get(form.lower()) and owner != form:
+                collisions[form] = {"candidate": candidate, "clashes_with": owner}
                 continue
             # Two characters can also land on each other rather than on someone
             # already there: Lady Lucas and Miss Lucas both become Mr. Lucas,
             # and no existing man is involved.
-            others = [n for n, c in landing.items() if c == candidate and n != name]
+            others = [
+                f
+                for f, d in landing.items()
+                if d == candidate and taken.get(f.lower()) != taken.get(form.lower())
+            ]
             if others:
-                collisions[name] = {"candidate": candidate, "clashes_with": others[0]}
+                collisions[form] = {"candidate": candidate, "clashes_with": others[0]}
         return collisions
 
     @staticmethod
@@ -1045,6 +1401,82 @@ class CharacterService(BaseService):
             while parent.get(name, name) != name:
                 name = parent[name]
             return name
+
+        # Two entries that answer to the same short name are one person --
+        # unless their given names differ, in which case the short name is
+        # ambiguous and they are two.
+        #
+        # "Mr. Darcy" and "Fitzwilliam Darcy" both list the alias "Darcy".
+        # Neither names the other, so nothing folded them, and the protagonist's
+        # suitor was two cast entries: the gender-swap edition called one
+        # "Frances Darcy" and the other "Mrs. Fitzwillia Darcy". One has no given
+        # name and the other does, so there is nothing to contradict.
+        #
+        # The guard matters as much as the rule. "Charlotte Lucas" and "Maria
+        # Lucas" both list the alias "Miss Lucas", and they are sisters.
+        #
+        # Structure cannot settle every case: "Mrs. Bennet" and "Jane Bennet"
+        # are mother and daughter, share a surname and a gender, and only the
+        # honorific says which is which. Where it cannot be known, nothing is
+        # merged and the map audit raises the pair for a person to answer.
+        def _behind_titles(name: str) -> list:
+            parts = [part for part in name.split() if part]
+            while parts and parts[0].rstrip(".").lower() in _GROUPING_TITLES:
+                parts.pop(0)
+            return parts
+
+        def given_of(name: str) -> Optional[str]:
+            parts = _behind_titles(name)
+            return parts[0].lower() if len(parts) > 1 else None
+
+        def surname_of(name: str) -> Optional[str]:
+            parts = _behind_titles(name)
+            return parts[-1].lower() if parts else None
+
+        claimants: dict[str, list] = {}
+        for char in characters:
+            for alias in getattr(char, "aliases", []) or []:
+                if alias in by_name:
+                    continue  # the alias-names-an-entry rule below covers this
+                if not _is_name_form(alias):
+                    # A relation is not an identity. "his wife" is listed for
+                    # Mrs. Bennet, Mrs. Wickham and Harriet Forster, and taking
+                    # it as a shared name chained six different women into one
+                    # person -- Mrs. Bennet, Lydia Bennet, Lydia Wickham, Mrs.
+                    # Wickham, Harriet Harrington and Mrs. Forster all folded
+                    # into Harriet Forster.
+                    continue
+                claimants.setdefault(alias.lower(), []).append(char)
+
+        for sharers in claimants.values():
+            if len(sharers) < 2:
+                continue
+            first = sharers[0]
+            for other in sharers[1:]:
+                if first.gender != other.gender:
+                    continue
+                given_a, given_b = given_of(first.name), given_of(other.name)
+                if given_a and given_b and given_a != given_b:
+                    continue  # two people who share a form of address
+                surname_a, surname_b = surname_of(first.name), surname_of(other.name)
+                if surname_a and surname_b and surname_a != surname_b:
+                    # Harriet Forster and Harriet Harrington both answer to
+                    # "Harriet" and are two women. A married name crossing
+                    # surnames -- Lydia Bennet to Lydia Wickham -- is only ever
+                    # merged on the stronger evidence of one entry naming the
+                    # other, which the rule below does.
+                    continue
+                a, b = root(first.name), root(other.name)
+                if a == b:
+                    continue
+                # The form carrying a given name makes the better canonical one.
+                if given_of(a) and not given_of(b):
+                    keep, fold = a, b
+                elif given_of(b) and not given_of(a):
+                    keep, fold = b, a
+                else:
+                    keep, fold = sorted((a, b), key=lambda n: (-len(by_name[n].aliases or []), n))
+                parent[fold] = keep
 
         for char in characters:
             for alias in getattr(char, "aliases", []) or []:
@@ -1191,6 +1623,10 @@ Rules:
 - Keep the era/period appropriate (Victorian names stay Victorian, etc.)
 - For titles like "Sir [Name]": use "Dame [Name]" for female equivalents; for "Mr." use "Ms." or "Mrs."
 - Do NOT change family surnames — only given names and honorific titles
+- If the character HAS a given name, that given name must CHANGE. Changing only
+  the title is not an answer: "Sir William Lucas" -> "Noble William Lucas" leaves
+  a man's name in place and will be rejected. Give them a new given name and keep
+  the surname: "Sir William Lucas" -> "Noble Vivian Lucas".
 - A character marked NEEDS A GIVEN NAME has none of their own, so swapping the
   title would merge them with an existing character. Give them a period-appropriate
   given name and return the full form, e.g. "Mrs. Bennet" -> "Mr. Thomas Bennet".
@@ -1218,6 +1654,13 @@ Return ONLY the JSON array.{steer_note}"""
                 return []
 
             # Validate and clean each entry
+            from src.services.name_engine import cast_name_index, check_rename
+
+            # What the cast already is. Without it the check has to guess from
+            # the shape of a name whether "Sir William" names a man called
+            # William or the Lucas family, and whether "Jane" is free.
+            cast_surnames, cast_givens, reserved = cast_name_index(characters)
+
             result = []
             for item in parsed:
                 if not isinstance(item, dict):
@@ -1226,6 +1669,26 @@ Return ONLY the JSON array.{steer_note}"""
                 suggested = str(item.get("suggested", "")).strip()
                 character_id = str(item.get("character_id", original)).strip()
                 if original and suggested and original != suggested:
+                    # A suggestion the reader approves becomes the book's name and
+                    # overrides the engine, so it has to clear the same bar the
+                    # engine's own proposals clear. It used to clear none: "Sir
+                    # William Lucas" -> "Noble William Lucas" changed the title,
+                    # left the masculine given name, and was offered as a valid
+                    # nonbinary name. A suggestion that fails here is not shown;
+                    # the character falls through to the engine, which has the
+                    # period-attested pool and will choose.
+                    problem = check_rename(
+                        original,
+                        suggested,
+                        surnames=cast_surnames,
+                        givens=cast_givens,
+                        reserved=reserved,
+                    )
+                    if problem:
+                        self.logger.warning(
+                            f"Dropped name suggestion {original!r} -> {suggested!r}: {problem}"
+                        )
+                        continue
                     entry = {
                         "original": original,
                         "suggested": suggested,

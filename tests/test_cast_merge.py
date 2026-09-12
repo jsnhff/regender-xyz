@@ -132,7 +132,18 @@ class TestTheAliasKeepsItsOwnSurname:
         )
         assert expanded["Lydia Wickham"] == "Lyle Wickham"
 
-    def test_a_titled_alias_still_takes_the_whole_target(self):
+    def test_a_titled_alias_needs_no_entry_of_its_own(self):
+        """The name inside the phrase carries it, and the register survives.
+
+        Giving these their own entries is how the book lost its honorifics:
+        "Miss Bennet" mapped to a bare given name fell from 59 occurrences to 0,
+        and "Miss Eliza" mapped to the cast's canonical "Elijah Bennet Darcy"
+        put Darcy's name on Elizabeth years before the wedding.
+
+        Nothing has to reach inside the phrase. "Elizabeth" -> "Edmund" fires
+        within "Miss Elizabeth", and the term map moves the honorific, so the
+        phrase arrives as "Mr. Edmund" with no entry for it anywhere.
+        """
         analysis = CharacterAnalysis(
             book_id="t",
             characters=[
@@ -140,14 +151,27 @@ class TestTheAliasKeepsItsOwnSurname:
                     name="Elizabeth Bennet",
                     gender=Gender.FEMALE,
                     pronouns={},
-                    aliases=["Miss Elizabeth"],
+                    aliases=["Miss Elizabeth", "Miss Bennet"],
                 )
             ],
         )
-        expanded = self.svc()._expand_name_map_with_aliases(
+        svc = self.svc()
+        expanded = svc._expand_name_map_with_aliases(
             {"Elizabeth Bennet": "Edmund Bennet"}, analysis
         )
-        assert expanded["Miss Elizabeth"] == "Edmund Bennet"
+        assert "Miss Elizabeth" not in expanded
+        assert "Miss Bennet" not in expanded
+        assert expanded["Elizabeth"] == "Edmund"
+
+        # And the phrases come out right without them.
+        assert (
+            svc._apply_name_map("Miss Elizabeth was announced.", expanded)
+            == "Miss Edmund was announced."
+        )
+        assert (
+            svc._apply_name_map("Miss Bennet was announced.", expanded)
+            == "Miss Bennet was announced."
+        )
 
 
 @pytest.mark.parametrize(

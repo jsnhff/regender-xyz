@@ -1064,8 +1064,20 @@ class TransformService(BaseService):
     # Fixed expressions where a gendered word names no one. "Good Lord!" is an
     # exclamation, not a title, and swapping it yields "Good Lady!" — which the
     # printed Pride and Prejudice carries three times.
+    # An oath is not a peerage. "Good Lord!" was already held back here, but the
+    # bare exclamation was not -- so "Lord! how I laughed!" went through the
+    # title map and came out "Noble! how I laughed!" in the nonbinary edition and
+    # would have been "Lady!" in the others. Every one of these is Lydia or Mrs.
+    # Bennet swearing, and none of them is a lord.
+    #
+    # Holding them here only stops the title map. Where a variant wants the oath
+    # itself changed -- a masculine invocation is the one thing left standing in
+    # a book with no men -- _OATH_FIXES converts it afterwards, which is why the
+    # peer forms are excluded: "Lord ----" and "Lord Byron" carry a space, and
+    # every pattern below needs punctuation or a lowercase word straight after.
     _PROTECTED_PHRASES = re.compile(
-        r"[Gg]ood\s+Lord|O\s+Lord|Lord\s+(?:bless|knows|have\s+mercy)"
+        r"[Gg]ood\s+Lord|O\s+Lord|Oh,\s+Lord|Lord\s+(?:bless|knows|have\s+mercy)"
+        r"|Lord[!?]|Lord,(?=\s+[a-z])"
         r"|[Gg]ood\s+God|[Gg]ood\s+[Hh]eavens?"
     )
 
@@ -1142,8 +1154,108 @@ class TransformService(BaseService):
         },
     }
 
+    # Words the model coined where a term had already been decided.
+    #
+    # These cannot be held to the residual mask, and that is the whole point of
+    # keeping them separate. The mask asks whether a word is identical to its
+    # source counterpart, so that the net never undoes correct model work -- but
+    # a coinage is by definition not identical to its source, so every rule whose
+    # job is to repair one was structurally unable to fire. "nibbling" ->
+    # "nibling" was written and commented as an LLM typo correction and could
+    # never correct an LLM typo: the shipped nonbinary edition has 30 of one
+    # beside 34 of the other.
+    #
+    # The same gap left "Ladyship" in six spellings. The rule Ladyship ->
+    # Nobleship only fires where the model left the word alone, which it did four
+    # times out of forty-two; the rest came back as Nobship (14), Nobility (14),
+    # Noblemajesty (4), Noblesip (1) and Nobleperson (1), none of them dominant
+    # and one of them not a word. Mapping the coinages back to the decided term
+    # is what makes a decision hold.
+    _CANONICAL_FORMS: dict[str, dict[str, str]] = {
+        "nonbinary": {
+            # The honorific, settled on one spelling. "Nobship", "Noblesip",
+            # "Noblemajesty" and "Nobleperson" are not words and are safe to
+            # match bare. "Nobility" is a real one -- the aristocracy as a class
+            # -- so it is matched only in the possessive frame where the model
+            # used it as an honorific, and Austen's own noun is left alone.
+            "nobship": "nobleship",
+            "noblemajesty": "nobleship",
+            "noblesip": "nobleship",
+            "nobleperson": "nobleship",
+            "their nobility": "their nobleship",
+            "your nobility": "your nobleship",
+            # the kinship term, settled likewise
+            "nibbling": "nibling",
+            # -person coinages where a real word was already chosen
+            "gentleperson": "gentlefolk",
+            "gentlepersons": "gentlefolk",
+            "gentlepersonlike": "genteel",
+            "gentlepersonly": "genteel",
+            "clergyperson": "cleric",
+            "chamberperson": "chambermaid",
+            "horseperson": "rider",
+            "tradesperson": "tradesfolk",
+            "spokesperson": "speaker",
+            "sportspeople": "sporting folk",
+            "siblingly": "kindly",
+            "relativeses": "relatives",
+            "siblingses": "siblings",
+        },
+        "all_female": {
+            # "damehood" is not English; the honour keeps its own name.
+            "damehood": "knighthood",
+            "mama": "mamma",
+            "mistresss": "mistresses",
+        },
+        "gender_swap": {
+            "damehood": "knighthood",
+            "mama": "mamma",
+        },
+        "all_male": {
+            "mama": "papa",
+        },
+    }
+
+    # A "master" who teaches is not a man being described; he is a profession,
+    # and the word for a woman doing it is not "mistress" in the sense the swap
+    # produces. Austen's two uses of the plural both mean teachers -- "for the
+    # benefit of masters" -- and with sense rules defined for the nonbinary
+    # variant alone, the gender-swap and all-female editions read "for the
+    # benefit of mistresses", which says something else entirely. These frames
+    # are about the sense of the word rather than the gender of anyone, so they
+    # hold for every variant. The idioms are deliberately not shared: "her own
+    # mistress" really does become "his own master", and "mistress of the house"
+    # really does become "master of the house".
+    _SENSE_RULES_EVERY_VARIANT: dict[str, str] = {
+        "music master": "music teacher",
+        "music mistress": "music teacher",
+        "dancing master": "dancing teacher",
+        "dancing mistress": "dancing teacher",
+        "drawing master": "drawing teacher",
+        "drawing mistress": "drawing teacher",
+        "writing master": "writing teacher",
+        "writing mistress": "writing teacher",
+        "london master": "london teacher",
+        "london mistress": "london teacher",
+        "masters": "teachers",
+        "mistresses": "teachers",
+    }
+
     _TERM_MAPS: dict[str, dict[str, str]] = {
         "all_male": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergywoman": "clergyman",
+            "coachwoman": "coachman",
+            "tradeswoman": "tradesman",
+            "footwoman": "footman",
+            "spokeswoman": "spokesman",
+            "sportswoman": "sportsman",
+            "frenchwoman": "frenchman",
+            "horsewoman": "horseman",
+            "patroness": "patron",
+            "sisterly": "brotherly",
+            "housemaid": "manservant",
+            "chambermaid": "manservant",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "aunts": "uncles",
@@ -1237,6 +1349,16 @@ class TransformService(BaseService):
             "Mrs": "Mr",
         },
         "all_female": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergyman": "clergywoman",
+            "coachman": "coachwoman",
+            "tradesman": "tradeswoman",
+            "footman": "footwoman",
+            "spokesman": "spokeswoman",
+            "sportsman": "sportswoman",
+            "frenchman": "frenchwoman",
+            "horseman": "horsewoman",
+            "brotherly": "sisterly",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "boys": "girls",
@@ -1321,10 +1443,37 @@ class TransformService(BaseService):
             "he": "she",
             "him": "her",
             "himself": "herself",
-            # Title safety nets — LLM sometimes leaves gendered titles on character names
-            "Mr": "Ms",
+            # Title safety nets — LLM sometimes leaves gendered titles on character names.
+            #
+            # "Mrs", not "Ms": the name map, which knows the cast, already
+            # decides "Mrs." and used it 551 times in the shipped edition while
+            # this line produced "Ms." 202 times -- the same honorific written
+            # two ways, near half and half, one of them a word that did not
+            # exist in 1813. The net is the residual for names the map does not
+            # cover, so it has to agree with the map.
+            "Mr": "Mrs",
         },
         "gender_swap": {
+            # Occupations and derivations carrying gender in the word itself.
+            "clergyman": "clergywoman",
+            "clergywoman": "clergyman",
+            "coachman": "coachwoman",
+            "coachwoman": "coachman",
+            "tradesman": "tradeswoman",
+            "tradeswoman": "tradesman",
+            "footman": "footwoman",
+            "footwoman": "footman",
+            "spokesman": "spokeswoman",
+            "spokeswoman": "spokesman",
+            "sportsman": "sportswoman",
+            "sportswoman": "sportsman",
+            "frenchman": "frenchwoman",
+            "frenchwoman": "frenchman",
+            "horseman": "horsewoman",
+            "horsewoman": "horseman",
+            "housemaid": "manservant",
+            "sisterly": "brotherly",
+            "brotherly": "sisterly",
             # Familial / relational (both directions)
             "mother": "father",
             "father": "mother",
@@ -1469,6 +1618,28 @@ class TransformService(BaseService):
             "Mrs": "Mr",
         },
         "nonbinary": {
+            # Occupations and derivations carrying gender in the word itself.
+            # Real English words, not -person coinages: one edition produced
+            # gentleperson, clergyperson, chamberperson, horseperson,
+            # tradesperson, spokesperson and sportspeople.
+            "clergyman": "cleric",
+            "clergywoman": "cleric",
+            "coachman": "driver",
+            "coachwoman": "driver",
+            "tradesman": "trader",
+            "tradeswoman": "trader",
+            "footman": "attendant",
+            "footwoman": "attendant",
+            "spokesman": "speaker",
+            "spokeswoman": "speaker",
+            "sportsman": "sporting sort",
+            "sportswoman": "sporting sort",
+            "horseman": "rider",
+            "horsewoman": "rider",
+            "patroness": "patron",
+            "sisterly": "kindly",
+            "brotherly": "kindly",
+            "manservant": "servant",
             # Ported from the Aug-2026 transform hardening: plurals,
             # familiar forms, and singular-they verb agreement.
             "aunts": "relatives",
@@ -1477,8 +1648,8 @@ class TransformService(BaseService):
             "daughters": "children",
             "fathers": "parents",
             "gentlemanlike": "genteel",
-            "gentlemen": "people",
-            "gentlewomen": "people",
+            "gentlemen": "gentlefolk",
+            "gentlewomen": "gentlefolk",
             "girls": "youths",
             "goddaughter": "godchild",
             "godson": "godchild",
@@ -1723,6 +1894,27 @@ class TransformService(BaseService):
     # Case-sensitive regex fixes applied after _apply_term_map.
     # Keyed by transform type value. Used for patterns where re.IGNORECASE
     # would cause false positives (e.g. "Miss" verb vs title).
+    # "Oh, Lord!" is an oath, not a peer, and in a book where nobody is a lord
+    # by gender it is the one masculine invocation the transforms left standing.
+    # Austen supplies the replacement herself: "Good gracious" is Mrs. Bennet's
+    # own exclamation, five times in this book, and she stacks them -- "Good
+    # gracious! Lord bless me! only think! dear me!" Every "Lord!" oath in Pride
+    # and Prejudice is spoken by Lydia or Mrs. Bennet, so the register has to
+    # stay loud and unguarded, which "Good gracious!" is and "Oh, no!" is not.
+    # "Heaven" carries the blessing, as Austen uses it seven times.
+    #
+    # Order matters: the framed forms go first, so by the time the bare rule runs
+    # there is no "good Lord!" left for it to touch. The peer is safe throughout
+    # -- "Lord ----" and "Lord Byron" are followed by a space, and every pattern
+    # here demands punctuation or a lowercase word immediately after.
+    _OATH_FIXES: list[tuple] = [
+        (re.compile(r"(?<![A-Za-z])Oh,\s+Lord([!,?])"), r"Good gracious\1"),
+        (re.compile(r"(?<![A-Za-z])([Gg])ood\s+Lord([!,?])"), r"\1ood gracious\2"),
+        (re.compile(r"(?<![A-Za-z])Lord(\s+bless)"), r"Heaven\1"),
+        (re.compile(r"(?<![A-Za-z])Lord([!?])"), r"Good gracious\1"),
+        (re.compile(r"(?<![A-Za-z])Lord,(\s+[a-z])"), r"Good gracious,\1"),
+    ]
+
     _CASE_SENSITIVE_FIXES: dict[str, list[tuple]] = {
         # "Sir" before a name swaps to "Lady", not to "Madam". The flat map
         # gives the vocative answer -- right for "Yes, sir" and wrong for
@@ -1762,14 +1954,18 @@ class TransformService(BaseService):
                 "Mx. ",
             ),
             (re.compile(r"\bSir (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mx. "),
+            *_OATH_FIXES,
         ],
         "all_male": [
             (re.compile(r"Miss (?=[A-Z]|(?:de|du|van|von|del|della|la|le|di|da) [A-Z])"), "Mr. "),
             (re.compile(r"_Miss ([A-Z])"), r"_Mr. \1"),
+            # No oath rule: "Lord" is already the masculine form, so nothing here
+            # is out of place for this variant.
         ],
         "all_female": [
             # "Miss" is already female — only need to catch "Mr." on now-female characters.
-            # Handled by the "Mr" → "Ms" term map entry; no case-sensitive fix needed here.
+            # Handled by the "Mr" → "Mrs" term map entry; no case-sensitive fix needed here.
+            *_OATH_FIXES,
         ],
     }
 
@@ -1983,6 +2179,14 @@ class TransformService(BaseService):
     # Irregular plurals for the gendered nouns in the term maps. Everything else
     # is derived by _pluralize so that "her sisters" is covered as well as
     # "her sister" -- a bare \b<singular>\b pattern never matches the plural.
+    #
+    # There was a second, shorter copy of this dictionary further down the class
+    # body, and being later it silently won -- taking gentleman, gentlewoman,
+    # kinsman, kinswoman and hero out of every lookup. So "gentlemen" was never
+    # in a term map at all: the gender-swap edition has 74 of them unswapped,
+    # more than the 40 in the source, because nothing touched the word. The same
+    # shadowing made _pluralize answer "gentlemans", "heros", "monarches" and
+    # "grandchilds".
     _IRREGULAR_PLURALS: dict[str, str] = {
         "man": "men",
         "woman": "women",
@@ -1994,6 +2198,26 @@ class TransformService(BaseService):
         "hero": "heroes",
         "child": "children",
         "person": "people",
+        # Every occupational in -man. Derived regularly these come out
+        # "clergymans" and "sportsmans", so the plural the source actually uses
+        # matches nothing at all.
+        "clergyman": "clergymen",
+        "clergywoman": "clergywomen",
+        "coachman": "coachmen",
+        "coachwoman": "coachwomen",
+        "tradesman": "tradesmen",
+        "tradeswoman": "tradeswomen",
+        "footman": "footmen",
+        "footwoman": "footwomen",
+        "spokesman": "spokesmen",
+        "spokeswoman": "spokeswomen",
+        "sportsman": "sportsmen",
+        "sportswoman": "sportswomen",
+        "frenchman": "frenchmen",
+        "frenchwoman": "frenchwomen",
+        "horseman": "horsemen",
+        "horsewoman": "horsewomen",
+        "manservant": "menservants",
     }
 
     # Every pronoun form the transforms touch. Kept apart from the nouns because
@@ -2050,7 +2274,10 @@ class TransformService(BaseService):
         cached = cls._UNCONDITIONAL_TERMS.get(key)
         if cached is not None:
             return cached
-        terms = {cls._fold_apostrophe(t.lower()) for t in cls._SENSE_RULES.get(key, {})}
+        terms = {cls._fold_apostrophe(t.lower()) for t in cls._sense_rules_for(key)}
+        # A repair for a coined word can never match its source, so holding it
+        # to the mask disables it entirely.
+        terms.update(cls._fold_apostrophe(t.lower()) for t in cls._CANONICAL_FORMS.get(key, {}))
         terms.update(
             cls._fold_apostrophe(t.lower())
             for t in cls._effective_term_map(key)
@@ -2058,6 +2285,13 @@ class TransformService(BaseService):
         )
         cls._UNCONDITIONAL_TERMS[key] = frozenset(terms)
         return cls._UNCONDITIONAL_TERMS[key]
+
+    @classmethod
+    def _sense_rules_for(cls, key: str) -> dict[str, str]:
+        """Sense rules in force for a variant: the shared ones, then its own."""
+        rules = dict(cls._SENSE_RULES_EVERY_VARIANT)
+        rules.update(cls._SENSE_RULES.get(key, {}))
+        return rules
 
     @classmethod
     def _effective_term_map(cls, key: str) -> dict[str, str]:
@@ -2072,7 +2306,8 @@ class TransformService(BaseService):
 
         base = cls._TERM_MAPS.get(key, {})
         effective = dict(base)
-        effective.update(cls._SENSE_RULES.get(key, {}))
+        effective.update(cls._sense_rules_for(key))
+        effective.update(cls._CANONICAL_FORMS.get(key, {}))
         for original, replacement in base.items():
             if (
                 original.lower() in cls._NO_PLURAL
@@ -2488,15 +2723,6 @@ class TransformService(BaseService):
             return True
         return all(mask[i] for i in range(start, end) if text[i].isalpha())
 
-    # Kinship nouns whose plural is not simply "+s".
-    _IRREGULAR_PLURALS = {
-        "wife": "wives",
-        "child": "children",
-        "man": "men",
-        "woman": "women",
-        "person": "people",
-    }
-
     # "her uncle and aunt" -- a possessive owning two relations, or the same
     # relation twice once the transform has run.
     _PAIRED_RELATIONS = re.compile(
@@ -2506,9 +2732,21 @@ class TransformService(BaseService):
 
     @classmethod
     def _plural_of(cls, noun: str) -> str:
+        """The plural of a noun that may already be one.
+
+        A coordinated pair is collapsed by pluralising the word both halves map
+        to, and some of those words are plural before they arrive -- nonbinary
+        sends "uncle and aunt" to "relatives", not "relative". Pluralising again
+        put "Who are your relativeses?" into Lady Catherine's interrogation of
+        Elizabeth, and would have done "siblingses" and "childrens" as readily.
+        """
         lowered = noun.lower()
         if lowered in cls._IRREGULAR_PLURALS:
             plural = cls._IRREGULAR_PLURALS[lowered]
+        elif lowered in cls._IRREGULAR_PLURALS.values():
+            plural = lowered  # already the irregular plural: children, people
+        elif lowered.endswith("s") and not lowered.endswith(("ss", "us", "is")):
+            plural = lowered  # already plural: relatives, siblings, parents
         elif lowered.endswith(("s", "x", "z", "ch", "sh")):
             plural = lowered + "es"
         else:
@@ -2711,6 +2949,35 @@ class TransformService(BaseService):
 
             text = pattern.sub(_replace, text)
 
+            # Agreement needs a second look, because the first pass is what
+            # created the disagreement. The substitution is one simultaneous
+            # scan, so where "she" became "they" the scanner had already moved
+            # past and "they was" was never a candidate: the rule fires on
+            # "they was very glad" given to it directly and not on "she was very
+            # glad", which is the only way it ever arrives. Grammar, not gender,
+            # so the mask has no business here either.
+            agreement = {
+                term: replacement
+                for term, replacement in term_map.items()
+                if _AGREEMENT_PHRASE.match(term)
+            }
+            if agreement:
+                second, second_lookup = self._compile_substitution(tuple(sorted(agreement.items())))
+
+                def _fix_agreement(match: "re.Match") -> str:
+                    term = match.group("term")
+                    start, end = match.span("term")
+                    if self._in_protected(protected, start, end):
+                        return match.group(0)
+                    replacement = second_lookup[self._fold_apostrophe(term.lower())]
+                    if "’" in term:
+                        replacement = replacement.replace("'", "’")
+                    result = self._match_case(term, replacement)
+                    self._record_substitution(text, start, term, result, where)
+                    return result + (match.group("clitic") or "")
+
+                text = second.sub(_fix_agreement, text)
+
         text = self._apply_contextual_pronouns(text, key, source_text)
         text = self._collapse_coordinated_pair(text, key, source_text)
 
@@ -2887,8 +3154,78 @@ class TransformService(BaseService):
         return expanded
 
     # A possessive or article opening an alias marks it as a description of a
-    # person rather than a name for one.
-    _RELATIONAL_OPENERS = frozenset({"my", "his", "her", "their", "our", "your", "the", "a", "an"})
+    # person rather than a name for one. "old" and "young" do the same work:
+    # "old Wickham" is a description, and mapping it renamed the description.
+    _RELATIONAL_OPENERS = frozenset(
+        {
+            "my",
+            "his",
+            "her",
+            "their",
+            "our",
+            "your",
+            "the",
+            "a",
+            "an",
+            "old",
+            "young",
+            "elder",
+            "eldest",
+            "younger",
+            "youngest",
+            "little",
+            "poor",
+            "dear",
+            "good",
+        }
+    )
+
+    # Words for a relation. Anywhere in an alias, these make it a description of
+    # somebody rather than a name for them: "mamma", "sister-in-law", "brother
+    # Gardiner". The term map owns these words -- "her husband" becomes "his
+    # wife" -- and a rename map that claims them replaces a relationship with a
+    # proper name mid-sentence.
+    _RELATION_WORDS = frozenset(
+        {
+            "mother",
+            "father",
+            "mamma",
+            "mama",
+            "papa",
+            "mummy",
+            "mother-in-law",
+            "father-in-law",
+            "parent",
+            "son",
+            "daughter",
+            "child",
+            "children",
+            "brother",
+            "sister",
+            "sibling",
+            "brother-in-law",
+            "sister-in-law",
+            "husband",
+            "wife",
+            "spouse",
+            "uncle",
+            "aunt",
+            "niece",
+            "nephew",
+            "cousin",
+            "grandmother",
+            "grandfather",
+            "grandson",
+            "granddaughter",
+            "widow",
+            "widower",
+            "bride",
+            "bridegroom",
+            "friend",
+            "ladyship",
+            "lordship",
+        }
+    )
 
     @classmethod
     def _unsafe_alias(cls, alias: str, target: str) -> bool:
@@ -2909,11 +3246,42 @@ class TransformService(BaseService):
         rename but is really a title being added, and applying it to text that
         already says "Miss Wickham" yields "Miss Miss Wickham". The surname is
         unchanged; only the title moves, and that is the term map's job too.
+
+        A title with a SURNAME is a form of address, not a nickname. "Miss
+        Bennet", "Mrs. Hurst" and "Mr. Collins" were mapped to bare given names
+        and the book lost its register: "Miss Bennet" fell from 59 occurrences
+        to 0, "Mr. Collins" from 145 to 0, and "danced only once with Mrs.
+        Hurst" became "once with Leslie Hurst". The title is the term map's to
+        change and the surname survives, so there is nothing here to rename.
+        The name engine has always refused these; this side had no equivalent,
+        which also let it write renames the engine had explicitly declined --
+        three hundred and thirteen occurrences in the all-female edition, past a
+        refusal recorded in the report, with no flag.
+
+        A title with a GIVEN name needs no entry either, and giving it one is
+        how a maiden name acquired a husband: "Miss Eliza" and "Miss Elizabeth
+        Bennet" were both mapped to "Elijah Bennet Darcy", putting Darcy's name
+        on her in chapters set years before the wedding, and "Miss Lucas" was
+        mapped to "Chester Collins", changing Charlotte's maiden surname to her
+        married one. Nothing needs to reach inside the phrase, because the
+        entry for the name itself already does: "Elizabeth" -> "Edmund" fires
+        within "Miss Elizabeth", and the term map moves the honorific, so the
+        phrase becomes "Mr. Edmund" with no entry of its own.
+
+        A relation is not a name either, whatever it stands next to. "mamma"
+        was mapped to "Mx. Hilary Bennet", so five passages have children
+        addressing their mother as '"Oh, Mx. Hilary Bennet,"'. "sister-in-law"
+        and "brother Gardiner" were armed the same way.
         """
         words = cls._WORD_RE.findall(alias)
         if not words:
             return True
-        if words[0].lower() in cls._RELATIONAL_OPENERS:
+        lowered = [w.lower() for w in words]
+        if lowered[0] in cls._RELATIONAL_OPENERS:
+            return True
+        if any(word in cls._RELATION_WORDS for word in lowered):
+            return True
+        if lowered[0] in cls._HONORIFICS or lowered[0] in cls._RANKS:
             return True
         target_words = {w.lower() for w in cls._WORD_RE.findall(target)}
         return len(words) == 1 and words[0].lower() in target_words
@@ -2966,9 +3334,16 @@ class TransformService(BaseService):
         return words[0]
 
     # Honorifics sit in front of a name rather than being part of it.
+    # "noble" belongs here: it is what the nonbinary variant writes for Sir and
+    # Lady, so leaving it out made "Noble Sydney de Bourgh" read as the given
+    # name "Noble" and sent bare aliases to the title instead of the name.
     _HONORIFICS = frozenset(
-        {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam"}
+        {"mr", "mrs", "ms", "mx", "miss", "sir", "lady", "lord", "dame", "madam", "noble"}
     )
+
+    # Particles belong to the surname they precede, so nothing behind them is a
+    # given name: "Noble de Bourgh" offers none.
+    _PARTICLES = frozenset({"de", "van", "von", "du", "del", "della", "di", "da", "la", "le"})
 
     # Ranks and professions sit in front of a surname the same way a title
     # does. Without them "Colonel Fitzwilliam" reads as given name "Colonel",
@@ -2996,13 +3371,24 @@ class TransformService(BaseService):
 
         "Edward Bennet" -> "Edward"; "Mr. King" -> "Mr. King", because an
         honorific is not a first name and stripping it leaves a bare surname.
+
+        A title in front of a full name used to make this return the whole
+        thing, which is how a nickname became a formal address: with the target
+        "Dame Louisa de Bourgh", the alias "Lew" turned '"Come, Lew, you must
+        dance."' into '"Come, Dame Louisa de Bourgh, you must dance."' The
+        title is skipped when there is a given name behind it, and only then.
         """
         words = cls._WORD_RE.findall(full)
         if not words:
             return full
-        if words[0].lower() in cls._HONORIFICS:
+        rest = [
+            w for w in words if w.lower() not in cls._HONORIFICS and w.lower() not in cls._RANKS
+        ]
+        # Fewer than two words left is a bare surname, and a particle in front
+        # of one says the same thing: there is no given name here to take.
+        if len(rest) < 2 or rest[0].lower() in cls._PARTICLES:
             return full
-        return words[0]
+        return rest[0]
 
     # Paragraph delimiter the model is asked to echo back. Blank lines alone are
     # not a safe protocol: a merged pair, an added preamble, or a paragraph

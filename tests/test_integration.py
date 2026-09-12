@@ -22,9 +22,11 @@ def test_pipeline_works_with_mock(app_with_mock, simple_story_path, tmp_path):
     # Basic checks that pipeline completed
     assert result["success"] is True
     assert result["book_title"] is not None
-    # Characters might be 0 with simple mock, that's OK
-    assert "characters" in result
     assert "changes" in result
+    # The mock answers the extraction prompt, so the pipeline runs against a
+    # real cast. It used to answer only a phrase the prompt never sent, so this
+    # ran end to end with nobody in the book and said that was fine.
+    assert result["characters"] >= 1
 
     # Verify output file was created
     assert Path(output_file).exists()

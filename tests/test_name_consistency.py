@@ -292,10 +292,28 @@ class TestAnAliasMustBeAName:
 
     @pytest.mark.parametrize(
         ("alias", "target"),
-        [("Lizzy", "Edmund"), ("Mrs. Collins", "Charles Collins"), ("Kitty", "Charles")],
+        [("Lizzy", "Edmund"), ("Eliza", "Edmund"), ("Kitty", "Charles")],
     )
     def test_a_real_name_is_kept(self, svc, alias, target):
         assert not svc._unsafe_alias(alias, target)
+
+    @pytest.mark.parametrize(
+        "alias", ["Mrs. Collins", "Miss Bennet", "Mr. Bingley", "Colonel Forster"]
+    )
+    def test_a_form_of_address_is_not_a_nickname(self, svc, alias):
+        """The title is the term map's to move, and the surname survives.
+
+        Mapping these to bare given names cost the book its register: "Mr.
+        Collins" fell from 145 occurrences to 0 and "danced only once with Mrs.
+        Hurst" became "once with Leslie Hurst". It also wrote renames the name
+        engine had explicitly declined in order to keep two characters apart --
+        313 occurrences in the all-female edition, past a recorded refusal.
+
+        Where transforming the title alone really would merge two people, the
+        answer is a given name for one of them, decided once by the collision
+        check and put to the reader. It is not a silent rename here.
+        """
+        assert svc._unsafe_alias(alias, "Charles Collins")
 
     def test_the_kinship_aliases_never_reach_the_map(self, svc):
         characters = cast(("Mr. Bennet", Gender.MALE, ["her husband", "their father"]))

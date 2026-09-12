@@ -317,6 +317,121 @@ def _version_from_model_id(model_id: str) -> str:
     return f"{m.group(1)}.{m.group(2)}" if m else ""
 
 
+#: The colour the review stepper already uses for the term under discussion.
+_CHANGED = "#e5c07b"
+
+#: The marker an excerpt carries where it was cut, at either end.
+_TRUNCATED = re.compile(r"^(?:\.\.\.|…)|(?:\.\.\.|…)$")
+
+
+def _mark_changes(before: str, after: str, width: int = 66) -> tuple[str, str]:
+    """The was/now pair with the word that changed picked out, and in view.
+
+    Two problems with printing the excerpts plainly. The reader had to find the
+    difference themselves, in two nearly identical lines of Regency prose. And
+    both lines were cut at the width from their start, so a change past that
+    column was simply not on screen -- the one word the question is about.
+
+    So: diff by word, window around the first difference rather than the start,
+    and emphasise what moved. When the two lines have little in common there is
+    no single changed word to point at, and highlighting most of the sentence
+    tells the reader nothing, so the emphasis is dropped and the text stands.
+    """
+    import difflib
+
+    b_words, a_words = before.split(), after.split()
+
+    # The excerpts arrive cut to length, mid-word, with "..." on the cut end.
+    # Those markers are not content, and treating them as words made a line
+    # look more changed than it was: "...ry becoming" against "...becoming"
+    # counts two differences where there are none, the tail does the same at
+    # the other end, and four real changes in eleven words came to six -- over
+    # the threshold, so the emphasis was dropped on the William lines, which
+    # are the ones being asked about. Compare without the markers, and never
+    # point at a word that is only half itself.
+    b_plain = [_TRUNCATED.sub("", w) for w in b_words]
+    a_plain = [_TRUNCATED.sub("", w) for w in a_words]
+
+    def cut_ends(words: list) -> tuple[bool, bool]:
+        if not words:
+            return False, False
+        return bool(_TRUNCATED.match(words[0])), bool(_TRUNCATED.search(words[-1]))
+
+    b_head, b_tail = cut_ends(b_words)
+    a_head, a_tail = cut_ends(a_words)
+    # A cut on either side makes that end unreliable on both.
+    head_cut, tail_cut = b_head or a_head, b_tail or a_tail
+
+    def unreliable(words: list) -> set:
+        edges = set()
+        if words and head_cut:
+            edges.add(0)
+        if words and tail_cut:
+            edges.add(len(words) - 1)
+        return edges
+
+    b_skip, a_skip = unreliable(b_words), unreliable(a_words)
+
+    b_changed = [False] * len(b_words)
+    a_changed = [False] * len(a_words)
+    anchored = False
+    matcher = difflib.SequenceMatcher(a=b_plain, b=a_plain, autojunk=False)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            anchored = True
+            continue
+        for i in range(i1, i2):
+            b_changed[i] = i not in b_skip
+        for j in range(j1, j2):
+            a_changed[j] = j not in a_skip
+
+    # With no word in common there is nothing to point at, and lighting the
+    # whole line tells the reader less than leaving it alone.
+    if not anchored:
+        b_changed = [False] * len(b_words)
+        a_changed = [False] * len(a_words)
+
+    return (
+        _render_excerpt(b_words, b_changed, "#666666", width),
+        _render_excerpt(a_words, a_changed, "#aaaaaa", width),
+    )
+
+
+def _render_excerpt(words: list, changed: list, base: str, width: int) -> str:
+    """One excerpt, windowed on its change and marked up word by word."""
+    if not words:
+        return ""
+
+    focus = next((i for i, flag in enumerate(changed) if flag), 0)
+    low = high = focus
+    total = len(words[focus])
+    while True:
+        grew = False
+        if high + 1 < len(words) and total + 1 + len(words[high + 1]) <= width:
+            high += 1
+            total += 1 + len(words[high])
+            grew = True
+        if low - 1 >= 0 and total + 1 + len(words[low - 1]) <= width:
+            low -= 1
+            total += 1 + len(words[low])
+            grew = True
+        if not grew:
+            break
+
+    # Each word carries its own colour: nesting a highlight inside an outer tag
+    # relies on the renderer restoring the outer one, and this does not.
+    parts = [
+        f"[bold {_CHANGED}]{word}[/]" if flag else f"[{base}]{word}[/]"
+        for word, flag in zip(words[low : high + 1], changed[low : high + 1])
+    ]
+    body = " ".join(parts)
+    if low > 0:
+        body = f"[{base}]…[/] " + body
+    if high < len(words) - 1:
+        body = body + f" [{base}]…[/]"
+    return body
+
+
 def _friendly_model_name(model: str) -> str:
     """Convert API model ID to a short display name."""
     all_models = [m for models in _FALLBACK_MODELS.values() for m in models]
@@ -969,36 +1084,70 @@ class RegenderTUI(App):
     transform_type: reactive[str] = reactive("—")
     status_text: reactive[str] = reactive("Ready")
 
+    #: State that outlives a run: how the interface was wired, what the reader
+    #: prefers, and what the session has spent so far. Everything else belongs
+    #: to one book and is declared in _reset_run_state.
+    SESSION_STATE = frozenset(
+        {
+            "_process_callback",
+            "_session_usage",
+            "_friendly_mode",
+            "_setup_provider",
+        }
+    )
+
     def __init__(self, process_callback: Callable | None = None, **kwargs):
         super().__init__(**kwargs)
         self._process_callback = process_callback
-        self._ran_application = None
         # What this session has spent, gathered before each application is shut
         # down. Reading it afterwards returned nothing: shutdown clears the
         # container, so the completion report asked a closed service and
         # silently showed no cost at all.
         self._session_usage = {"tokens_in": 0, "tokens_out": 0, "calls": 0}
+        self._friendly_mode: bool = False
+        self._setup_provider: str = ""
+        self._reset_run_state()
+
+    def _reset_run_state(self) -> None:
+        """Everything that belongs to one book, cleared between books.
+
+        A run must be self-contained. When this list was maintained separately
+        from the restart path, the cast, the renames, the title and the review
+        queue all survived into the next book -- so the reader reviewed one
+        book's characters and transformed another's.
+        """
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
         self._no_qc = False
-        self._name_map: dict[str, str] | None = None
+        self._result: dict | None = None
+        self._ran_application = None
+
+        # The cast, and every decision taken about it. This is the one that bit:
+        # a cast reviewed for the previous book is not this book's cast.
         self._pending_characters = None
+        self._name_map: dict[str, str] | None = None
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
-        self._review_items: list = []
-        self._review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._name_regen_mode: bool = False
         self._name_steer: str = ""
+
+        # The editorial review queue, which is about this book's findings.
+        self._review_items: list = []
+        self._review_idx: int = 0
+
+        # Titles are per book, by definition.
         self._custom_title: str = ""
-        self._friendly_mode: bool = False
-        self._setup_provider: str = ""
+        self._suggested_title: str = ""
+
         self._model_choices: list = []
         self._model_showing_all: bool = False
-        self._result: dict | None = None
+        self._export_format_list: list = []
+
         self._process_start: float | None = None
+        self._analysis_start_time: float | None = None
         self._json_output_path: str | None = None
         self._output_path: Path | None = None
         self._stage_start: float | None = None
@@ -1006,6 +1155,9 @@ class RegenderTUI(App):
         self._last_progress_line_id: str | None = None
         self._book_stats: dict | None = None
         self._analysis_running: bool = False
+        self._transform_loader = None
+        self._stage_loader = None
+        self._analysis_loader = None
 
     def compose(self) -> ComposeResult:
         yield HeaderBar(id="header")
@@ -2482,10 +2634,11 @@ class RegenderTUI(App):
         # where it said "Mr. Darcy", and the two look identical on the page.
         before = (item.get("source_excerpt") or "").strip().replace("\n", " ")
         after = (item.get("excerpt") or "").strip().replace("\n", " ")
+        was_line, now_line = _mark_changes(before, after)
         if before:
-            self.print(f"  [#666666]was  {before[:66]}[/]")
+            self.print(f"  [#666666]was[/]  {was_line}")
         if after:
-            self.print(f"  [#aaaaaa]now  {after[:66]}[/]")
+            self.print(f"  [#aaaaaa]now[/]  {now_line}")
         self.print("")
         self.print(f"  [#e5c07b]{item.get('term', '')}[/]")
         suggestion = item.get("suggestion")
@@ -2929,6 +3082,10 @@ class RegenderTUI(App):
                 if self._transform_loader:
                     self._transform_loader._activity = f"Transforming · Ch {done}/{total}"
 
+            # The cast analysed a few screens ago, whose count the reader saw and
+            # whose names they just approved. Without this the run would analyse
+            # again -- or worse, load some other run's cast -- and the book would
+            # not be the book that was reviewed.
             result = await app.process_book(
                 file_path=self._result["input"],
                 transform_type=self._result["transform_type"],
@@ -2936,6 +3093,7 @@ class RegenderTUI(App):
                 name_map=self._result.get("name_map"),
                 custom_title=self._custom_title or None,
                 on_chapter_complete=on_chapter_complete,
+                characters=self._pending_characters,
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -3244,22 +3402,7 @@ class RegenderTUI(App):
 
     def _restart_flow(self) -> None:
         """Reset state and start a new transformation."""
-        self._selected_book = None
-        self._selected_transform = None
-        self._no_qc = False
-        self._result = None
-        self._process_start = None
-        self._json_output_path = None
-        self._output_path = None
-        self._stage_start = None
-        self._current_stage = None
-        self._last_progress_line_id = None
-        self._book_stats = None
-        self._analysis_running = False
-        self._transform_loader = None
-        self._stage_loader = None
-        self._analysis_loader = None
-        self._model_choices = []
+        self._reset_run_state()
         os.environ.pop("DEFAULT_MODEL", None)
 
         self.book_title = "—"

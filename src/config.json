@@ -1,7 +1,8 @@
 {
   "character_extraction": {
     "chunk_size_tokens": 32000,
-    "temperature": 0.3,
+    "_temperature_note": "0 because reading a cast is not a writing task. At 0.3, 22 of the 90 characters in Pride and Prejudice are mentioned exactly once and each was a coin flip: successive runs of the same file found 89, 91, 88, 86, 85, 77, 80 and 82 people.",
+    "temperature": 0.0,
     "similarity_threshold": 0.8,
     "deduplication_similarity_threshold": 80
   },
