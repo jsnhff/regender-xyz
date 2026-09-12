@@ -1651,14 +1651,22 @@ class RegenderTUI(App):
         )
 
     def _show_character_analysis_prompt(self) -> None:
-        """Ask if user wants to analyze characters first."""
+        """Ask whether to read the cast.
+
+        It used to run first and say so. It now comes after the transform and
+        the title, and what it decides is whether anyone can be renamed -- the
+        name review has nothing to offer without it -- so it says that instead.
+        """
         self._stage = "analyze_prompt"
-        self.print("[#ffffff]?[/] [bold #ffffff]Analyze characters first?[/]")
+        self.print("[#ffffff]?[/] [bold #ffffff]Analyze characters?[/]")
         self.print("")
         cost = self._estimate_cost_str(0.2)
         cost_hint = f", costs {cost}" if cost else ""
-        self.print(f"  [bold #ffffff]Y[/]  Yes [#aaaaaa](identifies characters{cost_hint})[/]")
-        self.print("  [bold #ffffff]n[/]  No  [#aaaaaa](skip to transformation)[/]")
+        self.print(
+            f"  [bold #ffffff]Y[/]  Yes [#aaaaaa](find the cast, so you can rename them"
+            f"{cost_hint})[/]"
+        )
+        self.print("  [bold #ffffff]n[/]  No  [#aaaaaa](transform without renaming anyone)[/]")
         self.print("")
         self.set_prompt(">  ")
 
