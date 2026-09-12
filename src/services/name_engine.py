@@ -69,7 +69,7 @@ Rules:
 - One target per name; different names must not share a target.
 - Targets must not equal any name or surname in the reserved list.
 - For each nickname, give a matching nickname of the target name (e.g. Elizabeth→Elijah with Lizzy→Eli). If no natural nickname exists, reuse the target.
-- Keep the first letter of the original name when a natural option exists.
+- Keep the first letter of the original name when a natural option exists, EXCEPT for the nonbinary variant, where a neutral name matters more than an echo of the original.
 - If a listed name is actually a SURNAME (family name) of a minor character — not a given name — return {{"original": "...", "is_surname": true}} for it instead of a target. Surnames must never be renamed.
 
 Required JSON:
@@ -92,7 +92,13 @@ _VARIANT_STYLE = {
     "all_male": "traditionally male names",
     "all_female": "traditionally female names",
     "gender_swap": "names of the opposite gender to the character's current gender",
-    "nonbinary": "gender-neutral names",
+    "nonbinary": (
+        "names that read as neither masculine nor feminine. Prefer names genuinely "
+        "used across genders in English before 1850 -- Francis, Evelyn, Hilary, "
+        "Vivian, Meredith, Jocelyn, Sidney, Leslie, Valentine, Clare, Aubrey -- "
+        "or a period-plausible surname used as a given name. Not modern unisex "
+        "coinages, which break the period"
+    ),
 }
 
 

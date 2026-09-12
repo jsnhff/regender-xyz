@@ -1080,11 +1080,36 @@ class CharacterService(BaseService):
             canonical.aliases = names
         return out, merged
 
+    # Neutrality was one hedged clause -- "gender-neutral where possible" --
+    # against three firm ones about tradition, rhythm and period, plus the name
+    # engine's "keep the first letter". For a Regency cast those combine to
+    # produce Elizabeth -> Edmund: three rules obeyed and the fourth quietly
+    # dropped. The fix is to make neutrality the requirement, release the
+    # first letter, and hand over a pool that is genuinely period-attested
+    # rather than leaving the model to invent or approximate.
+    _NONBINARY_NAMING = """
+- THE NAME MUST READ AS NEITHER MASCULINE NOR FEMININE. This outranks matching
+  the rhythm, the register, or the first letter of the original. A name most
+  readers would class as a man's or a woman's name is wrong here, however well
+  it echoes the original: "Elizabeth" -> "Edmund" is a failure, not a
+  compromise.
+- Do NOT keep the first letter if doing so costs neutrality.
+- Prefer names genuinely used across genders in English before 1850. Among
+  them: Francis, Frances, Evelyn, Hilary, Vivian, Meredith, Jocelyn, Sidney,
+  Leslie, Valentine, Clare, Cyril, Aubrey, Shirley, Beverly, Carol, Dana,
+  Esme, Laurie, Morgan, Quincy, Reilly, Sydney. Shirley and Evelyn were men's
+  names in this period and women's later, which is exactly the quality wanted.
+- Do NOT use modern unisex coinages (Rowan, Sage, River, Phoenix). They are
+  neutral but break the period, which is as wrong as breaking the neutrality.
+- A surname used as a given name (Bennet, Darcy, Fitzwilliam) is period-plausible
+  and neutral, and is a good answer when no given name fits."""
+
     async def suggest_name_alternatives(
         self,
         characters: CharacterAnalysis,
         transform_type: Any,
         style_context: str = "",
+        steer: str = "",
     ) -> list[dict[str, str]]:
         """Suggest gender-appropriate name alternatives for characters whose gender changes.
 
@@ -1144,6 +1169,15 @@ class CharacterService(BaseService):
         char_list_str = "\n".join(char_lines)
 
         style_note = f"\nStyle context: {style_context}" if style_context else ""
+        neutral_note = self._NONBINARY_NAMING if transform_type == TransformType.NONBINARY else ""
+        # What the reader said about the last set. Their words, put where the
+        # model will weigh them against the rules rather than under them.
+        steer_note = (
+            f"\n\nThe reader has seen a previous set of suggestions and asked for "
+            f"this: {steer}\nTreat it as the most important instruction here."
+            if steer
+            else ""
+        )
 
         prompt = f"""You are a literary name consultant. For a gender-transformed version of a book, suggest new names for characters whose gender is changing.
 
@@ -1161,11 +1195,11 @@ Rules:
   title would merge them with an existing character. Give them a period-appropriate
   given name and return the full form, e.g. "Mrs. Bennet" -> "Mr. Thomas Bennet".
   The given name must not already belong to anyone in the book.
-- For nonbinary transforms: use gender-neutral given names where possible
+{neutral_note}
 - Return a JSON array only, no other text:
 [{{"original": "original name here", "suggested": "suggested name here", "character_id": "original name here"}}]
 
-Return ONLY the JSON array."""
+Return ONLY the JSON array.{steer_note}"""
 
         try:
             response = await self._complete_with_retry(prompt, temperature=0.5)
