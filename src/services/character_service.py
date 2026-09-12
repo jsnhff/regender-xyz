@@ -1191,6 +1191,10 @@ Rules:
 - Keep the era/period appropriate (Victorian names stay Victorian, etc.)
 - For titles like "Sir [Name]": use "Dame [Name]" for female equivalents; for "Mr." use "Ms." or "Mrs."
 - Do NOT change family surnames — only given names and honorific titles
+- If the character HAS a given name, that given name must CHANGE. Changing only
+  the title is not an answer: "Sir William Lucas" -> "Noble William Lucas" leaves
+  a man's name in place and will be rejected. Give them a new given name and keep
+  the surname: "Sir William Lucas" -> "Noble Vivian Lucas".
 - A character marked NEEDS A GIVEN NAME has none of their own, so swapping the
   title would merge them with an existing character. Give them a period-appropriate
   given name and return the full form, e.g. "Mrs. Bennet" -> "Mr. Thomas Bennet".
@@ -1218,6 +1222,8 @@ Return ONLY the JSON array.{steer_note}"""
                 return []
 
             # Validate and clean each entry
+            from src.services.name_engine import check_rename
+
             result = []
             for item in parsed:
                 if not isinstance(item, dict):
@@ -1226,6 +1232,20 @@ Return ONLY the JSON array.{steer_note}"""
                 suggested = str(item.get("suggested", "")).strip()
                 character_id = str(item.get("character_id", original)).strip()
                 if original and suggested and original != suggested:
+                    # A suggestion the reader approves becomes the book's name and
+                    # overrides the engine, so it has to clear the same bar the
+                    # engine's own proposals clear. It used to clear none: "Sir
+                    # William Lucas" -> "Noble William Lucas" changed the title,
+                    # left the masculine given name, and was offered as a valid
+                    # nonbinary name. A suggestion that fails here is not shown;
+                    # the character falls through to the engine, which has the
+                    # period-attested pool and will choose.
+                    problem = check_rename(original, suggested)
+                    if problem:
+                        self.logger.warning(
+                            f"Dropped name suggestion {original!r} -> {suggested!r}: {problem}"
+                        )
+                        continue
                     entry = {
                         "original": original,
                         "suggested": suggested,

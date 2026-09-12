@@ -22,6 +22,12 @@ from src.models.transformation import TransformType
 # Titles that carry gender and transform with the variant.
 GENDERED_TITLES = {"Mr", "Mrs", "Ms", "Mx", "Miss", "Sir", "Lady", "Lord", "Dame", "Madam"}
 
+# Titles the variants introduce, which carry no gender and so are never mapped
+# again. "Noble" is what Sir/Lady/Lord/Dame become for nonbinary; leaving it out
+# of the title set made "Noble William Lucas" parse as the given name "Noble"
+# with the surname "William Lucas".
+NEUTRAL_TITLES = {"Noble", "Mx"}
+
 # Ranks and professions are gender-neutral: never inflected, never mapped.
 RANK_TITLES = {
     "Colonel",
@@ -37,6 +43,9 @@ RANK_TITLES = {
     "Reverend",
     "Rev",
 }
+
+# Every token that can lead a name without being part of it.
+ALL_TITLES = GENDERED_TITLES | RANK_TITLES | NEUTRAL_TITLES
 
 # How Sir/Lady/Lord/Dame + given-name units transform, per variant.
 # (Mr./Mrs./Miss + surname units are handled by the transform service's term
@@ -105,7 +114,7 @@ _VARIANT_STYLE = {
 def _strip_titles(name: str) -> list[str]:
     """Split a display name into tokens with leading titles removed."""
     tokens = [t for t in re.split(r"\s+", name.strip()) if t]
-    while tokens and tokens[0].rstrip(".") in (GENDERED_TITLES | RANK_TITLES):
+    while tokens and tokens[0].rstrip(".") in ALL_TITLES:
         tokens.pop(0)
     return tokens
 
@@ -117,7 +126,7 @@ def _is_title_led(alias: str) -> bool:
     the title and the surname must survive, so they never belong in a rename map.
     """
     tokens = alias.split()
-    return bool(tokens) and tokens[0].rstrip(".") in (GENDERED_TITLES | RANK_TITLES)
+    return bool(tokens) and tokens[0].rstrip(".") in ALL_TITLES
 
 
 # Capitalized English words that character extraction sometimes mistakes for
@@ -146,6 +155,88 @@ def _is_plausible_name(target: str) -> bool:
 def _is_invented(original: str, target: str) -> bool:
     o, t = original.lower(), target.lower()
     return any(t == o + s for s in _INVENTED_SUFFIXES)
+
+
+#: Particles that belong to a surname rather than standing between names.
+#: Without these "Miss de Bourgh" reads as the given name "de".
+_SURNAME_PARTICLES = {"de", "van", "von", "du", "del", "della", "di", "da", "la", "le"}
+
+#: Words that disambiguate a surname instead of following a given name, so
+#: "Mrs. Wickham senior" is a surname with a qualifier, not Given + Surname.
+_SURNAME_QUALIFIERS = {"senior", "junior", "elder", "younger", "snr", "jnr"}
+
+
+def given_and_surname(name: str) -> tuple[Optional[str], Optional[str]]:
+    """Split a display name into (given, surname), either of which may be absent.
+
+    A single token behind a title is a surname -- "Mr. Jones" names no given
+    name -- while a single bare token is a given name. Two or more tokens are
+    Given + Surname, except where the tail says otherwise: particles keep their
+    surname together ("de Bourgh"), and a qualifier means the whole thing is a
+    surname ("Wickham senior").
+    """
+    tokens = _strip_titles(name)
+    if not tokens:
+        return None, None
+
+    lowered = [t.lower() for t in tokens]
+
+    # A leading particle, or a qualifier anywhere, means no given name is present.
+    if lowered[0] in _SURNAME_PARTICLES or any(t in _SURNAME_QUALIFIERS for t in lowered[1:]):
+        return None, " ".join(tokens)
+
+    if len(tokens) == 1:
+        titled = name.strip().split()[0].rstrip(".") in ALL_TITLES
+        return (None, tokens[0]) if titled else (tokens[0], None)
+    return tokens[0], " ".join(tokens[1:])
+
+
+def check_rename(original: str, suggested: str) -> Optional[str]:
+    """Why this rename is wrong, or None if it is fine.
+
+    Both naming paths need these answers and only one of them had them. The
+    engine validated its own proposals; the interface's suggestions -- which
+    the reader sees, approves, and which then outrank the engine entirely --
+    were checked for nothing beyond being different from the original. So
+    "Sir William Lucas" -> "Noble William Lucas" was offered, accepted, and
+    shipped: the title had changed, the masculine given name had not, and
+    nothing in the pipeline was looking at the given name. Same for
+    "Mr. Fitzwilliam Darcy" -> "Mx. Fitzwilliam Darcy".
+    """
+    # Not every entry in a name map is a person. "Lucas boys" -> "Lucas
+    # children", "The chambermaid" -> "The chamberperson" and "Wickham's father"
+    # -> "Wickham's parent" are term substitutions that happen to contain a
+    # surname, and reading them as Given + Surname rejects nineteen correct
+    # entries. The term map governs these; this function has no opinion.
+    if _is_descriptive_name(original) or _is_descriptive_name(suggested):
+        return None
+    if "'" in original or "'" in suggested or "’" in original or "’" in suggested:
+        return None
+
+    orig_given, orig_surname = given_and_surname(original)
+    new_given, new_surname = given_and_surname(suggested)
+
+    # Surnames are family, not gender. Losing one renames a whole household --
+    # this is how ~300 surnames were destroyed in the all-female edition.
+    if orig_surname and new_surname and orig_surname.lower() != new_surname.lower():
+        return f"surname changed: {orig_surname!r} became {new_surname!r}"
+    if orig_surname and not new_surname:
+        return f"surname {orig_surname!r} lost"
+
+    # A character who has a given name must be given a different one. Changing
+    # only the honorific leaves the gendered name in place, which is the whole
+    # thing the reader asked for.
+    if orig_given:
+        if not new_given:
+            return f"given name {orig_given!r} lost with nothing in its place"
+        if new_given.lower() == orig_given.lower():
+            return f"given name {orig_given!r} unchanged; only the title moved"
+        if _is_invented(orig_given, new_given):
+            return f"{new_given!r} looks invented (the original plus a suffix)"
+        if not _is_plausible_name(new_given):
+            return f"{new_given!r} is not a plausible given name"
+
+    return None
 
 
 def target_gender(gender: Gender, transform_type: TransformType) -> Optional[Gender]:
@@ -344,7 +435,12 @@ class NameEngine:
                 problems.append(f"{given}: '{target}' looks invented (original + suffix)")
                 continue
             if target.lower() == given.lower():
-                continue  # no-op rename; drop silently
+                # Not a no-op: a refusal. The model was asked for a different
+                # name and returned the same one, and dropping that in silence
+                # is how a masculine given name reaches a nonbinary edition with
+                # nothing anywhere saying so.
+                problems.append(f"{given}: proposed its own name back — not renamed")
+                continue
             if target.lower() in reserved:
                 problems.append(f"{given}: '{target}' collides with an existing cast name")
                 continue
