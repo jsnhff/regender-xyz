@@ -67,6 +67,105 @@ class UnionFind:
         return list(groups.values())
 
 
+#: Words that stand in front of a name without being part of it, lowercased and
+#: without the period, for reading a cast entry's shape.
+_GROUPING_TITLES = frozenset(
+    {
+        "mr",
+        "mrs",
+        "ms",
+        "mx",
+        "miss",
+        "madam",
+        "sir",
+        "lady",
+        "lord",
+        "dame",
+        "noble",
+        "colonel",
+        "captain",
+        "major",
+        "general",
+        "admiral",
+        "lieutenant",
+        "dr",
+        "doctor",
+        "reverend",
+        "professor",
+    }
+)
+
+
+#: Words that make a phrase a description of somebody rather than a name for
+#: them. An alias containing one of these identifies nobody in particular:
+#: "his wife" belongs to three women in the Pride and Prejudice cast.
+_RELATION_WORDS = frozenset(
+    {
+        "mother",
+        "father",
+        "mamma",
+        "mama",
+        "papa",
+        "parent",
+        "son",
+        "daughter",
+        "child",
+        "children",
+        "brother",
+        "sister",
+        "sibling",
+        "husband",
+        "wife",
+        "spouse",
+        "uncle",
+        "aunt",
+        "niece",
+        "nephew",
+        "cousin",
+        "widow",
+        "bride",
+        "friend",
+        "eldest",
+        "youngest",
+        "elder",
+        "younger",
+        "ladyship",
+        "lordship",
+        "housekeeper",
+        "butler",
+        "waiter",
+        "gardener",
+        "chambermaid",
+        "boy",
+        "boys",
+        "girl",
+        "girls",
+    }
+)
+
+
+def _is_name_form(alias: str) -> bool:
+    """True when an alias names a person rather than describing one.
+
+    Every token capitalised (titles and nobiliary particles excepted) and no
+    relation word anywhere. "Darcy" and "Miss Lucas" qualify; "his wife", "her
+    mother", "mamma" and "the eldest Miss Bennet" do not.
+    """
+    tokens = [t for t in alias.split() if t]
+    if not tokens:
+        return False
+    for position, token in enumerate(tokens):
+        bare = token.rstrip(".").lower()
+        if bare in _RELATION_WORDS:
+            return False
+        if token[:1].isupper():
+            continue
+        if position and bare in {"de", "van", "von", "du", "del", "della", "di", "da", "la", "le"}:
+            continue
+        return False
+    return True
+
+
 class CharacterService(BaseService):
     """
     Refactored character analysis service.
@@ -102,7 +201,7 @@ class CharacterService(BaseService):
         # Set up configuration with defaults and validation
         self.extraction_config = {
             "chunk_size": char_config.get("chunk_size_tokens", 32000),
-            "temperature": char_config.get("temperature", 0.3),
+            "temperature": char_config.get("temperature", 0.0),
             "max_retries": 3,
             "retry_backoff": char_config.get("retry_backoff_seconds", 1.0),
         }
@@ -112,6 +211,10 @@ class CharacterService(BaseService):
         # 77 characters one run and 91 the next with nothing anywhere saying a
         # chunk had been lost. Recorded so the run can say so.
         self.empty_chunks: list[int] = []
+
+        # Said once per run, not once per call: a chunked book would otherwise
+        # repeat it eighteen times.
+        self._warned_forced_temperature = False
 
         # Validate chunk size
         if self.extraction_config["chunk_size"] <= 0:
@@ -145,7 +248,7 @@ class CharacterService(BaseService):
             )
 
         self.merging_config = {
-            "temperature": char_config.get("temperature", 0.3),
+            "temperature": char_config.get("temperature", 0.0),
             "timeout": 30,
             "batch_size": 50,
         }
@@ -644,12 +747,68 @@ class CharacterService(BaseService):
             last1 = parts1[-1].lower()
             last2 = parts2[-1].lower()
 
-            # Skip titles when comparing (Dr, Mr, Mrs, Ms, etc.)
-            titles = {"dr", "mr", "mrs", "ms", "prof", "sir", "lady", "lord"}
-            if first1 in titles:
-                first1 = parts1[1].lower() if len(parts1) > 2 else first1
-            if first2 in titles:
-                first2 = parts2[1].lower() if len(parts2) > 2 else first2
+            # Skip titles when comparing. Two gaps here made this guard reject
+            # every duplicate in the book. "miss" was missing from the set, and
+            # Pride and Prejudice's cast is full of Miss Bennets; and the skip
+            # only applied when a name had three tokens, so for the two-token
+            # "Mr. Darcy" the title itself was compared as the first name --
+            # against "Fitzwilliam", which differs, with the same surname, which
+            # reads as a sibling. On the real 90-entry cast this produced 90
+            # groups and not one pair, so the merge phase after it had nothing to
+            # do. "Anne de Bourgh" against "Miss Anne de Bourgh" scored a perfect
+            # 100 and was still rejected.
+            titles = {
+                "dr",
+                "mr",
+                "mrs",
+                "ms",
+                "mx",
+                "miss",
+                "prof",
+                "sir",
+                "lady",
+                "lord",
+                "dame",
+                "madam",
+                "colonel",
+                "captain",
+                "major",
+                "general",
+                "reverend",
+            }
+            titled1 = first1 in titles
+            titled2 = first2 in titles
+            behind1 = parts1[1:] if titled1 else parts1
+            behind2 = parts2[1:] if titled2 else parts2
+
+            # Two titled forms of one surname, with different titles, are two
+            # people: Mr. and Mrs. Bennet are husband and wife, and so are the
+            # Hursts, the Gardiners, the Philipses and the Wickhams. Grouping
+            # them asks the merge step a question it should never be asked.
+            if (
+                titled1
+                and titled2
+                and len(behind1) == 1
+                and len(behind2) == 1
+                and behind1[0].lower() == behind2[0].lower()
+                and first1 != first2
+            ):
+                self.logger.debug(f"Not grouping a married pair: {name1} vs {name2}")
+                return False
+
+            # "Mr. Darcy" and "Fitzwilliam Darcy" are one man, but they are NOT
+            # grouped here, deliberately. Grouping is transitive, so calling that
+            # pair similar also pulls in every other Darcy through the title
+            # form, and the whole Bennet family arrives in one group -- seven
+            # people the merge step is then asked about as a single question,
+            # with a wrong "yes" collapsing a family. That pair is settled
+            # deterministically instead, in _merge_same_person, where a title
+            # form is folded into a given name only when exactly one person of
+            # that gender carries the surname.
+            if titled1 and len(parts1) > 1:
+                first1 = parts1[1].lower()
+            if titled2 and len(parts2) > 1:
+                first2 = parts2[1].lower()
 
             if first1 != first2 and last1 == last2:
                 # Different first names, same last name - likely family members
@@ -800,11 +959,19 @@ class CharacterService(BaseService):
                 # Our new prompts already explicitly request JSON
                 kwargs = {}
 
-                # Some models like gpt-5-mini only support temperature=1.0
-                # Check if the model has this limitation
+                # Some models like gpt-5-mini only support temperature=1.0.
+                # Say so rather than substituting in silence: reading a cast is
+                # a task that wants no sampling at all, and a run that could not
+                # have it should not look like a run that did.
                 model_name = getattr(self.provider, "model", "")
                 if "gpt-5-mini" in model_name or "gpt-5-nano" in model_name:
-                    # These models only support temperature=1.0
+                    if temperature != 1.0 and not self._warned_forced_temperature:
+                        self._warned_forced_temperature = True
+                        self.logger.warning(
+                            f"{model_name} accepts only temperature 1.0, so the configured "
+                            f"{temperature} cannot be used. This cast will vary between runs; "
+                            "a model that honours temperature 0 will not."
+                        )
                     kwargs["temperature"] = 1.0
                 else:
                     kwargs["temperature"] = temperature
@@ -1161,6 +1328,82 @@ class CharacterService(BaseService):
             while parent.get(name, name) != name:
                 name = parent[name]
             return name
+
+        # Two entries that answer to the same short name are one person --
+        # unless their given names differ, in which case the short name is
+        # ambiguous and they are two.
+        #
+        # "Mr. Darcy" and "Fitzwilliam Darcy" both list the alias "Darcy".
+        # Neither names the other, so nothing folded them, and the protagonist's
+        # suitor was two cast entries: the gender-swap edition called one
+        # "Frances Darcy" and the other "Mrs. Fitzwillia Darcy". One has no given
+        # name and the other does, so there is nothing to contradict.
+        #
+        # The guard matters as much as the rule. "Charlotte Lucas" and "Maria
+        # Lucas" both list the alias "Miss Lucas", and they are sisters.
+        #
+        # Structure cannot settle every case: "Mrs. Bennet" and "Jane Bennet"
+        # are mother and daughter, share a surname and a gender, and only the
+        # honorific says which is which. Where it cannot be known, nothing is
+        # merged and the map audit raises the pair for a person to answer.
+        def _behind_titles(name: str) -> list:
+            parts = [part for part in name.split() if part]
+            while parts and parts[0].rstrip(".").lower() in _GROUPING_TITLES:
+                parts.pop(0)
+            return parts
+
+        def given_of(name: str) -> Optional[str]:
+            parts = _behind_titles(name)
+            return parts[0].lower() if len(parts) > 1 else None
+
+        def surname_of(name: str) -> Optional[str]:
+            parts = _behind_titles(name)
+            return parts[-1].lower() if parts else None
+
+        claimants: dict[str, list] = {}
+        for char in characters:
+            for alias in getattr(char, "aliases", []) or []:
+                if alias in by_name:
+                    continue  # the alias-names-an-entry rule below covers this
+                if not _is_name_form(alias):
+                    # A relation is not an identity. "his wife" is listed for
+                    # Mrs. Bennet, Mrs. Wickham and Harriet Forster, and taking
+                    # it as a shared name chained six different women into one
+                    # person -- Mrs. Bennet, Lydia Bennet, Lydia Wickham, Mrs.
+                    # Wickham, Harriet Harrington and Mrs. Forster all folded
+                    # into Harriet Forster.
+                    continue
+                claimants.setdefault(alias.lower(), []).append(char)
+
+        for sharers in claimants.values():
+            if len(sharers) < 2:
+                continue
+            first = sharers[0]
+            for other in sharers[1:]:
+                if first.gender != other.gender:
+                    continue
+                given_a, given_b = given_of(first.name), given_of(other.name)
+                if given_a and given_b and given_a != given_b:
+                    continue  # two people who share a form of address
+                surname_a, surname_b = surname_of(first.name), surname_of(other.name)
+                if surname_a and surname_b and surname_a != surname_b:
+                    # Harriet Forster and Harriet Harrington both answer to
+                    # "Harriet" and are two women. A married name crossing
+                    # surnames -- Lydia Bennet to Lydia Wickham -- is only ever
+                    # merged on the stronger evidence of one entry naming the
+                    # other, which the rule below does.
+                    continue
+                a, b = root(first.name), root(other.name)
+                if a == b:
+                    continue
+                # The form carrying a given name makes the better canonical one.
+                if given_of(a) and not given_of(b):
+                    keep, fold = a, b
+                elif given_of(b) and not given_of(a):
+                    keep, fold = b, a
+                else:
+                    keep, fold = sorted((a, b), key=lambda n: (-len(by_name[n].aliases or []), n))
+                parent[fold] = keep
 
         for char in characters:
             for alias in getattr(char, "aliases", []) or []:
