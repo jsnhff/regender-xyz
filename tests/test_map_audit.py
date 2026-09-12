@@ -38,58 +38,96 @@ def cast(*names):
 
 
 class TestOneCharacterSeveralNames:
-    def test_two_targets_for_one_given_name_is_reported(self):
+    """One person under two names. Identity comes from the cast, because two
+    different Annes are two people and may have two names -- Austen's own cast
+    has two Marys and three Williams."""
+
+    def test_two_names_for_one_person_is_reported(self):
+        cast = CharacterAnalysis(
+            book_id="t",
+            characters=[
+                Character(
+                    name="Charlotte Collins",
+                    gender=Gender.FEMALE,
+                    pronouns={},
+                    aliases=["Charlotte Lucas"],
+                )
+            ],
+        )
         problems = audit_name_map(
             {
                 "Charlotte Lucas": "Courtney Lucas",
                 "Charlotte Collins": "Carol Collins",
             },
-            cast("Charlotte Lucas", "Charlotte Collins"),
+            cast,
         )
-        assert any("renamed 2 different ways" in p and "charlotte" in p for p in problems)
+        assert any("two people, one name" in p or "several names" in p for p in problems), problems
 
-    def test_three_are_reported_as_three(self):
+    def test_two_different_people_sharing_a_first_name_are_fine(self):
+        """Mary Bennet and Mary King are two women and get two names."""
         problems = audit_name_map(
-            {
-                "Catherine Bennet": "Christopher Bennet",
-                "Catherine de Bourgh": "Cuthbert de Bourgh",
-                "Catherine Long": "Charles Long",
-            },
-            cast("Catherine Bennet", "Catherine de Bourgh", "Catherine Long"),
+            {"Mary Bennet": "Martin Bennet", "Mary King": "Matthew King"},
+            cast("Mary Bennet", "Mary King"),
         )
-        assert any("renamed 3 different ways" in p for p in problems)
+        assert problems == [], problems
 
-    def test_one_target_everywhere_is_silent(self):
-        problems = audit_name_map(
-            {
-                "Charlotte Lucas": "Carol Lucas",
-                "Charlotte Collins": "Carol Collins",
-            },
-            cast("Charlotte Lucas", "Charlotte Collins"),
+    def test_a_nickname_is_not_a_contradiction(self):
+        """Kitty and Catherine Bennet are one girl; "Kit" is a short form of
+        "Christopher" and not a second name for her."""
+        people = CharacterAnalysis(
+            book_id="t",
+            characters=[
+                Character(
+                    name="Catherine Bennet",
+                    gender=Gender.FEMALE,
+                    pronouns={},
+                    aliases=["Kitty", "Kitty Bennet"],
+                )
+            ],
         )
-        assert not [p for p in problems if "different ways" in p]
+        problems = audit_name_map({"Kitty": "Kit", "Kitty Bennet": "Christopher Bennet"}, people)
+        assert not [p for p in problems if "several names" in p], problems
 
 
 class TestTwoCharactersOneName:
-    def test_a_shared_target_is_reported(self):
-        problems = audit_name_map(
-            {
-                "Harriet Forster": "Hilary Forster",
-                "William Collins": "Hilary Collins",
-            },
-            cast("Harriet Forster", "William Collins"),
-        )
-        assert any("2 different characters" in p and "hilary" in p for p in problems)
+    """Two people a reader could not tell apart. A shared given name is only
+    confusing when the surname matches too."""
 
-    def test_distinct_targets_are_silent(self):
+    def test_the_same_full_name_for_two_people_is_reported(self):
         problems = audit_name_map(
-            {
-                "Harriet Forster": "Evelyn Forster",
-                "William Collins": "Hilary Collins",
-            },
-            cast("Harriet Forster", "William Collins"),
+            {"Harriet Forster": "Hilary Forster", "Henrietta Forster": "Hilary Forster"},
+            cast("Harriet Forster", "Henrietta Forster"),
         )
-        assert not [p for p in problems if "different characters" in p]
+        assert any("2 different characters" in p for p in problems), problems
+
+    def test_a_shared_given_name_across_surnames_is_fine(self):
+        """Christopher Bingley and Christopher Bennet are two men, as the book
+        already has two Marys."""
+        problems = audit_name_map(
+            {"Caroline Bingley": "Christopher Bingley", "Kitty Bennet": "Christopher Bennet"},
+            cast("Caroline Bingley", "Kitty Bennet"),
+        )
+        assert not [p for p in problems if "different characters" in p], problems
+
+    def test_one_person_under_two_forms_sharing_a_target_is_fine(self):
+        """ "Kitty Bennet" and "Catherine Bennet" are one girl, so of course they
+        map to the same name. Reporting that is the opposite of the truth."""
+        people = CharacterAnalysis(
+            book_id="t",
+            characters=[
+                Character(
+                    name="Catherine Bennet",
+                    gender=Gender.FEMALE,
+                    pronouns={},
+                    aliases=["Kitty Bennet"],
+                )
+            ],
+        )
+        problems = audit_name_map(
+            {"Catherine Bennet": "Christopher Bennet", "Kitty Bennet": "Christopher Bennet"},
+            people,
+        )
+        assert not [p for p in problems if "different characters" in p], problems
 
 
 class TestPerEntryFaultsAreStillReported:
@@ -131,7 +169,8 @@ class TestItStaysQuietWhereTheMapIsRight:
 
 
 class TestAgainstTheShippedEditions:
-    """Measured, not fixtured: the audit must find what was actually there."""
+    """Measured, not fixtured: the audit must find what was actually there, and
+    stay quiet about what was not."""
 
     def test_the_nonbinary_edition(self):
         import json
@@ -148,12 +187,28 @@ class TestAgainstTheShippedEditions:
         characters = CharacterAnalysis.from_dict(json.loads((base / "characters.json").read_text()))
         problems = audit_name_map(name_map, characters)
 
-        multi = [p for p in problems if "different ways" in p]
-        shared = [p for p in problems if "different characters" in p]
-        # The audit that found these counted ten and eight; "william" appears in
-        # both lists, which is why the shared count differs by the overlap.
-        assert len(multi) >= 9, multi
-        assert len(shared) >= 4, shared
-        assert any("charlotte" in p for p in multi)
-        assert any("hilary" in p for p in shared)
-        assert any("aubrey" in p for p in shared)
+        # Elizabeth Bennet and Anne de Bourgh were both called Aubrey, across
+        # 1057 occurrences, and Sir William kept a man's given name.
+        assert any("aubrey" in p for p in problems), problems
+        assert any("Sir William Lucas" in p for p in problems), problems
+        # And the report stays short enough to act on.
+        assert len(problems) <= 14, problems
+
+    def test_the_gender_swap_the_reader_ran(self):
+        """Three findings, and the one that matters is a name that is not a
+        name: Darcy was called "Fitzwillia" 222 times."""
+        import json
+        import pathlib
+
+        base = pathlib.Path(
+            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
+            "gender_swap_2026-09-12_14-37"
+        )
+        if not (base / "name_map.json").exists():
+            pytest.skip("that edition is not on this machine")
+
+        name_map = json.loads((base / "name_map.json").read_text())
+        characters = CharacterAnalysis.from_dict(json.loads((base / "characters.json").read_text()))
+        problems = audit_name_map(name_map, characters)
+        assert any("Fitzwillia" in p for p in problems), problems
+        assert len(problems) <= 5, problems

@@ -378,35 +378,80 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
         else (frozenset(), frozenset(), frozenset())
     )
 
+    # Which cast member each name belongs to. Two map keys for one person --
+    # "Kitty Bennet" and "Catherine Bennet", or the nicknames "Eliza" and
+    # "Lizzy" -- must share a target, and reporting that as two people given one
+    # name is the opposite of the truth.
+    owner: dict[str, str] = {}
+    for char in getattr(characters, "characters", characters) or []:
+        canonical = getattr(char, "name", "")
+        for form in [canonical, *(getattr(char, "aliases", []) or [])]:
+            if not form:
+                continue
+            owner.setdefault(form.lower(), canonical)
+            # And without the title, because the map holds both "Lady Anne
+            # Darcy" and "Anne Darcy" and they are one woman.
+            bare = " ".join(_strip_titles(form)).lower()
+            if bare:
+                owner.setdefault(bare, canonical)
+
+    def whose(name: str) -> str:
+        """The cast member a map key is about, or the key itself.
+
+        Titles are tried both ways, or "Lady Anne Darcy" and "Anne Darcy" count
+        as two people and the report says so twice with the same name.
+        """
+        key = name.lower()
+        if key in owner:
+            return owner[key]
+        stripped = " ".join(_strip_titles(name)).lower()
+        return owner.get(stripped, stripped or key)
+
     problems: list[str] = []
-    by_source: dict[str, set] = {}
-    by_target: dict[str, set] = {}
+    # Keyed by the whole source name, not its given name alone: two different
+    # Annes are two people and may have two names.
+    by_character: dict[tuple, set] = {}
+    by_target: dict[tuple, set] = {}
 
     for key, value in name_map.items():
         if _is_descriptive_name(key) or _POSSESSIVE.search(key):
             continue  # a term substitution, not a person
         shape = given_and_surname(key, surnames, givens)
-        key_given, _ = shape
-        new_given, _ = given_and_surname(value, surnames, givens, like=shape)
+        key_given, key_surname = shape
+        new_given, new_surname = given_and_surname(value, surnames, givens, like=shape)
         if not key_given or not new_given:
             continue
         if key_given.lower() == new_given.lower():
             continue  # no rename here to be inconsistent about
-        by_source.setdefault(key_given.lower(), set()).add(new_given)
-        by_target.setdefault(new_given.lower(), set()).add(key_given)
+        person = whose(key)
+        # Only full forms. A lone given name is how a nickname enters the map,
+        # and "Kitty" -> "Kit" beside "Kitty Bennet" -> "Christopher Bennet" is
+        # one girl with a formal name and a short one, not two names for her.
+        if key_surname:
+            by_character.setdefault(person, set()).add(new_given)
+        by_target.setdefault((new_given.lower(), (new_surname or "").lower()), set()).add(
+            (person, key_given, key_surname or "")
+        )
 
-    for source, targets in sorted(by_source.items()):
-        if len(targets) > 1:
-            problems.append(
-                f"{source!r} is renamed {len(targets)} different ways "
-                f"({', '.join(sorted(targets))}); one character, several names"
-            )
-    for target, sources in sorted(by_target.items()):
-        if len(sources) > 1:
-            problems.append(
-                f"{target!r} is the new name of {len(sources)} different characters "
-                f"({', '.join(sorted(sources))}); two people, one name"
-            )
+    for person, targets in sorted(by_character.items()):
+        if len(targets) < 2:
+            continue
+        ordered = sorted(targets)
+        problems.append(
+            f"{person!r} is renamed {len(targets)} different ways "
+            f"({', '.join(ordered)}); one character, several names"
+        )
+
+    for (given, surname), sources in sorted(by_target.items()):
+        if len({person for person, _g, _s in sources}) < 2:
+            continue
+        # Two people may share a given name, as Austen's own cast does; they are
+        # only confusable when the surname matches too.
+        who = ", ".join(sorted(f"{g} {s}".strip() for _p, g, s in sources))
+        problems.append(
+            f"{given!r} {('' if not surname else surname + ' ')}is the new name of "
+            f"{len(sources)} different characters ({who}); two people, one name"
+        )
 
     for key, value in sorted(name_map.items()):
         problem = check_rename(key, value, surnames=surnames, givens=givens)
