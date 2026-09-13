@@ -422,6 +422,43 @@ def check_substitution(original: str, suggested: str, transform: str) -> Optiona
     return None
 
 
+def check_title(original: str, suggested: str, transform: str) -> Optional[str]:
+    """Why this rename keeps a title the transform replaces, or None.
+
+    Only when the gendered title survives untouched. A different title is the
+    model's business -- "Sir William Lucas" -> "Dame Wilhelmina Lucas" is a
+    correct answer and so is "Ms." for "Mrs." -- but the same one is the
+    transform not having happened.
+    """
+    from src.services.transform_service import TransformService
+
+    tokens = [t for t in original.split() if t]
+    new_tokens = [t for t in suggested.split() if t]
+    if not tokens or not new_tokens:
+        return None
+
+    lead = tokens[0].rstrip(".")
+    if lead not in GENDERED_TITLES:
+        return None
+
+    try:
+        term_map = TransformService._effective_term_map(transform)
+    except Exception:
+        return None  # no map for this transform; no opinion rather than a wrong one
+
+    wanted = term_map.get(lead) or term_map.get(lead.lower())
+    if not wanted:
+        return None  # a title this transform leaves alone
+
+    if new_tokens[0].rstrip(".").lower() != lead.lower():
+        return None  # it changed to something; which something is not this rule
+
+    return (
+        f"{suggested!r} keeps the title {tokens[0]!r}, which this transform "
+        f"replaces with {wanted!r}"
+    )
+
+
 def screen_renames(
     proposals: list,
     characters: Any,
@@ -460,6 +497,11 @@ def screen_renames(
             and (_is_descriptive_name(original) or _POSSESSIVE.search(original))
         ):
             problem = check_substitution(original, suggested, transform)
+        # And a character the book names only by title and family name has no
+        # given name for check_rename to compare, so it says nothing about them
+        # either -- including about the title, which is the whole rename.
+        if problem is None and transform:
+            problem = check_title(original, suggested, transform)
         if problem:
             reasons.append(f"{original!r} -> {suggested!r}: {problem}")
             continue
