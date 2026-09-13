@@ -788,9 +788,12 @@ class NameEngine:
         """
         index = self._cast_index(characters)
         reserved = self._reserved_names(index)
+        # What the cast already is, for judging a supplied rename against it.
+        surnames, givens, _spoken_for = cast_name_index(characters)
         selected = set(selected_characters) if selected_characters is not None else None
 
         base_map = dict(base_map or {})
+
         base_lower = {k.lower() for k in base_map}
 
         to_rename = [
@@ -811,6 +814,30 @@ class NameEngine:
         proposal_list = list(unique_by_given.values())
 
         report: dict[str, Any] = {"proposed": 0, "accepted": 0, "dropped": [], "flags": []}
+
+        # A supplied entry outranks everything the engine would choose, so it
+        # has to clear the same bar. Until now it cleared none: the gate was
+        # wired into the interface's suggestions and into the report written
+        # afterwards, and never into the map itself. That is how "William
+        # Collins" -> "Mrs. Collins" was written, a man left with only a title,
+        # and how "Fitzwilliam Darcy" -> "Fitzwillia Darcy" reached fifty-nine
+        # chapters and 187 pages.
+        #
+        # Filtered here, at the entrance, because there are two exits: one loop
+        # expands a supplied entry into aliases and title units, another writes
+        # the entry itself, and guarding only the first refused Fitzwillia in
+        # the log while leaving it in the map.
+        refused = {}
+        for orig, target in list(base_map.items()):
+            problem = check_rename(orig, target, surnames=surnames, givens=givens)
+            if problem:
+                refused[orig] = problem
+                report["flags"].append(f"'{orig}' -> '{target}' refused: {problem}")
+                self._log("warning", f"Refused supplied rename '{orig}' -> '{target}': {problem}")
+                del base_map[orig]
+        report["refused"] = refused
+
+        base_lower = {k.lower() for k in base_map}
         accepted: dict[str, dict] = {}
 
         if proposal_list and self.provider:
