@@ -195,8 +195,10 @@ class TestAgainstTheShippedEditions:
         assert len(problems) <= 14, problems
 
     def test_the_gender_swap_the_reader_ran(self):
-        """Three findings, and the one that matters is a name that is not a
-        name: Darcy was called "Fitzwillia" 222 times."""
+        """That edition is live output and gets repaired, so this asserts the
+        shape of the report rather than one finding in it. "Fitzwillia" itself
+        is covered by a fixture in test_review_alignment.py, which no repair can
+        move."""
         import json
         import pathlib
 
@@ -210,5 +212,6 @@ class TestAgainstTheShippedEditions:
         name_map = json.loads((base / "name_map.json").read_text())
         characters = CharacterAnalysis.from_dict(json.loads((base / "characters.json").read_text()))
         problems = audit_name_map(name_map, characters)
-        assert any("Fitzwillia" in p for p in problems), problems
+        # Few enough to act on, and every one about a real person.
         assert len(problems) <= 5, problems
+        assert not [p for p in problems if "renamed 0" in p]
