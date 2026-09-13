@@ -87,6 +87,12 @@ net would still change this, so the text predates the fix), `needs_review` (a
 gendered word the net will not guess at), and `structural` (chapter/paragraph
 counts or suspicious length drift).
 
+Three checks need the run's name map: surnames surviving, renames landing, and
+invented names. The script now finds `name_map.json` (or `name_map_proposed.json`)
+beside the edition on its own; pass `--name-map` only for one kept elsewhere. If
+no map is found the report says so at the top, naming the checks that did not
+run -- a report that cannot say "I did not check this" says "clean" instead.
+
 ### Testing
 ```bash
 # Run all tests

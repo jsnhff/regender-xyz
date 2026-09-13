@@ -171,6 +171,10 @@ class QCReport:
     transform_type: str
     chapters: list[ChapterReport] = field(default_factory=list)
     findings: list[Finding] = field(default_factory=list)
+    # Checks that could not run, and why. Without this a report says "clean"
+    # when it means "untested", which is how an edition with three hundred
+    # destroyed surnames passed quality control.
+    not_checked: dict[str, str] = field(default_factory=dict)
 
     @property
     def all_findings(self) -> list[Finding]:
@@ -195,9 +199,15 @@ class QCReport:
                 NEEDS_REVIEW: self.count(NEEDS_REVIEW),
                 STRUCTURAL: self.count(STRUCTURAL),
             },
+            "not_checked": dict(self.not_checked),
             "book_findings": [f.to_dict() for f in self.findings],
             "chapters": [c.to_dict() for c in self.chapters],
         }
+
+    @property
+    def complete(self) -> bool:
+        """True when every check actually ran."""
+        return not self.not_checked
 
 
 class QCService:
@@ -347,6 +357,9 @@ class QCService:
         of its mentions.
         """
         if not self.name_map:
+            report.not_checked["surnames_survive"] = (
+                "no name map was given, so the family names of this book are unknown"
+            )
             return
         surnames = set(self._surnames)
 
@@ -395,6 +408,11 @@ class QCService:
         real shortfall rather than any shortfall.
         """
         if not self._expected_word:
+            report.not_checked["renames_landed"] = (
+                "no name map was given, so what each character should be called is unknown"
+                if not self.name_map
+                else "no map entry lines up word for word, so no rename can be traced"
+            )
             return
         source_text = "\n".join(
             _text_of(p) for c in source_chapters for p in c.get("paragraphs", [])
@@ -440,6 +458,12 @@ class QCService:
         findings that say the same thing bury the other 3.
         """
         if not self._expected_word:
+            report.not_checked["invented_names"] = (
+                "no name map was given, so a name the engine never chose cannot be told "
+                "from one it did"
+                if not self.name_map
+                else "no map entry lines up word for word, so no invented name can be spotted"
+            )
             return
         counts: dict[tuple, int] = {}
         where: dict[tuple, tuple] = {}
@@ -1256,6 +1280,12 @@ def load_book(path: str) -> dict:
 def format_report(report: QCReport, limit: int = 8) -> str:
     """Render a report as a terminal table plus a sample of findings."""
     lines = []
+    if report.not_checked:
+        lines.append(f"!! {len(report.not_checked)} CHECK(S) DID NOT RUN — this is not a pass")
+        for name, why in sorted(report.not_checked.items()):
+            lines.append(f"     {name}: {why}")
+        lines.append("   Pass --name-map, or keep name_map.json beside the edition.")
+        lines.append("")
     lines.append(f"Transform: {report.transform_type}")
     lines.append(f"Coverage:  {report.coverage:.1%} of gendered words transformed")
     totals = report.to_dict()["totals"]

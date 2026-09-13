@@ -33,6 +33,28 @@ from src.services.qc_service import (  # noqa: E402
 SEVERITIES = {AUTO_FIXABLE: 0, STRUCTURAL: 1, NEEDS_REVIEW: 2}
 
 
+def find_name_map(transformed: Path) -> tuple:
+    """The run's own name map, looked for where the run leaves it.
+
+    Three checks -- surnames surviving, renames landing, invented names -- do
+    nothing without it, and the documented way to run this script passed none,
+    so the default invocation silently skipped all three and printed a report
+    that read as clean.
+
+    name_map.json is written when a run finishes; name_map_proposed.json is
+    written earlier, when the map is audited, and is the one that exists if the
+    run was stopped before the transform.
+    """
+    for name in ("name_map.json", "name_map_proposed.json"):
+        candidate = transformed.parent / name
+        if candidate.exists():
+            try:
+                return json.loads(candidate.read_text()), candidate
+            except ValueError:
+                continue
+    return None, None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", help="Parsed source book JSON")
@@ -69,6 +91,10 @@ def main() -> int:
     name_map = None
     if args.name_map:
         name_map = json.loads(Path(args.name_map).read_text())
+    else:
+        name_map, found_at = find_name_map(Path(args.transformed))
+        if name_map:
+            print(f"Using the name map beside the edition: {found_at}\n")
     service = QCService(transform_type, name_map=name_map)
 
     report = service.check_book(source, transformed)
