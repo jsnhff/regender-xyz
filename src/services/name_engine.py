@@ -842,7 +842,19 @@ class NameEngine:
 
         if proposal_list and self.provider:
             # Targets may not collide with anything in the book OR the user map.
-            reserved_for_targets = reserved | {v.lower() for v in base_map.values()}
+            #
+            # The GIVEN name of each supplied target, not the whole string. A
+            # supplied entry reads "Jane Bennet Bingley" -> "Sidney Bennet
+            # Bingley", so reserving the value reserved "sidney bennet bingley",
+            # while what a proposal offers is the bare "Sidney". The two never
+            # matched, the reservation did nothing, and Jane and Sarah were both
+            # named Sidney.
+            supplied_givens = set()
+            for value in base_map.values():
+                behind_titles = _strip_titles(value)
+                if behind_titles:
+                    supplied_givens.add(behind_titles[0].lower())
+            reserved_for_targets = reserved | supplied_givens
             try:
                 proposals = await self._propose(proposal_list, transform_type, reserved_for_targets)
                 report["proposed"] = len(proposals)
