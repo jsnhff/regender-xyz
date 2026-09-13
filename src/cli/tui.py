@@ -867,6 +867,100 @@ class ContentArea(ScrollableContainer):
 BRAILLE_LOADING_FRAMES = ["⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇"]
 
 
+#: The heading of a live decision is dim until the sweep reaches it.
+_SHIMMER_DIM = (0x7A, 0x7A, 0x7A)
+_SHIMMER_LIT = (0xFF, 0xFF, 0xFF)
+
+#: How many characters either side of the sweep's centre catch some light.
+_SHIMMER_SPREAD = 7.0
+
+
+def shimmer_markup(text: str, phase: float) -> str:
+    """`text` with a band of light centred on `phase`, as Rich markup.
+
+    Each character is coloured by its distance from the centre, eased so the
+    band has soft edges rather than a hard front. Markup characters would be
+    read as tags, so a heading containing one is returned plain rather than
+    mangled.
+    """
+    if "[" in text or "]" in text:
+        return text
+
+    pieces = []
+    for index, character in enumerate(text):
+        if character == " ":
+            pieces.append(character)
+            continue
+        distance = abs(index - phase)
+        weight = max(0.0, 1.0 - distance / _SHIMMER_SPREAD)
+        weight = weight * weight * (3.0 - 2.0 * weight)  # smoothstep
+        red, green, blue = (
+            int(dim + (lit - dim) * weight) for dim, lit in zip(_SHIMMER_DIM, _SHIMMER_LIT)
+        )
+        pieces.append(f"[#{red:02x}{green:02x}{blue:02x}]{character}[/]")
+    return "".join(pieces)
+
+
+class ShimmerLine(Static):
+    """A heading that sweeps while the question under it is unanswered."""
+
+    DEFAULT_CSS = """
+    ShimmerLine {
+        height: 1;
+        padding: 0;
+        margin: 0;
+    }
+    """
+
+    def __init__(self, text: str, suffix: str = "", **kwargs):
+        # Built with its first frame rather than an empty string: Textual may
+        # render a widget before on_mount has run, and a bare "" is not a
+        # renderable it can draw.
+        self._text = text
+        self._suffix = suffix
+        self._phase = -_SHIMMER_SPREAD
+        super().__init__(Text.from_markup(self._frame_markup()), **kwargs)
+        # _suffix is held back from the sweep: where a finding is, or how many
+        # are left, is context rather than the question itself.
+        self._running = False
+
+    def on_mount(self) -> None:
+        self._running = True
+        self.update(Text.from_markup(self._frame_markup()))
+        self.set_interval(0.06, self._advance)
+
+    def _advance(self) -> None:
+        if not self._running:
+            return
+        # Off the right-hand end, then round again after a beat, so the eye is
+        # drawn back to the question rather than nagged continuously.
+        limit = len(self._text) + _SHIMMER_SPREAD * 4
+        self._phase += 0.9
+        if self._phase > limit:
+            self._phase = -_SHIMMER_SPREAD
+        self.update(Text.from_markup(self._frame_markup()))
+
+    def _frame_markup(self) -> str:
+        """This frame as markup.
+
+        Not named _render: Widget._render is Textual's own method, and
+        overriding it handed the framework a string where it expected a
+        renderable -- reported from deep in the compositor as "'str' object has
+        no attribute 'render_strips'", which names neither this class nor that
+        collision.
+        """
+        lit = shimmer_markup(self._text, self._phase)
+        return f"{lit}   [#666666]{self._suffix}[/]" if self._suffix else lit
+
+    def stop(self) -> None:
+        """Settle on the plain heading: answered questions do not move."""
+        self._running = False
+        settled = f"[bold #ffffff]{self._text}[/]"
+        if self._suffix:
+            settled += f"   [#666666]{self._suffix}[/]"
+        self.update(Text.from_markup(settled))
+
+
 class BrailleLoader(Static):
     """Braille loading animation with elapsed time for LLM activities."""
 
@@ -1180,6 +1274,9 @@ class RegenderTUI(App):
         self._cast_candidates: list = []
         self._cast_idx: int = 0
         self._cast_merges: list = []
+        # The sweeping heading of whichever question is currently live.
+        self._heading = None
+
         # The book's own text, read once when a question needs a line from it.
         self._source_text: str | None = None
 
@@ -2723,6 +2820,33 @@ class RegenderTUI(App):
         line = " ".join(found.group(0).split())
         return f"...{line}..." if len(line) >= 70 else line
 
+    def _live_heading(self, text: str, suffix: str = "") -> None:
+        """A heading that sweeps while the question under it is unanswered.
+
+        Every other line here is still, so motion is the whole signal: this one
+        wants an answer. It settles the moment one is given, which makes a still
+        heading mean "already dealt with" without a word being spent on it.
+        """
+        self._settle_heading()
+        try:
+            heading = ShimmerLine(text, suffix)
+            self.query_one("#content", ContentArea).add_widget(heading)
+            self._heading = heading
+        except Exception:
+            # No live screen -- a test, or a terminal that cannot mount widgets.
+            # The heading still has to appear.
+            line = f"[bold #ffffff]{text}[/]"
+            self.print(f"{line}   [#666666]{suffix}[/]" if suffix else line)
+
+    def _settle_heading(self) -> None:
+        """Stop the sweep on whatever question was last asked."""
+        heading = getattr(self, "_heading", None)
+        if heading is None:
+            return
+        self._heading = None
+        with contextlib.suppress(Exception):
+            heading.stop()
+
     def _show_cast_candidate(self) -> None:
         """Ask about one pair."""
         self._stage = "cast_review"
@@ -2734,7 +2858,7 @@ class RegenderTUI(App):
         position = f"{self._cast_idx + 1} of {len(self._cast_candidates)}"
 
         self.print("")
-        self.print(f"[#ffffff]?[/] [bold #ffffff]Same person? {position}[/]")
+        self._live_heading(f"? Same person? {position}")
         self.print("")
         # Each name with what the analysis knows about them, and a line of the
         # book if it names them outright. Two names alone are unanswerable by
@@ -2791,6 +2915,7 @@ class RegenderTUI(App):
 
     def _finish_cast_review(self) -> None:
         """Apply what was decided, write it down, and go on to the names."""
+        self._settle_heading()
         if self._cast_merges:
             self._apply_cast_merges()
         self.print("")
@@ -2889,9 +3014,7 @@ class RegenderTUI(App):
         where = f"ch{item.get('chapter')} p{item.get('paragraph')}"
 
         self.print("")
-        self.print(
-            f"[#ffffff]?[/] [bold #ffffff]Editorial call {position}[/]   [#666666]{where}[/]"
-        )
+        self._live_heading(f"? Editorial call {position}", where)
         self.print("")
         # Source first. The transformed line alone cannot be judged: "talked of
         # Mr. Darcy" is right where the source said "Mrs. Darcy" and wrong
@@ -2925,6 +3048,7 @@ class RegenderTUI(App):
 
     def _finish_review(self) -> None:
         """Say what was decided, write it down, and move on."""
+        self._settle_heading()
         changed = sum(1 for i in self._review_items if i.get("decision"))
         kept = len(self._review_items) - changed
         if changed:
