@@ -1404,6 +1404,47 @@ class CharacterService(BaseService):
         tokens = [t for t in canonical.split() if t.rstrip(".").lower() not in _GROUPING_TITLES]
         return len(tokens) > 1
 
+    async def _retry_suggestions(self, prompt: str, dropped: list, characters, transform_type):
+        """One more attempt at the names that were refused, told why.
+
+        Returns (original, suggested) pairs that pass the same gate. A second
+        refusal is the end of it: the character falls through to the engine,
+        which has the period-attested pool and its own retry.
+        """
+        from src.services.name_engine import screen_renames
+
+        reasons = "\n".join(f"  - {line}" for line in dropped)
+        second = (
+            f"{prompt}\n\nThese answers were rejected. Return replacements for "
+            f"ONLY these, obeying the reason given:\n{reasons}"
+        )
+        try:
+            response = await self._complete_with_retry(second, temperature=0.5)
+            parsed = self._parse_json_response(response)
+        except Exception:
+            return []
+        if isinstance(parsed, dict):
+            for key in ("suggestions", "names", "characters", "results"):
+                if isinstance(parsed.get(key), list):
+                    parsed = parsed[key]
+                    break
+        if not isinstance(parsed, list):
+            return []
+
+        retried = []
+        for item in parsed:
+            if not isinstance(item, dict):
+                continue
+            original = str(item.get("original", "")).strip()
+            suggested = str(item.get("suggested", "")).strip()
+            if original and suggested and original != suggested:
+                retried.append((original, suggested))
+
+        kept, refused_again = screen_renames(retried, characters, transform=transform_type.value)
+        if refused_again:
+            self.logger.warning("Dropped %d name suggestion(s) on retry", len(refused_again))
+        return kept
+
     @classmethod
     def unresolved_collisions(cls, characters, transform_type, name_map: dict) -> list:
         """Two characters still landing on one name once the map is applied.
@@ -1832,7 +1873,17 @@ class CharacterService(BaseService):
                     f" — NEEDS A GIVEN NAME: swapping the title alone gives "
                     f'"{clash["candidate"]}", which is also {clash["clashes_with"]}'
                 )
-            char_lines.append(f'  - name: "{char.name}", gender: {gender_val}{note}')
+            # The gender it must BECOME, not the one it has. This said
+            # "gender: male" beside a name an all-female edition had to
+            # feminise, and got back Thomas, Edmund and Edward.
+            from src.services.name_engine import target_gender
+
+            wants = target_gender(char.gender, transform_type)
+            becomes = wants.value if wants else gender_val
+            char_lines.append(
+                f'  - name: "{char.name}", currently {gender_val}, '
+                f"MUST BECOME {becomes.upper()}{note}"
+            )
         char_list_str = "\n".join(char_lines)
 
         # The example has to point the way this run points. One all_male
@@ -1943,8 +1994,24 @@ Return ONLY the JSON array.{steer_note}"""
             accepted, dropped = screen_renames(
                 proposals, characters, transform=transform_type.value
             )
-            for reason in dropped:
-                self.logger.warning(f"Dropped name suggestion {reason}")
+            # Counted, not named. The reasons carry character names, which a
+            # security scanner reads as personal data in a log -- and a log is
+            # the wrong home for them anyway, since nobody reads it. They belong
+            # in the run's report, which is the follow-up.
+            if dropped:
+                self.logger.warning("Dropped %d name suggestion(s) at the gate", len(dropped))
+
+            # Ask once more for the ones refused, with the reasons attached.
+            # Without this, refusing a bad name leaves the character with no
+            # name at all -- and for the ones marked NEEDS A GIVEN NAME that
+            # puts back the very collision the suggestion was there to solve.
+            if dropped:
+                settled = {original for original, _ in accepted}
+                again = await self._retry_suggestions(prompt, dropped, characters, transform_type)
+                for original, suggested in again:
+                    if original not in settled:
+                        accepted.append((original, suggested))
+                        settled.add(original)
 
             result = []
             for original, suggested in accepted:
