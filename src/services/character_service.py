@@ -1815,54 +1815,49 @@ Return ONLY the JSON array.{steer_note}"""
             if not isinstance(parsed, list):
                 return []
 
-            # Validate and clean each entry
-            from src.services.name_engine import cast_name_index, check_rename
+            # The same gate the engine's renames pass. A suggestion the reader
+            # approves becomes the book's name and overrides the engine, so it
+            # has to clear the same bar -- and for a long time it cleared a
+            # lesser one written separately here. That screen checked each
+            # suggestion against the cast and nothing against the other
+            # suggestions in the same batch, so the model could hand one new
+            # name to two characters and both passed: a real run offered Aubrey
+            # to Anne and to William, Leslie to Louisa and to Lydia, Sidney to
+            # Charles and to Jane. A suggestion that fails is not shown; the
+            # character falls through to the engine, which has the
+            # period-attested pool and will choose.
+            from src.services.name_engine import screen_renames
 
-            # What the cast already is. Without it the check has to guess from
-            # the shape of a name whether "Sir William" names a man called
-            # William or the Lucas family, and whether "Jane" is free.
-            cast_surnames, cast_givens, reserved = cast_name_index(characters)
-
-            result = []
+            ids: dict[str, str] = {}
+            proposals: list = []
             for item in parsed:
                 if not isinstance(item, dict):
                     continue
                 original = str(item.get("original", "")).strip()
                 suggested = str(item.get("suggested", "")).strip()
-                character_id = str(item.get("character_id", original)).strip()
-                if original and suggested and original != suggested:
-                    # A suggestion the reader approves becomes the book's name and
-                    # overrides the engine, so it has to clear the same bar the
-                    # engine's own proposals clear. It used to clear none: "Sir
-                    # William Lucas" -> "Noble William Lucas" changed the title,
-                    # left the masculine given name, and was offered as a valid
-                    # nonbinary name. A suggestion that fails here is not shown;
-                    # the character falls through to the engine, which has the
-                    # period-attested pool and will choose.
-                    problem = check_rename(
-                        original,
-                        suggested,
-                        surnames=cast_surnames,
-                        givens=cast_givens,
-                        reserved=reserved,
-                    )
-                    if problem:
-                        self.logger.warning(
-                            f"Dropped name suggestion {original!r} -> {suggested!r}: {problem}"
-                        )
-                        continue
-                    entry = {
-                        "original": original,
-                        "suggested": suggested,
-                        "character_id": character_id,
-                    }
-                    # Say why, for the ones where it matters. Most suggestions
-                    # are a matter of taste; these are the ones that stop two
-                    # characters becoming one person.
-                    clash = collisions.get(original)
-                    if clash:
-                        entry["reason"] = f"otherwise both are {clash['candidate']}"
-                    result.append(entry)
+                if not original or not suggested or original == suggested:
+                    continue
+                ids[original] = str(item.get("character_id", original)).strip()
+                proposals.append((original, suggested))
+
+            accepted, dropped = screen_renames(proposals, characters)
+            for reason in dropped:
+                self.logger.warning(f"Dropped name suggestion {reason}")
+
+            result = []
+            for original, suggested in accepted:
+                entry = {
+                    "original": original,
+                    "suggested": suggested,
+                    "character_id": ids.get(original, original),
+                }
+                # Say why, for the ones where it matters. Most suggestions are a
+                # matter of taste; these are the ones that stop two characters
+                # becoming one person.
+                clash = collisions.get(original)
+                if clash:
+                    entry["reason"] = f"otherwise both are {clash['candidate']}"
+                result.append(entry)
 
             return result
 

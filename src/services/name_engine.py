@@ -350,6 +350,101 @@ def cast_name_index(characters: Any) -> tuple[frozenset, frozenset, frozenset]:
     return frozenset(surnames), frozenset(givens), frozenset(surnames | givens | lone)
 
 
+def cast_owner_index(characters: Any) -> dict[str, str]:
+    """Which cast member each written form belongs to.
+
+    "Kitty", "Kitty Bennet" and "Catherine Bennet" are one girl, so a rename
+    giving all three the same new name is right and reporting it as three people
+    under one name is wrong. Built here because both the gate and the audit need
+    the same answer, and when they each had their own they disagreed.
+    """
+    owner: dict[str, str] = {}
+    for char in getattr(characters, "characters", characters) or []:
+        canonical = getattr(char, "name", "")
+        for form in [canonical, *(getattr(char, "aliases", []) or [])]:
+            if not form:
+                continue
+            owner.setdefault(form.lower(), canonical)
+            # And without the title, because a map holds both "Lady Anne Darcy"
+            # and "Anne Darcy" and they are one woman.
+            bare = " ".join(_strip_titles(form)).lower()
+            if bare:
+                owner.setdefault(bare, canonical)
+    return owner
+
+
+def claimed_given(original: str, suggested: str) -> str:
+    """The given name a rename claims, or "" if it claims none.
+
+    A term substitution claims nothing: "The chambermaid" -> "The chamberperson"
+    must not reserve the word for a person.
+    """
+    if _is_descriptive_name(original) or _POSSESSIVE.search(original):
+        return ""
+    tokens = _strip_titles(suggested)
+    return tokens[0].lower() if tokens else ""
+
+
+def screen_renames(
+    proposals: list,
+    characters: Any,
+    reserved: Any = frozenset(),
+) -> tuple[list, list]:
+    """The one gate. Returns (accepted, why-the-rest-were-not).
+
+    `proposals` are (original, suggested) pairs. Every rename in the book passes
+    through here whoever proposed it -- the engine, or the model whose
+    suggestions the reader approves -- because the two used to be screened
+    differently and the weaker screen was the one that decided the book.
+
+    Two proposals in one batch may not claim the same given name. That is the
+    rule the interface was missing: each of its suggestions was checked against
+    the cast as it was, and nothing accumulated, so the model could hand the
+    same new name to two characters and both passed.
+    """
+    surnames, givens, spoken_for = cast_name_index(characters)
+    owner = cast_owner_index(characters)
+    taken = {name.lower() for name in spoken_for} | {name.lower() for name in reserved}
+
+    accepted: list = []
+    reasons: list[str] = []
+    claims: dict[str, str] = {}
+
+    for original, suggested in proposals:
+        problem = check_rename(
+            original, suggested, surnames=surnames, givens=givens, reserved=frozenset(taken)
+        )
+        if problem:
+            reasons.append(f"{original!r} -> {suggested!r}: {problem}")
+            continue
+
+        claimed = claimed_given(original, suggested)
+        if claimed:
+            person = owner.get(original.lower(), original.lower())
+            holder = claims.get(claimed)
+            if holder is not None and holder != person:
+                reasons.append(
+                    f"{original!r} -> {suggested!r}: {claimed!r} is already the new "
+                    f"name of {holder!r}; two people, one name"
+                )
+                continue
+            # A character with no given name of their own is being granted one,
+            # which check_rename has no opinion about -- it only guards a given
+            # name being changed. "Mrs. Bennet" -> "Mr. Thomas Bennet" could
+            # hand Thomas to somebody the book already has.
+            own_given = (given_and_surname(original, surnames, givens)[0] or "").lower()
+            if claimed != own_given and claimed in taken:
+                reasons.append(
+                    f"{original!r} -> {suggested!r}: {claimed!r} is already somebody in this book"
+                )
+                continue
+            claims[claimed] = person
+
+        accepted.append((original, suggested))
+
+    return accepted, reasons
+
+
 def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
     """Everything wrong with a finished map that no single entry can show.
 
@@ -378,22 +473,9 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
         else (frozenset(), frozenset(), frozenset())
     )
 
-    # Which cast member each name belongs to. Two map keys for one person --
-    # "Kitty Bennet" and "Catherine Bennet", or the nicknames "Eliza" and
-    # "Lizzy" -- must share a target, and reporting that as two people given one
-    # name is the opposite of the truth.
-    owner: dict[str, str] = {}
-    for char in getattr(characters, "characters", characters) or []:
-        canonical = getattr(char, "name", "")
-        for form in [canonical, *(getattr(char, "aliases", []) or [])]:
-            if not form:
-                continue
-            owner.setdefault(form.lower(), canonical)
-            # And without the title, because the map holds both "Lady Anne
-            # Darcy" and "Anne Darcy" and they are one woman.
-            bare = " ".join(_strip_titles(form)).lower()
-            if bare:
-                owner.setdefault(bare, canonical)
+    # Two map keys for one person -- "Kitty Bennet" and "Catherine Bennet", or
+    # the nicknames "Eliza" and "Lizzy" -- must be allowed to share a target.
+    owner = cast_owner_index(characters)
 
     def whose(name: str) -> str:
         """The cast member a map key is about, or the key itself.

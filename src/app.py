@@ -494,6 +494,14 @@ class Application:
                 with open(output_dir / "name_report.json", "w") as f:
                     json.dump(name_report, f, indent=2)
 
+                # The map the audit just judged, written before the transform
+                # rather than after it. Without this the report names problems
+                # in a map nobody can open: the only copy on disk is the one
+                # saved when the run finishes, which is too late to check a
+                # verdict that was meant to stop the run.
+                with open(output_dir / "name_map_proposed.json", "w") as f:
+                    json.dump(name_map or {}, f, indent=2, ensure_ascii=False)
+
             # Transform the book
             transformer = self.get_service("transform")
 
