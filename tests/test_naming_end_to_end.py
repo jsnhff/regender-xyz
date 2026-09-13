@@ -169,3 +169,64 @@ class TestWhatAProposalClaims:
 
     def test_a_title_is_not_the_claim(self):
         assert claimed_given("Sir William Lucas", "Noble Vivian Lucas") == "vivian"
+
+
+class TestADescriptionIsNotExemptFromEveryCheck:
+    """check_rename returns early for a possessive or descriptive entry --
+    "Wickham's father", "The butler" -- because the term map governs those and
+    reading them as Given + Surname cost nineteen correct entries. Returning
+    None meant nothing looked at them at all, so any string passed: a real run
+    produced "Mx. Bennet's great-ancle the judge", and nonsense passed too."""
+
+    JUDGE = "Mr. Bennet's great-uncle the judge"
+
+    def test_the_mangling_that_reached_a_real_map_is_refused(self, cast):
+        accepted, reasons = screen_renames(
+            [(self.JUDGE, "Mx. Bennet's great-ancle the judge")], cast, transform="nonbinary"
+        )
+        assert accepted == []
+        assert any("ancle" in r for r in reasons), reasons
+
+    def test_a_word_from_nowhere_is_refused(self, cast):
+        accepted, _ = screen_renames(
+            [(self.JUDGE, "Mx. Bennet's zzzqqq the judge")], cast, transform="nonbinary"
+        )
+        assert accepted == []
+
+    def test_changing_only_the_title_is_kept(self, cast):
+        accepted, reasons = screen_renames(
+            [(self.JUDGE, "Mx. Bennet's great-uncle the judge")], cast, transform="nonbinary"
+        )
+        assert len(accepted) == 1, reasons
+
+    @pytest.mark.parametrize(
+        ("transform", "original", "suggested"),
+        [
+            ("nonbinary", "Wickham's father", "Wickham's parent"),
+            ("nonbinary", "Mr. Darcy's father", "Mx. Darcy's parent"),
+            ("all_female", "The butler", "The housekeeper"),
+            ("all_female", "Wickham's father", "Wickham's mother"),
+            ("all_female", "The Archbishop", "The Abbess"),
+            ("all_male", "The Miss Webbs", "The Mr. Webbs"),
+            ("gender_swap", "The late Mr. Darcy", "The late Mrs. Darcy"),
+        ],
+    )
+    def test_the_real_substitutions_all_survive(self, cast, transform, original, suggested):
+        """Taken from the four maps a real run produced. The check has to cost
+        none of these, or it trades one defect for a worse one."""
+        accepted, reasons = screen_renames([(original, suggested)], cast, transform=transform)
+        assert len(accepted) == 1, reasons
+
+    def test_a_substitution_belonging_to_another_transform_is_refused(self, cast):
+        """A butler becomes a housekeeper when the cast turns female, not when
+        it turns nonbinary."""
+        accepted, _ = screen_renames(
+            [("The butler", "The housekeeper")], cast, transform="nonbinary"
+        )
+        assert accepted == []
+
+    def test_no_transform_named_means_no_opinion(self, cast):
+        """Callers that do not know the transform keep the old behaviour rather
+        than getting a guess."""
+        accepted, _ = screen_renames([(self.JUDGE, "Mx. Bennet's zzzqqq the judge")], cast)
+        assert len(accepted) == 1

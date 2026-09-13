@@ -385,10 +385,48 @@ def claimed_given(original: str, suggested: str) -> str:
     return tokens[0].lower() if tokens else ""
 
 
+_WORD = re.compile(r"[A-Za-z']+")
+
+
+def _words(text: str) -> set:
+    """Every word in a phrase, hyphens split, lowercased.
+
+    Hyphens split because "great-uncle" -> "great-ancle" keeps one half and
+    mangles the other, and a whole-token comparison sees only a changed token.
+    """
+    return {w.lower().rstrip("'") for w in _WORD.findall(text.replace("-", " "))}
+
+
+def check_substitution(original: str, suggested: str, transform: str) -> Optional[str]:
+    """Why this term substitution is wrong, or None.
+
+    For the entries that are descriptions rather than names. Their words may be
+    kept, their titles may change, and a word the transform's term map replaces
+    may become what that map replaces it with. A word from nowhere else is a
+    mangling.
+    """
+    from src.services.transform_service import TransformService
+
+    try:
+        term_map = TransformService._effective_term_map(transform)
+    except Exception:
+        return None  # no map for this transform; no opinion rather than a wrong one
+
+    allowed = _words(original)
+    allowed |= {t.lower() for t in ALL_TITLES}
+    for replacement in term_map.values():
+        allowed |= _words(replacement)
+
+    for word in sorted(_words(suggested) - allowed):
+        return f"{suggested!r} is not a substitution this transform makes ({word!r})"
+    return None
+
+
 def screen_renames(
     proposals: list,
     characters: Any,
     reserved: Any = frozenset(),
+    transform: str = "",
 ) -> tuple[list, list]:
     """The one gate. Returns (accepted, why-the-rest-were-not).
 
@@ -414,6 +452,14 @@ def screen_renames(
         problem = check_rename(
             original, suggested, surnames=surnames, givens=givens, reserved=frozenset(taken)
         )
+        # A description is exempt from the name checks, which is why
+        # check_rename says nothing about it -- but not from every check.
+        if (
+            problem is None
+            and transform
+            and (_is_descriptive_name(original) or _POSSESSIVE.search(original))
+        ):
+            problem = check_substitution(original, suggested, transform)
         if problem:
             reasons.append(f"{original!r} -> {suggested!r}: {problem}")
             continue

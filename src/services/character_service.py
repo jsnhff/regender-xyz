@@ -1840,7 +1840,9 @@ Return ONLY the JSON array.{steer_note}"""
                 ids[original] = str(item.get("character_id", original)).strip()
                 proposals.append((original, suggested))
 
-            accepted, dropped = screen_renames(proposals, characters)
+            accepted, dropped = screen_renames(
+                proposals, characters, transform=transform_type.value
+            )
             for reason in dropped:
                 self.logger.warning(f"Dropped name suggestion {reason}")
 
