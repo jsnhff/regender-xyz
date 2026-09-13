@@ -1442,7 +1442,10 @@ class CharacterService(BaseService):
 
         kept, refused_again = screen_renames(retried, characters, transform=transform_type.value)
         for reason in refused_again:
-            self.logger.warning(f"Dropped on retry {reason}")
+            # As above: fictional characters, and the reason is the message.
+            self.logger.warning(  # codeql[py/clear-text-logging-sensitive-data]
+                f"Dropped on retry {reason}"
+            )
         return kept
 
     @classmethod
@@ -1995,7 +1998,11 @@ Return ONLY the JSON array.{steer_note}"""
                 proposals, characters, transform=transform_type.value
             )
             for reason in dropped:
-                self.logger.warning(f"Dropped name suggestion {reason}")
+                # The names here are a novel's characters, and saying which
+                # rename was refused and why is the point of the line.
+                self.logger.warning(  # codeql[py/clear-text-logging-sensitive-data]
+                    f"Dropped name suggestion {reason}"
+                )
 
             # Ask once more for the ones refused, with the reasons attached.
             # Without this, refusing a bad name leaves the character with no
