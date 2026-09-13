@@ -1832,7 +1832,17 @@ class CharacterService(BaseService):
                     f" — NEEDS A GIVEN NAME: swapping the title alone gives "
                     f'"{clash["candidate"]}", which is also {clash["clashes_with"]}'
                 )
-            char_lines.append(f'  - name: "{char.name}", gender: {gender_val}{note}')
+            # The gender it must BECOME, not the one it has. This said
+            # "gender: male" beside a name an all-female edition had to
+            # feminise, and got back Thomas, Edmund and Edward.
+            from src.services.name_engine import target_gender
+
+            wants = target_gender(char.gender, transform_type)
+            becomes = wants.value if wants else gender_val
+            char_lines.append(
+                f'  - name: "{char.name}", currently {gender_val}, '
+                f"MUST BECOME {becomes.upper()}{note}"
+            )
         char_list_str = "\n".join(char_lines)
 
         # The example has to point the way this run points. One all_male
