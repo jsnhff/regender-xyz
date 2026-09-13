@@ -2491,16 +2491,23 @@ class RegenderTUI(App):
         # while Enter, confusingly, did nothing at all.
         options = []
         self._model_default = 1
+        recommended_at = 0
         for i, (model_id, display_name, pricing) in enumerate(visible, 1):
             if model_id == current or current.startswith(model_id):
                 self._model_default = i
             rec = " [bold #ffffff]★ recommended[/]" if _is_recommended_model(model_id) else ""
+            if rec and not recommended_at:
+                recommended_at = i
             # What this book costs beats a rate card the reader has to do
             # arithmetic on. Falls back to the rate when no book is loaded yet.
             cost = _estimate_book_cost(model_id, tokens) or pricing
             time_est = _estimate_transform_time(model_id, tokens)
             time_tag = f"  [#666666]{time_est}[/]" if time_est else ""
             options.append((f"{display_name:<26}", f"{cost:<10}{time_tag}{rec}"))
+        # Enter takes the star. Pointing it at whichever model was already
+        # configured meant that on a fresh install it pointed at row one,
+        # recommending nothing while a row below it said "recommended".
+        self._model_default = recommended_at or self._model_default
         verbs = ("more",) if not show_all and len(choices) > 5 else ()
         self._ask(
             "Select a model", options=tuple(options), default=self._model_default, verbs=verbs
