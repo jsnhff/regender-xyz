@@ -1441,9 +1441,8 @@ class CharacterService(BaseService):
                 retried.append((original, suggested))
 
         kept, refused_again = screen_renames(retried, characters, transform=transform_type.value)
-        for reason in refused_again:
-            # As above: fictional characters, and the reason is the message.
-            self.logger.warning(f"Dropped on retry {reason}")
+        if refused_again:
+            self.logger.warning("Dropped %d name suggestion(s) on retry", len(refused_again))
         return kept
 
     @classmethod
@@ -1995,10 +1994,12 @@ Return ONLY the JSON array.{steer_note}"""
             accepted, dropped = screen_renames(
                 proposals, characters, transform=transform_type.value
             )
-            for reason in dropped:
-                # The names here are a novel's characters, and saying which
-                # rename was refused and why is the point of the line.
-                self.logger.warning(f"Dropped name suggestion {reason}")
+            # Counted, not named. The reasons carry character names, which a
+            # security scanner reads as personal data in a log -- and a log is
+            # the wrong home for them anyway, since nobody reads it. They belong
+            # in the run's report, which is the follow-up.
+            if dropped:
+                self.logger.warning("Dropped %d name suggestion(s) at the gate", len(dropped))
 
             # Ask once more for the ones refused, with the reasons attached.
             # Without this, refusing a bad name leaves the character with no
