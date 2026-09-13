@@ -1119,6 +1119,12 @@ class QCService:
                     term = joined.group(0)
                     suggestion = f"{owner_a} {noun_a}s"
                     detail += f'; "{suggestion}" would read better'
+                else:
+                    # Not side by side, so a plural cannot join them. English
+                    # distinguishes the second one instead: "my other mother".
+                    suggestion = f"{owner_a} other {noun_a}"
+                    detail += f'; "{suggestion}" would tell them apart'
+
                 chapter.findings.append(
                     Finding(
                         NEEDS_REVIEW,
