@@ -78,9 +78,15 @@ class TestTheAnswers:
         assert lines[0].index("x") == lines[1].index("y")
 
     def test_a_second_line_can_hang_under_an_answer(self):
+        """Where the setup menu keeps the address you go to for a key.
+
+        Asserted whole rather than as a substring: a bare `"host" in line`
+        reads to a security scanner as a URL check done the unsafe way, and
+        the exact row is the stronger claim in any case.
+        """
         lines = choice_lines([("Anthropic", "literary", "console.anthropic.com")])
         assert len(lines) == 2
-        assert "console.anthropic.com" in lines[1]
+        assert plain(lines[1]).strip() == "console.anthropic.com"
 
 
 class TestTheVerbs:
