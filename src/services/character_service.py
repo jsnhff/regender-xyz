@@ -1522,7 +1522,25 @@ class CharacterService(BaseService):
                         reason = f"both answer to {sorted(shared)[0]!r}, with different given names"
 
                 if reason:
-                    found.append({"a": first.name, "b": other.name, "reason": reason})
+                    # What the analysis already knows about each of them. Asked
+                    # with only the two names, this question is unanswerable by
+                    # anyone who has not read the book -- "Mary Bennet" beside
+                    # "Mary King" offers nothing to decide on. The descriptions
+                    # were computed during the analysis and never shown, and
+                    # they settle nearly every pair on sight: "Middle Bennet
+                    # daughter, plain and pedantic" beside "Young woman who went
+                    # to Liverpool, was connected to Wickham" is obviously two
+                    # people, and two entries both reading "Fourth Bennet
+                    # daughter" are obviously one.
+                    found.append(
+                        {
+                            "a": first.name,
+                            "b": other.name,
+                            "reason": reason,
+                            "a_description": (getattr(first, "description", "") or "").strip(),
+                            "b_description": (getattr(other, "description", "") or "").strip(),
+                        }
+                    )
         return found
 
     @staticmethod
