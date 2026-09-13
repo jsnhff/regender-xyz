@@ -475,6 +475,20 @@ class Application:
             from src.services.name_engine import audit_name_map
 
             name_report["problems"] = audit_name_map(name_map or {}, characters)
+
+            # And the collisions the map cannot show. A character the book
+            # names only by title and family name carries no map entry -- the
+            # title swap belongs to the term map -- so "Mr. Bennet" and "Mrs.
+            # Bennet" both landing on "Mrs. Bennet" is invisible to an audit
+            # that reads the map. It is still two people under one name, and it
+            # is the shape a refused suggestion leaves behind.
+            from src.services.character_service import CharacterService
+
+            name_report["problems"].extend(
+                CharacterService.unresolved_collisions(
+                    characters, TransformType(transform_type), name_map or {}
+                )
+            )
             if name_report["problems"]:
                 self.logger.error(
                     f"{len(name_report['problems'])} problem(s) in the name map, "

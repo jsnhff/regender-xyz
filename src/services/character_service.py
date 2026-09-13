@@ -1404,6 +1404,56 @@ class CharacterService(BaseService):
         tokens = [t for t in canonical.split() if t.rstrip(".").lower() not in _GROUPING_TITLES]
         return len(tokens) > 1
 
+    @classmethod
+    def unresolved_collisions(cls, characters, transform_type, name_map: dict) -> list:
+        """Two characters still landing on one name once the map is applied.
+
+        The map is consulted first: an entry that renames one of the pair is the
+        resolution, and there is nothing left to report. What remains are the
+        pairs nothing separates -- which is what a refused suggestion leaves
+        behind, and what the map-reading audit cannot see, because neither
+        character has an entry in it to read.
+        """
+        from src.services.name_engine import cast_owner_index, target_gender
+
+        # Only the characters this transform actually moves. In an all_female
+        # run Jane is already female and goes nowhere, so pairing her with her
+        # mother is a collision between a character and herself standing still.
+        changing = [
+            char
+            for char in characters.characters
+            if target_gender(char.gender, transform_type) is not None
+        ]
+        collisions = cls._name_collisions(characters, changing, transform_type)
+
+        # Whose name the map already changes. A character renamed by given name
+        # is told apart by that: Charles Bingley becomes Clara Bingley, so
+        # "Mr. Bingley" cannot be confused with "Mrs. Bingley" afterwards.
+        owner = cast_owner_index(characters)
+        renamed = {
+            owner.get(key.lower())
+            for key, value in name_map.items()
+            if value and value != key and owner.get(key.lower())
+        }
+
+        problems = []
+        said = set()
+        for form, clash in sorted(collisions.items()):
+            other = str(clash["clashes_with"])
+            mine = owner.get(form.lower(), form)
+            theirs = owner.get(other.lower(), other)
+            if mine in renamed or theirs in renamed:
+                continue
+            pair = frozenset((mine, theirs))
+            if len(pair) < 2 or pair in said:
+                continue  # one person under two forms, or already said once
+            said.add(pair)
+            problems.append(
+                f"{form!r} and {other!r} both become {clash['candidate']!r}, "
+                "and nothing in the map tells them apart; two people, one name"
+            )
+        return problems
+
     @staticmethod
     def possible_duplicates(characters: list) -> list:
         """Pairs that look like one person but cannot be settled from structure.
@@ -1785,6 +1835,31 @@ class CharacterService(BaseService):
             char_lines.append(f'  - name: "{char.name}", gender: {gender_val}{note}')
         char_list_str = "\n".join(char_lines)
 
+        # The example has to point the way this run points. One all_male
+        # example served every transform, and the model followed its shape
+        # rather than the rule above it.
+        worked = {
+            "all_female": (
+                '"Mr. Thorne" -> "Mrs. Harriet Thorne"',
+                'for "Mr." use "Mrs." or "Ms."',
+            ),
+            "all_male": (
+                '"Mrs. Thorne" -> "Mr. Thomas Thorne"',
+                'for "Mrs." and "Miss" use "Mr."',
+            ),
+            "gender_swap": (
+                '"Mrs. Thorne" -> "Mr. Thomas Thorne", and "Mr. Thorne" -> "Mrs. Harriet Thorne"',
+                '"Mr." becomes "Mrs." and "Mrs." becomes "Mr."',
+            ),
+            "nonbinary": (
+                '"Mr. Thorne" -> "Mx. Hilary Thorne"',
+                'for "Mr.", "Mrs." and "Miss" use "Mx."',
+            ),
+        }
+        example, title_rule = worked.get(
+            transform_type.value, ('"Mrs. Thorne" -> "Mr. Thomas Thorne"', "swap the title")
+        )
+
         style_note = f"\nStyle context: {style_context}" if style_context else ""
         neutral_note = self._NONBINARY_NAMING if transform_type == TransformType.NONBINARY else ""
         # What the reader said about the last set. Their words, put where the
@@ -1806,7 +1881,8 @@ Rules:
 - Suggest names from the same cultural/ethnic tradition as the original
 - Match the rhythm and feel of the original name (similar syllables, similar register)
 - Keep the era/period appropriate (Victorian names stay Victorian, etc.)
-- For titles like "Sir [Name]": use "Dame [Name]" for female equivalents; for "Mr." use "Ms." or "Mrs."
+- The title must change with the character: {title_rule}. A suggestion that
+  keeps the original title will be rejected.
 - Do NOT change family surnames — only given names and honorific titles
 - If the character HAS a given name, that given name must CHANGE. Changing only
   the title is not an answer: "Sir William Lucas" -> "Noble William Lucas" leaves
@@ -1814,8 +1890,9 @@ Rules:
   the surname: "Sir William Lucas" -> "Noble Vivian Lucas".
 - A character marked NEEDS A GIVEN NAME has none of their own, so swapping the
   title would merge them with an existing character. Give them a period-appropriate
-  given name and return the full form, e.g. "Mrs. Bennet" -> "Mr. Thomas Bennet".
-  The given name must not already belong to anyone in the book.
+  given name AND the new title, and return the full form: {example}.
+  The given name must not already belong to anyone in the book, and it must suit
+  the gender this transform is producing.
 {neutral_note}
 - Return a JSON array only, no other text:
 [{{"original": "original name here", "suggested": "suggested name here", "character_id": "original name here"}}]
