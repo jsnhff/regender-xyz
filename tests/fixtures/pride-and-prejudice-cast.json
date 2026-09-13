@@ -1,0 +1,1347 @@
+{
+  "book_id": "2adb8459ff929a39",
+  "characters": [
+    {
+      "name": "Mr. Bennet",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Mr. Bennet"
+      ],
+      "description": "Father of five daughters, husband to Mrs. Bennet, sarcastic and witty gentleman of Longbourn",
+      "importance": "main",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Bennet's great-uncle the judge",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Deceased relative whose portrait hangs at Pemberley",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Bennet",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [
+        "his lady",
+        "his wife",
+        "her mother",
+        "mamma"
+      ],
+      "description": "Mother of five daughters, wife to Mr. Bennet, obsessed with marrying off her daughters",
+      "importance": "main",
+      "confidence": 0.7
+    },
+    {
+      "name": "Elizabeth Bennet Darcy",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Lizzy",
+        "Eliza",
+        "Miss Eliza",
+        "my little Lizzy",
+        "Elizabeth",
+        "Mrs. Darcy",
+        "dearest child",
+        "my sweetest Lizzy",
+        "dear Lizzy"
+      ],
+      "description": "Second daughter of the Bennets, witty and intelligent protagonist and Mr. Bennet's favorite, who marries Mr. Darcy",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Jane Bennet Bingley",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Jane Bennet",
+        "the eldest Miss Bennet",
+        "Miss Bennet",
+        "Jane",
+        "Dearest Jane",
+        "Mrs. Bingley"
+      ],
+      "description": "Eldest and most beautiful Bennet daughter, sweet-tempered and admired by Mr. Bingley, whom she later marries",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Mary Bennet",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Middle Bennet daughter, plain, studious, pedantic, plays piano",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Catherine Bennet",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Kitty",
+        "Kitty Bennet"
+      ],
+      "description": "Fourth Bennet daughter, often coughs, called Kitty",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lydia Bennet Wickham",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Lydia",
+        "Lydia Bennet",
+        "Miss Lydia Bennet",
+        "my niece",
+        "Miss"
+      ],
+      "description": "Youngest Bennet daughter, tallest, bold and confident, who eloped with Wickham and is now married to him, wild and unabashed about her situation",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Mr. Darcy Senior",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "the late Mr. Darcy",
+        "my father",
+        "my excellent father"
+      ],
+      "description": "Darcy's late father who was fond of Wickham and left provisions for him in his will",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Darcy's father",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "late master"
+      ],
+      "description": "Late master of Pemberley, described as an excellent man, raised Wickham at his own expense",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Long",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Neighbor who brings news about Netherfield, has two nieces",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Morris",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Person Mr. Bingley agreed with about Netherfield",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Sir William Lucas",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Sir"
+      ],
+      "aliases": [],
+      "description": "Former tradesman, knighted, friendly neighbor to the Bennets, father of Charlotte",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lady Lucas",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Lady"
+      ],
+      "aliases": [],
+      "description": "Wife of Sir William Lucas, good neighbor to Mrs. Bennet",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Charlotte Lucas Collins",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Charlotte Lucas",
+        "Miss Lucas",
+        "Charlotte",
+        "Mrs. Collins",
+        "Charlotte Collins"
+      ],
+      "description": "Eldest Lucas daughter, about 27, sensible and practical, Elizabeth's intimate friend who later married Mr. Collins and became mistress of Hunsford Parsonage, managing her household strategically",
+      "importance": "supporting",
+      "confidence": 0.8
+    },
+    {
+      "name": "Maria Lucas",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "One of the Lucas daughters, danced with Mr. Bingley",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "A young Lucas",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [
+        "the boy"
+      ],
+      "description": "Young Lucas boy who came with his sisters, wants foxhounds and wine",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Hurst",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Husband of Mr. Bingley's eldest sister, man of fashion",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Robinson",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Man who asked Mr. Bingley about the Meryton assembly",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss King",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Woman Mr. Bingley danced with at the ball",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Colonel Forster",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Colonel"
+      ],
+      "aliases": [],
+      "description": "Military officer Elizabeth teased about giving a ball at Meryton",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Fitzwilliam Darcy",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Mr. Darcy",
+        "Darcy",
+        "Mr. Fitzwilliam Darcy",
+        "the present Mr. Darcy"
+      ],
+      "description": "Wealthy gentleman from Pemberley who admires Elizabeth despite social differences. Initially perceived as proud and ill-natured, he is discerning and connected to Wickham's past.",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Charles Bingley",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Mr. Bingley",
+        "Bingley",
+        "Charles",
+        "Mr. Charles Bingley"
+      ],
+      "description": "Wealthy, amiable gentleman who leases Netherfield, shows genuine concern for Jane and kindness to Elizabeth. Jane's love interest who was kept away from her by his sisters.",
+      "importance": "main",
+      "confidence": 0.8
+    },
+    {
+      "name": "Caroline Bingley",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Miss Bingley"
+      ],
+      "description": "Bingley's snobbish sister who pursues Mr. Darcy and criticizes Elizabeth behind her back",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Louisa Hurst",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [
+        "Mrs. Hurst"
+      ],
+      "description": "Bingley's married sister who joins Caroline in criticizing Elizabeth and the Bennets",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Philips",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Mrs. Bennet's sister, married to Mr. Philips, aunt to the Bennet girls who provides gossip about officers",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Philips",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Mrs. Philips's husband, former clerk who succeeded Mrs. Bennet's father as attorney in Meryton",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Gardiner",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Mrs. Bennet's brother settled in London in trade, mentioned in connection with Jane's past admirer",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Gardiner children",
+      "gender": "unknown",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Four children of Mr. and Mrs. Gardiner - two girls aged six and eight, and two younger boys",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Gardiner",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Mr. Gardiner's wife, sister-in-law to Mrs. Bennet",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Captain Carter",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Captain"
+      ],
+      "aliases": [],
+      "description": "Officer admired by Lydia who was going to London",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Jones",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "The apothecary who attends to Jane during her illness at Netherfield",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss Watson",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Young woman in Meryton whom officers Colonel Forster and Captain Carter used to visit",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss Grantley",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Acquaintance whose table design is compared unfavorably to Miss Darcy's by Caroline Bingley",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lady Catherine de Bourgh",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Lady",
+        "Right Honourable"
+      ],
+      "aliases": [
+        "her Ladyship"
+      ],
+      "description": "Mr. Collins's wealthy and proud patroness, widow of Sir Lewis de Bourgh",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss de Bourgh",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Lady Catherine's sickly daughter, heiress of Rosings",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Sir Lewis de Bourgh",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Sir"
+      ],
+      "aliases": [],
+      "description": "Deceased husband of Lady Catherine",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Denny",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Denny"
+      ],
+      "description": "Officer in the regiment who introduces Mr. Wickham to the Bennet sisters",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Nicholls",
+      "gender": "female",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [
+        "Mrs. Nichols"
+      ],
+      "description": "Servant at Netherfield responsible for making white soup",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Hill",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [],
+      "aliases": [
+        "Hill",
+        "Mrs. Hill"
+      ],
+      "description": "Housekeeper and servant at Longbourn (the Bennet household) who brings news of the express letter and receives news of Lydia's upcoming marriage",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Richard",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Person Mr. Philips may turn away, whom Colonel Forster might hire",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Collins's father",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Deceased father of Mr. Collins, was illiterate and miserly, quarreled with Mr. Bennet",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Collins",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Collins",
+        "William Collins"
+      ],
+      "description": "Clergyman and cousin to the Bennet sisters, obsequious and socially awkward, patronized by Lady Catherine",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Wickham",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [
+        "Wickham",
+        "George Wickham"
+      ],
+      "description": "Charming officer who claims to have been wronged by Mr. Darcy, son of the late Mr. Darcy's steward",
+      "importance": "main",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Wickham Senior",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Wickham's late father who managed the Pemberley estates, described as respectable but poor due to his wife's extravagance",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The late Mr. Darcy",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Mr. Darcy's deceased father, Wickham's godfather, described as one of the best men",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lady Anne Darcy",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Lady"
+      ],
+      "aliases": [],
+      "description": "Deceased sister of Lady Catherine, mother of Mr. Darcy",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Wickham's father",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [
+        "old Wickham"
+      ],
+      "description": "The late Mr. Darcy's steward who devoted his life to managing Pemberley",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The Archbishop",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Religious authority mentioned by Mr. Collins regarding propriety of dancing",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss Anne de Bourgh",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Miss De Bourgh"
+      ],
+      "description": "Daughter of Lady Catherine, potential match for Mr. Darcy according to Caroline Bingley",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Georgiana Darcy",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Miss Darcy",
+        "Miss Georgiana Darcy",
+        "Georgiana Darcy"
+      ],
+      "description": "Mr. Darcy's sister, praised by Caroline Bingley and expected to dine with the Bingleys",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Mrs. Jenkinson",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Companion to Miss de Bourgh, arranges her footstool",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lady Metcalfe",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Lady"
+      ],
+      "aliases": [],
+      "description": "Acquaintance of Lady Catherine who thanked her for recommending Miss Pope",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Miss Pope",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Young person recommended by Lady Catherine as governess, considered a treasure",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The Miss Webbs",
+      "gender": "female",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Young ladies who all play music despite their father having less income than Mr. Bennet",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Colonel Fitzwilliam",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Colonel"
+      ],
+      "aliases": [
+        "Fitzwilliam"
+      ],
+      "description": "Mr. Darcy's cousin, younger son of an earl, pleasant and sociable gentleman",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lord ----",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Lord"
+      ],
+      "aliases": [],
+      "description": "Colonel Fitzwilliam's father, an earl",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Younge",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Governess who presided over Georgiana's establishment, connived with Wickham in the attempted elopement",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Dawson",
+      "gender": "unknown",
+      "pronouns": {},
+      "titles": [],
+      "aliases": [],
+      "description": "Lady Catherine's servant who does not object to the barouche-box",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "John",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Servant Lady Catherine suggests Mrs. Collins send with the young ladies",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Forster",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Wife of Colonel Forster, young and recently married, Lydia's friend who invites her to Brighton",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mary King",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [],
+      "description": "Young woman Wickham had been pursuing, now gone to Liverpool",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Harriet Harrington",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Harriet"
+      ],
+      "description": "One of the two Harrington sisters, was ill and couldn't attend Mrs. Forster's dance",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Pen Harrington",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Miss"
+      ],
+      "aliases": [
+        "Pen"
+      ],
+      "description": "One of the two Harrington sisters who came alone to Mrs. Forster's dance",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Chamberlayne",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Man dressed in women's clothes as a prank at Mrs. Forster's party",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Pratt",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "One of the officers in the regiment",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Colonel Miller",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Colonel"
+      ],
+      "aliases": [],
+      "description": "Colonel whose regiment's departure Mrs. Bennet remembers crying over 25 years ago",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mrs. Reynolds",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [
+        "Reynolds",
+        "Poor Reynolds"
+      ],
+      "description": "Old, respectable housekeeper at Pemberley who praises Mr. Darcy highly and is fond of Wickham",
+      "importance": "minor",
+      "confidence": 0.8
+    },
+    {
+      "name": "Mrs. Annesley",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs."
+      ],
+      "aliases": [],
+      "description": "Genteel woman who lives with Miss Darcy in London and helps facilitate conversation",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The little Gardiners",
+      "gender": "unknown",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "The Gardiner children who greet the carriage at Longbourn",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Harriet Forster",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [
+        "Mrs. Forster"
+      ],
+      "aliases": [],
+      "description": "Colonel Forster's wife, recipient of Lydia's letter announcing the elopement",
+      "importance": "supporting",
+      "confidence": 0.7
+    },
+    {
+      "name": "Sally",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Servant mentioned in Lydia's letter, asked to mend her muslin gown",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Haggerston",
+      "gender": "unknown",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Solicitor mentioned by Mr. Gardiner for preparing the marriage settlement",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Lady Catherine's daughter",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Daughter of Lady Catherine, mentioned as agreeing about the scandal's effects on the family",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The butler",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Servant at Longbourn who directs the girls to find their father",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "William Goulding",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Local man Lydia showed her wedding ring to from the carriage",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Mr. Stone",
+      "gender": "male",
+      "pronouns": {
+        "subject": "he",
+        "object": "him",
+        "possessive": "his"
+      },
+      "titles": [
+        "Mr."
+      ],
+      "aliases": [],
+      "description": "Man who called Mr. Gardiner away on business on Lydia's wedding day",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The Gouldings",
+      "gender": "unknown",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Family who might quit Haye Park according to Mrs. Bennet",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "The Lucases",
+      "gender": "unknown",
+      "pronouns": {
+        "subject": "they",
+        "object": "them",
+        "possessive": "theirs"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "Neighboring family Lydia wants to visit",
+      "importance": "minor",
+      "confidence": 0.7
+    },
+    {
+      "name": "Sarah",
+      "gender": "female",
+      "pronouns": {
+        "subject": "she",
+        "object": "her",
+        "possessive": "hers"
+      },
+      "titles": [],
+      "aliases": [],
+      "description": "A servant called to help Jane dress",
+      "importance": "minor",
+      "confidence": 0.7
+    }
+  ],
+  "metadata": {
+    "total": 82,
+    "by_gender": {
+      "male": 35,
+      "female": 40,
+      "unknown": 7
+    },
+    "by_importance": {
+      "main": 8,
+      "minor": 62,
+      "supporting": 12
+    }
+  },
+  "timestamp": "2026-09-13T13:52:51.685105",
+  "provider": "anthropic",
+  "model": "claude-opus-4-5-20251101"
+}

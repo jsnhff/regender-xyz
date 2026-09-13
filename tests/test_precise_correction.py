@@ -120,8 +120,23 @@ class TestAcceptingASuggestion:
         assert any("his uncles" in line for line in plain(tui._lines))
 
     def test_the_accept_key_is_offered(self, tui):
+        """Offered as a numbered answer now, like every other question asks."""
         tui._show_review_menu()
-        assert any(" a accept" in line for line in plain(tui._lines))
+        assert any('2  Use "his uncles"' in line for line in plain(tui._lines))
+
+    def test_the_old_accept_key_still_works(self, tui):
+        """ "a" was the key for a long time; muscle memory should not misfire."""
+        tui._handle_review_input("a")
+        assert tui._review_items[0]["decision"] == "his uncles"
+
+    def test_the_number_accepts_it_too(self, tui):
+        tui._handle_review_input("2")
+        assert tui._review_items[0]["decision"] == "his uncles"
+
+    def test_one_keeps_it(self, tui):
+        """The first answer is always the one that changes nothing."""
+        tui._handle_review_input("1")
+        assert not tui._review_items[0].get("decision")
 
     def test_a_applies_it(self, tui):
         tui._handle_review_input("a")

@@ -868,6 +868,94 @@ BRAILLE_LOADING_FRAMES = ["⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇"
 
 
 #: The heading of a live decision is dim until the sweep reaches it.
+# -----------------------------------------------------------------------------
+# The question grammar
+# -----------------------------------------------------------------------------
+# Every question is built from these four pieces. The marker IS the question
+# mark, so a heading never carries its own; choices are always numbered and
+# vertical; the one answer Enter gives you wears the return glyph in the cursor
+# column; and the verbs that are not answers -- back, skip, type your own --
+# live in a dim footer under them, keyed by the same letters everywhere.
+
+_ASK = "[#ffffff]?[/]"
+_ENTER = "\u21b5"
+_KEY = "[bold #ffffff]{}[/]"
+_PLAIN = re.compile(r"\[/?[^\]]*\]")
+
+
+def question_line(question: str, where: str = "") -> tuple[str, str]:
+    """A heading and its dim location. `? Same person`, never `? Same person?`.
+
+    Returned in two pieces because the heading sweeps while the question is
+    live and the location -- "2 of 9", "ch10 p0" -- should not.
+    """
+    return question.strip().rstrip("?").rstrip(), where.strip()
+
+
+def choice_lines(options: list, default: int = 1) -> list[str]:
+    """The answers, numbered from 1, with the return glyph on the default.
+
+    `options` are labels, or (label, hint) pairs. One and only one row is
+    cursored: whichever number Enter stands for, which is not always the first
+    -- the model list defaults to the model already configured.
+    """
+    rows = []
+    for option in options:
+        parts = list(option) if isinstance(option, tuple) else [option]
+        rows.append(tuple((parts + ["", ""])[:3]))
+
+    # One column for the hints, measured on the labels as they will be seen.
+    width = max((len(_PLAIN.sub("", label)) for label, hint, _ in rows if hint), default=0)
+
+    lines = []
+    for i, (label, hint, note) in enumerate(rows, 1):
+        cursor = f"[#98c379]{_ENTER}[/]" if i == default else " "
+        row = f"{cursor} {_KEY.format(i)}  {label}"
+        if hint:
+            row += " " * (width - len(_PLAIN.sub("", label)) + 3) + f"[#aaaaaa]{hint}[/]"
+        lines.append(row)
+        if note:
+            lines.append(f"     [#666666]{note}[/]")
+    return lines
+
+
+# The verbs that are not answers. Same key, same words, every time they appear:
+# a reader who learns "s" once on the cast review knows it on the editorial one.
+_VERBS = {
+    "back": ("b", "back"),
+    "rest": ("s", "keep the rest"),
+    "more": ("m", "more"),
+    "mapping": ("m", "add a mapping"),
+    "again": ("r", "ask again"),
+    "accept": ("a", "accept all"),
+    "keep": ("k", "keep the originals"),
+}
+
+
+def footer_line(*verbs: str, free: str = "", default: str = "") -> str:
+    """The dim line of verbs under the answers.
+
+    `free` names what typing something does, for the questions that take prose
+    as well as a choice. `default` cursors a verb instead of a number, for the
+    one question whose numbers are already spoken for by its list.
+    """
+    parts = []
+    for verb in verbs:
+        key, label = _VERBS[verb]
+        lit = f"[#98c379]{_ENTER}[/] " if key == default else ""
+        parts.append(f"{lit}[#aaaaaa]{key}[/] [#666666]{label}[/]")
+    if free:
+        parts.append(f"[#666666]{free}[/]")
+    return "  " + " [#444444]\u00b7[/] ".join(parts)
+
+
+def reject_line(count: int, *verbs: str) -> str:
+    """What to say when the answer was not one of the above. Said one way."""
+    keys = [f"1-{count}" if count > 1 else "1"]
+    keys += [_VERBS[verb][0] for verb in verbs]
+    return f"[#666666]Enter {', '.join(keys)}[/]"
+
+
 _SHIMMER_DIM = (0x7A, 0x7A, 0x7A)
 _SHIMMER_LIT = (0xFF, 0xFF, 0xFF)
 
@@ -1286,6 +1374,7 @@ class RegenderTUI(App):
 
         self._model_choices: list = []
         self._model_showing_all: bool = False
+        self._model_default: int = 1
         self._export_format_list: list = []
 
         self._process_start: float | None = None
@@ -1349,16 +1438,15 @@ class RegenderTUI(App):
     def _show_friendly_mode_question(self) -> None:
         """Ask whether the user wants guided (friendly) or standard setup."""
         self._stage = "setup_mode"
-        self.print("[#aaaaaa]First time here? We can walk you through setup step by step.[/]")
-        self.print("")
-        self.print("  [bold #ffffff]1[/]  Yes, guide me through it")
-        self.print("  [bold #ffffff]2[/]  I know what I'm doing")
-        self.print("")
-        self.set_prompt(">  ")
+        self._ask(
+            "Guided setup",
+            context=("First time here? We can walk you through it step by step.",),
+            options=("Yes, guide me through it", "I know what I'm doing"),
+        )
 
     def _handle_friendly_mode_input(self, value: str) -> None:
         """Route to friendly setup or standard wizard."""
-        if value == "1":
+        if value in ("1", ""):
             self._friendly_mode = True
             self.print("")
             self._show_friendly_setup()
@@ -1367,7 +1455,7 @@ class RegenderTUI(App):
             self.print("")
             self._show_setup_wizard()
         else:
-            self.print("[#aaaaaa]Enter 1 or 2[/]")
+            self._reject(2)
 
     def _show_friendly_setup(self) -> None:
         """Guided Anthropic setup for first-time non-technical users."""
@@ -1389,32 +1477,32 @@ class RegenderTUI(App):
     def _show_setup_wizard(self) -> None:
         """Interactive first-run setup wizard."""
         self._stage = "setup_provider"
-        self.print("[#aaaaaa]To transform books you'll need access to an AI model.[/]")
-        self.print("[#aaaaaa]Pick one below — or press Enter to skip for now.[/]")
-        self.print("")
-        self.print("[#ffffff]?[/] [bold #ffffff]Which provider would you like to use?[/]")
-        self.print("")
-        self.print("  [bold #ffffff]1[/]  Anthropic [bold #ffffff](Claude)[/]")
-        self.print("     [#aaaaaa]Nuanced, literary — excellent for complex prose[/]")
-        self.print("     [#aaaaaa]→ console.anthropic.com/settings/keys[/]")
-        self.print("")
-        self.print("  [bold #ffffff]2[/]  OpenAI [bold #ffffff](ChatGPT)[/]")
-        self.print("     [#aaaaaa]Fast and affordable — good for most books[/]")
-        self.print("     [#aaaaaa]→ platform.openai.com/api-keys[/]")
-        self.print("")
-        self.print("  [bold #ffffff]3[/]  Local model [bold #ffffff](Ollama)[/]")
-        self.print("     [#aaaaaa]Free, runs on your computer — no API key needed[/]")
-        self.print("     [#aaaaaa]→ ollama.com[/]")
-        self.print("")
-        self.print(
-            "  [bold #ffffff]↵[/]  Skip for now [#aaaaaa](parse_only still works without a key)[/]"
+        self._ask(
+            "Choose a provider",
+            context=("To transform books you'll need access to an AI model.",),
+            options=(
+                (
+                    "Anthropic [bold #ffffff](Claude)[/]",
+                    "nuanced, literary — excellent for complex prose",
+                    "console.anthropic.com/settings/keys",
+                ),
+                (
+                    "OpenAI [bold #ffffff](ChatGPT)[/]",
+                    "fast and affordable — good for most books",
+                    "platform.openai.com/api-keys",
+                ),
+                (
+                    "Local model [bold #ffffff](Ollama)[/]",
+                    "free, runs on your computer — no API key needed",
+                    "ollama.com",
+                ),
+                ("Skip for now", "parse_only still works without a key"),
+            ),
         )
-        self.print("")
-        self.set_prompt(">  ")
 
     def _handle_setup_provider_input(self, value: str) -> None:
         """Handle provider selection in setup wizard."""
-        if value == "1":
+        if value in ("1", ""):
             self._setup_provider = "anthropic"
             self.print("[#ffffff]✓[/] Anthropic selected")
             self.print("")
@@ -1429,12 +1517,12 @@ class RegenderTUI(App):
             self.print("[#ffffff]✓[/] Local model selected")
             self.print("")
             self._show_setup_ollama_prompt()
-        elif value.strip() == "":
+        elif value == "4":
             self.print("[#aaaaaa]Skipping setup — you can add keys to .env any time.[/]")
             self.print("")
             self._show_book_menu()
         else:
-            self.print("[#ffffff]Enter 1, 2, 3, or press Enter to skip[/]")
+            self._reject(4)
 
     def _show_setup_key_prompt(self) -> None:
         """Prompt user to paste their API key."""
@@ -1602,28 +1690,24 @@ class RegenderTUI(App):
     def _show_book_menu(self) -> None:
         """Show book selection with colorful styling."""
         self._stage = "book"
-        self.print("[#ffffff]?[/] [bold #ffffff]Select a book[/]")
-        self.print("")
-        self.print(
-            "  [#aaaaaa]Add plain-text (.txt) books to [bold]books/texts/[/] in this folder[/]"
+        self._ask(
+            "Select a book",
+            context=("Add plain-text (.txt) books to books/texts/ in this folder.",),
+            options=(
+                "Browse files in [bold]books/texts/[/]...",
+                "Type or drag a file path...",
+                ("Pride and Prejudice", "sample"),
+            ),
         )
-        self.print("  [#aaaaaa]then choose an option below.[/]")
-        self.print("")
-        self.print("  [bold #ffffff]1[/]  Browse files in [bold]books/texts/[/]...")
-        self.print("  [bold #ffffff]2[/]  Enter or drag file path...")
-        self.print("  [bold #ffffff]3[/]  Pride and Prejudice [#aaaaaa](sample)[/]")
-        self.print("")
-        self.set_prompt(">  ")
 
     def _show_transform_menu(self) -> None:
         """Show transform selection with colorful styling."""
         self._stage = "transform"
-        self.print("[#ffffff]?[/] [bold #ffffff]Select transformation[/]")
-        self.print("")
-        for i, (name, desc) in enumerate(self.TRANSFORM_TYPES, 1):
-            self.print(f"  [bold #ffffff]{i}[/]  {name:<18} [#aaaaaa]{desc}[/]")
-        self.print("")
-        self.set_prompt(">  ")
+        self._ask(
+            "Select a transformation",
+            options=tuple((f"{name:<18}", desc) for name, desc in self.TRANSFORM_TYPES),
+            verbs=("back",),
+        )
 
     def _show_options_menu(self) -> None:
         """Show options with colorful styling."""
@@ -1752,27 +1836,24 @@ class RegenderTUI(App):
         suggested = self._suggest_title(current, self._selected_transform or "")
         self._suggested_title = suggested if suggested != current else ""
 
-        self.print("[#ffffff]?[/] [bold #ffffff]Title for output book[/]")
-        self.print(f"  [#aaaaaa]Current: {current}[/]")
+        options = [(f"Keep [bold #ffffff]{current}[/]",)]
         if self._suggested_title:
-            self.print(f"  [bold #ffffff]Suggested:[/] {self._suggested_title}")
-            self.print("")
-            self.print("  [bold #ffffff]S[/]  Use suggested title")
-            self.print("  [bold #ffffff]↵[/]  Keep current")
-            self.print("  [#aaaaaa]or type a new title[/]")
-        else:
-            self.print("")
-            self.print("  Type a new title, or press [bold #ffffff]Enter[/] to keep it")
-        self.print("")
-        self.set_prompt(">  ")
+            options.append(
+                (f"Use [bold #ffffff]{self._suggested_title}[/]", "suggested for this transform")
+            )
+        self._ask(
+            "Title for the output book",
+            options=tuple(options),
+            free="or type a title of your own",
+        )
 
     def _handle_retitle_input(self, value: str) -> None:
         """Handle retitle prompt input."""
         suggested = getattr(self, "_suggested_title", "")
-        if value.strip().lower() == "s" and suggested:
+        if value.strip().lower() in ("2", "s") and suggested:
             self._custom_title = suggested
             self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
-        elif value.strip():
+        elif value.strip() and value.strip() != "1":
             self._custom_title = value.strip()
             self.print(f"[#ffffff]✓[/] Title set to: [bold #ffffff]{self._custom_title}[/]")
         else:
@@ -1862,7 +1943,7 @@ class RegenderTUI(App):
         """Handle book selection."""
         sample = Path("books/texts/pride-prejudice-sample.txt")
 
-        if value == "1":
+        if value in ("1", ""):
             start = Path("books/texts") if Path("books/texts").exists() else Path.home()
             self.push_screen(FileBrowserScreen(start), self._on_file_browser_result)
         elif value == "2":
@@ -1954,17 +2035,15 @@ class RegenderTUI(App):
         name review has nothing to offer without it -- so it says that instead.
         """
         self._stage = "analyze_prompt"
-        self.print("[#ffffff]?[/] [bold #ffffff]Analyze characters?[/]")
-        self.print("")
         cost = self._estimate_cost_str(0.2)
         cost_hint = f", costs {cost}" if cost else ""
-        self.print(
-            f"  [bold #ffffff]Y[/]  Yes [#aaaaaa](find the cast, so you can rename them"
-            f"{cost_hint})[/]"
+        self._ask(
+            "Analyze characters?",
+            options=(
+                ("Yes", f"find the cast, so you can rename them{cost_hint}"),
+                ("No", "transform without renaming anyone"),
+            ),
         )
-        self.print("  [bold #ffffff]n[/]  No  [#aaaaaa](transform without renaming anyone)[/]")
-        self.print("")
-        self.set_prompt(">  ")
 
     def _handle_analyze_prompt_input(self, value: str) -> None:
         """Handle character analysis prompt."""
@@ -1974,7 +2053,11 @@ class RegenderTUI(App):
         # and its loader is orphaned and keeps ticking.
         if self._analysis_running:
             return
-        if value.lower() in ("y", "yes", ""):
+        answer = value.strip().lower()
+        if answer not in ("", "1", "y", "yes", "2", "n", "no"):
+            self._reject(2)
+            return
+        if answer in ("", "1", "y", "yes"):
             self._analysis_running = True
             self._analysis_start_time = time.time()
             self.status_text = "Analyzing..."
@@ -2191,7 +2274,7 @@ class RegenderTUI(App):
             return
 
         try:
-            idx = int(value) - 1
+            idx = int(value or 1) - 1
             if 0 <= idx < len(self.TRANSFORM_TYPES):
                 self._selected_transform = self.TRANSFORM_TYPES[idx][0]
                 self.transform_type = self._selected_transform
@@ -2207,7 +2290,7 @@ class RegenderTUI(App):
                     self._after_transform_chosen()
                     return
 
-        self.print(f"[#ffffff]Enter 1-{len(self.TRANSFORM_TYPES)}[/]")
+        self._reject(len(self.TRANSFORM_TYPES), "back")
 
     def _after_transform_chosen(self) -> None:
         """Nonbinary asks the reader for rulings. Say so before they commit."""
@@ -2275,22 +2358,24 @@ class RegenderTUI(App):
         self.print("[#aaaaaa]whatever is genuinely left, each one with its options. Fill in[/]")
         self.print("[#aaaaaa]a ruling per line and re-run to apply them.[/]")
         self.print("")
-        self.print(
-            "[#ffffff]?[/] [bold #ffffff]Continue with nonbinary?[/] "
-            "[#aaaaaa](Y/n, or 'back' to pick another)[/]"
-        )
         self._stage = "editorial_notice"
-        self.set_prompt(">  ")
+        self._ask(
+            "Continue with nonbinary?",
+            options=(
+                "Yes, transform the book",
+                "No, pick another transform",
+            ),
+        )
 
     def _handle_editorial_notice_input(self, value: str) -> None:
         answer = value.strip().lower()
-        if answer in ("back", "b", "n", "no"):
+        if answer in ("2", "back", "b", "n", "no"):
             self._show_transform_menu()
             return
-        if answer in ("", "y", "yes"):
+        if answer in ("", "1", "y", "yes"):
             self._show_options_menu()
             return
-        self.print("[#ffffff]Y to continue, n to pick another transform[/]")
+        self._reject(2)
 
     def _show_model_menu(self) -> None:
         """Kick off async model detection then render the selection menu."""
@@ -2400,27 +2485,27 @@ class RegenderTUI(App):
         current = _get_resolved_model()
         visible = choices if show_all else choices[:5]
         tokens = self._book_stats.get("tokens", 0) if self._book_stats else 0
-        self.print("[#ffffff]?[/] [bold #ffffff]Select a model[/]")
-        self.print("")
+
+        # The return glyph sits on the model already configured, wherever it
+        # falls in the list -- it used to carry a "default" tag of its own
+        # while Enter, confusingly, did nothing at all.
+        options = []
+        self._model_default = 1
         for i, (model_id, display_name, pricing) in enumerate(visible, 1):
-            is_current = model_id == current or current.startswith(model_id)
-            marker = " [#aaaaaa]◄ default[/]" if is_current else ""
+            if model_id == current or current.startswith(model_id):
+                self._model_default = i
             rec = " [bold #ffffff]★ recommended[/]" if _is_recommended_model(model_id) else ""
             # What this book costs beats a rate card the reader has to do
             # arithmetic on. Falls back to the rate when no book is loaded yet.
             cost = _estimate_book_cost(model_id, tokens) or pricing
             time_est = _estimate_transform_time(model_id, tokens)
             time_tag = f"  [#666666]{time_est}[/]" if time_est else ""
-            self.print(
-                f"  [bold #ffffff]{i}[/]  {display_name:<26} [#aaaaaa]{cost:<10}[/]{time_tag}{rec}{marker}"
-            )
-        if not show_all and len(choices) > 5:
-            self.print(
-                f"  [bold #ffffff]M[/]  [#aaaaaa]More models ({len(choices) - 5} additional)...[/]"
-            )
+            options.append((f"{display_name:<26}", f"{cost:<10}{time_tag}{rec}"))
+        verbs = ("more",) if not show_all and len(choices) > 5 else ()
+        self._ask(
+            "Select a model", options=tuple(options), default=self._model_default, verbs=verbs
+        )
         self._warn_about_unpriced_models()
-        self.print("")
-        self.set_prompt(">  ")
 
     def _capture_usage(self, app) -> None:
         """Add one application's token usage to the session total.
@@ -2644,7 +2729,6 @@ class RegenderTUI(App):
         if not unpriced:
             return
         shown = ", ".join(unpriced[:3]) + ("…" if len(unpriced) > 3 else "")
-        self.print("")
         self.print(f"  [#666666]{len(unpriced)} model(s) have no price in the table ({shown}).[/]")
         self.print(
             "  [#666666]Costs shown elsewhere will be wrong for them — "
@@ -2665,7 +2749,7 @@ class RegenderTUI(App):
 
         visible = choices if self._model_showing_all else choices[:5]
         try:
-            idx = int(value) - 1
+            idx = int(value or getattr(self, "_model_default", 1)) - 1
             if 0 <= idx < len(visible):
                 model_id, display_name, _ = visible[idx]
                 os.environ["DEFAULT_MODEL"] = model_id
@@ -2687,7 +2771,7 @@ class RegenderTUI(App):
                 return
 
         limit = len(choices) if self._model_showing_all else min(5, len(choices))
-        self.print(f"[#ffffff]Enter 1-{limit}[/]")
+        self._reject(limit, *(() if self._model_showing_all else ("more",)))
 
     def _recalculate_cost(self, model: str) -> None:
         """Recalculate cost estimate for the selected model and update header."""
@@ -2820,6 +2904,76 @@ class RegenderTUI(App):
         line = " ".join(found.group(0).split())
         return f"...{line}..." if len(line) >= 70 else line
 
+    def _ask(
+        self,
+        question: str,
+        *,
+        where: str = "",
+        context: tuple = (),
+        options: tuple = (),
+        default: int = 1,
+        verbs: tuple = (),
+        free: str = "",
+        default_verb: str = "",
+        live: bool = False,
+    ) -> None:
+        """Ask one question, in the shape all of them share.
+
+        Heading, an optional dim line or two of context, the numbered answers
+        with the return glyph on the one Enter gives you, then the verbs that
+        are not answers. Every question on screen goes through here, which is
+        the only reason they stay alike.
+        """
+        self._ask_heading(question, where=where, context=context, live=live)
+        self._ask_answers(
+            options=options,
+            default=default,
+            verbs=verbs,
+            free=free,
+            default_verb=default_verb,
+        )
+
+    def _ask_heading(
+        self, question: str, *, where: str = "", context: tuple = (), live: bool = False
+    ) -> None:
+        """The heading half, so a review can put its evidence under it."""
+        text, location = question_line(question, where)
+        if live:
+            self._live_heading(f"? {text}", location)
+        else:
+            head = f"{_ASK} [bold #ffffff]{text}[/]"
+            self.print(f"{head}   [#666666]{location}[/]" if location else head)
+        for line in context:
+            self.print(f"  [#aaaaaa]{line}[/]")
+
+    def _ask_answers(
+        self,
+        *,
+        options: tuple = (),
+        default: int = 1,
+        verbs: tuple = (),
+        free: str = "",
+        default_verb: str = "",
+    ) -> None:
+        """The answers half: the numbered list and the verbs under it."""
+        if options:
+            self.print("")
+            for line in choice_lines(list(options), default):
+                self.print(line)
+        if verbs:
+            self.print("")
+            self.print(footer_line(*verbs, default=default_verb))
+        if free:
+            if not verbs:
+                self.print("")
+            self.print(f"  [#666666]{free}[/]")
+        self.print("")
+        self.set_prompt(">  ")
+
+    def _reject(self, count: int, *verbs: str) -> None:
+        """Say the answer was not one of the above. Said one way everywhere."""
+        self.print(reject_line(count, *verbs))
+
     def _live_heading(self, text: str, suffix: str = "") -> None:
         """A heading that sweeps while the question under it is unanswered.
 
@@ -2858,7 +3012,7 @@ class RegenderTUI(App):
         position = f"{self._cast_idx + 1} of {len(self._cast_candidates)}"
 
         self.print("")
-        self._live_heading(f"? Same person? {position}")
+        self._ask_heading("Same person?", where=position, live=True)
         self.print("")
         # Each name with what the analysis knows about them, and a line of the
         # book if it names them outright. Two names alone are unanswerable by
@@ -2874,18 +3028,20 @@ class RegenderTUI(App):
                 self.print(f'    [#666666]"{quotation}"[/]')
             self.print("")
         self.print(f"  [#aaaaaa]{item['reason']}[/]")
-        self.print("")
-        self.print(
-            "  [#aaaaaa]y[/] one person   [#aaaaaa]Enter[/] two people"
-            "   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest separate"
+        # Enter is the answer that changes nothing. A merge cannot be undone by
+        # a later pass, so it is never what a tired reader gets by default.
+        self._ask_answers(
+            options=(
+                ("Two different people", "leave them as they are"),
+                ("One person", "merge them into one"),
+            ),
+            verbs=("back", "rest"),
         )
-        self.print("")
         self.status_text = f"Cast {position}"
         self._accept_input()
-        self.set_prompt(">  ")
 
     def _handle_cast_review_input(self, value: str) -> None:
-        """y merges, Enter keeps them apart, b goes back, s ends the review."""
+        """2 merges, Enter keeps them apart, b goes back, s ends the review."""
         answer = value.strip().lower()
 
         if answer in ("b", "back"):
@@ -2902,8 +3058,12 @@ class RegenderTUI(App):
             self._show_cast_candidate()
             return
 
+        if answer not in ("", "1", "2", "y", "yes", "n", "no"):
+            self._reject(2, "back", "rest")
+            return
+
         item = self._cast_candidates[self._cast_idx]
-        if answer in ("y", "yes"):
+        if answer in ("2", "y", "yes"):
             self._cast_merges.append((item["a"], item["b"], self._cast_idx))
             # Say which name survives, which is not always the one listed first:
             # "Miss King" and "Mary King" are one woman and she is Mary King.
@@ -3014,7 +3174,7 @@ class RegenderTUI(App):
         where = f"ch{item.get('chapter')} p{item.get('paragraph')}"
 
         self.print("")
-        self._live_heading(f"? Editorial call {position}", where)
+        self._ask_heading("Editorial call", where=f"{position} \u00b7 {where}", live=True)
         self.print("")
         # Source first. The transformed line alone cannot be judged: "talked of
         # Mr. Darcy" is right where the source said "Mrs. Darcy" and wrong
@@ -3034,17 +3194,16 @@ class RegenderTUI(App):
         decision = item.get("decision")
         if decision:
             self.print(f"  [#98c379]already changed to {decision}[/]")
-        self.print("")
-        keys = "  [#aaaaaa]Enter[/] keep it"
+        options = [("Keep it", "as the transform left it")]
         if suggestion:
-            keys += f'   [#aaaaaa]a[/] accept "{suggestion}"'
-        keys += "   [#aaaaaa]b[/] back   [#aaaaaa]s[/] keep the rest"
-        self.print(keys)
-        self.print("  [#666666]or type what it should say[/]")
-        self.print("")
+            options.append((f'Use "{suggestion}"', "the suggestion above"))
+        self._ask_answers(
+            options=tuple(options),
+            verbs=("back", "rest"),
+            free="or type what it should say",
+        )
         self.status_text = f"Review {position}"
         self._accept_input()
-        self.set_prompt(">  ")
 
     def _finish_review(self) -> None:
         """Say what was decided, write it down, and move on."""
@@ -3068,9 +3227,11 @@ class RegenderTUI(App):
         # on a real book had one, and typing each out by hand is both slower
         # and a chance to mistype.
         item = items[self._review_idx]
-        if raw.lower() == "a":
-            # A bare "a" is always the accept key, never replacement text.
-            # Taking it as text turned "his uncle and uncle" into "a".
+        if raw == "1":
+            raw = ""  # keep it, which is what an empty answer means below
+        elif raw.lower() in ("2", "a"):
+            # A bare "2" or "a" is always the accept key, never replacement
+            # text. Taking it as text turned "his uncle and uncle" into "a".
             if not item.get("suggestion"):
                 self.print("[#555555]Nothing suggested here — Enter keeps it as it is[/]")
                 self.set_prompt(">  ")
@@ -3223,15 +3384,17 @@ class RegenderTUI(App):
         self._name_custom_mode = False
 
         if not self._name_suggestions:
-            self.print("[#555555]No name suggestions — you can add custom mappings or skip[/]")
-            self.print("")
-            self.print("  [#aaaaaa]M[/] add mapping  [#aaaaaa]K[/] skip")
-            self.print("")
-            self.set_prompt(">  ")
+            self._ask_heading(
+                "Rename anyone?",
+                context=("Nothing was suggested for this cast.",),
+            )
+            self._ask_answers(verbs=("mapping", "keep"), default_verb="k")
             return
 
         n = len(self._name_suggestions)
-        self.print("[#aaaaaa]Suggested name changes:[/]")
+        # The numbers here are the cast, not the answers -- so the answers are
+        # the verbs underneath, and the glyph sits on one of those instead.
+        self._ask_heading("Name changes", where=f"{n} suggested")
         self.print("")
         for i, suggestion in enumerate(self._name_suggestions, 1):
             orig = suggestion["original"]
@@ -3244,14 +3407,11 @@ class RegenderTUI(App):
             reason = suggestion.get("reason")
             if reason:
                 self.print(f"      [#e5c07b]{reason}[/]")
-        self.print("")
-        self.print(
-            f"  [#aaaaaa]A[/] accept all  [#aaaaaa]K[/] keep originals"
-            f"  [#aaaaaa]1-{n}[/] edit entry  [#aaaaaa]M[/] add custom"
-            f"  [#aaaaaa]R[/] ask again"
+        self._ask_answers(
+            verbs=("accept", "keep", "mapping", "again"),
+            default_verb="a",
+            free=f"or 1-{n} to change one",
         )
-        self.print("")
-        self.set_prompt(">  ")
 
     def _handle_name_review_input(self, value: str) -> None:
         """Handle A/K/M/R/number input on the name review menu."""
@@ -3339,13 +3499,9 @@ class RegenderTUI(App):
                     )
                     self.set_prompt(f"  {orig} → ")
                 else:
-                    self.print(
-                        f"[#ffffff]Enter A, K, M, or a number 1-{len(self._name_suggestions)}[/]"
-                    )
+                    self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
             except ValueError:
-                self.print(
-                    f"[#ffffff]Enter A, K, M, or a number 1-{len(self._name_suggestions)}[/]"
-                )
+                self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
 
     def _handle_options_input(self, value: str) -> None:
         """Handle options."""
@@ -3674,14 +3830,12 @@ class RegenderTUI(App):
         self._stage = "export"
         self._export_format_list = list(FORMATS.keys())
         self.print("")
-        self.print("[#ffffff]?[/] [bold #ffffff]Export format[/]")
-        self.print("")
-        for i, key in enumerate(self._export_format_list, 1):
-            info = FORMATS[key]
-            self.print(f"  [bold #ffffff]{i}[/]  {key:<15} [#aaaaaa]{info['description']}[/]")
+        options = [(f"{key:<15}", FORMATS[key]["description"]) for key in self._export_format_list]
         skip_num = len(self._export_format_list) + 1
-        self.print(f"  [bold #ffffff]{skip_num}[/]  skip [#aaaaaa](JSON only)[/]")
-        self.print("")
+        options.append(("Skip", "keep the JSON only"))
+        # The glyph sits on Skip, which is what Enter has always done here --
+        # an export writes a file, and Enter should not write one by surprise.
+        self._ask("Export format", options=tuple(options), default=skip_num)
 
         self.status_text = "Export?"
         self._accept_input()
@@ -3716,7 +3870,7 @@ class RegenderTUI(App):
         format_map["text"] = "txt"
         format_key = format_map.get(value.lower() if value else "")
         if not format_key:
-            self.print(f"[#ffffff]Enter 1-{skip_num} or format key[/]")
+            self._reject(skip_num)
             return
 
         if not self._json_output_path:
@@ -3742,18 +3896,16 @@ class RegenderTUI(App):
         """Offer to transform another book or quit."""
         self._stage = "done"
         self.print("")
-        self.print("[#ffffff]?[/] [bold #ffffff]What next?[/]")
-        self.print("")
         if self._selected_book:
-            book_name = self._selected_book.stem
-            self.print(
-                f"  [bold #ffffff]1[/]  Transform [#aaaaaa]{book_name}[/] again [#aaaaaa](different type)[/]"
-            )
+            again = (f"Transform {self._selected_book.stem} again", "a different type")
         else:
-            self.print("  [bold #ffffff]1[/]  Transform same book again")
-        self.print("  [bold #ffffff]2[/]  Transform a different book")
-        self.print("  [bold #ffffff]3[/]  Quit")
-        self.print("")
+            again = ("Transform the same book again", "a different type")
+        # Enter used to quit, while Enter everywhere else in the run means
+        # "keep what you have". Quitting now takes saying so.
+        self._ask(
+            "What next?",
+            options=(again, "Transform a different book", "Quit"),
+        )
         self.status_text = "Complete ✓"
 
         try:
@@ -3765,14 +3917,14 @@ class RegenderTUI(App):
 
     def _handle_done_input(self, value: str) -> None:
         """Handle post-completion menu: restart or quit."""
-        if value in ("1", "again", "a", "y", "yes"):
+        if value in ("", "1", "again", "a", "y", "yes"):
             self._restart_same_book()
         elif value in ("2", "b", "book"):
             self._restart_flow()
-        elif value in ("3", "q", "quit", "exit", ""):
+        elif value in ("3", "q", "quit", "exit"):
             self.exit()
         else:
-            self.print("[#ffffff]Enter 1, 2, or 3[/]")
+            self._reject(3)
 
     def _restart_same_book(self) -> None:
         """Reset transform state only, keeping the selected book, and jump to transform menu."""
@@ -3821,11 +3973,14 @@ class RegenderTUI(App):
         self.status_text = "Error"
 
         self._stage = "done"
-        self.print("[#ffffff]?[/] [bold #ffffff]What next?[/]")
-        self.print("")
-        self.print("  [bold #ffffff]1[/]  Try another book")
-        self.print("  [bold #ffffff]2[/]  Quit")
-        self.print("")
+        # The same three answers the finished run offers, because they are
+        # routed to the same handler -- these used to be two of their own, so
+        # "2 Quit" started another book and nothing on screen quit.
+        if self._selected_book:
+            again = (f"Try {self._selected_book.stem} again", "same book, same settings")
+        else:
+            again = ("Try the same book again", "same settings")
+        self._ask("What next?", options=(again, "Try a different book", "Quit"))
         try:
             input_bar = self.query_one(InputBar)
             input_bar.stop_loading_animation(restore="[#ffffff]✗[/]  ")
