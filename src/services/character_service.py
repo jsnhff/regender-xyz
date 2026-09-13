@@ -1379,7 +1379,30 @@ class CharacterService(BaseService):
             ]
             if others:
                 collisions[form] = {"candidate": candidate, "clashes_with": others[0]}
+
+        # Two forms that land on each other need one forename between them, not
+        # two, and it belongs to whichever character already has one. Using a
+        # name the book gave them beats coining one for somebody the author
+        # never named -- and the author's own register is the thing being kept.
+        for form, clash in list(collisions.items()):
+            other = clash["clashes_with"]
+            if other not in collisions or collisions[other]["clashes_with"] != form:
+                continue  # not a mutual pair; somebody else is involved
+            mine = taken.get(form.lower(), form)
+            theirs = taken.get(other.lower(), other)
+            if cls._has_given_name(theirs) and not cls._has_given_name(mine):
+                del collisions[form]
         return collisions
+
+    @classmethod
+    def _has_given_name(cls, canonical: str) -> bool:
+        """True when the book gives this character a forename of their own.
+
+        "Jane Bennet Bingley" has one; "Mrs. Bennet" has only a title and a
+        family name, so any forename for her would be invented.
+        """
+        tokens = [t for t in canonical.split() if t.rstrip(".").lower() not in _GROUPING_TITLES]
+        return len(tokens) > 1
 
     @staticmethod
     def possible_duplicates(characters: list) -> list:
