@@ -496,15 +496,21 @@ def analyze_book_file(path: Path) -> dict:
     except Exception:
         return {}
 
-    # Count chapters (look for common patterns)
+    # Count chapters (look for common patterns).
+    #
+    # Case-insensitively, and allowing an indent, because the first matching
+    # pattern used to win outright: Pride and Prejudice spells two of its
+    # sixty-one headings "Chapter" and the rest "CHAPTER", so the strict pattern
+    # matched fifty-nine, stopped, and the header said 59 for a book with 61.
+    # The number is shown before a run and feeds the cost estimate, so being
+    # quietly two short is worse than being obviously unknown.
     chapter_patterns = [
-        r"^CHAPTER\s+[IVXLCDM\d]+",  # CHAPTER I, CHAPTER 1
-        r"^Chapter\s+[IVXLCDM\d]+",
-        r"^\d+\.\s+[A-Z]",  # 1. Title
+        r"(?im)^[ \t]*chapter\s+[IVXLCDM\d]+",  # CHAPTER I, Chapter 1
+        r"(?m)^\d+\.\s+[A-Z]",  # 1. Title
     ]
     chapters = 0
     for pattern in chapter_patterns:
-        matches = re.findall(pattern, text, re.MULTILINE)
+        matches = re.findall(pattern, text)
         if matches:
             chapters = len(matches)
             break
