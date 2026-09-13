@@ -459,6 +459,45 @@ def check_title(original: str, suggested: str, transform: str) -> Optional[str]:
     )
 
 
+def _person_for(form: str, characters: Any, owner: dict):
+    """The cast member a map key is about, as an object rather than a name."""
+    canonical = owner.get(form.lower())
+    if not canonical:
+        return None
+    for char in getattr(characters, "characters", characters) or []:
+        if getattr(char, "name", "") == canonical:
+            return char
+    return None
+
+
+def check_given_gender(suggested: str, wants: Any) -> Optional[str]:
+    """Why this new given name does not suit the gender being produced, or None.
+
+    Refuses only a name positively known to read as the wrong gender; a name in
+    neither list passes, because the lists cannot be complete and the engine
+    draws on a far larger pool. A neutral name suits every transform and is the
+    only kind a nonbinary edition should take.
+    """
+    from src.services.given_names import reads_as
+
+    tokens = _strip_titles(suggested)
+    if not tokens or wants is None:
+        return None
+
+    reads = reads_as(tokens[0])
+    if reads in ("unknown", "neutral"):
+        return None
+
+    target = getattr(wants, "value", str(wants))
+    if target == "nonbinary":
+        return (
+            f"{tokens[0]!r} reads as {reads}; a nonbinary edition wants a name used across genders"
+        )
+    if reads != target:
+        return f"{tokens[0]!r} is a {reads} name, and this character must become {target}"
+    return None
+
+
 def screen_renames(
     proposals: list,
     characters: Any,
@@ -484,6 +523,9 @@ def screen_renames(
     accepted: list = []
     reasons: list[str] = []
     claims: dict[str, str] = {}
+    by_name = {
+        getattr(c, "name", ""): c for c in (getattr(characters, "characters", characters) or [])
+    }
 
     for original, suggested in proposals:
         problem = check_rename(
@@ -502,6 +544,16 @@ def screen_renames(
         # either -- including about the title, which is the whole rename.
         if problem is None and transform:
             problem = check_title(original, suggested, transform)
+        # A granted forename has to suit the gender being produced. Saying so in
+        # the prompt got it from three wrong in five to two, and no further:
+        # "Mrs. Edward Gardiner" came back every run, because Edward Gardiner is
+        # his name in Austen's own text and the model is recalling the book.
+        if problem is None and transform:
+            person = _person_for(original, characters, owner)
+            if person is not None:
+                problem = check_given_gender(
+                    suggested, target_gender(person.gender, TransformType(transform))
+                )
         if problem:
             reasons.append(f"{original!r} -> {suggested!r}: {problem}")
             continue
