@@ -1180,6 +1180,8 @@ class RegenderTUI(App):
         self._cast_candidates: list = []
         self._cast_idx: int = 0
         self._cast_merges: list = []
+        # The book's own text, read once when a question needs a line from it.
+        self._source_text: str | None = None
 
         # Titles are per book, by definition.
         self._custom_title: str = ""
@@ -2693,6 +2695,34 @@ class RegenderTUI(App):
         )
         self._show_cast_candidate()
 
+    def _book_line_for(self, name: str) -> str:
+        """A line of the book that names this character, if one does.
+
+        Many cast entries are reconstructions the book never spells out --
+        "Mary Bennet" appears nowhere in Pride and Prejudice, though Mary and
+        the Bennets both do -- so this is evidence when it exists and silence
+        when it does not, never a guess.
+        """
+        source = getattr(self, "_source_text", None)
+        if source is None:
+            source = ""
+            try:
+                if self._selected_book:
+                    source = re.sub(r"\s+", " ", Path(self._selected_book).read_text())
+            except Exception:
+                source = ""
+            self._source_text = source
+        if not source:
+            return ""
+
+        found = re.search(
+            r".{0,40}(?<![A-Za-z])" + re.escape(name) + r"(?![A-Za-z]).{0,40}", source
+        )
+        if not found:
+            return ""
+        line = " ".join(found.group(0).split())
+        return f"...{line}..." if len(line) >= 70 else line
+
     def _show_cast_candidate(self) -> None:
         """Ask about one pair."""
         self._stage = "cast_review"
@@ -2706,9 +2736,19 @@ class RegenderTUI(App):
         self.print("")
         self.print(f"[#ffffff]?[/] [bold #ffffff]Same person? {position}[/]")
         self.print("")
-        self.print(f"  [#e5c07b]{item['a']}[/]")
-        self.print(f"  [#e5c07b]{item['b']}[/]")
-        self.print("")
+        # Each name with what the analysis knows about them, and a line of the
+        # book if it names them outright. Two names alone are unanswerable by
+        # anyone who has not read it -- "Mary Bennet" beside "Mary King" gives
+        # nothing to decide on, and a guess here merges two people permanently.
+        for side in ("a", "b"):
+            self.print(f"  [#e5c07b]{item[side]}[/]")
+            description = item.get(f"{side}_description")
+            if description:
+                self.print(f"    [#aaaaaa]{description[:70]}[/]")
+            quotation = self._book_line_for(item[side])
+            if quotation:
+                self.print(f'    [#666666]"{quotation}"[/]')
+            self.print("")
         self.print(f"  [#aaaaaa]{item['reason']}[/]")
         self.print("")
         self.print(
