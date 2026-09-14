@@ -143,4 +143,10 @@ python -m pytest tests/test_qc_service.py      # chapter-by-chapter QC
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). Free to use, modify and redistribute,
+commercially or otherwise, with no fee. The one condition is that the
+copyright notice and licence text travel with the code.
+
+This covers the software only. The four *Pride & Prejudice* editions it
+produced are separate: Austen's text is public domain, the cover artwork is
+Raman Djafari's, and the typefaces carry their own licences.
