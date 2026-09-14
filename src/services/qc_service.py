@@ -32,6 +32,7 @@ from typing import Any, Optional
 from rapidfuzz import fuzz
 
 from src.models.transformation import TransformType
+from src.services.name_engine import _is_descriptive_name
 from src.services.transform_service import TransformService
 
 # Severity buckets, ordered worst first for reporting.
@@ -268,6 +269,12 @@ class QCService:
         for original in list(cast or []) + list(self.name_map):
             if "'" in original or "\u2019" in original:
                 continue  # "Elizabeth's Uncle" describes a person, not names one
+            # Nor does an endearment. "Dearest Jane" reads as Given + Surname
+            # and filed Jane -- a given name, renamed on every run -- as the
+            # Bennet family name, so every edition reported 292 lost mentions
+            # of a surname nobody has.
+            if _is_descriptive_name(original):
+                continue
             words = TransformService._WORD_RE.findall(original)
             kept = [
                 w
@@ -888,6 +895,12 @@ class QCService:
         if repaired == output:
             return
         for before, after in _word_diffs(output, repaired):
+            # A capitalised cast surname is a person. The net would turn Mary
+            # King into Mary Queen and the transform rightly declines; saying
+            # so here asked the reader to rule on a monarch seven times.
+            leading = re.match(r"[A-Za-z]+", before)
+            if leading and leading.group(0).capitalize() in self._surnames:
+                continue
             chapter.findings.append(
                 Finding(
                     AUTO_FIXABLE,
