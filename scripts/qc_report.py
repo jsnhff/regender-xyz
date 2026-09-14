@@ -55,6 +55,25 @@ def find_name_map(transformed: Path) -> tuple:
     return None, None
 
 
+def find_cast(transformed: Path) -> tuple:
+    """The run's own characters.json, looked for where the run leaves it.
+
+    QC uses it to know which capitalised words are family names. Without it
+    "King" is a monarch rather than Mary King, and the report says so on every
+    one of her mentions.
+    """
+    candidate = transformed.parent / "characters.json"
+    if candidate.exists():
+        try:
+            data = json.loads(candidate.read_text())
+        except ValueError:
+            return None, None
+        names = [c.get("name", "") for c in data.get("characters", []) if c.get("name")]
+        if names:
+            return names, candidate
+    return None, None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", help="Parsed source book JSON")
@@ -94,8 +113,16 @@ def main() -> int:
     else:
         name_map, found_at = find_name_map(Path(args.transformed))
         if name_map:
-            print(f"Using the name map beside the edition: {found_at}\n")
-    service = QCService(transform_type, name_map=name_map)
+            print(f"Using the name map beside the edition: {found_at}")
+
+    # The cast too. Without it QC cannot tell a family name from an ordinary
+    # word, and asks the reader to rule on "Miss King" becoming "Miss Queen".
+    cast, cast_at = find_cast(Path(args.transformed))
+    if cast:
+        print(f"Using the cast beside the edition:     {cast_at}")
+    print()
+
+    service = QCService(transform_type, name_map=name_map, cast=cast)
 
     report = service.check_book(source, transformed)
     print(format_report(report, limit=args.limit))
