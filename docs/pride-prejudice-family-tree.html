@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bennet Connections</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f4f3ee; --ink:#22241f; --muted:#6b6e64; --rule:#c9cbc2; --panel:#ffffff;
+  --m:#d6e0ea; --m-line:#5b7893; --f:#ecdcc8; --f-line:#a3743c; --n:#e6e6e0;
+  --accent:#8a2e5a; --dead:#8e9088;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1b1c19; --ink:#e8e6df; --muted:#9a9c92; --rule:#3c3e38; --panel:#242621;
+  --m:#2c3d4d; --m-line:#8fb0cc; --f:#4a3921; --f-line:#d7a86a; --n:#33352f;
+  --accent:#e08ab5; --dead:#7a7c74;
+}}
+:root[data-theme="dark"]{
+  --bg:#1b1c19; --ink:#e8e6df; --muted:#9a9c92; --rule:#3c3e38; --panel:#242621;
+  --m:#2c3d4d; --m-line:#8fb0cc; --f:#4a3921; --f-line:#d7a86a; --n:#33352f;
+  --accent:#e08ab5; --dead:#7a7c74;
+}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1720px;margin:0 auto;padding-block:32px 48px;padding-inline:16px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0 0 6px;text-wrap:balance}
+h2{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:22px;margin:36px 0 10px}
+.lede{max-width:70ch;color:var(--muted);margin:0 0 20px}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.toolbar .eyebrow{margin-right:6px}
+.toolbar button{font:inherit;font-size:13px;font-weight:500;padding:5px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--panel);color:var(--ink);cursor:pointer}
+.toolbar button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.toolbar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+figure{margin:0;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+.scroll{overflow-x:auto;overscroll-behavior-x:contain}
+svg.tree{display:block;width:100%;min-width:1500px;height:auto;color:var(--ink)}
+figcaption{padding:10px 14px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}
+.ground{fill:var(--panel)}
+.band{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;fill:var(--muted);font-weight:600}
+.boundary{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 6}
+.desc{stroke:var(--muted);stroke-width:1.2;fill:none}
+.marr{stroke:var(--ink);stroke-width:1.3}
+.marr.cross{stroke:var(--accent);stroke-width:1.6}
+.tie{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 4}
+.tielabel{font-size:10.5px;fill:var(--muted);font-style:italic}
+.node rect{stroke:var(--ink);stroke-width:1}
+.node.dead rect{stroke:var(--dead);stroke-dasharray:4 3}
+.node .name{font-size:12px;font-weight:600;fill:var(--ink)}
+.node .sub{font-size:10px;fill:var(--muted)}
+.node.dead .name{fill:var(--muted)}
+.g-m rect{fill:var(--m)} .g-f rect{fill:var(--f)} .g-n rect{fill:var(--n)}
+/* transformation modes recolour the boxes the way the pipeline recasts the cast */
+[data-mode="swap"] .g-m rect{fill:var(--f)} [data-mode="swap"] .g-f rect{fill:var(--m)}
+[data-mode="female"] .g-m rect{fill:var(--f)}
+[data-mode="male"] .g-f rect{fill:var(--m)}
+.legend{display:flex;flex-wrap:wrap;gap:14px 22px;margin:14px 0 0;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:8px}
+.sw{width:22px;height:14px;border:1px solid var(--ink);border-radius:2px;flex:none}
+.sw.m{background:var(--m)} .sw.f{background:var(--f)} .sw.n{background:var(--n)}
+.sw.dead{border:1px dashed var(--dead);background:transparent}
+.ln{width:26px;flex:none;border-top:1.3px solid var(--ink);position:relative}
+.ln::after{content:"";position:absolute;left:0;right:0;top:3px;border-top:1.3px solid var(--ink)}
+.ln.cross,.ln.cross::after{border-color:var(--accent)}
+.ln.desc{border-top:1.2px solid var(--muted)} .ln.desc::after{display:none}
+.ln.tie{border-top:1.2px dashed var(--muted)} .ln.tie::after{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px 28px}
+.house h3{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:17px;margin:0 0 6px}
+.house p{margin:0 0 6px;color:var(--muted);font-size:13px}
+.house ul{margin:0;padding-left:18px;font-size:14px}
+.house li{margin:2px 0}
+.note{font-size:13px;color:var(--muted);max-width:70ch;margin-top:28px}
+@media (prefers-reduced-motion:no-preference){.node rect{transition:fill .25s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Pride and Prejudice · the cast by blood and marriage</div>
+  <h1>Bennet Connections</h1>
+  <p class="lede">Every family tie in the novel on one grid. Two worlds stacked: the Meryton gentry on top, reading down the generations, and the Netherfield, Pemberley and Rosings set below, reading up. Three marriages cross the line between them.</p>
+
+  <div class="toolbar" role="group" aria-label="Colour the cast by transformation">
+    <span class="eyebrow">Colour as</span>
+    <button type="button" id="mode-source" data-mode="source" aria-pressed="true">Source text</button>
+    <button type="button" id="mode-swap" data-mode="swap" aria-pressed="false">gender_swap</button>
+    <button type="button" id="mode-female" data-mode="female" aria-pressed="false">all_female</button>
+    <button type="button" id="mode-male" data-mode="male" aria-pressed="false">all_male</button>
+  </div>
+
+  <figure id="tree" data-mode="source">
+    <div class="scroll">
+      <svg class="tree" viewBox="0 0 1890 730" role="img" aria-label="Family tree of Pride and Prejudice: the Bennet, Gardiner, Philips, Lucas and Collins families above, the Bingley, Darcy, Fitzwilliam, de Bourgh and Wickham families below, joined by the marriages of Jane to Bingley, Elizabeth to Darcy and Lydia to Wickham.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0.5 L8,4 L0,7.5 Z" fill="currentColor" opacity=".7"/>
+          </marker>
+        </defs>
+<rect x="0" y="0" width="1890" height="730" class="ground"/>
+<text x="32" y="24" class="band">Longbourn, Meryton and Lucas Lodge · generations read downward</text>
+<text x="32" y="716" class="band">Netherfield, Pemberley and Rosings · generations read upward</text>
+<line x1="0" y1="359" x2="1890" y2="359" class="boundary"/>
+<text x="1858" y="352" text-anchor="end" class="band">the three Bennet marriages cross this line</text>
+<line x1="488.0" y1="94" x2="488.0" y2="116" class="desc"/>
+<line x1="260.0" y1="116" x2="716.0" y2="116" class="desc"/>
+<line x1="260.0" y1="116" x2="260.0" y2="150" class="desc" marker-end="url(#arrow)"/>
+<line x1="412.0" y1="116" x2="412.0" y2="150" class="desc" marker-end="url(#arrow)"/>
+<line x1="716.0" y1="116" x2="716.0" y2="150" class="desc" marker-end="url(#arrow)"/>
+<line x1="488.0" y1="177.0" x2="488.0" y2="199.0" class="desc"/>
+<line x1="412.0" y1="199.0" x2="488.0" y2="199.0" class="desc"/>
+<line x1="412.0" y1="199.0" x2="412.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="792.0" y1="177.0" x2="792.0" y2="199.0" class="desc"/>
+<line x1="564.0" y1="199.0" x2="1172.0" y2="199.0" class="desc"/>
+<line x1="564.0" y1="199.0" x2="564.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="716.0" y1="199.0" x2="716.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="868.0" y1="199.0" x2="868.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1020.0" y1="199.0" x2="1020.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1172.0" y1="199.0" x2="1172.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1324.0" y1="204" x2="1324.0" y2="226" class="desc"/>
+<line x1="1324.0" y1="226" x2="1324.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1552.0" y1="177.0" x2="1552.0" y2="199.0" class="desc"/>
+<line x1="1476.0" y1="199.0" x2="1780.0" y2="199.0" class="desc"/>
+<line x1="1476.0" y1="199.0" x2="1476.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1628.0" y1="199.0" x2="1628.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="1780.0" y1="199.0" x2="1780.0" y2="270" class="desc" marker-end="url(#arrow)"/>
+<line x1="412.0" y1="510" x2="412.0" y2="488" class="desc"/>
+<line x1="260.0" y1="488" x2="564.0" y2="488" class="desc"/>
+<line x1="260.0" y1="488" x2="260.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="412.0" y1="488" x2="412.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="564.0" y1="488" x2="564.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="792.0" y1="537.0" x2="792.0" y2="515.0" class="desc"/>
+<line x1="716.0" y1="515.0" x2="868.0" y2="515.0" class="desc"/>
+<line x1="716.0" y1="515.0" x2="716.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="868.0" y1="515.0" x2="868.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="1172.0" y1="510" x2="1172.0" y2="488" class="desc"/>
+<line x1="1172.0" y1="488" x2="1172.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="1400.0" y1="537.0" x2="1400.0" y2="515.0" class="desc"/>
+<line x1="1324.0" y1="515.0" x2="1400.0" y2="515.0" class="desc"/>
+<line x1="1324.0" y1="515.0" x2="1324.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="1628.0" y1="510" x2="1628.0" y2="488" class="desc"/>
+<line x1="1628.0" y1="488" x2="1628.0" y2="454" class="desc" marker-end="url(#arrow)"/>
+<line x1="1248.0" y1="620" x2="1248.0" y2="598" class="desc"/>
+<line x1="868.0" y1="598" x2="1628.0" y2="598" class="desc"/>
+<line x1="868.0" y1="598" x2="868.0" y2="564" class="desc" marker-end="url(#arrow)"/>
+<line x1="1476.0" y1="598" x2="1476.0" y2="564" class="desc" marker-end="url(#arrow)"/>
+<line x1="1628.0" y1="598" x2="1628.0" y2="564" class="desc" marker-end="url(#arrow)"/>
+<line x1="178.0" y1="174.5" x2="190.0" y2="174.5" class="marr"/>
+<line x1="178.0" y1="179.5" x2="190.0" y2="179.5" class="marr"/>
+<line x1="482.0" y1="174.5" x2="494.0" y2="174.5" class="marr"/>
+<line x1="482.0" y1="179.5" x2="494.0" y2="179.5" class="marr"/>
+<line x1="786.0" y1="174.5" x2="798.0" y2="174.5" class="marr"/>
+<line x1="786.0" y1="179.5" x2="798.0" y2="179.5" class="marr"/>
+<line x1="1546.0" y1="174.5" x2="1558.0" y2="174.5" class="marr"/>
+<line x1="1546.0" y1="179.5" x2="1558.0" y2="179.5" class="marr"/>
+<line x1="1394.0" y1="294.5" x2="1406.0" y2="294.5" class="marr"/>
+<line x1="1394.0" y1="299.5" x2="1406.0" y2="299.5" class="marr"/>
+<line x1="178.0" y1="424.5" x2="190.0" y2="424.5" class="marr"/>
+<line x1="178.0" y1="429.5" x2="190.0" y2="429.5" class="marr"/>
+<line x1="786.0" y1="534.5" x2="798.0" y2="534.5" class="marr"/>
+<line x1="786.0" y1="539.5" x2="798.0" y2="539.5" class="marr"/>
+<line x1="1394.0" y1="534.5" x2="1406.0" y2="534.5" class="marr"/>
+<line x1="1394.0" y1="539.5" x2="1406.0" y2="539.5" class="marr"/>
+<line x1="561.5" y1="324" x2="561.5" y2="400" class="marr cross"/>
+<line x1="566.5" y1="324" x2="566.5" y2="400" class="marr cross"/>
+<line x1="713.5" y1="324" x2="713.5" y2="400" class="marr cross"/>
+<line x1="718.5" y1="324" x2="718.5" y2="400" class="marr cross"/>
+<line x1="1169.5" y1="324" x2="1169.5" y2="400" class="marr cross"/>
+<line x1="1174.5" y1="324" x2="1174.5" y2="400" class="marr cross"/>
+<line x1="938.0" y1="177.0" x2="1254.0" y2="177.0" class="tie"/>
+<text x="1096.0" y="169.0" text-anchor="middle" class="tielabel">cousins · Longbourn entailed to Collins</text>
+<g class="node g-m dead"><rect x="418.0" y="40" width="140" height="54" rx="3"/>
+<text x="488.0" y="58" text-anchor="middle" class="name">old Mr. Gardiner</text>
+<text x="488.0" y="72" text-anchor="middle" class="sub">Mrs. Bennet&#x27;s father</text>
+<text x="488.0" y="85" text-anchor="middle" class="sub">Meryton attorney; deceased</text>
+</g>
+<g class="node g-m"><rect x="38.0" y="150" width="140" height="54" rx="3"/>
+<text x="108.0" y="168" text-anchor="middle" class="name">Mr. Philips</text>
+<text x="108.0" y="182" text-anchor="middle" class="sub">attorney at Meryton</text>
+<text x="108.0" y="195" text-anchor="middle" class="sub">succeeded old Gardiner</text>
+</g>
+<g class="node g-f"><rect x="190.0" y="150" width="140" height="54" rx="3"/>
+<text x="260.0" y="168" text-anchor="middle" class="name">Mrs. Philips</text>
+<text x="260.0" y="182" text-anchor="middle" class="sub">née Gardiner</text>
+<text x="260.0" y="195" text-anchor="middle" class="sub">aunt to the Bennets</text>
+</g>
+<g class="node g-m"><rect x="342.0" y="150" width="140" height="54" rx="3"/>
+<text x="412.0" y="168" text-anchor="middle" class="name">Mr. Gardiner</text>
+<text x="412.0" y="182" text-anchor="middle" class="sub">in trade, London</text>
+<text x="412.0" y="195" text-anchor="middle" class="sub">Mrs. Bennet&#x27;s brother</text>
+</g>
+<g class="node g-f"><rect x="494.0" y="150" width="140" height="54" rx="3"/>
+<text x="564.0" y="168" text-anchor="middle" class="name">Mrs. Gardiner</text>
+<text x="564.0" y="195" text-anchor="middle" class="sub">Elizabeth&#x27;s confidante</text>
+</g>
+<g class="node g-f"><rect x="646.0" y="150" width="140" height="54" rx="3"/>
+<text x="716.0" y="168" text-anchor="middle" class="name">Mrs. Bennet</text>
+<text x="716.0" y="182" text-anchor="middle" class="sub">née Gardiner</text>
+<text x="716.0" y="195" text-anchor="middle" class="sub">of Longbourn</text>
+</g>
+<g class="node g-m"><rect x="798.0" y="150" width="140" height="54" rx="3"/>
+<text x="868.0" y="168" text-anchor="middle" class="name">Mr. Bennet</text>
+<text x="868.0" y="182" text-anchor="middle" class="sub">of Longbourn</text>
+<text x="868.0" y="195" text-anchor="middle" class="sub">estate entailed</text>
+</g>
+<g class="node g-m dead"><rect x="1254.0" y="150" width="140" height="54" rx="3"/>
+<text x="1324.0" y="168" text-anchor="middle" class="name">old Mr. Collins</text>
+<text x="1324.0" y="182" text-anchor="middle" class="sub">Mr. Bennet&#x27;s cousin</text>
+<text x="1324.0" y="195" text-anchor="middle" class="sub">quarrelled; deceased</text>
+</g>
+<g class="node g-m"><rect x="1406.0" y="150" width="140" height="54" rx="3"/>
+<text x="1476.0" y="168" text-anchor="middle" class="name">Sir William Lucas</text>
+<text x="1476.0" y="182" text-anchor="middle" class="sub">of Lucas Lodge</text>
+<text x="1476.0" y="195" text-anchor="middle" class="sub">knighted; ex-trade</text>
+</g>
+<g class="node g-f"><rect x="1558.0" y="150" width="140" height="54" rx="3"/>
+<text x="1628.0" y="168" text-anchor="middle" class="name">Lady Lucas</text>
+</g>
+<g class="node g-n"><rect x="342.0" y="270" width="140" height="54" rx="3"/>
+<text x="412.0" y="288" text-anchor="middle" class="name">Gardiner children</text>
+<text x="412.0" y="302" text-anchor="middle" class="sub">two girls, two boys</text>
+<text x="412.0" y="315" text-anchor="middle" class="sub">the Bennets&#x27; cousins</text>
+</g>
+<g class="node g-f"><rect x="494.0" y="270" width="140" height="54" rx="3"/>
+<text x="564.0" y="288" text-anchor="middle" class="name">Jane Bennet</text>
+<text x="564.0" y="302" text-anchor="middle" class="sub">eldest, 22</text>
+<text x="564.0" y="315" text-anchor="middle" class="sub">becomes Mrs. Bingley</text>
+</g>
+<g class="node g-f"><rect x="646.0" y="270" width="140" height="54" rx="3"/>
+<text x="716.0" y="288" text-anchor="middle" class="name">Elizabeth Bennet</text>
+<text x="716.0" y="302" text-anchor="middle" class="sub">second, 20</text>
+<text x="716.0" y="315" text-anchor="middle" class="sub">becomes Mrs. Darcy</text>
+</g>
+<g class="node g-f"><rect x="798.0" y="270" width="140" height="54" rx="3"/>
+<text x="868.0" y="288" text-anchor="middle" class="name">Mary Bennet</text>
+<text x="868.0" y="302" text-anchor="middle" class="sub">third</text>
+</g>
+<g class="node g-f"><rect x="950.0" y="270" width="140" height="54" rx="3"/>
+<text x="1020.0" y="288" text-anchor="middle" class="name">Catherine (Kitty)</text>
+<text x="1020.0" y="302" text-anchor="middle" class="sub">fourth, 17</text>
+</g>
+<g class="node g-f"><rect x="1102.0" y="270" width="140" height="54" rx="3"/>
+<text x="1172.0" y="288" text-anchor="middle" class="name">Lydia Bennet</text>
+<text x="1172.0" y="302" text-anchor="middle" class="sub">youngest, 15</text>
+<text x="1172.0" y="315" text-anchor="middle" class="sub">becomes Mrs. Wickham</text>
+</g>
+<g class="node g-m"><rect x="1254.0" y="270" width="140" height="54" rx="3"/>
+<text x="1324.0" y="288" text-anchor="middle" class="name">Mr. Collins</text>
+<text x="1324.0" y="302" text-anchor="middle" class="sub">rector of Hunsford</text>
+<text x="1324.0" y="315" text-anchor="middle" class="sub">heir to Longbourn</text>
+</g>
+<g class="node g-f"><rect x="1406.0" y="270" width="140" height="54" rx="3"/>
+<text x="1476.0" y="288" text-anchor="middle" class="name">Charlotte Lucas</text>
+<text x="1476.0" y="302" text-anchor="middle" class="sub">27</text>
+<text x="1476.0" y="315" text-anchor="middle" class="sub">becomes Mrs. Collins</text>
+</g>
+<g class="node g-f"><rect x="1558.0" y="270" width="140" height="54" rx="3"/>
+<text x="1628.0" y="288" text-anchor="middle" class="name">Maria Lucas</text>
+</g>
+<g class="node g-n"><rect x="1710.0" y="270" width="140" height="54" rx="3"/>
+<text x="1780.0" y="288" text-anchor="middle" class="name">younger Lucases</text>
+<text x="1780.0" y="302" text-anchor="middle" class="sub">several children</text>
+</g>
+<g class="node g-m"><rect x="38.0" y="400" width="140" height="54" rx="3"/>
+<text x="108.0" y="418" text-anchor="middle" class="name">Mr. Hurst</text>
+<text x="108.0" y="432" text-anchor="middle" class="sub">man of fashion</text>
+</g>
+<g class="node g-f"><rect x="190.0" y="400" width="140" height="54" rx="3"/>
+<text x="260.0" y="418" text-anchor="middle" class="name">Louisa Hurst</text>
+<text x="260.0" y="432" text-anchor="middle" class="sub">née Bingley</text>
+</g>
+<g class="node g-f"><rect x="342.0" y="400" width="140" height="54" rx="3"/>
+<text x="412.0" y="418" text-anchor="middle" class="name">Caroline Bingley</text>
+<text x="412.0" y="432" text-anchor="middle" class="sub">unmarried</text>
+<text x="412.0" y="445" text-anchor="middle" class="sub">pursues Darcy</text>
+</g>
+<g class="node g-m"><rect x="494.0" y="400" width="140" height="54" rx="3"/>
+<text x="564.0" y="418" text-anchor="middle" class="name">Charles Bingley</text>
+<text x="564.0" y="432" text-anchor="middle" class="sub">leases Netherfield</text>
+<text x="564.0" y="445" text-anchor="middle" class="sub">£4–5,000 a year</text>
+</g>
+<g class="node g-m"><rect x="646.0" y="400" width="140" height="54" rx="3"/>
+<text x="716.0" y="418" text-anchor="middle" class="name">Fitzwilliam Darcy</text>
+<text x="716.0" y="432" text-anchor="middle" class="sub">of Pemberley</text>
+<text x="716.0" y="445" text-anchor="middle" class="sub">£10,000 a year</text>
+</g>
+<g class="node g-f"><rect x="798.0" y="400" width="140" height="54" rx="3"/>
+<text x="868.0" y="418" text-anchor="middle" class="name">Georgiana Darcy</text>
+<text x="868.0" y="432" text-anchor="middle" class="sub">16</text>
+<text x="868.0" y="445" text-anchor="middle" class="sub">ward of Darcy</text>
+</g>
+<g class="node g-m"><rect x="1102.0" y="400" width="140" height="54" rx="3"/>
+<text x="1172.0" y="418" text-anchor="middle" class="name">George Wickham</text>
+<text x="1172.0" y="432" text-anchor="middle" class="sub">officer; steward&#x27;s son</text>
+<text x="1172.0" y="445" text-anchor="middle" class="sub">Darcy Sr&#x27;s godson</text>
+</g>
+<g class="node g-f"><rect x="1254.0" y="400" width="140" height="54" rx="3"/>
+<text x="1324.0" y="418" text-anchor="middle" class="name">Anne de Bourgh</text>
+<text x="1324.0" y="432" text-anchor="middle" class="sub">heiress of Rosings</text>
+<text x="1324.0" y="445" text-anchor="middle" class="sub">meant for Darcy</text>
+</g>
+<g class="node g-m"><rect x="1558.0" y="400" width="140" height="54" rx="3"/>
+<text x="1628.0" y="418" text-anchor="middle" class="name">Col. Fitzwilliam</text>
+<text x="1628.0" y="432" text-anchor="middle" class="sub">the Earl&#x27;s younger son</text>
+<text x="1628.0" y="445" text-anchor="middle" class="sub">Darcy&#x27;s cousin</text>
+</g>
+<g class="node g-m dead"><rect x="342.0" y="510" width="140" height="54" rx="3"/>
+<text x="412.0" y="528" text-anchor="middle" class="name">the late Mr. Bingley</text>
+<text x="412.0" y="542" text-anchor="middle" class="sub">fortune from trade</text>
+<text x="412.0" y="555" text-anchor="middle" class="sub">deceased</text>
+</g>
+<g class="node g-m dead"><rect x="646.0" y="510" width="140" height="54" rx="3"/>
+<text x="716.0" y="528" text-anchor="middle" class="name">the late Mr. Darcy</text>
+<text x="716.0" y="542" text-anchor="middle" class="sub">of Pemberley</text>
+<text x="716.0" y="555" text-anchor="middle" class="sub">deceased</text>
+</g>
+<g class="node g-f dead"><rect x="798.0" y="510" width="140" height="54" rx="3"/>
+<text x="868.0" y="528" text-anchor="middle" class="name">Lady Anne Darcy</text>
+<text x="868.0" y="542" text-anchor="middle" class="sub">née Fitzwilliam</text>
+<text x="868.0" y="555" text-anchor="middle" class="sub">deceased</text>
+</g>
+<g class="node g-m dead"><rect x="1102.0" y="510" width="140" height="54" rx="3"/>
+<text x="1172.0" y="528" text-anchor="middle" class="name">old Mr. Wickham</text>
+<text x="1172.0" y="542" text-anchor="middle" class="sub">Pemberley&#x27;s steward</text>
+<text x="1172.0" y="555" text-anchor="middle" class="sub">deceased</text>
+</g>
+<g class="node g-m dead"><rect x="1254.0" y="510" width="140" height="54" rx="3"/>
+<text x="1324.0" y="528" text-anchor="middle" class="name">Sir Lewis de Bourgh</text>
+<text x="1324.0" y="542" text-anchor="middle" class="sub">of Rosings</text>
+<text x="1324.0" y="555" text-anchor="middle" class="sub">deceased</text>
+</g>
+<g class="node g-f"><rect x="1406.0" y="510" width="140" height="54" rx="3"/>
+<text x="1476.0" y="528" text-anchor="middle" class="name">Lady Catherine</text>
+<text x="1476.0" y="542" text-anchor="middle" class="sub">née Fitzwilliam</text>
+<text x="1476.0" y="555" text-anchor="middle" class="sub">Collins&#x27;s patroness</text>
+</g>
+<g class="node g-m"><rect x="1558.0" y="510" width="140" height="54" rx="3"/>
+<text x="1628.0" y="528" text-anchor="middle" class="name">Lord ——</text>
+<text x="1628.0" y="542" text-anchor="middle" class="sub">an earl</text>
+</g>
+<g class="node g-m dead"><rect x="1178.0" y="620" width="140" height="54" rx="3"/>
+<text x="1248.0" y="638" text-anchor="middle" class="name">the previous Earl</text>
+<text x="1248.0" y="652" text-anchor="middle" class="sub">Fitzwilliam</text>
+<text x="1248.0" y="665" text-anchor="middle" class="sub">not named in the text</text>
+</g>
+      </svg>
+    </div>
+    <figcaption>Descent arrows point from parent to child. Double lines mark a marriage; the three coloured ones are the marriages that end the novel. Dashed boxes are people dead before chapter one. Scroll sideways on a small screen.</figcaption>
+  </figure>
+
+  <ul class="legend">
+    <li><span class="sw m"></span>man in the source text</li>
+    <li><span class="sw f"></span>woman in the source text</li>
+    <li><span class="sw n"></span>group, mixed</li>
+    <li><span class="sw dead"></span>deceased before the story</li>
+    <li><span class="ln"></span>married</li>
+    <li><span class="ln cross"></span>married in the course of the novel</li>
+    <li><span class="ln desc"></span>parent to child</li>
+    <li><span class="ln tie"></span>kinship without descent</li>
+  </ul>
+
+  <h2>The same relationships, in words</h2>
+  <div class="grid">
+    <section class="house">
+      <h3>Bennets of Longbourn</h3>
+      <p>Mr. and Mrs. Bennet; five daughters, no son, so the estate is entailed away.</p>
+      <ul>
+        <li>Jane (eldest) marries Charles Bingley</li>
+        <li>Elizabeth marries Fitzwilliam Darcy</li>
+        <li>Mary and Catherine (Kitty) stay unmarried</li>
+        <li>Lydia (youngest) elopes with and marries George Wickham</li>
+        <li>Mr. Collins is Mr. Bennet's cousin and heir under the entail; their fathers had quarrelled</li>
+      </ul>
+    </section>
+    <section class="house">
+      <h3>Gardiners of Meryton</h3>
+      <p>Mrs. Bennet's family. Her father was an attorney in Meryton.</p>
+      <ul>
+        <li>Mrs. Philips, her sister, married Mr. Philips, her father's clerk and successor</li>
+        <li>Mr. Gardiner, her brother, in trade in London, married to Mrs. Gardiner</li>
+        <li>The Gardiners have four children: two girls, two boys</li>
+        <li>Mr. and Mrs. Gardiner are the aunt and uncle who take Elizabeth to Pemberley and later settle Lydia's marriage</li>
+      </ul>
+    </section>
+    <section class="house">
+      <h3>Lucases of Lucas Lodge</h3>
+      <p>Neighbours of the Bennets; Sir William was knighted after a career in trade.</p>
+      <ul>
+        <li>Charlotte, the eldest, marries Mr. Collins</li>
+        <li>Maria, a younger daughter, visits Hunsford with Elizabeth</li>
+        <li>Several younger children, one boy who speaks</li>
+      </ul>
+    </section>
+    <section class="house">
+      <h3>Bingleys</h3>
+      <p>Northern family, fortune made in trade by the late father.</p>
+      <ul>
+        <li>Charles, the only son, leases Netherfield and marries Jane</li>
+        <li>Louisa, married to Mr. Hurst</li>
+        <li>Caroline, unmarried, hopes to marry Darcy</li>
+      </ul>
+    </section>
+    <section class="house">
+      <h3>Darcys of Pemberley</h3>
+      <p>The late Mr. Darcy married Lady Anne Fitzwilliam, daughter of an earl.</p>
+      <ul>
+        <li>Fitzwilliam Darcy, their son, marries Elizabeth</li>
+        <li>Georgiana, their daughter, is the ward of Darcy and Colonel Fitzwilliam</li>
+        <li>George Wickham is the son of the late Mr. Darcy's steward and the late Mr. Darcy's godson; he was raised alongside Darcy and tried to elope with Georgiana</li>
+      </ul>
+    </section>
+    <section class="house">
+      <h3>Fitzwilliams and de Bourghs</h3>
+      <p>Lady Anne, Lady Catherine and Lord —— (the Earl) are siblings.</p>
+      <ul>
+        <li>Lady Catherine married Sir Lewis de Bourgh; their daughter Anne is heiress of Rosings and was intended for Darcy</li>
+        <li>Colonel Fitzwilliam is the Earl's younger son, so Darcy's and Anne's first cousin</li>
+        <li>Lady Catherine is aunt to Darcy, Georgiana and the Colonel, and patroness to Mr. Collins</li>
+      </ul>
+    </section>
+  </div>
+
+  <p class="note">Left out on purpose: Mrs. Long and her two nieces, Colonel and Mrs. Forster, the Harringtons and Miss King. They are named kin to each other but tie to no one in the main cast. The earl one generation above Lady Anne and Lady Catherine is never named; the box stands in for whoever produced three siblings with the Fitzwilliam name.</p>
+</div>
+<script>
+(function(){
+  var fig=document.getElementById('tree');
+  var btns=document.querySelectorAll('.toolbar button');
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    fig.setAttribute('data-mode',b.getAttribute('data-mode'));
+    btns.forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
+  });});
+})();
+</script>
+</body>
+</html>
