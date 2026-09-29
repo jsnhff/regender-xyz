@@ -4,6 +4,7 @@ Integrated Parser
 Combines all parser components into a complete parsing solution.
 """
 
+import re
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -185,6 +186,19 @@ class IntegratedParser:
         process_section(hierarchy)
         return chapters
 
+    #: Project Gutenberg marks a letter's salutation and date line with its own
+    #: typesetting instructions -- /* NIND "My dear friend, */ for no indent,
+    #: /* RIGHT "Hunsford, near Westerham, Kent, ... */ for right alignment.
+    #: They are instructions to a typesetter, not words Austen wrote, and they
+    #: reached the printed page: nine per edition, "/* NIND" and all.
+    #:
+    #: The instruction is dropped rather than translated. Where the text is
+    #: laid out, those paragraphs already carry Salutation and Date Line styles,
+    #: which is the same information said properly.
+    _TYPESETTING = re.compile(
+        r"^\s*/\*\s*(?:NIND|RIGHT|CENTER|CENTRE)?\s*(.*?)\s*\*/\s*$", re.DOTALL
+    )
+
     def _lines_to_paragraphs(self, lines: list[str]) -> list[str]:
         """
         Convert lines to paragraphs.
@@ -200,7 +214,7 @@ class IntegratedParser:
             if not line:
                 # Empty line - end current paragraph
                 if current_para:
-                    paragraphs.append(" ".join(current_para))
+                    paragraphs.append(self._strip_typesetting(" ".join(current_para)))
                     current_para = []
             else:
                 # Add to current paragraph
@@ -208,9 +222,14 @@ class IntegratedParser:
 
         # Don't forget the last paragraph
         if current_para:
-            paragraphs.append(" ".join(current_para))
+            paragraphs.append(self._strip_typesetting(" ".join(current_para)))
 
-        return paragraphs
+        return [p for p in paragraphs if p]
+
+    def _strip_typesetting(self, text: str) -> str:
+        """A paragraph that is only a typesetting instruction, unwrapped."""
+        match = self._TYPESETTING.match(text)
+        return match.group(1) if match else text
 
 
 def parse_book(file_path: str, format_hint: Optional[str] = None) -> ParsedBook:
