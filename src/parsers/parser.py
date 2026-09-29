@@ -209,7 +209,11 @@ class IntegratedParser:
         current_para = []
 
         for line in lines:
-            line = line.rstrip()
+            # Both ends. Gutenberg indents the continuation lines of a letter,
+            # and rstrip() alone left that indent to be joined into the middle
+            # of the sentence -- "my late honoured      father", 316 times
+            # across an edition, all of them inside the letters.
+            line = line.strip()
 
             if not line:
                 # Empty line - end current paragraph

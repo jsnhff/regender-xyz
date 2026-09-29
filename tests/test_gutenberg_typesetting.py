@@ -74,3 +74,37 @@ class TestWhatItMustNotTouch:
 
     def test_an_empty_wrapper_leaves_nothing_behind(self, parser):
         assert parser._lines_to_paragraphs(["/* */", ""]) == []
+
+
+class TestTheIndentInLetters:
+    """Gutenberg indents each continuation line of a letter:
+
+        "The disagreement subsisting between yourself and my late honoured
+              father always gave me much uneasiness; and, since I have had the
+
+    rstrip() took the trailing whitespace and left the leading, so the indent
+    was joined into the middle of the sentence -- "my late honoured      father".
+    316 gaps per edition, every one six spaces wide, all inside the letters.
+    Chapter 52's letter carried 147 of them in a single paragraph.
+    """
+
+    def test_the_indent_does_not_reach_the_sentence(self, parser):
+        lines = [
+            '"The disagreement subsisting between yourself and my late honoured',
+            "      father always gave me much uneasiness; and, since I have had the",
+            "      misfortune to lose him, I have frequently wished to heal the",
+            "",
+        ]
+        got = parser._lines_to_paragraphs(lines)
+        assert "  " not in got[0], got[0]
+        assert "honoured father always" in got[0]
+
+    def test_every_line_joins_with_exactly_one_space(self, parser):
+        lines = ["    first line", "        second line", "   third line", ""]
+        assert parser._lines_to_paragraphs(lines) == ["first line second line third line"]
+
+    def test_a_paragraph_that_was_never_indented_is_unchanged(self, parser):
+        lines = ["It is a truth universally acknowledged,", "that a single man", ""]
+        assert parser._lines_to_paragraphs(lines) == [
+            "It is a truth universally acknowledged, that a single man"
+        ]
