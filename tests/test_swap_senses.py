@@ -98,10 +98,41 @@ class TestTheSwapStillWorks:
     def test_ordinary_swaps_are_untouched(self, swap, text, expected):
         assert swap(text) == expected
 
-    def test_other_transforms_have_no_frames(self):
-        """Only gender_swap carries these; nonbinary has its own sense rules."""
+    def test_only_gender_swap_carries_the_title_frame(self):
+        """Sir -> Lady is a swap problem; nonbinary has its own sense rules."""
         assert TransformService.protected_spans("Sir William Lucas", "nonbinary") == []
         assert TransformService.protected_spans("Sir William Lucas", "gender_swap") != []
+
+
+class TestTheSensesGuardEveryTransform:
+    """A page of a book is a page of a book in all four editions.
+
+    These rules lived inside the gender_swap frame, so gender_swap was the one
+    edition that printed "read three pages" correctly. all_female printed "read
+    three handmaids" in all three places Austen means paper -- Fordyce's
+    Sermons, Darcy's letter, and Darcy's own book -- and nobody reported it.
+    """
+
+    @pytest.mark.parametrize("key", ["gender_swap", "all_female", "all_male", "nonbinary", ""])
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "before she had read three pages",
+            "scarcely knowing anything of the last page or two",
+            "looking at her page",
+            "a host of friends",
+            "I count on your discretion.",
+            "She took up a rake.",
+        ],
+    )
+    def test_the_common_sense_is_protected_whatever_the_transform(self, key, text):
+        assert TransformService.protected_spans(text, key) != []
+
+    def test_all_female_leaves_a_page_of_a_book_alone(self):
+        service = TransformService.__new__(TransformService)
+        text = "before she had read three pages, she interrupted him"
+        out = service._apply_term_map(text, TransformType.ALL_FEMALE, text)
+        assert "handmaid" not in out
 
     def test_the_default_call_still_works(self):
         """qc_service calls this with no key."""

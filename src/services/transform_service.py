@@ -1000,6 +1000,10 @@ class TransformService(BaseService):
         if not name_map:
             return text
         pattern, lookup = self._compile_substitution(tuple(sorted(name_map.items())))
+        # The matched text back to the map key that claimed it, so the casing of
+        # the two can be compared. `lookup` is keyed lower case and cannot
+        # answer this.
+        cased = {self._fold_apostrophe(key.lower()): key for key in name_map}
         mask = (
             self._residual_mask_for(source_text, text, self._name_vocabulary(name_map))
             if source_text is not None
@@ -1013,6 +1017,19 @@ class TransformService(BaseService):
             # else here is the model's own rename, and renaming that again is
             # how one character ends up with two names.
             if not self._is_residual(mask, text, start, end):
+                return match.group(0)
+            # A name is a proper noun, and the alternation is case-insensitive
+            # because the term map needs it to be. So the map's "Pen" -- Pen
+            # Harrington, a real character -- also matched Austen's "pen", and
+            # `_match_case` lowered "Peter" to fit: "I am afraid you do not like
+            # your peter", and "I take up my peter again", in three of the four
+            # printed editions.
+            #
+            # A capitalised key may only claim capitalised text. Not plain case
+            # sensitivity: Gutenberg signs letters in full capitals ("LYDIA
+            # BENNET."), and those have to keep matching.
+            key = cased.get(self._fold_apostrophe(term.lower()))
+            if key and key[:1].isupper() and not term[:1].isupper():
                 return match.group(0)
             replacement = self._match_case(term, lookup[self._fold_apostrophe(term.lower())])
             # A replacement must not repeat the word already in front of it.
@@ -2556,18 +2573,27 @@ class TransformService(BaseService):
     # a name, but "Madam" never precedes one in English, which is how the
     # printed book got "Madam William Lucas". Held here so the flat map cannot
     # touch it, then converted to "Lady" by the case-sensitive fixes below.
+    # Senses that are not a person at all, whatever the transform is doing.
+    # These were written inside the gender_swap frame, which is why gender_swap
+    # is the one edition that printed "read three pages" correctly while
+    # all_female printed "read three handmaids" -- the protection existed and
+    # was wired to a single transform. Nothing here is about direction.
+    _PROTECTED_SENSES = re.compile(
+        # a page of a book, not a page in livery. All three uses in Austen
+        # are the reading kind, and the servant sense is vanishingly rare.
+        r"(?<![A-Za-z])pages?(?![A-Za-z])"
+        # "a host of friends" is a multitude; "count on" is a verb; a rake
+        # is a garden tool. None of the three appears as a person in Austen,
+        # and all three were live in the map.
+        r"|(?<![A-Za-z])host\s+of(?![A-Za-z])"
+        r"|(?<![A-Za-z])counts?\s+(?:on|upon)(?![A-Za-z])"
+        r"|(?<![A-Za-z])(?:a|the|his|her|their)\s+rakes?(?![A-Za-z])",
+        re.IGNORECASE,
+    )
+
     _PROTECTED_FRAMES: dict[str, "re.Pattern"] = {
         "gender_swap": re.compile(
-            r"(?<![A-Za-z])(?:Sir|Madam)\s+(?=[A-Z])"
-            # a page of a book, not a page in livery. All three uses in Austen
-            # are the reading kind, and the servant sense is vanishingly rare.
-            r"|(?<![A-Za-z])pages?(?![A-Za-z])"
-            # "a host of friends" is a multitude; "count on" is a verb; a rake
-            # is a garden tool. None of the three appears as a person in Austen,
-            # and all three were live in the map.
-            r"|(?<![A-Za-z])host\s+of(?![A-Za-z])"
-            r"|(?<![A-Za-z])counts?\s+(?:on|upon)(?![A-Za-z])"
-            r"|(?<![A-Za-z])(?:a|the|his|her|their)\s+rakes?(?![A-Za-z])",
+            r"(?<![A-Za-z])(?:Sir|Madam)\s+(?=[A-Z])",
             re.IGNORECASE,
         ),
     }
@@ -2576,6 +2602,7 @@ class TransformService(BaseService):
     def protected_spans(cls, text: str, key: str = "") -> list:
         """Character ranges holding a fixed expression, which must not be swapped."""
         spans = [m.span() for m in cls._PROTECTED_PHRASES.finditer(text)]
+        spans += [m.span() for m in cls._PROTECTED_SENSES.finditer(text)]
         frames = cls._PROTECTED_FRAMES.get(key)
         if frames:
             spans += [m.span() for m in frames.finditer(text)]
