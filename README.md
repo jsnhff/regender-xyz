@@ -143,4 +143,4 @@ python -m pytest tests/test_qc_service.py      # chapter-by-chapter QC
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). Use it, fork it, run it on another book.
