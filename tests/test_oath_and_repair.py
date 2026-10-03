@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """An oath is not a peerage, and a repair must be able to fire.
 
 Two things, related by the same mechanism.

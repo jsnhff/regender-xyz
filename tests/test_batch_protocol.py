@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Tests for the batch request/response protocol.
 
 A batch response has to be mapped back onto its source paragraphs exactly. The

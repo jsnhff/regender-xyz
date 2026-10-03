@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """What the name map got wrong, before the book is transformed.
 
 The map is built and audited before the first chapter, and the result is written

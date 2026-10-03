@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The duplicates nothing could settle, put to the reader.
 
 The deterministic merge folds only what it is certain of, on purpose: a wrong

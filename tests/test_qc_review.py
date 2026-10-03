@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Asking the person the question only a person can answer.
 
 A run reported findings and then went straight to the export menu, so the

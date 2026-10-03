@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Four defects in the deterministic net, each with shipped damage.
 
 Everything here was measured in the four shipped editions against the source,

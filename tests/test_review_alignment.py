@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Show the same passage on both lines, and catch a mangled name.
 
 The reader was shown two review cards whose "was" line was identical and whose

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The provider counts what a run actually spent.
 
 `response.usage` was returned by every call and discarded, so the only figure

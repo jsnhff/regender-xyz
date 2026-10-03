@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A correction lands where it was reported, and can be accepted rather than typed.
 
 Chapter 61 of Pride and Prejudice says "his aunt" of Lady Catherine early on,

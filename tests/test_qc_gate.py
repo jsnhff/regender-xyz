@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """What the QC gate hands back to the run.
 
 QC counts every gendered word and how many of them changed, then reported

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """
 Post-process P&P finals .txt files to catch gendered language the LLM
 misses when treating character name honorifics as proper nouns.

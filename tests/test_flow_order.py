@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The order the questions arrive in.
 
 It used to run character analysis — thirty seconds and real money — before

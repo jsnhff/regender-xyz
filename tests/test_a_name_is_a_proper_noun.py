@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A name map may not rewrite a common noun that happens to spell a name.
 
 Pen Harrington is a real character in Pride and Prejudice -- "Harriet was ill,

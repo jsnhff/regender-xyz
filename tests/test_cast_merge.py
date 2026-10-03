@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """One person, one entry, one name.
 
 Extraction lists a person once by name, again by title, and a third time under

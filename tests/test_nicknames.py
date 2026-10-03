@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A pet name should stay a pet name.
 
 The engine has asked for nicknames alongside each new name for a while, but

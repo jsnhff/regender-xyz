@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Each run owns a folder, and its artifacts stay together.
 
 A name map describes exactly one transformed book; beside a different one it is

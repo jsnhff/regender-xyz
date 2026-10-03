@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Keep the honorifics, and see the collisions that make people lose them.
 
 Austen's register lives in her forms of address. The alias expansion had been

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """One bar for a rename, whichever path proposed it.
 
 Two things decide names. The engine proposes and validates its own work. The

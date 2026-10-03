@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Two people may not be given one name.
 
 A reservation existed for this and did nothing, because it held the wrong thing.

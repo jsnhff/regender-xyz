@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Deterministic name engine — ported from the Aug-2026 transform hardening.
 
 Each test encodes a failure class seen in the May-2026 printed P&P: one

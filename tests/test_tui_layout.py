@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The content area must wrap long lines, not clip them.
 
 Labels size to their content by default and ContentArea hides overflow-x, so a

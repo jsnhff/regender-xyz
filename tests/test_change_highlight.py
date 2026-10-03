@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Point at the word the question is about.
 
 The review stepper shows the source line and the transformed line and asks for

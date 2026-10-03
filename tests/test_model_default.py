@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Enter takes the recommended model.
 
 The return glyph sat on whichever model was already configured, which on a

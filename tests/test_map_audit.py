@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Some faults are only visible in the whole map.
 
 Every entry in the shipped maps defends itself. The damage is in how they sit

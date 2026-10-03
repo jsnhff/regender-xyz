@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The words that carry gender in the word itself, and the verb after them.
 
 No variant had a rule for -man occupationals, so the model invented an answer

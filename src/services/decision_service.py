@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """What a transform cannot decide on its own.
 
 Some words have no neutral English equivalent. "sir" and "madam" carry no

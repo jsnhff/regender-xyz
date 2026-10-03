@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Ask the question with the evidence attached.
 
 "Same person? Mary Bennet / Mary King" is unanswerable by anyone who has not

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A run must be self-contained.
 
 Two versions of one bug were shipped for weeks.

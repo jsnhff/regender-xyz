@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """What the safety net changed, and which of those changes deserve a look.
 
 The change log records whole-paragraph diffs, so a decision like

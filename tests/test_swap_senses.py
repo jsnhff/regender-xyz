@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Words in the swap map that are not always the person they name.
 
 The nonbinary map has thirty sense rules; gender_swap had none, so it ran flat

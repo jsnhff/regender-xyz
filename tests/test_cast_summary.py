@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """How many characters a run actually regenders.
 
 A finished run reported the size of the cast it analysed, which is a fact

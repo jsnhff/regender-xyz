@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Who is the same person, and who only looks like it.
 
 One character listed twice gets renamed twice, and the book then calls one woman

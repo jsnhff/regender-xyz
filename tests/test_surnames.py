@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A surname is not a nickname.
 
 Single-word aliases were sent to the target's given name so that "Lizzy" would

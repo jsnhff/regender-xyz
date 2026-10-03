@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """End-to-end recovery when a batch response cannot be mapped.
 
 The batch path is where paragraphs used to go missing: a response that did not

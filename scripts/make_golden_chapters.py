@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Build a golden-chapter test file from the verified Gutenberg source.
 
 Five chapters, ~6,700 words, about 5% of the book. Chosen by measured

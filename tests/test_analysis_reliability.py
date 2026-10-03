@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A short cast should not look like a short book.
 
 Successive analyses of Pride and Prejudice found 89, 91, 88, 86, 85, 77, 80 and

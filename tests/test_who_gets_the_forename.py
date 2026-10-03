@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """When two title forms collide, the forename goes to whoever already has one.
 
 Austen calls Jane "Miss Bennet" and her mother "Mrs. Bennet". Swap the cast and

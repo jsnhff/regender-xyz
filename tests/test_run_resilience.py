@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """One bad chapter must not cost the other sixty.
 
 asyncio.gather without return_exceptions propagates the first failure

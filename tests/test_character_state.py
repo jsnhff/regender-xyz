@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Character state that changes partway through a book.
 
 A cast is not static. Darcy is unmarried for sixty chapters and married in the

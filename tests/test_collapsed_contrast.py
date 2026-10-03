@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Two people the source told apart that the transform gives one name.
 
 In an all-male book Elizabeth has two fathers, and "his father" is the right

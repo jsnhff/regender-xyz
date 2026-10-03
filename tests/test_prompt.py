@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Tests for the prompt the pipeline actually sends.
 
 The prompt was only ever inspected as a template. Rendered, it turned out to

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Given names by the gender English has conventionally read them as.
 
 Used to refuse a rename whose new name does not suit the gender the transform is

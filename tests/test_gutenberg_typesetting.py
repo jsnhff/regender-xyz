@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Project Gutenberg's typesetting instructions are not words Austen wrote.
 
 Its plain text marks a letter's salutation and date line with instructions to a

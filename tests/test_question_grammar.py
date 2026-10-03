@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Every question is asked the same way.
 
 Fifteen prompt sites had grown fifteen dialects. Headings ended in a second
