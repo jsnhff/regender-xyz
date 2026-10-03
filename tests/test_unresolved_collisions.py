@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Two characters still landing on one name once the map is applied.
 
 A character the book names only by title and family name carries no map entry:

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A surname that is also a gendered noun must survive the term map.
 
 Pride and Prejudice has a Mary King. The flat, case-insensitive gender_swap

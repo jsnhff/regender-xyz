@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Where a run puts its output.
 
 Every artifact a run produces belongs together: the book, the source it came

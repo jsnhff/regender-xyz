@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Extract a paragraph-by-paragraph map of an IDML book for formatting review.
 
 Reads an .idml, walks every story in page order, and emits one row per paragraph

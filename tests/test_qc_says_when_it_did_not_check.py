@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A report that cannot say "I did not check this" says "clean" instead.
 
 Three checks returned in silence without a name map: the one that catches a

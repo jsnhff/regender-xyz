@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Say it once, in the plural.
 
 A one-directional transform sends both halves of a coordinated pair to the

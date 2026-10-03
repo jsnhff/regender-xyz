@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The cast's own answers have to reach the prompt that uses them.
 
 Two fields were being thrown away on every run of every book.

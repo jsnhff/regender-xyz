@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A batch must not be asked for more than it is allowed to write back.
 
 Batches were sized against the context window -- 120k tokens, whole chapters

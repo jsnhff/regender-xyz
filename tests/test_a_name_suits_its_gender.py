@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A granted forename has to suit the gender the transform is producing.
 
 An all-female run offered "Mrs. Edward Gardiner" and "Mrs. Edmund Philips" on

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Two characters must not become one person.
 
 A woman known only as "Mrs. Bennet" has no given name of her own, so an

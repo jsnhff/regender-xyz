@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Dropping a file into the TUI has to open it.
 
 Dropping does not paste the path — it pastes the path as a shell would need it

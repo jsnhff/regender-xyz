@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Tests for the editorial-decision scanner.
 
 The nonbinary transform meets words English has no neutral form for. These

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """
 Custom exceptions for the regender-xyz application.
 Provides structured error handling across all services.

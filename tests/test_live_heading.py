@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A live decision announces itself by moving.
 
 Every other line in the interface is still, so a sweep of light across a heading

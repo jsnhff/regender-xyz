@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The review menu, driven through a real Textual app.
 
 The menu rendered correctly and could not be typed into: a transform leaves

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Tests for the chapter-by-chapter QC checks.
 
 QC has to catch the failure modes the transform can still produce, so each

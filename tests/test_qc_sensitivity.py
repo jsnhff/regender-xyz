@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Mutation test: QC must catch every class of transform error we know of.
 
 A clean chapter is transformed correctly, then one realistic error is injected

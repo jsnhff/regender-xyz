@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A way to tell two mothers apart, where the two are not side by side.
 
 The coordinated case already had an answer -- "her uncle and aunt" becoming

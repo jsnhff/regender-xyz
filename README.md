@@ -143,4 +143,8 @@ python -m pytest tests/test_qc_service.py      # chapter-by-chapter QC
 
 ## License
 
-MIT
+GNU General Public License v3.0 — see [LICENSE](LICENSE).
+
+Use it, fork it, run it on another book. Copyleft is deliberate: if you
+distribute a modified version, it carries the same licence and the same
+credit, and its source stays available. Nobody gets to close it.

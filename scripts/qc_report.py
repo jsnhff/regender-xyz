@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """
 Chapter-by-chapter QC for a transformed book. No LLM calls, no API keys.
 

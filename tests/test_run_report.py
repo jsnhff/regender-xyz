@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """What a finished run tells you.
 
 "Complete" and a path is the least a run can say, and the path was long enough

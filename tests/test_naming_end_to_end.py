@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """The naming run that failed, replayed against the real cast.
 
 Every naming defect so far has been found by Jason running the real thing and

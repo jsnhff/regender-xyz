@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """A title the transform replaces may not survive the rename.
 
 An all_female run offered these, and Jason stopped it when he saw them:

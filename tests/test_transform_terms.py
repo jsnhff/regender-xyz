@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Jason Huff
 """Regression tests for the deterministic gender-term safety net.
 
 The safety net runs on LLM output. For a bidirectional map like gender_swap
