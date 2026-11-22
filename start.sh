@@ -31,15 +31,24 @@ if [ -d "$DEST/.git" ]; then
   git -C "$DEST" pull --quiet
 else
   echo "  → Downloading regender.xyz to $DEST ..."
-  git clone --quiet https://github.com/jsnhff/regender-xyz.git "$DEST"
+  git clone --quiet --depth 1 https://github.com/jsnhff/regender-xyz.git "$DEST"
 fi
 
 # ── Install dependencies ──────────────────────────────────────────────────────
+# A virtual environment of its own, so the install works on Pythons that
+# refuse system-wide pip installs (Homebrew's, for one) and touches nothing else.
+if [ ! -x "$DEST/.venv/bin/python" ]; then
+  echo "  → Setting up a private Python environment..."
+  python3 -m venv "$DEST/.venv"
+fi
+PY="$DEST/.venv/bin/python"
+
 echo "  → Installing dependencies (this may take a minute)..."
-python3 -m pip install --quiet -r "$DEST/requirements.txt"
+"$PY" -m pip install --quiet --upgrade pip
+"$PY" -m pip install --quiet -r "$DEST/requirements.txt"
 
 # ── Launch ────────────────────────────────────────────────────────────────────
 echo "  → Done! Starting regender.xyz..."
 echo ""
 cd "$DEST"
-python3 regender_cli.py
+"$PY" regender_cli.py

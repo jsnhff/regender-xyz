@@ -154,6 +154,12 @@ async def process_book(args):
         _write_decision_sheet(args.transform_type, result.get("output_path"))
     else:
         print(f"\n❌ Error: {result['error']}")
+        if "llm_provider" in str(result["error"]):
+            print(
+                "\n  No model is set up. Add ANTHROPIC_API_KEY or OPENAI_API_KEY to a .env file"
+                "\n  in this folder (copy .env.example to start), or set DEFAULT_PROVIDER=ollama there."
+                "\n  Or run `python regender_cli.py` with no arguments and it will walk you through it."
+            )
         sys.exit(1)
 
     # Clean up

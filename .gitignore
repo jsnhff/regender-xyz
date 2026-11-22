@@ -117,3 +117,6 @@ python-arm64/
 
 # Personal review notes
 /Model feedback from *.rtf
+
+# Virtual environment made by start.sh
+.venv/
