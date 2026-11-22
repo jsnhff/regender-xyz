@@ -59,6 +59,6 @@ class TestItDoesNotCorruptRealPaths:
 class TestTheRealCase:
     def test_the_folder_that_broke_it(self):
         """The repo's own test books live in a folder with two spaces in it."""
-        real = "/Users/jasonhuff/regender-xyz test books/pride-prejudice-golden.txt"
+        real = "/Users/me/regender-xyz test books/pride-prejudice-golden.txt"
         for dropped in (real.replace(" ", "\\ "), f"'{real}'", f'"{real}"'):
             assert normalize_dropped_path(dropped) == real

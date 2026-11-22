@@ -167,10 +167,7 @@ class TestAgainstTheShippedMap:
     else; an earlier version objected to nineteen.
     """
 
-    NAME_MAP = (
-        "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-        "nonbinary_2026-09-11_23-16/name_map.json"
-    )
+    NAME_MAP = "books/output/pride-and-prejudice/nonbinary_2026-09-11_23-16/name_map.json"
 
     def test_exactly_the_known_bad_entries_are_refused(self):
         import json
@@ -220,8 +217,7 @@ class TestTheAuditsWrongAnswers:
         from src.services.name_engine import cast_name_index
 
         path = pathlib.Path(
-            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-            "nonbinary_2026-09-11_23-16/characters.json"
+            "books/output/pride-and-prejudice/nonbinary_2026-09-11_23-16/characters.json"
         )
         if not path.exists():
             pytest.skip("the real cast is not on this machine")

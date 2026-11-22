@@ -186,8 +186,7 @@ class TestAgainstTheRealCast:
         import pathlib
 
         path = pathlib.Path(
-            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-            "all_male_2026-09-10_21-44/characters.json"
+            "books/output/pride-and-prejudice/all_male_2026-09-10_21-44/characters.json"
         )
         if not path.exists():
             pytest.skip("the real cast is not on this machine")
@@ -219,8 +218,7 @@ class TestAgainstTheRealCast:
         import pathlib
 
         path = pathlib.Path(
-            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-            "all_male_2026-09-10_21-44/characters.json"
+            "books/output/pride-and-prejudice/all_male_2026-09-10_21-44/characters.json"
         )
         if not path.exists():
             pytest.skip("the real cast is not on this machine")
