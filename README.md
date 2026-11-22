@@ -4,7 +4,7 @@
 
 Regender changes the gender of every character in a public domain book, so you can read an old story from a different position. Every other word stays the author's.
 
-The first title is Jane Austen's *Pride and Prejudice*, in four versions. In one, every character's gender is swapped, so Mr. Bennet becomes Mrs. Bennet. In the others, the whole cast is male, female or nonbinary. They're printed books, with cover illustrations by Raman Djafari and book design by Matt Bucknall, and you can find them at **[regender.xyz](https://regender.xyz)**.
+The first title is Jane Austen's *Pride and Prejudice*, in four versions. In one, every character's gender is swapped, so Mr. Bennet becomes Mrs. Bennet. In the others, the whole cast is male, female or nonbinary. They're printed books, with cover illustrations by Raman Djafari and book design by Matthew Bucknall, and you can find them at **[regender.xyz](https://regender.xyz)**.
 
 This repository is the software that made them. It's free and open source, so you can make your own.
 
@@ -19,7 +19,7 @@ This repository is the software that made them. It's free and open source, so yo
 | **All female** | ...a single woman in possession of a good fortune, must be in want of a wife. |
 | **Nonbinary** | ...a single person in possession of a good fortune, must be in want of a spouse. |
 
-Gender in a novel decides who inherits, who proposes and who gets to speak. Change it everywhere at once and some scenes collapse while others gain tension. The original starts to look built, which it was.
+Gender in a novel decides who inherits, who proposes and who gets to speak. Change it everywhere at once and some scenes stop working while others get sharper. You can see how much of the plot was resting on it.
 
 ## Try it on a book
 
@@ -63,13 +63,19 @@ The app asks for a book, a model and one of four transforms, then saves the resu
 
 Names change too. You see the name map and can edit it before anything runs.
 
-## How well it works
+## How it works
 
-A find-and-replace breaks on the first "her", which can mean "him" or "his". Regender has a model read each passage in context, then runs a fixed rule pass over the result, so no gendered word survives a model call that failed. A quality check reads every chapter and says plainly when it couldn't check something.
+A find-and-replace breaks on the first "her", which can mean "him" or "his". Regender works in two layers instead.
 
-All four editions of *Pride and Prejudice* reached 99.8% coverage or better before they went to print. Reading the laid-out proofs still turned up mistakes no check could see, like Project Gutenberg's notes to a typesetter arriving on the page as text. Each one became a test. There are about 1,300.
+Python does the deterministic part: finding the cast, matching a name across its spellings and titles, and applying a map of rules for the cases where the right answer never varies. A model reads each passage in context for everything the rules can't see. The rule pass then runs again over what the model returned, so no gendered word survives a model call that went wrong.
 
-The nonbinary version needs a person at the end. It lists the words it couldn't settle by rule, and you decide each one.
+That leaves a handful of words no rule and no model should settle on your behalf. English has no neutral "sir" or "madam"; they mark rank and distance rather than the speaker's sex, and every substitute says something the original didn't. "Master" is an employer, a teacher, a household head, and half of "his own master", and only the words beside it decide which. Some of those the rules do settle, so "music master" becomes "music teacher" without asking.
+
+The rest are editorial calls, and Regender treats them as yours. Before the transform runs it counts them, tells you where they are and shows the mechanical readings of each, so you rule on them up front instead of finding them in a printed book. `--estimate` reports the count without running anything. The nonbinary transform needs the most rulings by a wide margin.
+
+Every word is either settled automatically or ruled on by you, so a finished book has nothing left unresolved in it.
+
+A quality check reads every chapter afterwards and grades what it finds: fixable by rule, needs a person, or a structural problem like a missing chapter. It says plainly when it couldn't check something. Reading the laid-out proofs still turned up mistakes no check could see, such as Project Gutenberg's notes to a typesetter arriving on the page as text. Each one became a test. There are about 1,300.
 
 ## Command line
 
@@ -101,10 +107,10 @@ The tests run without an API key. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) e
 Made by [Jason Huff](https://jasonhuff.info), Los Angeles, 2026.
 
 - Cover illustration: [Raman Djafari](https://ramandjafari.com)
-- Book design: Matt Bucknall
-- Typography: Bye Bye Binary
-- Engineering: Bill Barnes
-- Agent: Claude
+- Book design: Matthew Bucknall
+- Engineering: William Barnes
+- Type set in BBB Baskervvol, a post-binary fork of Baskervville by [Bye Bye Binary](https://typotheque.byebyebinary.space) et al.; BBB Herthey Futural, Clara Sambot and Laure Giletti's fork of Paul Bernhard's Hershey Futural; and PicNic by Mariel Nils
+- Text transformed by claude-opus-4-5-20251101, September 13, 2026
 
 ## License
 
