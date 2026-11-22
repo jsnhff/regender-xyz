@@ -1,7 +1,5 @@
 # Regender
 
-![Four editions of Pride and Prejudice: swapped, all male, all female and nonbinary](docs/images/regender-covers.jpg)
-
 Regender changes the gender of every character in a public domain book, so you can read an old story from a different position. Every other word stays the author's.
 
 The first title is Jane Austen's *Pride and Prejudice*, in four versions. In one, every character's gender is swapped, so Mr. Bennet becomes Mrs. Bennet. In the others, the whole cast is male, female or nonbinary. They're printed books, with cover illustrations by Raman Djafari and book design by Matthew Bucknall, and you can find them at **[regender.xyz](https://regender.xyz)**.
