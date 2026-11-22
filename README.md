@@ -1,10 +1,10 @@
 # Regender
 
-Regender changes the gender of every character in a public domain book, so you can read an old story from a different position. Every other word stays the author's.
+Regender changes the gender of every character in a public domain book, so you can read an old story from a different position. Every other word stays true to the original story.
 
-The first title is Jane Austen's *Pride and Prejudice*, in four versions. In one, every character's gender is swapped, so Mr. Bennet becomes Mrs. Bennet. In the others, the whole cast is male, female or nonbinary. They're printed books, with cover illustrations by Raman Djafari and book design by Matthew Bucknall, and you can find them at **[regender.xyz](https://regender.xyz)**.
+The first title and demo is Jane Austen's *Pride and Prejudice*, in four versions. In one, every character's gender is swapped, so Mr. Bennet becomes Mrs. Bennet. In the others, the whole cast is male, female or nonbinary. They're available in print in unlimited editions as print-on-demand, sold at cost to increase access. Gratitude to Raman Djafari for the incredible cover illustrations and to Matthew Bucknall for the book design. You can find them at **[regender.xyz](https://regender.xyz)**.
 
-This repository is the software that made them. It's free and open source, so you can make your own.
+This repository contains the software used to make them. It's free and open source, so you can make your own. Enjoy and let me know what you make.
 
 ## The first line, four ways
 
@@ -21,7 +21,7 @@ Gender in a novel decides who inherits, who proposes and who gets to speak. Chan
 
 ## Try it on a book
 
-You need a book as a plain text file (any [Project Gutenberg](https://www.gutenberg.org) book works) and one of these:
+You need a public domain book as a plain text file (any [Project Gutenberg](https://www.gutenberg.org) book works) and one of these:
 
 - an [Anthropic](https://console.anthropic.com/settings/keys) or [OpenAI](https://platform.openai.com/api-keys) API key, or
 - [Ollama](https://ollama.com), which runs a model on your own computer for free.
@@ -65,15 +65,13 @@ Names change too. You see the name map and can edit it before anything runs.
 
 A find-and-replace breaks on the first "her", which can mean "him" or "his". Regender works in two layers instead.
 
-Python does the deterministic part: finding the cast, matching a name across its spellings and titles, and applying a map of rules for the cases where the right answer never varies. A model reads each passage in context for everything the rules can't see. The rule pass then runs again over what the model returned, so no gendered word survives a model call that went wrong.
+Python does the deterministic part: finding the cast, matching a name across its spellings and titles, and applying a map of rules for the cases where the right answer never varies. A model reads each passage in context for everything the rules can't see. The rule pass then runs again over what the model returned, so no gendered word survives a model call that went wrong. That leaves a handful of words no rule or model can settle without your judgement.
 
-That leaves a handful of words no rule and no model should settle on your behalf. English has no neutral "sir" or "madam"; they mark rank and distance rather than the speaker's sex, and every substitute says something the original didn't. "Master" is an employer, a teacher, a household head, and half of "his own master", and only the words beside it decide which. Some of those the rules do settle, so "music master" becomes "music teacher" without asking.
+The rest are editorial calls. Regender identifies them, brings them to you with some context, and asks for your decision. This happens before the transform runs. The software counts them, tells you where they are, and shows the mechanical readings of each. This keeps them from ending up in a printed book or PDF. Running `--estimate` reports the count without transforming anything if you want to check first.
 
-The rest are editorial calls, and Regender treats them as yours. Before the transform runs it counts them, tells you where they are and shows the mechanical readings of each, so you rule on them up front instead of finding them in a printed book. `--estimate` reports the count without running anything. The nonbinary transform needs the most rulings by a wide margin.
+Every word is either settled automatically or ruled on by you. This combo makes the transformation complete.
 
-Every word is either settled automatically or ruled on by you, so a finished book has nothing left unresolved in it.
-
-A quality check reads every chapter afterwards and grades what it finds: fixable by rule, needs a person, or a structural problem like a missing chapter. It says plainly when it couldn't check something. Reading the laid-out proofs still turned up mistakes no check could see, such as Project Gutenberg's notes to a typesetter arriving on the page as text. Each one became a test. There are about 1,300.
+A quality check reads every chapter afterwards, grading what it finds: fixable by rule, needs a person, or a structural problem like a missing chapter. It says when it fails or wasn't able to check something. Every time I run it on a new book I find a new way to improve it. English is complex.
 
 ## Command line
 
