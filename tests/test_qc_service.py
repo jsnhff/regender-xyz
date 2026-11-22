@@ -51,7 +51,7 @@ class TestCleanTransform:
 
 class TestPairGender:
     def test_pronoun_moved_but_noun_did_not(self, qc):
-        """Carly's report: one half of "her husband" changes and the other does not."""
+        """A reader's report: one half of "her husband" changes and the other does not."""
         source = book(["Her husband was there."])
         output = book(["His husband was there."])
         report = qc.check_book(source, output)

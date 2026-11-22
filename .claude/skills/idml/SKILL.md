@@ -59,7 +59,7 @@ The current pipeline is `scripts/layout_book.py` → produces `books/output/prid
 Spawn an **Explore agent** to read the current template state, even if you think you remember it. Templates drift between sessions when Matt or the user tunes them.
 
 ```
-Explore agent prompt: "Unzip /Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice-finals/book_template.idml to /tmp/. Report:
+Explore agent prompt: "Unzip books/output/pride-and-prejudice-finals/book_template.idml to /tmp/. Report:
 1. Resources/Styles.xml — all paragraph styles by name + key properties (PointSize, Leading, FirstLineIndent). Confirm Basic Paragraph BBB, Chapter Header, Chapter Numbers exist with expected values.
 2. MasterSpread_ue8dd.xml — frame IDs and their ItemTransform + path anchors for the chapter number frame (ue977) and label frame (ue990). Compute net spread coords (transform + anchor).
 3. Master B placeholder story contents — confirm ue994 has 'CHAPTER' literal and ue97a has the number placeholder.
@@ -81,7 +81,7 @@ Run `python3 scripts/layout_book.py` end-to-end. The in-script `validate()` runs
 
 1. **Spawn a structural-audit agent** to re-open the emitted IDML and verify deeper invariants the in-script validate misses:
    ```
-   general-purpose agent prompt: "Open /Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice-finals/all_male.idml. Verify:
+   general-purpose agent prompt: "Open books/output/pride-and-prejudice-finals/all_male.idml. Verify:
    1. Every spread referenced in designmap.xml exists in the ZIP.
    2. Every Story ID in StoryList= has a corresponding Stories/Story_*.xml file.
    3. Master B's placeholder stories (ue94b, ue97a, ue993, ue9b5, ue9ce, ue9e7, uea00) and Master A's (u637e, u5ff1, u600a, u6023, u603d) are all present and non-empty (or empty-but-well-formed).

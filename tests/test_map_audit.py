@@ -178,10 +178,7 @@ class TestAgainstTheShippedEditions:
         import json
         import pathlib
 
-        base = pathlib.Path(
-            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-            "nonbinary_2026-09-11_23-16"
-        )
+        base = pathlib.Path("books/output/pride-and-prejudice/nonbinary_2026-09-11_23-16")
         if not (base / "name_map.json").exists():
             pytest.skip("the shipped nonbinary edition is not on this machine")
 
@@ -204,10 +201,7 @@ class TestAgainstTheShippedEditions:
         import json
         import pathlib
 
-        base = pathlib.Path(
-            "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-            "gender_swap_2026-09-12_14-37"
-        )
+        base = pathlib.Path("books/output/pride-and-prejudice/gender_swap_2026-09-12_14-37")
         if not (base / "name_map.json").exists():
             pytest.skip("that edition is not on this machine")
 

@@ -15,7 +15,8 @@ import json
 import re
 from pathlib import Path
 
-B = "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice-finals/press_ready_files_82926/"
+REPO = Path(__file__).resolve().parents[1]
+B = str(REPO / "books/output/pride-and-prejudice-finals/press_ready_files_82926") + "/"
 with open(B + "source_pg1342_61ch.json") as handle:
     book = json.load(handle)
 by_number = {c["number"]: c for c in book["chapters"]}
@@ -65,7 +66,7 @@ for number, _why in GOLDEN:
         out.append("")
     out.append("")
 
-path = Path("/Users/jasonhuff/regender-xyz test books/pride-prejudice-golden.txt")
+path = REPO.parent / "regender-xyz test books" / "pride-prejudice-golden.txt"
 path.write_text("\n".join(out), encoding="utf-8")
 
 text = path.read_text(encoding="utf-8")

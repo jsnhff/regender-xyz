@@ -6,7 +6,7 @@ This volume was produced using regender.xyz, free and open source software that 
 
 The software processed Jane Austen's Pride & Prejudice (1813) to generate four complete versions of the novel: genders swapped, all male, all female, and gender neutral.
 
-Cover illustration: Raman Dijafari
+Cover illustration: Raman Djafari
 Book design: Matt Bucknall
 Typography: Bye Bye Binary
 Engineering: Bill Barnes

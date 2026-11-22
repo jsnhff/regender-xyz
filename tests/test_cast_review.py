@@ -33,8 +33,7 @@ from src.models.character import Character, CharacterAnalysis, Gender
 from src.services.character_service import CharacterService
 
 REAL_CAST = pathlib.Path(
-    "/Users/jasonhuff/regender-xyz/books/output/pride-and-prejudice/"
-    "all_male_2026-09-10_21-44/characters.json"
+    "books/output/pride-and-prejudice/all_male_2026-09-10_21-44/characters.json"
 )
 
 
