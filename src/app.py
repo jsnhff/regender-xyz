@@ -22,6 +22,57 @@ from src.parsers.book_converter import BookConverter
 from src.plugins.base import PluginManager
 
 
+def run_problems(result: dict) -> list[str]:
+    """What a person has to know before trusting a finished book.
+
+    A run that completes has produced a whole book, and "whole" was all it
+    said. Each of these is a way that book can be wrong while the run reports
+    success, and each was already known to the run: logged among the progress
+    lines, or written to a file beside the output, and absent from the one
+    place a person looks. The interface and the command line both read this
+    list, so neither can fall behind the other again.
+    """
+    problems = []
+
+    partial = result.get("untransformed_chapters") or []
+    if partial:
+        noun = "Chapter" if len(partial) == 1 else "Chapters"
+        problems.append(
+            f"{noun} {', '.join(str(n) for n in partial)} kept original text, in whole or "
+            "in part: model calls failed there, so the book is only partly transformed."
+        )
+
+    qc = result.get("quality_control")
+    if not qc or qc.get("did_not_run"):
+        reason = (qc or {}).get("did_not_run")
+        problems.append(
+            "Quality control did not run" + (f" ({reason})" if reason else "") + ", so nothing "
+            "in this book has been checked against its source."
+        )
+    elif qc.get("structural"):
+        count = qc["structural"]
+        naming = qc.get("naming_problems") or 0
+        if naming and count == 1:
+            detail = ": a character is called a name nobody chose"
+        elif naming:
+            detail = f", {naming} of them a character called a name nobody chose"
+        else:
+            detail = ""
+        problems.append(
+            f"QC found {count} structural problem{'' if count == 1 else 's'}{detail}. "
+            "Read the QC report before using this book."
+        )
+
+    names = result.get("name_map_problems") or []
+    if names:
+        shown = "; ".join(names[:2]) + (f"; and {len(names) - 2} more" if len(names) > 2 else "")
+        problems.append(
+            f"The name map has {len(names)} problem{'' if len(names) == 1 else 's'}: {shown}."
+        )
+
+    return problems
+
+
 def _cast_summary(characters, transform_type: TransformType) -> dict:
     """Who this transform actually regenders, and into what.
 
@@ -268,7 +319,7 @@ class Application:
 
             source = book.to_dict() if hasattr(book, "to_dict") else book
             if not hasattr(transformation, "get_transformed_book"):
-                return None
+                return {"did_not_run": "the transform produced no book to check"}
             transformed = transformation.get_transformed_book().to_dict()
 
             # QCService wants the enum; process_book carries the string. Passing
@@ -346,8 +397,11 @@ class Application:
                 "blocked": bool(structural),
             }
         except Exception as error:  # QC must never be the reason a run is lost
-            self.logger.warning(f"Quality control did not run: {error}")
-            return None
+            # Nor may it be lost quietly. This returned nothing, and nothing is
+            # what a caller shows for a clean report: a run whose QC crashed
+            # read exactly like a run whose QC found no fault.
+            self.logger.error(f"Quality control did not run: {error}", exc_info=True)
+            return {"did_not_run": str(error) or type(error).__name__}
 
     def get_service(self, name: str):
         """
@@ -601,12 +655,28 @@ class Application:
             # and the counts line up. That is a partial book, and it must not
             # read as a complete one.
             qc_summary = None
+            map_problems: list[str] = []
             partial = list(getattr(transformer, "failed_chapters", []) or [])
             if partial:
                 self.logger.error(
                     f"{len(partial)} chapter(s) kept their original, untransformed text: "
                     + ", ".join(str(n) for n in partial)
                 )
+
+            # Every chapter kept original text: the model answered for none
+            # of the book. Writing that out as a transformed edition -- the
+            # source with the term map run over it -- is the worst thing a run
+            # can do quietly, so it is not written at all.
+            if partial and len(partial) >= len(book.chapters):
+                first = next(iter(getattr(transformer, "unanswered", []) or []), None)
+                reason = f" The first failure was: {first[1]}" if first else ""
+                return {
+                    "success": False,
+                    "error": (
+                        f"The model did not answer for any of the {len(book.chapters)} "
+                        f"chapters, so no book was written.{reason}"
+                    ),
+                }
 
             # What the safety net decided, and which of those decisions want a
             # second look. A capitalised word that does not open a sentence is
@@ -702,12 +772,21 @@ class Application:
                 "output_path": output_path,
                 "untransformed_chapters": partial,
                 "quality_control": qc_summary,
+                # Both audits: the one before the transform sees collisions the
+                # finished map cannot show, and the one after sees what the
+                # alias and title expansion added. They were logged and written
+                # to a file, and never returned.
+                "name_map_problems": list(
+                    dict.fromkeys([*(name_report.get("problems") or []), *map_problems])
+                ),
                 "substitutions_to_review": len(flagged),
             }
 
         except Exception as e:
-            self.logger.error(f"Failed to process book: {e}")
-            return {"success": False, "error": str(e)}
+            # With the traceback: "Failed to process book: 'name'" names a
+            # symptom and throws away where it happened.
+            self.logger.error(f"Failed to process book: {e}", exc_info=True)
+            return {"success": False, "error": str(e) or type(e).__name__}
 
     async def _save_output(self, transformation, output_path: str):
         """Save transformation output."""

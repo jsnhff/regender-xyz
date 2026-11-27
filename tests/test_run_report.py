@@ -277,3 +277,37 @@ class TestUsageSurvivesShutdown:
         app = self.make()
         app._capture_usage(_App(_Provider(100, 50, 1)))
         assert app._session_usage["calls"] == 1
+
+
+class TestWhatUsedToGoUnsaid:
+    """Known when the run ended, and shown nowhere."""
+
+    def test_qc_that_crashed_does_not_read_as_a_clean_report(self, tui):
+        result = {**RESULT, "quality_control": {"did_not_run": "KeyError: 'paragraphs'"}}
+        tui._show_run_report(result, 62.0)
+        lines = plain(tui._lines)
+        assert any("QC" in line and "did not run" in line for line in lines)
+        assert not any("0 structural" in line for line in lines)
+
+    def test_qc_that_never_ran_says_so_too(self, tui):
+        tui._show_run_report({**RESULT, "quality_control": None}, 62.0)
+        assert any("did not run" in line for line in plain(tui._lines))
+
+    def test_name_map_problems_get_a_line(self, tui):
+        result = {**RESULT, "name_map_problems": ["two people, one name", "given name lost"]}
+        tui._show_run_report(result, 62.0)
+        assert any("Name map" in line and "2 problems" in line for line in plain(tui._lines))
+
+    def test_a_clean_map_gets_none(self, tui):
+        tui._show_run_report({**RESULT, "name_map_problems": []}, 62.0)
+        assert not any("Name map" in line for line in plain(tui._lines))
+
+    def test_the_new_lines_fit_eighty_columns(self, tui):
+        result = {
+            **RESULT,
+            "quality_control": {"did_not_run": "x" * 200},
+            "name_map_problems": ["y"] * 12,
+        }
+        tui._show_run_report(result, 62.0)
+        for line in plain(tui._lines):
+            assert len(line) <= 78, f"too wide: {line!r}"
