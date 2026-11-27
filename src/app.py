@@ -547,12 +547,21 @@ class Application:
                 from src.services.character_state import (
                     detect_marital_changes,
                     initial_marital_state,
+                    marital_states,
                     marital_title_maps,
                 )
 
                 book_dict = book.to_dict() if hasattr(book, "to_dict") else book
                 changes = detect_marital_changes(book_dict, characters.characters)
-                opening = initial_marital_state(characters.characters)
+                # With the book, not from the cast alone: the cast cannot tell
+                # a wife from a bride, or a wife from a mother.
+                opening = initial_marital_state(characters.characters, book_dict)
+                # Each verdict with what it rests on, so it can be read and
+                # disputed before the book is printed rather than after.
+                name_report["marital_states"] = [
+                    state.to_dict()
+                    for state in marital_states(book_dict, characters.characters).values()
+                ]
                 title_base, title_timeline = marital_title_maps(
                     characters.characters, changes, opening
                 )

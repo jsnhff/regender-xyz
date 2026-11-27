@@ -62,9 +62,9 @@ class TestTitleEntriesAreNotWrittenFromDescriptions:
         entries = title_entries(man("Mr. Bennet"), woman("Mrs. Bennet", title="Mrs."))
         assert entries == {"Mr. Bennet": "Mrs. Bennet"}
 
-    def test_a_name_with_a_given_name_keeps_its_entry(self):
-        """It never matches the text, and it is what tells the model his title."""
-        assert title_entries(man("Mr. Charles Bingley")) == {"Mr. Charles Bingley": "Miss Bingley"}
+    def test_a_name_with_a_given_name_is_entered_as_the_text_names_him(self):
+        """The book says "Mr. Bingley", whatever the cast calls him."""
+        assert title_entries(man("Mr. Charles Bingley")) == {"Mr. Bingley": "Miss Bingley"}
 
     def test_surnames_of_other_shapes_are_still_surnames(self):
         for name, expected in (
