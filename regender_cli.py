@@ -161,6 +161,13 @@ async def process_book(args):
             print("\n  Before you use this book:")
             for problem in problems:
                 print(f"  - {problem}")
+            if result.get("name_map_problems"):
+                # The app asks about these before it runs. Here nobody can be
+                # asked, so say how a name is settled from the command line.
+                print(
+                    '\n  To settle a name, pass --name-map \'{"Original": "Target"}\', '
+                    "or run\n  regender_cli.py with no arguments: the app asks before it starts."
+                )
             app.shutdown()
             sys.exit(EXIT_FINISHED_WITH_PROBLEMS)
     else:

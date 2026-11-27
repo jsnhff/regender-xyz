@@ -210,6 +210,19 @@ class TestTheCommandLine:
         assert "Quality control did not run (boom)" in out
         assert "QC: 0 structural" not in out, "a crashed QC must not print a clean tally"
 
+    def test_a_name_problem_comes_with_what_to_do_about_it(self, monkeypatch, tmp_path, capsys):
+        """Nobody can be asked from the command line, so it says how to answer."""
+        result = {**CLEAN, "name_map_problems": ["two people, one name"]}
+        with pytest.raises(SystemExit):
+            _run_cli(monkeypatch, tmp_path, result)
+        out = capsys.readouterr().out
+        assert "--name-map" in out and "the app asks before it starts" in out
+
+    def test_other_problems_do_not_get_that_advice(self, monkeypatch, tmp_path, capsys):
+        with pytest.raises(SystemExit):
+            _run_cli(monkeypatch, tmp_path, {**CLEAN, "untransformed_chapters": [3]})
+        assert "--name-map" not in capsys.readouterr().out
+
     def test_a_failed_run_still_exits_one(self, monkeypatch, tmp_path, capsys):
         with pytest.raises(SystemExit) as stopped:
             _run_cli(monkeypatch, tmp_path, {"success": False, "error": "no provider"})
