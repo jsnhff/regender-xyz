@@ -423,10 +423,16 @@ class QCService:
         # there is no map at all, so every other name check stands down -- and
         # a model that renamed the heroine anyway would pass unremarked.
         for name in sorted(self._untouched_names):
-            before = self._word_count(source_text, name)
+            # A name is capitalised wherever it stands. A cast entry called
+            # "Housekeeper" is a job, and the book says "the housekeeper"
+            # sixteen times; a swap is right to change that word, and counting
+            # it as a name reported a character renamed against instructions.
+            if self._exact_count(source_text, name.lower()):
+                continue
+            before = self._exact_count(source_text, name)
             if before < 10:
                 continue
-            after = self._word_count(output_text, name)
+            after = self._exact_count(output_text, name)
             if after < before * 0.6:
                 report.findings.append(
                     Finding(
@@ -439,6 +445,11 @@ class QCService:
                         f"this character something nobody chose",
                     )
                 )
+
+    @staticmethod
+    def _exact_count(text: str, word: str) -> int:
+        """Whole-word occurrences in the case given."""
+        return len(re.findall(rf"(?<![A-Za-z']){re.escape(word)}(?![A-Za-z'])", text))
 
     @staticmethod
     def _word_count(text: str, word: str) -> int:

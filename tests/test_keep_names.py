@@ -208,6 +208,21 @@ class TestQCSeesAKeptNameGoMissing:
         renamed = _book(*[f"Edmund walked to Meryton with Jane on day {n}." for n in range(12)])
         assert _findings(renamed, name_map={"Elizabeth": "Edmund"}) == []
 
+    def test_a_job_the_cast_lists_as_a_name_is_not_one(self):
+        """ "Housekeeper" in the cast, "the housekeeper" in the book, "steward" after."""
+        source = _book(
+            *[f"The housekeeper showed them in on day {n}." for n in range(12)],
+            "Housekeeper Reynolds smiled.",
+        )
+        output = _book(
+            *[f"The steward showed them in on day {n}." for n in range(12)],
+            "Steward Reynolds smiled.",
+        )
+        report = QCService(TransformType.GENDER_SWAP, cast=["Housekeeper"]).check_book(
+            source, output
+        )
+        assert [f for f in report.findings if f.kind == "kept_name_lost"] == []
+
     def test_a_name_too_rare_to_count_is_left_alone(self):
         source = _book(*["Elizabeth walked to Meryton."] * 4)
         output = _book(*["Elliot walked to Meryton."] * 4)
