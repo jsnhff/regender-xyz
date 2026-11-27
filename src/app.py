@@ -22,6 +22,57 @@ from src.parsers.book_converter import BookConverter
 from src.plugins.base import PluginManager
 
 
+def run_problems(result: dict) -> list[str]:
+    """What a person has to know before trusting a finished book.
+
+    A run that completes has produced a whole book, and "whole" was all it
+    said. Each of these is a way that book can be wrong while the run reports
+    success, and each was already known to the run: logged among the progress
+    lines, or written to a file beside the output, and absent from the one
+    place a person looks. The interface and the command line both read this
+    list, so neither can fall behind the other again.
+    """
+    problems = []
+
+    partial = result.get("untransformed_chapters") or []
+    if partial:
+        noun = "Chapter" if len(partial) == 1 else "Chapters"
+        problems.append(
+            f"{noun} {', '.join(str(n) for n in partial)} kept original text, in whole or "
+            "in part: model calls failed there, so the book is only partly transformed."
+        )
+
+    qc = result.get("quality_control")
+    if not qc or qc.get("did_not_run"):
+        reason = (qc or {}).get("did_not_run")
+        problems.append(
+            "Quality control did not run" + (f" ({reason})" if reason else "") + ", so nothing "
+            "in this book has been checked against its source."
+        )
+    elif qc.get("structural"):
+        count = qc["structural"]
+        naming = qc.get("naming_problems") or 0
+        if naming and count == 1:
+            detail = ": a character is called a name nobody chose"
+        elif naming:
+            detail = f", {naming} of them a character called a name nobody chose"
+        else:
+            detail = ""
+        problems.append(
+            f"QC found {count} structural problem{'' if count == 1 else 's'}{detail}. "
+            "Read the QC report before using this book."
+        )
+
+    names = result.get("name_map_problems") or []
+    if names:
+        shown = "; ".join(names[:2]) + (f"; and {len(names) - 2} more" if len(names) > 2 else "")
+        problems.append(
+            f"The name map has {len(names)} problem{'' if len(names) == 1 else 's'}: {shown}."
+        )
+
+    return problems
+
+
 def _cast_summary(characters, transform_type: TransformType) -> dict:
     """Who this transform actually regenders, and into what.
 
@@ -124,9 +175,6 @@ class Application:
             Default configuration dictionary
         """
         return {
-            "providers": [
-                {"type": "unified", "module": "src.providers.unified_provider", "config": {}}
-            ],
             "services": {
                 "parser": {
                     "class": "src.services.parser_service.ParserService",
@@ -196,8 +244,13 @@ class Application:
 
         if provider:
             try:
-                # Initialize provider (it will read API keys from environment)
-                provider.initialize({})
+                # Initialize provider (it will read API keys from environment).
+                #
+                # The model chosen in the interface arrives as DEFAULT_MODEL.
+                # Nothing read it: the menu reported and priced the choice
+                # while every call went to whatever <PROVIDER>_MODEL or the
+                # provider's own default named.
+                provider.initialize({"model": os.getenv("DEFAULT_MODEL") or None})
 
                 # Register as service for dependency injection
                 self.context.register_instance("llm_provider", provider)
@@ -263,7 +316,7 @@ class Application:
 
             source = book.to_dict() if hasattr(book, "to_dict") else book
             if not hasattr(transformation, "get_transformed_book"):
-                return None
+                return {"did_not_run": "the transform produced no book to check"}
             transformed = transformation.get_transformed_book().to_dict()
 
             # QCService wants the enum; process_book carries the string. Passing
@@ -341,8 +394,11 @@ class Application:
                 "blocked": bool(structural),
             }
         except Exception as error:  # QC must never be the reason a run is lost
-            self.logger.warning(f"Quality control did not run: {error}")
-            return None
+            # Nor may it be lost quietly. This returned nothing, and nothing is
+            # what a caller shows for a clean report: a run whose QC crashed
+            # read exactly like a run whose QC found no fault.
+            self.logger.error(f"Quality control did not run: {error}", exc_info=True)
+            return {"did_not_run": str(error) or type(error).__name__}
 
     def get_service(self, name: str):
         """
@@ -395,6 +451,158 @@ class Application:
         character_service = self.get_service("character")
         return await character_service.process(book)
 
+    async def plan_names(
+        self,
+        transform_type: str,
+        characters: CharacterAnalysis,
+        file_path: Optional[str] = None,
+        name_map: Optional[dict[str, str]] = None,
+        selected_characters: Optional[list[str]] = None,
+        keep_names: bool = False,
+        marital_rulings: Optional[dict[str, dict]] = None,
+        book: Any = None,
+    ) -> dict[str, Any]:
+        """Decide everything about names, without transforming anything.
+
+        Renames used to be improvised by the model chunk by chunk, so one
+        character could end up with several names in the same book. They are
+        decided once here. User-supplied entries win; the engine fills in the
+        rest, unless the reader asked for the originals.
+
+        Returned as a plan a caller can show to someone, have ruled on with
+        finish_name_plan, and hand to process_book. This is the half that
+        needs a model; finish_name_plan is the half that does not.
+        """
+        from src.services.character_service import CharacterService
+        from src.services.name_engine import NameEngine, audit_name_map
+
+        if book is None:
+            book = await self.get_service("parser").process(file_path)
+        kind = TransformType(transform_type)
+
+        engine = NameEngine(provider=self.get_service("transform").provider, logger=self.logger)
+        engine_map, report = await engine.build_name_map(
+            characters,
+            kind,
+            base_map=name_map,
+            selected_characters=selected_characters,
+            propose=not keep_names,
+        )
+        self.logger.info(
+            f"Name map: {report['entries']} entries ({report['accepted']} characters renamed)"
+            + (" -- names kept as written" if keep_names else "")
+        )
+
+        # Audited as the engine left it. A gender-swap edition shipped with
+        # Darcy called "Fitzwillia" throughout, three women sharing one man's
+        # name, and five characters carrying two names each -- all of it
+        # visible in the map that produced it.
+        #
+        # And the collisions the map cannot show. A character the book names
+        # only by title and family name carries no map entry, so "Mr. Bennet"
+        # and "Mrs. Bennet" both landing on one name is invisible to an audit
+        # that reads the map. It is still two people under one name.
+        early = [
+            *audit_name_map(engine_map or {}, characters),
+            *CharacterService.unresolved_collisions(characters, kind, engine_map or {}),
+            # And the characters the engine meant to rename and could not: a
+            # proposal turned down twice, or the call that makes them failing.
+            # They keep their old names under a new gender, and that was only
+            # ever a warning in the log.
+            *(
+                f"no new name was chosen, so the original is kept: {item}"
+                for item in report.get("dropped") or []
+            ),
+        ]
+        return self.finish_name_plan(
+            {
+                "transform_type": kind.value,
+                "book": book.to_dict() if hasattr(book, "to_dict") else book,
+                "engine_map": dict(engine_map or {}),
+                "engine_report": report,
+                "early_problems": early,
+            },
+            characters,
+            marital_rulings,
+        )
+
+    def finish_name_plan(
+        self,
+        plan: dict[str, Any],
+        characters: CharacterAnalysis,
+        marital_rulings: Optional[dict[str, dict]] = None,
+    ) -> dict[str, Any]:
+        """Finish a plan from the engine's renames: titles, aliases, and the audit.
+
+        Nothing here needs a model, so it can be run again whenever a reader
+        rules on who is married -- the renames they have already seen stay
+        exactly as they were.
+
+        The map is only finished at the end of this: the engine's renames, the
+        titles a swap derives from marital state, and every alias the
+        transform will add. An audit of anything less called maps clean that
+        went on to give two people one name.
+        """
+        from src.services.name_engine import audit_name_map
+
+        kind = TransformType(plan["transform_type"])
+        report = dict(plan["engine_report"])
+        name_map = dict(plan["engine_map"])
+        timeline = None
+        states: dict[str, Any] = {}
+
+        # Marital status is not a fixed property. Darcy is unmarried for sixty
+        # chapters and married in the sixty-first; Collins marries in
+        # twenty-eight. A swap has to know, because English women's titles
+        # encode it and men's do not, and the answer changes mid-book --
+        # sometimes mid-chapter, so the marker is the paragraph.
+        if kind == TransformType.GENDER_SWAP:
+            from src.services.character_state import (
+                changes_from,
+                marital_states,
+                marital_title_maps,
+                with_rulings,
+            )
+
+            # Read from the book, not from the cast alone: the cast cannot tell
+            # a wife from a bride, or a wife from a mother. A reader can, and
+            # their rulings go over the top.
+            states = with_rulings(
+                marital_states(plan["book"], characters.characters), marital_rulings
+            )
+            changes = changes_from(states)
+            title_base, timeline = marital_title_maps(
+                characters.characters, changes, {name: s.opens for name, s in states.items()}
+            )
+            # The engine's own entries win: a rename decided for a character
+            # is more specific than a title derived from their status.
+            name_map = {**title_base, **name_map}
+            # Each verdict with what it rests on, so it can be read and
+            # disputed before the book is printed rather than after.
+            report["marital_states"] = [state.to_dict() for state in states.values()]
+            report["state_changes"] = [c.to_dict() for c in changes]
+            if changes:
+                self.logger.info(
+                    "Marital status changes: "
+                    + ", ".join(f"{c.character} at ch{c.chapter} p{c.paragraph}" for c in changes)
+                )
+
+        finished_map = self.get_service("transform").finished_name_map(name_map, characters)
+        problems = list(
+            dict.fromkeys([*plan["early_problems"], *audit_name_map(finished_map, characters)])
+        )
+        report["problems"] = problems
+        return {
+            **plan,
+            "name_map": name_map,
+            "title_timeline": timeline,
+            "finished_map": finished_map,
+            "problems": problems,
+            "report": report,
+            "marital_states": states,
+            "marital_rulings": dict(marital_rulings or {}),
+        }
+
     async def process_book(
         self,
         file_path: str,
@@ -405,6 +613,10 @@ class Application:
         custom_title: Optional[str] = None,
         on_chapter_complete: Optional[Any] = None,
         characters: Optional[CharacterAnalysis] = None,
+        keep_names: bool = False,
+        stop_on_name_problems: bool = False,
+        name_plan: Optional[dict] = None,
+        marital_rulings: Optional[dict[str, dict]] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -419,6 +631,17 @@ class Application:
             characters: The cast this run already analysed. Passing it is how a
                 caller that has shown the reader a cast guarantees the book is
                 transformed against that same cast and no other.
+            keep_names: Every character keeps the name the book gives them.
+                Entries in name_map are still applied; nothing is added to it.
+            stop_on_name_problems: Return before the transform, with the
+                problems, when the finished name map has any. The map and the
+                cast are still written beside where the book would have gone.
+            name_plan: What plan_names returned, when the caller has already
+                shown it to someone. The run then uses exactly that plan: the
+                names and titles that were read are the ones that are applied.
+            marital_rulings: A reader's rulings on who is married and when,
+                for a run that has to plan for itself. Without this, rulings
+                made on screen were lost whenever the plan was.
 
         Returns:
             Processing results
@@ -448,56 +671,30 @@ class Application:
                 self.logger.info("Using the cast supplied by the caller")
             self.logger.info(f"Using {len(characters.characters)} characters")
 
-            # Decide every character rename ONCE, before any chapter is
-            # transformed. Renames used to be improvised by the LLM chunk by
-            # chunk, so one character could end up with several targets in the
-            # same book (Elizabeth -> Elliot in one chapter, Edward in another).
-            # User-supplied entries win; the engine fills in the rest.
-            from src.services.name_engine import NameEngine
-
-            engine = NameEngine(provider=self.get_service("transform").provider, logger=self.logger)
-            name_map, name_report = await engine.build_name_map(
-                characters,
-                TransformType(transform_type),
-                base_map=name_map,
+            # Everything about names is settled here, before any chapter is
+            # transformed: the renames, the titles a swap derives from who is
+            # married, every alias, and an audit of the finished map. A caller
+            # that has already done this -- the interface does, so a person can
+            # read it and rule on it -- hands the plan over, and the run applies
+            # exactly what was shown.
+            if name_plan is not None and name_plan.get("transform_type") != (
+                TransformType(transform_type).value
+            ):
+                self.logger.warning("The name plan is for another transform; planning afresh")
+                name_plan = None
+            plan = name_plan or await self.plan_names(
+                transform_type=transform_type,
+                characters=characters,
+                name_map=name_map,
                 selected_characters=selected_characters,
+                keep_names=keep_names,
+                marital_rulings=marital_rulings,
+                book=book,
             )
-            self.logger.info(
-                f"Name map: {name_report['entries']} entries "
-                f"({name_report['accepted']} characters renamed)"
-            )
+            name_map = plan["name_map"]
+            name_report = plan["report"]
+            finished_map = plan["finished_map"]
 
-            # Audit the map here, before a single chapter is transformed. Every
-            # naming fault is knowable at this point and costs nothing to fix;
-            # found afterwards it has been written into the book 222 times and
-            # the run has already been paid for. A gender-swap edition shipped
-            # with Darcy called "Fitzwillia" throughout, three women sharing one
-            # man's name, and five characters carrying two names each -- all of
-            # it visible in the map that produced it.
-            from src.services.name_engine import audit_name_map
-
-            name_report["problems"] = audit_name_map(name_map or {}, characters)
-
-            # And the collisions the map cannot show. A character the book
-            # names only by title and family name carries no map entry -- the
-            # title swap belongs to the term map -- so "Mr. Bennet" and "Mrs.
-            # Bennet" both landing on "Mrs. Bennet" is invisible to an audit
-            # that reads the map. It is still two people under one name, and it
-            # is the shape a refused suggestion leaves behind.
-            from src.services.character_service import CharacterService
-
-            name_report["problems"].extend(
-                CharacterService.unresolved_collisions(
-                    characters, TransformType(transform_type), name_map or {}
-                )
-            )
-            if name_report["problems"]:
-                self.logger.error(
-                    f"{len(name_report['problems'])} problem(s) in the name map, "
-                    "before transforming: " + "; ".join(name_report["problems"][:6])
-                )
-
-            # Save character analysis immediately if we have output path and it's not already saved
             if output_dir:
                 # Written every time, not just when absent: the file beside an
                 # edition is the record of what produced it, and a stale one is
@@ -507,16 +704,16 @@ class Application:
                     json.dump(characters.to_dict(), f, indent=2, default=str)
                 self.logger.info(f"Saved character analysis to {char_file}")
 
+                # The map the audit judged, written before the transform rather
+                # than after it, so a verdict meant to stop a run can be checked
+                # against the map it is a verdict on.
+                with open(output_dir / "name_map_proposed.json", "w") as f:
+                    json.dump(finished_map, f, indent=2, ensure_ascii=False)
                 with open(output_dir / "name_report.json", "w") as f:
                     json.dump(name_report, f, indent=2)
-
-                # The map the audit just judged, written before the transform
-                # rather than after it. Without this the report names problems
-                # in a map nobody can open: the only copy on disk is the one
-                # saved when the run finishes, which is too late to check a
-                # verdict that was meant to stop the run.
-                with open(output_dir / "name_map_proposed.json", "w") as f:
-                    json.dump(name_map or {}, f, indent=2, ensure_ascii=False)
+                if name_report["problems"]:
+                    with open(output_dir / "name_map_problems.json", "w") as f:
+                        json.dump(name_report["problems"], f, indent=2)
 
             # Transform the book
             transformer = self.get_service("transform")
@@ -533,40 +730,26 @@ class Application:
                         token for token in re.split(r"\s+", form.strip()) if token[:1].isupper()
                     )
             transformer.protect_names(surnames, TransformType(transform_type))
-
-            # Marital status is not a fixed property. Darcy is unmarried for
-            # sixty chapters and married in the sixty-first; Collins marries in
-            # twenty-eight. A swap has to know, because English women's titles
-            # encode it and men's do not, and the answer changes mid-book --
-            # sometimes mid-chapter, so the marker is the paragraph.
-            if TransformType(transform_type) == TransformType.GENDER_SWAP:
-                from src.services.character_state import (
-                    detect_marital_changes,
-                    initial_marital_state,
-                    marital_title_maps,
-                )
-
-                book_dict = book.to_dict() if hasattr(book, "to_dict") else book
-                changes = detect_marital_changes(book_dict, characters.characters)
-                opening = initial_marital_state(characters.characters)
-                title_base, title_timeline = marital_title_maps(
-                    characters.characters, changes, opening
-                )
-                # The engine's own entries win: a rename decided for a character
-                # is more specific than a title derived from their status.
-                name_map = {**title_base, **(name_map or {})}
-                transformer.set_title_timeline(title_timeline)
-                name_report["state_changes"] = [c.to_dict() for c in changes]
-                if changes:
-                    self.logger.info(
-                        "Marital status changes: "
-                        + ", ".join(
-                            f"{c.character} at ch{c.chapter} p{c.paragraph}" for c in changes
-                        )
-                    )
+            transformer.set_title_timeline(plan["title_timeline"] or [])
             protected = getattr(transformer, "_protected_names", None)
             if protected:
                 self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")
+
+            if name_report["problems"]:
+                self.logger.error(
+                    f"{len(name_report['problems'])} problem(s) in the finished name map, "
+                    "before transforming: " + "; ".join(name_report["problems"][:6])
+                )
+                if stop_on_name_problems:
+                    return {
+                        "success": False,
+                        "stopped_before_transform": True,
+                        "error": (
+                            f"The name map has {len(name_report['problems'])} problem(s), "
+                            "so the transform was not started."
+                        ),
+                        "name_map_problems": name_report["problems"],
+                    }
 
             # Log selected characters if specified
             if selected_characters:
@@ -591,12 +774,32 @@ class Application:
             # and the counts line up. That is a partial book, and it must not
             # read as a complete one.
             qc_summary = None
+            map_problems: list[str] = []
             partial = list(getattr(transformer, "failed_chapters", []) or [])
             if partial:
                 self.logger.error(
                     f"{len(partial)} chapter(s) kept their original, untransformed text: "
                     + ", ".join(str(n) for n in partial)
                 )
+
+            # Every chapter kept original text: the model answered for none
+            # of the book. Writing that out as a transformed edition -- the
+            # source with the term map run over it -- is the worst thing a run
+            # can do quietly, so it is not written at all.
+            #
+            # Judged on replies, not on chapters. A chapter with one passage
+            # the model never answered counts as untransformed, so "every
+            # chapter failed" was also true of a short book that came through
+            # all but whole, and that book was refused.
+            if partial and getattr(transformer, "model_replies", None) == 0:
+                first = next(iter(getattr(transformer, "unanswered", []) or []), None)
+                reason = f" The first failure was: {first[1]}" if first else ""
+                return {
+                    "success": False,
+                    "error": (
+                        f"The model did not give one usable reply, so no book was written.{reason}"
+                    ),
+                }
 
             # What the safety net decided, and which of those decisions want a
             # second look. A capitalised word that does not open a sentence is
@@ -661,8 +864,16 @@ class Application:
                         + "; ".join(map_problems[:6])
                     )
                     if output_dir:
+                        # With the ones found before the run, which this file
+                        # already held. Written alone, this list replaced them,
+                        # and the report went on counting problems the file no
+                        # longer listed.
                         with open(output_dir / "name_map_problems.json", "w") as f:
-                            json.dump(map_problems, f, indent=2)
+                            json.dump(
+                                list(dict.fromkeys([*name_report["problems"], *map_problems])),
+                                f,
+                                indent=2,
+                            )
 
                 qc_summary = self._run_quality_control(
                     book,
@@ -692,12 +903,21 @@ class Application:
                 "output_path": output_path,
                 "untransformed_chapters": partial,
                 "quality_control": qc_summary,
+                # Both audits: the one before the transform sees collisions the
+                # finished map cannot show, and the one after sees what the
+                # alias and title expansion added. They were logged and written
+                # to a file, and never returned.
+                "name_map_problems": list(
+                    dict.fromkeys([*(name_report.get("problems") or []), *map_problems])
+                ),
                 "substitutions_to_review": len(flagged),
             }
 
         except Exception as e:
-            self.logger.error(f"Failed to process book: {e}")
-            return {"success": False, "error": str(e)}
+            # With the traceback: "Failed to process book: 'name'" names a
+            # symptom and throws away where it happened.
+            self.logger.error(f"Failed to process book: {e}", exc_info=True)
+            return {"success": False, "error": str(e) or type(e).__name__}
 
     async def _save_output(self, transformation, output_path: str):
         """Save transformation output."""

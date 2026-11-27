@@ -293,6 +293,29 @@ class QCService:
             if len(kept) > 1:
                 self._surnames.add(kept[-1])
 
+        # The names this run was not asked to change. A cast member the map
+        # says nothing about keeps their name -- because their gender does not
+        # move, or because the reader asked for the originals. Taken from the
+        # cast, less every word a map entry touches: "Lady Catherine" renamed
+        # as a unit removes most of the book's "Catherine", and that is the
+        # map working, not a name going missing.
+        mapped_words = {
+            w.lower() for entry in self.name_map for w in TransformService._WORD_RE.findall(entry)
+        }
+        self._untouched_names = set()
+        for original in cast or []:
+            if "'" in original or "\u2019" in original or _is_descriptive_name(original):
+                continue
+            for w in TransformService._WORD_RE.findall(original):
+                if (
+                    w[:1].isupper()
+                    and w.lower() not in TransformService._HONORIFICS
+                    and w.lower() not in TransformService._RANKS
+                    and w.lower() not in mapped_words
+                    and w not in self._surnames
+                ):
+                    self._untouched_names.add(w)
+
         self._exchange_targets = {
             name for name in self.name_map if name in set(self.name_map.values())
         }
@@ -365,9 +388,9 @@ class QCService:
         shapes, for position to be reliable -- but it cannot quietly lose most
         of its mentions.
         """
-        if not self.name_map:
+        if not self.name_map and not self._surnames:
             report.not_checked["surnames_survive"] = (
-                "no name map was given, so the family names of this book are unknown"
+                "no name map and no cast were given, so the family names of this book are unknown"
             )
             return
         surnames = set(self._surnames)
@@ -395,6 +418,38 @@ class QCService:
                         f"never the surname",
                     )
                 )
+
+        # And the given names nobody asked to change. With the originals kept
+        # there is no map at all, so every other name check stands down -- and
+        # a model that renamed the heroine anyway would pass unremarked.
+        for name in sorted(self._untouched_names):
+            # A name is capitalised wherever it stands. A cast entry called
+            # "Housekeeper" is a job, and the book says "the housekeeper"
+            # sixteen times; a swap is right to change that word, and counting
+            # it as a name reported a character renamed against instructions.
+            if self._exact_count(source_text, name.lower()):
+                continue
+            before = self._exact_count(source_text, name)
+            if before < 10:
+                continue
+            after = self._exact_count(output_text, name)
+            if after < before * 0.6:
+                report.findings.append(
+                    Finding(
+                        STRUCTURAL,
+                        "kept_name_lost",
+                        0,
+                        0,
+                        f"{name!r} was not to be renamed and is used {before}x in the "
+                        f"source but only {after}x in the transform: the book calls "
+                        f"this character something nobody chose",
+                    )
+                )
+
+    @staticmethod
+    def _exact_count(text: str, word: str) -> int:
+        """Whole-word occurrences in the case given."""
+        return len(re.findall(rf"(?<![A-Za-z']){re.escape(word)}(?![A-Za-z'])", text))
 
     @staticmethod
     def _word_count(text: str, word: str) -> int:

@@ -29,6 +29,7 @@ from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import DirectoryTree, Input, Label, Static
 
+from src import __version__
 from src.exporters import FORMATS, export_book
 from src.progress import ProgressContext, ProgressEvent, Stage, StageCompleteEvent
 
@@ -121,7 +122,7 @@ def _get_resolved_model() -> str:
         return model
     provider = os.environ.get("DEFAULT_PROVIDER", "openai")
     if provider == "anthropic":
-        return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
+        return os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
     return os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
@@ -145,17 +146,22 @@ MODEL_COSTS = {
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (1.00, 2.00),
+    "claude-fable-5-2": (8.00, 40.00),
+    "claude-mythos-5-2": (8.00, 40.00),
     "claude-fable-5-1": (10.00, 50.00),
     "claude-fable-5": (10.00, 50.00),
     "claude-mythos-5-1": (10.00, 50.00),
+    "claude-opus-5-5": (4.00, 20.00),
     "claude-opus-5": (5.00, 25.00),
     "claude-opus-4-8": (5.00, 25.00),
     "claude-opus-4-7": (5.00, 25.00),
     "claude-opus-4-6": (5.00, 25.00),
     "claude-opus-4-5": (5.00, 25.00),
+    "claude-sonnet-5-5": (2.00, 10.00),
     "claude-sonnet-5": (2.00, 10.00),
     "claude-sonnet-4-6": (3.00, 15.00),
     "claude-sonnet-4": (3.00, 15.00),
+    "claude-haiku-5-5": (0.10, 0.50),
     "claude-haiku-4-5": (1.00, 5.00),
     "claude-3-opus": (15.00, 75.00),
     "claude-3-sonnet": (3.00, 15.00),
@@ -168,17 +174,24 @@ MODEL_COSTS = {
 _UNPRICED = "pricing unknown"
 
 
+# What may follow a listed name and still be that model: the date of a
+# snapshot, in any of the three shapes the two vendors have used.
+_SNAPSHOT_SUFFIX = re.compile(r"^-(?:\d{8}|\d{4}-\d{2}-\d{2}|\d{4})$")
+
+
 def _lookup_model_cost(model: str) -> tuple[float, float] | None:
     """Match model string to cost table. Returns None if model is unrecognized.
 
-    Prefixes are tried longest first so a dated or point-release id resolves to
-    the most specific entry — `claude-fable-5-1` must not match `claude-fable-5`,
-    and `claude-sonnet-4-6` must not match `claude-sonnet-4`.
+    A listed name prices itself and its dated snapshots, nothing else. Any
+    longer id used to take the price of whatever it began with, so a model
+    released after this table was written was shown a price that belonged to
+    another: `gpt-4.1-mini` at the `gpt-4.1` rate, `claude-opus-5-5` at the
+    `claude-opus-5` rate. A wrong price is worse than "pricing unknown".
     """
     if model in MODEL_COSTS:
         return MODEL_COSTS[model]
     for key in sorted(MODEL_COSTS, key=len, reverse=True):
-        if model.startswith(key):
+        if model.startswith(key) and _SNAPSHOT_SUFFIX.match(model[len(key) :]):
             return MODEL_COSTS[key]
     return None
 
@@ -266,9 +279,9 @@ _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
         (mid, name, _price_label(mid))
         for mid, name in (
-            ("claude-opus-5", "Claude Opus 5"),
-            ("claude-sonnet-5", "Claude Sonnet 5"),
-            ("claude-haiku-4-5", "Claude Haiku 4.5"),
+            ("claude-opus-5-5", "Claude Opus 5.5"),
+            ("claude-sonnet-5-5", "Claude Sonnet 5.5"),
+            ("claude-haiku-5-5", "Claude Haiku 5.5"),
         )
     ],
     "openai": [
@@ -280,7 +293,11 @@ _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     ],
 }
 
-_OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
+# A family, not a list of generations. The list read ("gpt-4", "gpt-3.5-turbo",
+# "o1", "o3", "o4"), so an account offering GPT-5 and GPT-6 was shown GPT-4.1,
+# GPT-4o and o3 and nothing newer: the menu fell a generation behind every
+# time a generation shipped.
+_OPENAI_FAMILY = re.compile(r"^(?:gpt-|o\d)")
 _OPENAI_SKIP_PATTERNS = (
     "instruct",
     "realtime",
@@ -290,14 +307,56 @@ _OPENAI_SKIP_PATTERNS = (
     "dall-e",
     "embedding",
     "search",
+    "image",
+    "transcribe",
+    "moderation",
+    "codex",
+    "live",
+    "healthcare",
+    # Served by a different endpoint from the one this app calls.
+    "-pro",
 )
+_DATED_SNAPSHOT = re.compile(r"-\d{4}-\d{2}-\d{2}$")
 
 
 def _should_show_openai_model(model_id: str) -> bool:
     """Return True if this OpenAI model is suitable for text generation."""
     if any(s in model_id for s in _OPENAI_SKIP_PATTERNS):
         return False
-    return any(model_id.startswith(p) for p in _OPENAI_SHOW_PREFIXES)
+    return bool(_OPENAI_FAMILY.match(model_id))
+
+
+def _openai_models_to_offer(listed: list) -> list[str]:
+    """The ids worth showing, newest first, from what the account lists.
+
+    A dated snapshot is dropped when its undated name is also listed: they are
+    the same model, and thirty rows of dates bury the nine choices among them.
+    """
+    ids = {m.id for m in listed}
+    keep = [
+        m
+        for m in listed
+        if _should_show_openai_model(m.id)
+        and not (_DATED_SNAPSHOT.search(m.id) and _DATED_SNAPSHOT.sub("", m.id) in ids)
+    ]
+    keep.sort(key=lambda m: (-(getattr(m, "created", 0) or 0), m.id))
+    seen: set[str] = set()
+    ordered = [m.id for m in keep if not (m.id in seen or seen.add(m.id))]
+    # The recommended model leads, so Enter on a fresh install lands on a
+    # model this app has been run against rather than on whatever is newest.
+    return sorted(ordered, key=lambda mid: not _is_recommended_model(mid))
+
+
+def _provider_for_model(model_id: str, pricing: str = "") -> str:
+    """Which provider serves a model offered in the menu.
+
+    The menu lists every provider with a key side by side. Choosing a model
+    only recorded the model, so with both keys set and Anthropic the default,
+    picking GPT-4o sent "gpt-4o" to Anthropic.
+    """
+    if pricing == "local":
+        return "ollama"
+    return "anthropic" if model_id.startswith("claude-") else "openai"
 
 
 def _openai_display_name(model_id: str) -> str:
@@ -720,7 +779,9 @@ class HeaderBar(Container):
         with Horizontal(id="top-bar"), Horizontal(id="top-bar-content"):
             tagline = gradient_text("transform characters' gender in books", GREEN_GRADIENT)
             yield Label(f"{LOGO_ART}  {tagline}")
-            yield Label(gradient_text("v1.0", ["#aaaaaa", "#ffffff"]), id="version")
+            # One number, the release's. This said "v1.0" through two releases
+            # while the package said 2.0.0 and the Mac app said 1.1.0.
+            yield Label(gradient_text(f"v{__version__}", ["#aaaaaa", "#ffffff"]), id="version")
 
         # Border (wide enough for large terminals)
         yield Label("─" * 200, id="border1")
@@ -883,6 +944,13 @@ _ASK = "[#ffffff]?[/]"
 _ENTER = "\u21b5"
 _KEY = "[bold #ffffff]{}[/]"
 _PLAIN = re.compile(r"\[/?[^\]]*\]")
+
+
+def _wrap(text: str, width: int) -> list[str]:
+    """Plain word-wrap, for the lines that are sentences and not labels."""
+    import textwrap
+
+    return textwrap.wrap(text, width) or [""]
 
 
 def question_line(question: str, where: str = "") -> tuple[str, str]:
@@ -1341,7 +1409,6 @@ class RegenderTUI(App):
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
-        self._no_qc = False
         self._result: dict | None = None
         self._ran_application = None
 
@@ -1349,12 +1416,26 @@ class RegenderTUI(App):
         # a cast reviewed for the previous book is not this book's cast.
         self._pending_characters = None
         self._name_map: dict[str, str] | None = None
+        # "Keep the originals" is a decision, not the absence of one. No map
+        # on its own asks the engine to choose names, so the answer has to be
+        # carried separately or it is undone a moment later.
+        self._keep_names = False
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
         self._name_edit_mode: bool = False
         self._name_custom_mode: bool = False
         self._name_regen_mode: bool = False
         self._name_steer: str = ""
+
+        # Everything decided about names before the run, as the run will apply
+        # it, and what a person ruled on the way.
+        self._name_plan: dict | None = None
+        self._title_items: list = []
+        self._title_idx: int = 0
+        self._title_rulings: dict = {}
+        self._title_chapter_mode: bool = False
+        self._titles_settled: bool = False
+        self._plan_fix_mode: bool = False
 
         # The editorial review queue, which is about this book's findings.
         self._review_items: list = []
@@ -1423,6 +1504,11 @@ class RegenderTUI(App):
 
         has_openai = bool(openai_key and not openai_key.startswith("your-"))
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
+
+        # A local model needs no key. Without this the wizard ran again on
+        # every launch for anyone who had chosen one.
+        if provider == "ollama":
+            return False
 
         if not has_openai and not has_anthropic:
             return True  # Needs setup
@@ -1863,7 +1949,6 @@ class RegenderTUI(App):
                 f"[#ffffff]✓[/] Keeping: [bold #ffffff]{self._custom_title or self.book_title}[/]"
             )
         self.print("")
-        self._no_qc = True
         self._show_character_analysis_prompt()
 
     def _get_book_title(self, path: Path) -> str:
@@ -1926,14 +2011,16 @@ class RegenderTUI(App):
             self._handle_editorial_notice_input(value)
         elif self._stage == "model":
             self._handle_model_input(value)
-        elif self._stage == "options":
-            self._handle_options_input(value)
         elif self._stage == "retitle":
             self._handle_retitle_input(value)
         elif self._stage == "cast_review":
             self._handle_cast_review_input(value)
         elif self._stage == "name_review":
             self._handle_name_review_input(value)
+        elif self._stage == "title_review":
+            self._handle_title_review_input(value)
+        elif self._stage == "plan_problems":
+            self._handle_plan_problems_input(value)
         elif self._stage == "qc_review":
             self._handle_review_input(value)
         elif self._stage == "export":
@@ -2411,7 +2498,12 @@ class RegenderTUI(App):
             try:
                 import httpx
 
+                # The same variable the provider reads, which ends in /v1 for
+                # its OpenAI-style endpoint. The model list lives beside that,
+                # not under it, so the documented value always missed and the
+                # menu showed four models that may not be installed.
                 base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+                base_url = base_url.rstrip("/").removesuffix("/v1")
                 async with httpx.AsyncClient(timeout=5.0) as client:
                     resp = await client.get(f"{base_url}/api/tags")
                     models = resp.json().get("models", [])
@@ -2446,13 +2538,10 @@ class RegenderTUI(App):
 
                 client = AsyncOpenAI()
                 models_page = await client.models.list()
-                openai_models: list[tuple[str, str, str]] = []
-                seen: set[str] = set()
-                for m in sorted(models_page.data, key=lambda x: x.id):
-                    if m.id in seen or not _should_show_openai_model(m.id):
-                        continue
-                    seen.add(m.id)
-                    openai_models.append((m.id, _openai_display_name(m.id), _price_label(m.id)))
+                openai_models: list[tuple[str, str, str]] = [
+                    (mid, _openai_display_name(mid), _price_label(mid))
+                    for mid in _openai_models_to_offer(list(models_page.data))
+                ]
                 choices.extend(
                     openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
                 )
@@ -2469,8 +2558,8 @@ class RegenderTUI(App):
             return
 
         if len(self._model_choices) == 1:
-            model_id, display_name, _ = self._model_choices[0]
-            os.environ["DEFAULT_MODEL"] = model_id
+            model_id, display_name, pricing = self._model_choices[0]
+            self._choose_model(model_id, pricing)
             self.print(f"[#ffffff]✓[/] Using [bold #ffffff]{display_name}[/]")
             self._recalculate_cost(model_id)
             self.print("")
@@ -2635,7 +2724,11 @@ class RegenderTUI(App):
                 colour="#e5c07b",
             )
 
-        if qc:
+        if not qc or qc.get("did_not_run"):
+            # Silence here read as a clean report. A run whose QC crashed, or
+            # never started, has to say that nothing was checked.
+            row("QC", "did not run: this book is unchecked", colour="#e5c07b")
+        else:
             note = (
                 f"{qc.get('structural', 0)} structural, "
                 f"{qc.get('auto_fixable', 0)} auto-fixable, "
@@ -2643,9 +2736,21 @@ class RegenderTUI(App):
             )
             row("QC", note, colour="#e5c07b" if qc.get("structural") else "#ffffff")
 
+        # Known when the run ended, written to a file beside the book, and
+        # until now shown nowhere: two people sharing one name, or a given
+        # name dropped with nothing in its place.
+        name_problems = result.get("name_map_problems") or []
+        if name_problems:
+            count = len(name_problems)
+            row(
+                "Name map",
+                f"{count} problem{'' if count == 1 else 's'} \u2014 see name_map_problems.json",
+                colour="#e5c07b",
+            )
+
         flagged = result.get("substitutions_to_review")
         if flagged:
-            row("To review", f"{flagged} substitution pairs")
+            row("To review", f"{flagged} substitution pair{'' if flagged == 1 else 's'}")
 
         # The path on its own line, relative where possible: the run folder is
         # long enough to wrap mid-word beside a label.
@@ -2744,6 +2849,12 @@ class RegenderTUI(App):
             "update MODEL_COSTS in src/cli/tui.py.[/]"
         )
 
+    @staticmethod
+    def _choose_model(model_id: str, pricing: str = "") -> None:
+        """Record the model, and the provider that serves it, for this run."""
+        os.environ["DEFAULT_MODEL"] = model_id
+        os.environ["DEFAULT_PROVIDER"] = _provider_for_model(model_id, pricing)
+
     def _handle_model_input(self, value: str) -> None:
         """Handle model selection."""
         choices = self._model_choices
@@ -2760,8 +2871,8 @@ class RegenderTUI(App):
         try:
             idx = int(value or getattr(self, "_model_default", 1)) - 1
             if 0 <= idx < len(visible):
-                model_id, display_name, _ = visible[idx]
-                os.environ["DEFAULT_MODEL"] = model_id
+                model_id, display_name, pricing = visible[idx]
+                self._choose_model(model_id, pricing)
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
@@ -2770,9 +2881,9 @@ class RegenderTUI(App):
         except ValueError:
             pass
 
-        for model_id, display_name, _ in choices:
+        for model_id, display_name, pricing in choices:
             if value.lower() in (model_id.lower(), display_name.lower()):
-                os.environ["DEFAULT_MODEL"] = model_id
+                self._choose_model(model_id, pricing)
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
@@ -3471,17 +3582,25 @@ class RegenderTUI(App):
             return
 
         v = value.strip().lower()
+        # With nothing suggested the screen cursors "keep the originals", so
+        # that is what Enter has to do. It accepted an empty list instead,
+        # which hands the engine no names and no instruction to keep any, and
+        # the engine then chose names nobody was shown.
+        if v == "" and not self._name_suggestions:
+            v = "k"
         if v in ("a", ""):  # Accept all (A or Enter)
             self._name_map = {s["original"]: s["suggested"] for s in self._name_suggestions}
+            self._keep_names = False
             n = len(self._name_map)
             label = "character" if n == 1 else "characters"
             self.print(f"[#ffffff]✓[/] {n} {label} renamed")
             self.print("")
-            self._start_processing()
+            self._plan_run()
         elif v == "k":  # Keep originals
             self._name_map = None
+            self._keep_names = True
             self.print("[#555555]Keeping original names[/]")
-            self._start_processing()
+            self._plan_run()
         elif v == "r":  # Ask for a different set
             self._name_regen_mode = True
             self.print("")
@@ -3512,17 +3631,313 @@ class RegenderTUI(App):
             except ValueError:
                 self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
 
-    def _handle_options_input(self, value: str) -> None:
-        """Handle options."""
-        if value.lower() in ("n", "no"):
-            self._no_qc = True
-            self.print("[#ffffff]✓[/] QC disabled")
-        else:
-            self._no_qc = False
-            self.print("[#ffffff]✓[/] QC enabled")
+    # ------------------------------------------------- settled before the run
+
+    def _plan_run(self) -> None:
+        """Settle the names before anything is spent, and ask what only a person can say.
+
+        The run used to do this itself, behind the progress bar. A name given
+        to two characters, or a bachelor titled "Mrs." because his mother
+        shares his surname, was known in the first seconds and reported at the
+        end, in the finished book. Planning here puts those in front of the
+        reader while they cost nothing to put right.
+
+        Nothing can be answered while it works. The keyboard stayed live and
+        the last question stayed current, so a second Enter checked the names
+        twice, and a "2" typed while a fixed name was being checked started the
+        run on the plan from before the fix.
+        """
+        self._stage = "planning"
+        self._name_plan = None
+        with contextlib.suppress(Exception):
+            self.query_one(InputBar).disable()
+        self._check_the_names()
+
+    @work(exclusive=True)
+    async def _check_the_names(self) -> None:
+        """The part of _plan_run that waits on the model."""
+        loader = BrailleLoader("Checking the names", time.time())
+        with contextlib.suppress(Exception):
+            self.query_one("#content", ContentArea).add_widget(loader)
+
+        plan = None
+        try:
+            from dotenv import load_dotenv
+
+            from src.app import Application
+
+            load_dotenv()
+            app = Application("src/config.json")
+            plan = await app.plan_names(
+                transform_type=self._selected_transform or "",
+                characters=self._pending_characters,
+                file_path=str(self._selected_book),
+                name_map=self._name_map,
+                keep_names=self._keep_names,
+                marital_rulings=self._title_rulings or None,
+            )
+            self._capture_usage(app)
+            app.shutdown()
+        except Exception as error:
+            # The run plans for itself when it is handed nothing, so a failure
+            # here costs the reader the questions, not the book. It is still
+            # said: silence here looked exactly like having nothing to ask.
+            plan = None
+            self.print(
+                "  [#e5c07b]The names could not be checked beforehand[/] "
+                f"[#666666]({str(error)[:60] or type(error).__name__})[/]"
+            )
+            self.print("  [#aaaaaa]The run will check them itself.[/]")
+        finally:
+            with contextlib.suppress(Exception):
+                loader.stop()
+                loader.remove()
+
+        self._name_plan = plan
+        self._say_what_was_refused()
+        self._start_title_review()
+
+    def _say_what_was_refused(self) -> None:
+        """Name every supplied rename the engine would not use, and why.
+
+        The engine holds a name a person typed to the same bar as one it chose
+        itself, and drops the ones that fail. Dropped in silence, a fix typed
+        a moment ago simply does not happen and the same problem comes back.
+        """
+        refused = ((self._name_plan or {}).get("report") or {}).get("refused") or {}
+        for original, why in refused.items():
+            self.print(f"  [#e5c07b]\u2717[/] [#aaaaaa]{original} was left as it is:[/]")
+            for line in _wrap(str(why), 70):
+                self.print(f"    [#666666]{line}[/]")
+
+    #: A man the book titles fewer times than this is not asked about.
+    _TITLE_FLOOR = 5
+
+    def _start_title_review(self) -> None:
+        """Ask who is married, where the book leaves room to be wrong."""
+        states = (self._name_plan or {}).get("marital_states") or {}
+        self._title_items = (
+            []
+            if self._titles_settled
+            else sorted(
+                (
+                    state
+                    for state in states.values()
+                    if state.worth_a_look and state.mentions >= self._TITLE_FLOOR
+                ),
+                key=lambda state: -state.mentions,
+            )
+        )
+        self._title_idx = 0
+        self._title_chapter_mode = False
+
+        if not self._title_items:
+            self._show_plan_problems()
+            return
+
+        count = len(self._title_items)
+        self.print("")
+        self.print(
+            f"[#ffffff]◆[/] [bold #ffffff]{count} title{'s' if count > 1 else ''} to settle[/]"
+        )
+        self.print(
+            '  [#aaaaaa]A swap turns "Mr." into "Miss" or "Mrs.", so it has to know who is[/]'
+        )
+        self.print("  [#aaaaaa]married, and from when. This is what the book appears to say.[/]")
+        self._show_title_item()
+
+    @staticmethod
+    def _title_summary(name: str, opens: str, wedding) -> str:
+        """One man's titles across the book, in a line."""
+        surname = name.split(" ", 1)[1] if " " in name else name
+        if opens == "married":
+            return f"Mrs. {surname} throughout"
+        if wedding:
+            return f"Miss {surname} until chapter {wedding[0]}, then Mrs. {surname}"
+        return f"Miss {surname} throughout"
+
+    def _show_title_item(self) -> None:
+        """Ask about one man."""
+        self._stage = "title_review"
+        self._title_chapter_mode = False
+        if self._title_idx >= len(self._title_items):
+            self._finish_title_review()
+            return
+
+        state = self._title_items[self._title_idx]
+        position = f"{self._title_idx + 1} of {len(self._title_items)}"
+        surname = state.name.split(" ", 1)[1]
 
         self.print("")
-        self._start_processing()
+        self._ask_heading("Is this right?", where=position, live=True)
+        self.print("")
+        self.print(
+            f"  [#e5c07b]{state.name}[/]   "
+            f"[#ffffff]{self._title_summary(state.name, state.opens, state.wedding)}[/]"
+        )
+        # What the reading rests on, and the line of the book it came from.
+        # Wrapped, not cut: half a reason is no reason, and the quotation is
+        # the one thing here a person can check against their own memory.
+        for line in _wrap(state.reason, 70):
+            self.print(f"    [#aaaaaa]{line}[/]")
+        if state.evidence:
+            for line in _wrap(f'"\u2026{state.evidence}\u2026"', 70):
+                self.print(f"    [#666666]{line}[/]")
+        # Enter keeps what the book appears to say. The other three are the
+        # ways it can be wrong: she is his mother, the "Mrs." was said before
+        # the wedding, or his wife is never called by his surname.
+        self._ask_answers(
+            options=(
+                ("Yes", "keep it"),
+                ("Married from the start", f"Mrs. {surname} throughout"),
+                ("Never marries", f"Miss {surname} throughout"),
+                ("Marries in another chapter", "type which"),
+            ),
+            verbs=("back", "rest"),
+        )
+        self.status_text = f"Titles {position}"
+        self._accept_input()
+
+    def _handle_title_review_input(self, value: str) -> None:
+        """Enter keeps it, 2-4 rule otherwise, b goes back, s keeps the rest."""
+        answer = value.strip().lower()
+        if self._title_idx >= len(self._title_items):
+            return  # the last one was answered; a stray keystroke rules on nobody
+        state = self._title_items[self._title_idx]
+
+        if self._title_chapter_mode:
+            self._title_chapter_mode = False
+            if answer in ("", "b", "back"):
+                # Changed their mind. Any other answer re-asked for a chapter,
+                # so the only way out of this prompt was to make one up.
+                self._show_title_item()
+                return
+            last = self._last_chapter()
+            if not answer.isdigit() or not 1 <= int(answer) <= last:
+                self.print(f"  [#666666]Enter a chapter from 1 to {last}[/]")
+                self._title_chapter_mode = True
+                return
+            self._rule_title(state, "unmarried", [int(answer), 0])
+            return
+
+        if answer in ("b", "back"):
+            self._title_idx = max(0, self._title_idx - 1)
+            self._title_rulings.pop(self._title_items[self._title_idx].name, None)
+            self._show_title_item()
+            return
+
+        if answer in ("s", "skip"):
+            self._title_idx = len(self._title_items)
+            self._show_title_item()
+            return
+
+        if answer in ("", "1", "y", "yes"):
+            self._title_rulings.pop(state.name, None)
+            self._title_idx += 1
+            self._show_title_item()
+        elif answer == "2":
+            self._rule_title(state, "married", None)
+        elif answer == "3":
+            self._rule_title(state, "unmarried", None)
+        elif answer == "4":
+            self._title_chapter_mode = True
+            self.print("  [#aaaaaa]Which chapter is he married from? (Enter to go back)[/]")
+            self.set_prompt(">  ")
+        else:
+            self._reject(4, "back", "rest")
+
+    def _rule_title(self, state, opens: str, wedding) -> None:
+        """Record one ruling, say what it means, and move on."""
+        self._title_rulings[state.name] = {"opens": opens, "wedding": wedding}
+        summary = self._title_summary(state.name, opens, wedding)
+        self.print(f"  [#98c379]✓[/] [#aaaaaa]{state.name}: {summary}[/]")
+        self._title_idx += 1
+        self._show_title_item()
+
+    def _last_chapter(self) -> int:
+        chapters = ((self._name_plan or {}).get("book") or {}).get("chapters") or []
+        numbers = [c.get("number") for c in chapters if c.get("number")]
+        return max(numbers) if numbers else len(chapters) or 1
+
+    def _finish_title_review(self) -> None:
+        """Lay the rulings over the plan. No model is needed for this part."""
+        self._settle_heading()
+        self._titles_settled = True
+        if self._title_rulings and self._name_plan:
+            try:
+                from src.app import Application
+
+                app = Application("src/config.json")
+                self._name_plan = app.finish_name_plan(
+                    self._name_plan, self._pending_characters, self._title_rulings
+                )
+                app.shutdown()
+            except Exception:
+                # The plan as it stood is still a whole plan; the rulings are
+                # the only thing lost, and the reader is told.
+                self.print("  [#e5c07b]Could not apply those rulings; using the book's reading[/]")
+        self._show_plan_problems()
+
+    def _show_plan_problems(self) -> None:
+        """Say what is wrong with the finished name map, before it is used."""
+        problems = (self._name_plan or {}).get("problems") or []
+        if not problems:
+            self.print("")
+            self._start_processing()
+            return
+
+        self._stage = "plan_problems"
+        self._plan_fix_mode = False
+        count = len(problems)
+        self.print("")
+        self._ask_heading(f"The name map has {count} problem{'s' if count > 1 else ''}", live=True)
+        self.print("")
+        for problem in problems[:8]:
+            for i, line in enumerate(_wrap(problem, 72)):
+                bullet = "\u2022" if i == 0 else " "
+                self.print(f"  [#e5c07b]{bullet}[/] [#aaaaaa]{line}[/]")
+        if count > 8:
+            self.print(f"    [#666666]and {count - 8} more[/]")
+        # Enter is the answer that costs nothing. Starting anyway writes these
+        # into every chapter and is paid for before anyone reads a page.
+        self._ask_answers(
+            options=(
+                ("Fix a name", "say who should be called what"),
+                ("Start anyway", "the book will carry these"),
+            ),
+        )
+        self.status_text = "Names"
+        self._accept_input()
+
+    def _handle_plan_problems_input(self, value: str) -> None:
+        """1 fixes a name and checks again, 2 starts the run as it stands."""
+        raw = value.strip()
+
+        if self._plan_fix_mode:
+            self._plan_fix_mode = False
+            if "=" in raw:
+                original, new = (part.strip() for part in raw.split("=", 1))
+                if original and new:
+                    self._name_map = {**(self._name_map or {}), original: new}
+                    self.print(f"  [#98c379]✓[/] [#aaaaaa]{original} \u2192 {new}[/]")
+                    self._settle_heading()
+                    self._plan_run()
+                    return
+            self.print("  [#666666]Nothing changed[/]")
+            self._show_plan_problems()
+            return
+
+        answer = raw.lower()
+        if answer in ("", "1"):
+            self._plan_fix_mode = True
+            self.print("  [#aaaaaa]Enter it as Original=Target (e.g. Lizzy=Eddie):[/]")
+            self.set_prompt(">  ")
+        elif answer == "2":
+            self._settle_heading()
+            self.print("")
+            self._start_processing()
+        else:
+            self._reject(2)
 
     # -------------------------------------------------------------------------
     # Processing
@@ -3572,9 +3987,11 @@ class RegenderTUI(App):
         self._result = {
             "input": str(self._selected_book),
             "transform_type": self._selected_transform,
-            "no_qc": self._no_qc,
             "output_path": str(self._output_path) if self._output_path else None,
             "name_map": self._name_map,
+            "keep_names": self._keep_names,
+            "name_plan": self._name_plan,
+            "marital_rulings": self._title_rulings or None,
         }
 
         # Run processing in background worker
@@ -3647,6 +4064,13 @@ class RegenderTUI(App):
                 custom_title=self._custom_title or None,
                 on_chapter_complete=on_chapter_complete,
                 characters=self._pending_characters,
+                keep_names=bool(self._result.get("keep_names")),
+                # What was just read and ruled on. Without it the run would
+                # choose the names again, and they would not be the names seen.
+                name_plan=self._result.get("name_plan"),
+                # And the rulings on their own, for a run that has to plan for
+                # itself because the plan could not be made.
+                marital_rulings=self._result.get("marital_rulings"),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
@@ -4022,7 +4446,6 @@ def run_tui(process_callback: Callable | None = None) -> dict | None:
         process_callback: Function to call for processing. Should accept:
             - input_path: str
             - transform_type: str
-            - no_qc: bool
             - progress_callback: Callable
             - stage_callback: Callable
 

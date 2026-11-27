@@ -113,6 +113,46 @@ _VARIANT_STYLE = {
 }
 
 
+def _final_answer(reply: str, wanted: str) -> dict:
+    """The JSON a naming reply settles on.
+
+    A model that reasons will sometimes answer, think better of it, and answer
+    again in the same reply:
+
+        {"renames": [... "William" -> "Wilhelmina" ...]}
+
+        Wait -- I must correct this: Wilhelmina is a feminized form. Here is
+        the corrected final answer:
+
+        {"renames": [... "William" -> "Eleanor" ...]}
+
+    Read as one JSON document that is "Extra data", an error, and an error
+    here meant no name was chosen for anyone. The last object carrying the key
+    asked for is the answer; anything before it is the model's working.
+    """
+    cleaned = re.sub(r"^```(?:json)?|```$", "", reply.strip(), flags=re.MULTILINE).strip()
+    decoder = json.JSONDecoder()
+    answer = fallback = None
+    at = cleaned.find("{")
+    while at != -1:
+        try:
+            value, end = decoder.raw_decode(cleaned, at)
+        except json.JSONDecodeError:
+            at = cleaned.find("{", at + 1)
+            continue
+        if isinstance(value, dict):
+            fallback = value
+            if wanted in value:
+                answer = value
+        at = cleaned.find("{", end)
+    if answer is not None:
+        return answer
+    if fallback is not None:
+        return fallback
+    # Nothing in it parses: fail as it always did, with the parser's reason.
+    return json.loads(cleaned)
+
+
 def _strip_titles(name: str) -> list[str]:
     """Split a display name into tokens with leading titles removed."""
     tokens = [t for t in re.split(r"\s+", name.strip()) if t]
@@ -619,6 +659,18 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
     # the nicknames "Eliza" and "Lizzy" -- must be allowed to share a target.
     owner = cast_owner_index(characters)
 
+    # A given name on its own, to whoever in the cast has it -- when only one
+    # person does. The engine writes "Mary" -> "Martin" as its own entry, and
+    # the cast lists her as "Mary Bennet" with the nickname "Molly" and no
+    # bare "Mary". Unresolved, the key counted as a person of its own, and
+    # Mary beside her own nickname was reported as two people under one name.
+    given_owner: dict[str, set] = {}
+    for char in getattr(characters, "characters", characters) or []:
+        canonical = getattr(char, "name", "") or ""
+        given, _family = given_and_surname(canonical, surnames, givens)
+        if given:
+            given_owner.setdefault(given.lower(), set()).add(canonical)
+
     def whose(name: str) -> str:
         """The cast member a map key is about, or the key itself.
 
@@ -629,7 +681,12 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
         if key in owner:
             return owner[key]
         stripped = " ".join(_strip_titles(name)).lower()
-        return owner.get(stripped, stripped or key)
+        if stripped in owner:
+            return owner[stripped]
+        people = given_owner.get(stripped or key, set())
+        if len(people) == 1:
+            return next(iter(people))
+        return stripped or key
 
     problems: list[str] = []
     # Keyed by the whole source name, not its given name alone: two different
@@ -668,6 +725,13 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
 
     for (given, surname), sources in sorted(by_target.items()):
         if len({person for person, _g, _s in sources}) < 2:
+            continue
+        # Two people who shared a name before still share one. The engine
+        # renames a given name once for everyone who has it, on purpose, so
+        # Kitty Bennet and Lady Catherine both leaving "Catherine" for
+        # "Christopher" is the map doing what it was built to do. Nobody has
+        # been merged who was not already a namesake.
+        if len({g.lower() for _p, g, _s in sources}) == 1:
             continue
         # Two people may share a given name, as Austen's own cast does; they are
         # only confusable when the surname matches too.
@@ -889,8 +953,7 @@ class NameEngine:
         response = await self.provider.complete(
             messages=[{"role": "user", "content": prompt}], temperature=0.0
         )
-        cleaned = re.sub(r"^```(?:json)?|```$", "", response.strip(), flags=re.MULTILINE).strip()
-        data = json.loads(cleaned)
+        data = _final_answer(response, "renames")
         return {r["original"]: r for r in data.get("renames", []) if r.get("original")}
 
     async def _propose_nicknames(
@@ -914,8 +977,7 @@ class NameEngine:
             messages=[{"role": "user", "content": _NICKNAME_PROMPT.format(cast_lines=cast_lines)}],
             temperature=0.0,
         )
-        cleaned = re.sub(r"^```(?:json)?|```$", "", response.strip(), flags=re.MULTILINE).strip()
-        data = json.loads(cleaned)
+        data = _final_answer(response, "characters")
         return {
             entry["name"]: entry.get("nicknames") or {}
             for entry in data.get("characters", [])
@@ -1003,12 +1065,18 @@ class NameEngine:
         transform_type: TransformType,
         base_map: Optional[dict[str, str]] = None,
         selected_characters: Optional[list[str]] = None,
+        propose: bool = True,
     ) -> tuple[dict[str, str], dict[str, Any]]:
         """Build the book's rename map.
 
         Returns (name_map, report). base_map entries (user-provided) always win
         and suppress LLM proposals for those characters. The report records
         drops and review flags for QC.
+
+        propose=False is the reader saying "keep the originals". Supplied
+        entries are still honoured; the engine adds none of its own. Without
+        it there was no way to say so: declining every suggestion handed over
+        no map, and no map is exactly what asks the engine to choose.
         """
         index = self._cast_index(characters)
         reserved = self._reserved_names(index)
@@ -1064,7 +1132,13 @@ class NameEngine:
         base_lower = {k.lower() for k in base_map}
         accepted: dict[str, dict] = {}
 
-        if proposal_list and self.provider:
+        if proposal_list and not propose:
+            report["kept"] = len(proposal_list)
+            report["flags"].append(
+                f"names kept as written: {len(proposal_list)} given name(s) the engine "
+                "would have replaced were left alone, as asked"
+            )
+        elif proposal_list and self.provider:
             # Targets may not collide with anything in the book OR the user map.
             #
             # The GIVEN name of each supplied target, not the whole string. A
@@ -1102,7 +1176,7 @@ class NameEngine:
                 report["flags"].extend(surname_skips)
             except Exception as e:  # LLM/JSON failure → no auto renames, still safe
                 self._log("warning", f"Name proposal failed ({e}); characters keep original names")
-                report["dropped"] = [f"proposal failed: {e}"]
+                report["dropped"] = [f"proposal failed: {str(e) or type(e).__name__}"]
         elif proposal_list:
             report["dropped"] = ["no provider — characters keep original names"]
 

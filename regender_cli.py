@@ -41,7 +41,7 @@ load_dotenv()
 # Add src to path for new architecture
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.app import Application  # noqa: E402
+from src.app import Application, run_problems  # noqa: E402
 
 
 def setup_logging(verbose: bool = False):
@@ -130,12 +130,18 @@ async def process_book(args):
             output_path=str(output_path),
             selected_characters=selected_characters,
             name_map=name_map,
+            keep_names=args.keep_names,
             custom_title=args.title or None,
+            stop_on_name_problems=args.stop_on_name_problems,
         )
 
     # Display results
     if result["success"]:
-        print("\n✅ Success!")
+        # Worked out before the heading, so the heading cannot say one thing
+        # and the list under it another.
+        is_transform = args.transform_type not in ("parse_only", "character_analysis")
+        problems = run_problems(result) if is_transform else []
+        print("\n⚠️  Finished, with problems" if problems else "\n✅ Success!")
         print(f"  Book: {result['book_title']}")
         if args.transform_type == "parse_only":
             print(f"  Chapters: {result.get('chapters', 'N/A')}")
@@ -148,12 +154,26 @@ async def process_book(args):
             if result.get("main_characters"):
                 print(f"  Main characters: {', '.join(result['main_characters'][:5])}")
         else:
-            print(f"  Characters: {result['characters']}")
-            print(f"  Changes: {result['changes']}")
+            _print_run_report(result, app)
         print(f"  Output: {result['output_path']}")
         _write_decision_sheet(args.transform_type, result.get("output_path"))
+        if problems:
+            print("\n  Before you use this book:")
+            for problem in problems:
+                print(f"  - {problem}")
+            if result.get("name_map_problems"):
+                # The app asks about these before it runs. Here nobody can be
+                # asked, so say how a name is settled from the command line.
+                print(
+                    '\n  To settle a name, pass --name-map \'{"Original": "Target"}\', '
+                    "or run\n  regender_cli.py with no arguments: the app asks before it starts."
+                )
+            app.shutdown()
+            sys.exit(EXIT_FINISHED_WITH_PROBLEMS)
     else:
         print(f"\n❌ Error: {result['error']}")
+        for problem in result.get("name_map_problems") or []:
+            print(f"  - {problem}")
         if "llm_provider" in str(result["error"]):
             print(
                 "\n  No model is set up. Add ANTHROPIC_API_KEY or OPENAI_API_KEY to a .env file"
@@ -164,6 +184,54 @@ async def process_book(args):
 
     # Clean up
     app.shutdown()
+
+
+# The book was written, and something about it needs reading first. Distinct
+# from 1, which means no book: a script can tell "failed" from "look at this".
+#
+# Not 2: that is what the argument parser exits with for a mistyped option, and
+# "you spelled a flag wrong" must not read as "the book has problems".
+EXIT_FINISHED_WITH_PROBLEMS = 3
+
+
+def _print_run_report(result: dict, app) -> None:
+    """What the run did, as the interface reports it: not only that it ended."""
+    cast = result.get("cast") or {}
+    regendered = f" ({cast['regendered']} regendered)" if cast.get("regendered") else ""
+    print(f"  Characters: {result['characters']}{regendered}")
+    print(f"  Changes: {result['changes']:,} paragraphs rewritten")
+
+    qc = result.get("quality_control") or {}
+    changed, gendered = qc.get("transformed_words"), qc.get("gendered_words")
+    if gendered:
+        print(f"  Gender words: {changed:,} of {gendered:,} changed ({changed / gendered:.1%})")
+    if qc and not qc.get("did_not_run"):
+        print(
+            f"  QC: {qc.get('structural', 0)} structural, {qc.get('auto_fixable', 0)} "
+            f"auto-fixable, {qc.get('needs_review', 0)} to review"
+        )
+        if qc.get("report"):
+            print(f"  QC report: {qc['report']}")
+    flagged = result.get("substitutions_to_review")
+    if flagged:
+        print(f"  To review: {flagged} substitution pair{'' if flagged == 1 else 's'}")
+
+    # The model that was actually called and what it used, read back from the
+    # provider rather than from what was asked for.
+    try:
+        provider = app.get_service("transform").provider
+    except Exception:
+        provider = None
+    if provider is not None:
+        if getattr(provider, "model", None):
+            print(f"  Model: {provider.model}")
+        tokens_in = getattr(provider, "tokens_in", 0) or 0
+        tokens_out = getattr(provider, "tokens_out", 0) or 0
+        if tokens_in or tokens_out:
+            print(
+                f"  Usage: {tokens_in:,} tokens in, {tokens_out:,} out, "
+                f"{getattr(provider, 'calls', 0) or 0} calls"
+            )
 
 
 def _calc_output_path(input_path: str, transform_type: str) -> Path:
@@ -195,7 +263,10 @@ def _calc_output_path(input_path: str, transform_type: str) -> Path:
 async def async_main():
     """Async main entry point."""
     parser = argparse.ArgumentParser(
-        description="Regender-XYZ CLI - Transform gender representation in literature"
+        description="Regender-XYZ CLI - Transform gender representation in literature",
+        epilog="Exit status: 0 the book was written and nothing needs reading first; "
+        "3 the book was written, with problems listed at the end of the output; "
+        "1 no book was written; 2 the command itself was wrong.",
     )
 
     # Main arguments (optional — when omitted, launches interactive TUI)
@@ -216,7 +287,9 @@ async def async_main():
     )
 
     parser.add_argument(
-        "-o", "--output", help="Output file path (defaults to input_name_transform_type.json)"
+        "-o",
+        "--output",
+        help="Output file path (defaults to books/output/<book>-<timestamp>/<transform>.json)",
     )
 
     # Configuration options
@@ -241,6 +314,21 @@ async def async_main():
             "JSON string or path to .json file mapping original character names to replacements, "
             'e.g. \'{"Elizabeth":"Edward","Jane":"John"}\''
         ),
+    )
+
+    parser.add_argument(
+        "--keep-names",
+        action="store_true",
+        help="Every character keeps the name the book gives them. Entries passed "
+        "with --name-map are still applied; no others are chosen.",
+    )
+
+    parser.add_argument(
+        "--stop-on-name-problems",
+        action="store_true",
+        help="Check the finished name map before transforming, and stop if two "
+        "characters would share a name or a name would be lost. The map is written "
+        "beside the output so it can be corrected and passed back with --name-map.",
     )
 
     parser.add_argument(
@@ -432,7 +520,7 @@ def main():
         print("\nOperation cancelled by user")
         sys.exit(0)
     except Exception as e:
-        logging.error(f"Fatal error: {e}")
+        logging.error(f"Fatal error: {e}", exc_info=True)
         sys.exit(1)
 
 

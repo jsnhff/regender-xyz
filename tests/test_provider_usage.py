@@ -17,7 +17,8 @@ from src.providers.anthropic import AnthropicProvider
 
 def _response(input_tokens=100, output_tokens=40, text="ok"):
     response = MagicMock()
-    response.content = [MagicMock(text=text)]
+    response.content = [MagicMock(type="text", text=text)]
+    response.stop_reason = "end_turn"
     response.usage.input_tokens = input_tokens
     response.usage.output_tokens = output_tokens
     return response
@@ -26,7 +27,7 @@ def _response(input_tokens=100, output_tokens=40, text="ok"):
 @pytest.fixture
 def provider():
     p = AnthropicProvider.__new__(AnthropicProvider)
-    p.model = "claude-opus-4-1-20250805"
+    p.model = "claude-sonnet-5-5"
     p.logger = MagicMock()
     p.client = MagicMock()
     p.tokens_in = p.tokens_out = p.calls = 0
@@ -37,13 +38,13 @@ MESSAGES = [{"role": "user", "content": "hi"}]
 
 
 def test_a_call_records_what_it_used(provider):
-    provider.client.messages.create = AsyncMock(return_value=_response())
+    provider._send = AsyncMock(return_value=_response())
     asyncio.run(provider._complete_impl(MESSAGES))
     assert (provider.tokens_in, provider.tokens_out, provider.calls) == (100, 40, 1)
 
 
 def test_usage_accumulates_across_calls(provider):
-    provider.client.messages.create = AsyncMock(return_value=_response())
+    provider._send = AsyncMock(return_value=_response())
     for _ in range(3):
         asyncio.run(provider._complete_impl(MESSAGES))
     assert (provider.tokens_in, provider.tokens_out, provider.calls) == (300, 120, 3)
@@ -60,7 +61,7 @@ class TestCountingNeverBreaksACall:
         """A MagicMock usage made `+=` raise, which would kill the transform."""
         response = _response()
         response.usage.input_tokens = MagicMock()
-        provider.client.messages.create = AsyncMock(return_value=response)
+        provider._send = AsyncMock(return_value=response)
         assert asyncio.run(provider._complete_impl(MESSAGES)) == "ok"
         assert provider.tokens_in == 0
         assert provider.tokens_out == 40, "the field that was real still counts"
@@ -68,13 +69,13 @@ class TestCountingNeverBreaksACall:
     def test_a_response_without_usage_still_returns_its_text(self, provider):
         response = _response()
         del response.usage
-        provider.client.messages.create = AsyncMock(return_value=response)
+        provider._send = AsyncMock(return_value=response)
         assert asyncio.run(provider._complete_impl(MESSAGES)) == "ok"
         assert provider.calls == 0
 
     def test_a_boolean_is_not_a_token_count(self, provider):
         response = _response()
         response.usage.input_tokens = True
-        provider.client.messages.create = AsyncMock(return_value=response)
+        provider._send = AsyncMock(return_value=response)
         asyncio.run(provider._complete_impl(MESSAGES))
         assert provider.tokens_in == 0

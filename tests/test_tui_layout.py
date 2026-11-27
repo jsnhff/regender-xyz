@@ -80,6 +80,16 @@ class TestModelPricing:
     def test_an_unknown_model_is_still_unknown(self):
         assert _lookup_model_cost("some-other-vendor-model") is None
 
+    @pytest.mark.parametrize(
+        "model_id", ["gpt-4.1-mini", "gpt-4-turbo-preview", "claude-opus-4-9", "claude-fable-5-9"]
+    )
+    def test_a_newer_model_does_not_borrow_an_older_ones_price(self, model_id):
+        """It began with a listed name, and that was enough to be given its price."""
+        assert _lookup_model_cost(model_id) is None
+
+    def test_an_old_style_snapshot_still_resolves(self):
+        assert _lookup_model_cost("gpt-3.5-turbo-0125") == (1.00, 2.00)
+
 
 class TestPricingDrift:
     """The table is hand-maintained, so it needs a way to announce its own age.
@@ -125,3 +135,25 @@ class TestPricingDrift:
             assert costs is not None, f"{model_id} missing from MODEL_COSTS"
             assert f"${costs[0]:.2f}" in pricing, f"{model_id}: {pricing} disagrees with the table"
             assert f"${costs[1]:.2f}" in pricing, f"{model_id}: {pricing} disagrees with the table"
+
+
+class TestTheVersionShown:
+    """The header said "v1.0" through two releases."""
+
+    def test_it_is_the_packages_own_number(self):
+        import inspect
+
+        from src import __version__
+        from src.cli import tui
+
+        assert "v{__version__}" in inspect.getsource(tui.HeaderBar.compose)
+        assert tui.__version__ == __version__
+
+    def test_the_mac_app_carries_the_same_one(self):
+        import json
+        import pathlib
+
+        from src import __version__
+
+        package = pathlib.Path(__file__).parent.parent / "electron" / "package.json"
+        assert json.loads(package.read_text())["version"] == __version__

@@ -1,267 +1,68 @@
-# System Architecture & Pipeline
+# How it fits together
 
-## Overview
-
-Regender-XYZ transforms gender representation in literature using AI. The system follows a clear pipeline:
+Regender turns a plain-text book into a regendered edition in six steps. Each step writes what it decided into the run folder beside the book, so a run can be read afterwards and a decision can be disputed.
 
 ```
-Text File → Parse to JSON → Analyze Characters → Transform Gender → Output Files
+text file → parse → cast → names → transform → QC → rulings and export
 ```
 
-## Complete Flow
+`Application.process_book` in `src/app.py` runs the steps in order. The command line (`regender_cli.py`) and the app (`src/cli/tui.py`) both call it. The Mac app in `electron/` runs the same Python in a window.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        regender_book_cli.py                         │
-│                    (Unified CLI Entry Point)                        │
-└───────────────────────────┬─────────────────────────────────────────┘
-                            │
-        ┌───────────────────┴───────────────────┐
-        │         'regender' command            │
-        │    (Complete automated pipeline)      │
-        └───────────────────┬───────────────────┘
-                            │
-    ┌───────────────────────┴───────────────────────┐
-    │                                               │
-    ▼                                               ▼
-┌─────────────────┐                        ┌─────────────────┐
-│  Text Input     │                        │  JSON Input     │
-│  (.txt file)    │                        │  (.json file)   │
-└────────┬────────┘                        └────────┬────────┘
-         │                                          │
-         ▼                                          │
-┌─────────────────────────┐                         │
-│   1. PARSING STAGE      │                         │
-├─────────────────────────┤                         │
-│ book_parser/            │                         │
-│ • 100+ formats support  │                         │
-│ • Pattern detection     │                         │
-│ • Paragraph preservation│                         │
-└────────┬────────────────┘                         │
-         │                                          │
-         └──────────────────┬───────────────────────┘
-                            │
-                            ▼
-┌───────────────────────────────────────────────────┐
-│           2. CHARACTER ANALYSIS                   │
-├───────────────────────────────────────────────────┤
-│ book_characters/                                  │
-│ • Flagship-quality prompts only                   │
-│ • Identifies all characters & genders             │
-│ • Smart chunking for large books                  │
-│ • Rate limiting for APIs                          │
-└─────────────────────┬─────────────────────────────┘
-                      │
-                      ▼
-┌───────────────────────────────────────────────────┐
-│           3. TRANSFORMATION                       │
-├───────────────────────────────────────────────────┤
-│ book_transform/                                   │
-│ • Applies gender changes                          │
-│ • Uses character context                          │
-│ • Preserves narrative structure                   │
-└─────────────────────┬─────────────────────────────┘
-                      │
-                      ▼
-┌───────────────────────────────────────────────────┐
-│           4. QUALITY CONTROL                      │
-├───────────────────────────────────────────────────┤
-│ book_transform/quality_control.py                 │
-│ • Scans for missed transformations                │
-│ • Iterative corrections                           │
-│ • Validation scoring                              │
-└─────────────────────┬─────────────────────────────┘
-                      │
-                      ▼
-┌───────────────────────────────────────────────────┐
-│           5. OUTPUT GENERATION                    │
-├───────────────────────────────────────────────────┤
-│ • Saves transformed JSON                          │
-│ • Recreates readable text                         │
-│ • Generates transformation report                 │
-└───────────────────────────────────────────────────┘
-```
+## 1. Parse
 
-## Core Components
+`src/parsers/` and `ParserService` turn the text into a `Book` of chapters and paragraphs. Project Gutenberg front and back matter is removed. Plays have their own parser (`play.py`). Paragraphs are kept one to one with the source from here on, which is what lets every later step compare a paragraph with the one it came from.
 
-### 1. Book Parser (`book_parser/`)
-Converts any text format to structured JSON.
+## 2. Cast
 
-```
-book_parser/
-├── parser.py              # Main BookParser class
-├── patterns/             # Format detection
-│   ├── standard.py      # English (CHAPTER, Part)
-│   ├── international.py # French, German
-│   └── plays.py        # Drama (ACT, SCENE)
-└── detectors/           # Smart section detection
-```
+`CharacterService` has a model read the book in chunks and list the characters: name, gender, aliases, titles. Entries for the same person are merged.
 
-**Capabilities:**
-- 100% success rate on Project Gutenberg
-- Handles 100+ text formats
-- Preserves paragraph structure
-- Smart abbreviation handling
+Written: `characters.json`.
 
-### 2. Character Analysis (`book_characters/`)
-Identifies all characters using flagship AI models.
+In the app, this is where a person reviews the cast.
 
-**Key Features:**
-- Pure LLM analysis (no regex)
-- Flagship prompts for accuracy
-- Smart chunking for large books
-- Rate limiting support
+## 3. Names
 
-### 3. Transformation Engine (`book_transform/`)
-Applies gender transformations using character context.
+`NameEngine` (`src/services/name_engine.py`) chooses every rename once, before any chapter is transformed, so the whole book agrees. A model proposes; code checks each proposal against the cast and refuses the ones that would merge two people, invent a name or drop one. Names a person supplied win.
 
-**Components:**
-- `transform.py` - Main orchestration
-- `unified_transform.py` - Complete pipeline
-- `quality_control.py` - Post-transform validation
-- `chunking/` - Token-aware text splitting
+For a gender swap, `character_state.py` works out which men are married when the book opens and where each one marries, from the titles the book itself prints. "Mr." does not say; "Miss" and "Mrs." do, so the swap has to know.
 
-### 4. LLM Integration (`api_client.py`)
-Unified interface for AI providers.
+The finished map is audited before the transform starts.
 
-**Supported Providers:**
-- **OpenAI**: GPT-4o, GPT-4o-mini
-- **Anthropic**: Claude Opus 4, Claude 3.5 Sonnet
-- **Grok**: Grok-4-latest (256k), Grok-3-latest (131k)
+Written: `name_map_proposed.json`, `name_report.json`, and `name_map_problems.json` if the audit found any.
 
-## Data Structures
+## 4. Transform
 
-### Input Text
-```
-CHAPTER I
-The Beginning
+`TransformService` sends each chapter to the model in batches of paragraphs, each paragraph under a `[[Pn]]` marker so the reply can be matched back exactly. Chapters run in parallel.
 
-Alice was very tired. She had been sitting by her sister for a long time.
+After the model, two deterministic passes run over each paragraph:
 
-The White Rabbit appeared suddenly...
-```
+- the name map, resolved at that paragraph, for any name the model left alone;
+- the term map, a set of rules for words whose answer never varies.
 
-### Parsed JSON Structure
-```json
-{
-  "metadata": {
-    "title": "Alice in Wonderland",
-    "author": "Lewis Carroll",
-    "date": "1865",
-    "source": "Project Gutenberg",
-    "processing_note": "Parsed with modular book parser",
-    "format_version": "2.0"
-  },
-  "chapters": [{
-    "number": "I",
-    "title": "The Beginning",
-    "type": "chapter",
-    "paragraphs": [
-      {
-        "sentences": [
-          "Alice was very tired.",
-          "She had been sitting by her sister for a long time."
-        ]
-      },
-      {
-        "sentences": [
-          "The White Rabbit appeared suddenly..."
-        ]
-      }
-    ],
-    "sentence_count": 3,
-    "word_count": 25
-  }],
-  "statistics": {
-    "total_chapters": 12,
-    "total_paragraphs": 450,
-    "total_sentences": 2300,
-    "total_words": 27500
-  }
-}
-```
+A batch that fails is retried paragraph by paragraph, then in groups of sentences. Text that no call succeeded for keeps its original wording and is recorded, and the run reports the chapter as untransformed.
 
-### Character Analysis
-```json
-{
-  "characters": {
-    "Alice": {
-      "name": "Alice",
-      "gender": "female",
-      "role": "protagonist"
-    }
-  }
-}
-```
+Written: `<transform>.json`, `<transform>.txt`, `name_map.json` (the map as applied), `substitutions.json` and `substitutions_to_review.json`.
 
-### Transformed Output
-```json
-{
-  "chapters": [{
-    "paragraphs": [{
-      "sentences": [
-        "Alan was very tired..."
-      ]
-    }]
-  }],
-  "transformation": {
-    "type": "all_male",
-    "changes": ["Alice → Alan"]
-  }
-}
-```
+## 5. QC
 
-## Directory Structure
+`QCService` compares the transformed book with its source, chapter by chapter. No model is involved. Findings are graded by what can be done about them:
 
-```
-regender-xyz/
-├── api_client.py          # LLM provider interface
-├── regender_book_cli.py   # CLI entry point
-├── book_parser/           # Text parsing module
-├── book_characters/       # Character analysis
-├── book_transform/        # Transformation engine
-├── book_downloader/       # Gutenberg downloads
-├── config/
-│   └── models.json       # Model configurations
-├── books/
-│   ├── texts/           # Input text files
-│   ├── json/            # Parsed JSON files
-│   └── output/          # Transformed output
-└── docs/                # Documentation
-```
+- `auto_fixable`: the safety net would still change this;
+- `needs_review`: a gendered word the rules will not guess at;
+- `structural`: counts that no longer match the source, or a character called a name nobody chose.
 
-## Key Design Decisions
+Written: `<transform>_qc.json`. `scripts/qc_report.py` runs the same checks on any finished book.
 
-1. **Flagship Models Only** - Character analysis uses only top-tier models to minimize errors
-2. **Mandatory Character Analysis** - Ensures consistency across transformations
-3. **Unified Pipeline** - Single command handles entire workflow
-4. **Provider Abstraction** - Easy switching between AI providers
-5. **Smart Chunking** - Optimizes for each model's context window
+## 6. Rulings and export
 
-## Performance Characteristics
+Some words cannot be settled by rule: a "sir" or "madam" spoken to someone, a "master" that may be a title or a teacher. `DecisionService` lists them for a person to rule on, and applies the rulings.
 
-- **Parsing**: ~1-2 seconds per book
-- **Character Analysis**: ~2-5 minutes (depends on book size)
-- **Transformation**: ~5-10 minutes per book
-- **Quality Control**: ~1-3 minutes per iteration
+The app exports `.txt`, `.rtf` or `.json`.
 
-## Configuration
+## Providers
 
-Environment variables in `.env`:
-```bash
-# API Keys
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GROK_API_KEY=xai-...
+`src/providers/` has one class each for Anthropic, OpenAI and Ollama. They share one interface, `complete(messages)`, and each raises when a reply is cut off or declined so that part of an answer is never taken for the whole.
 
-# Settings
-DEFAULT_PROVIDER=anthropic
-DEFAULT_QUALITY_LEVEL=standard
-```
+## Tests
 
-## Error Handling
-
-- **Graceful Degradation**: Continues processing other chapters if one fails
-- **Automatic Retries**: Failed API calls retry with backoff
-- **Rate Limit Management**: Automatic pausing for rate-limited APIs
-- **Validation**: Each stage validates its output
+`python -m pytest tests/` runs without an API key. The model is replaced by mocks, and several tests use a real cast of Pride and Prejudice saved in `tests/fixtures/`.

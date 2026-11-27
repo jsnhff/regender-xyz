@@ -1,6 +1,6 @@
 {
   "name": "regender-app",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Electron wrapper for the Regender terminal app",
   "main": "main.js",
   "author": "Jason Huff",

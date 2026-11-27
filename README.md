@@ -26,6 +26,8 @@ You need a public domain book as a plain text file (any [Project Gutenberg](http
 - an [Anthropic](https://console.anthropic.com/settings/keys) or [OpenAI](https://platform.openai.com/api-keys) API key, or
 - [Ollama](https://ollama.com), which runs a model on your own computer for free.
 
+The books were made with Anthropic's models, so that path is the most tested. If OpenAI or Ollama gives you trouble, please [open an issue](https://github.com/jsnhff/regender-xyz/issues).
+
 The app walks you through setup the first time it opens.
 
 **Mac app.** Download **Regender.dmg** from [Releases](https://github.com/jsnhff/regender-xyz/releases/latest), drag it to Applications and open it. Apple Silicon Macs only.

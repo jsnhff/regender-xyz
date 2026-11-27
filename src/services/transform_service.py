@@ -244,6 +244,15 @@ class TransformService(BaseService):
 
         start_time = time.time()
 
+        # What went wrong belongs to the run it went wrong in. failed_chapters
+        # was a class attribute nothing reset, so a service used twice carried
+        # the first book's failures into the second.
+        self.failed_chapters = []
+        self.unanswered = []
+        # Replies the model gave that were usable. Zero, with failures on the
+        # record, is the one case where there is no book at all.
+        self.model_replies = 0
+
         try:
             # Get character analysis if not provided
             if not characters:
@@ -261,7 +270,7 @@ class TransformService(BaseService):
             # This runs before the context is built: the prompt has to carry the
             # finished map, or the model is told about a name it will never see.
             if name_map and characters:
-                expanded = self._expand_name_map_with_aliases(name_map, characters)
+                expanded = self.finished_name_map(name_map, characters)
                 if len(expanded) > len(name_map):
                     self.logger.info(
                         f"Expanded name_map with {len(expanded) - len(name_map)} character aliases"
@@ -282,6 +291,18 @@ class TransformService(BaseService):
             transformed_chapters, all_changes = await self._transform_chapters(
                 book.chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
             )
+
+            # A chapter with any text the model never answered for is a chapter
+            # that kept original text, whether the whole of it raised or one
+            # paragraph fell through every retry.
+            partly = {number for number, _error in self.unanswered if number}
+            if partly:
+                self.logger.error(
+                    f"{len(self.unanswered)} passage(s) in chapter(s) "
+                    f"{', '.join(str(n) for n in sorted(partly))} kept their original text: "
+                    f"no model call for them succeeded ({self.unanswered[0][1]})"
+                )
+                self.failed_chapters = sorted({*self.failed_chapters, *partly})
 
             # Create transformation result
             transformation = Transformation(
@@ -460,6 +481,15 @@ class TransformService(BaseService):
 
         lines.append(
             "\nApply these specific character transformations consistently throughout the text."
+        )
+        # Names are decided before the first chapter, once, for the whole book.
+        # A character with no new name above was left without one on purpose --
+        # or the reader asked for the originals -- and a model left to fill the
+        # gap fills it differently in every batch.
+        lines.append(
+            "NAMES: a character keeps the given name and surname the text uses unless a "
+            "new name is set for them above. Never invent or substitute a name. Titles "
+            "and other gendered words still change."
         )
 
         return "\n".join(lines)
@@ -863,9 +893,20 @@ class TransformService(BaseService):
             else:
                 progress_bar.set_postfix({"paragraphs": f"{batch_start + 1}-{batch_end}"})
 
-            # Create batch prompt with the actual paragraph objects
+            # Create batch prompt with the actual paragraph objects. The
+            # context is resolved at this batch: a man who marries in chapter
+            # twenty-eight is "Miss" in the prompt for chapter thirteen and
+            # "Mrs." in the prompt for chapter forty.
             prompt = self._create_batch_transform_prompt(
-                batch_paragraphs, context, len(batch_paragraphs)
+                batch_paragraphs,
+                self._context_at(
+                    context,
+                    getattr(chapter, "number", None) or chapter_index + 1,
+                    batch_start,
+                    batch_paragraphs,
+                    name_map,
+                ),
+                len(batch_paragraphs),
             )
 
             try:
@@ -883,6 +924,7 @@ class TransformService(BaseService):
 
                 # Split response by paragraph markers
                 transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
+                self.model_replies = getattr(self, "model_replies", 0) + 1
 
                 # Process each paragraph in the batch
                 for i, (paragraph, transformed_text) in enumerate(
@@ -944,7 +986,12 @@ class TransformService(BaseService):
                     f"Batch {batch_num}/{total_batches} failed ({e}), retrying at sentence level..."
                 )
                 retry_results = await self._retry_at_sentence_level(
-                    batch_paragraphs, context, name_map, transform_type
+                    batch_paragraphs,
+                    context,
+                    name_map,
+                    transform_type,
+                    chapter_number=getattr(chapter, "number", None) or chapter_index + 1,
+                    batch_start=batch_start,
                 )
                 transformed_paragraphs.extend(retry_results)
                 batch_start = batch_end
@@ -2656,6 +2703,71 @@ class TransformService(BaseService):
             else None
         )
 
+    # A title entry: the man as the text names him, and the woman's title
+    # that answers the question "Mr." never asked.
+    _TITLE_KEY = re.compile(r"^Mr\. \S+$")
+    _TITLE_VALUE = re.compile(r"^(?:Miss|Mrs\.) \S+$")
+
+    def _context_at(self, context, chapter_number, batch_start, batch_paragraphs, name_map):
+        """The transform context as it stands at one batch of one chapter.
+
+        The map applied after the model was already resolved paragraph by
+        paragraph. The map shown to the model was not: it was built once, so
+        the prompt said "Miss Wickham" in every chapter of the book, the model
+        wrote it, and the correction that follows only touches a name the
+        model left alone. A title the model gets wrong stays wrong.
+
+        Only a gender swap carries title entries, so every other transform
+        gets its context back untouched.
+        """
+        if context.get("transform_type") != TransformType.GENDER_SWAP or not name_map:
+            return context
+        here = self._name_map_at(chapter_number, batch_start, name_map)
+        note = self._titles_note(here, chapter_number, batch_start, batch_paragraphs)
+        if here is name_map and not note:
+            return context
+        return {**context, "name_map": here, "titles_note": note}
+
+    def _titles_note(self, name_map, chapter_number, batch_start, batch_paragraphs) -> str:
+        """What to call each "Mr. Surname" in this batch, and from which paragraph.
+
+        Said in the words the text uses. The cast may know a man as "Mr.
+        Fitzwilliam Darcy" or plain "Fitzwilliam Darcy"; the book says "Mr.
+        Darcy", so that is the form the instruction has to be about. Only the
+        men this batch mentions are listed.
+        """
+        text = "\n".join(p.get_text() for p in batch_paragraphs)
+        batch_end = batch_start + len(batch_paragraphs)
+        timeline = getattr(self, "_title_timeline", None) or []
+        lines = []
+        for key, value in sorted((name_map or {}).items()):
+            if not (self._TITLE_KEY.match(key) and self._TITLE_VALUE.match(value)):
+                continue
+            if not re.search(r"(?<![A-Za-z])" + re.escape(key) + r"(?![A-Za-z])", text):
+                continue
+            line = f'- "{key}" is "{value}"'
+            # A wedding inside this batch: say where, by the markers the model
+            # is already returning its paragraphs under.
+            for chapter, paragraph, entries in timeline:
+                becomes = entries.get(key)
+                if (
+                    chapter == chapter_number
+                    and batch_start < paragraph < batch_end
+                    and becomes
+                    and becomes != value
+                ):
+                    marker = paragraph - batch_start + 1
+                    line += f' up to [[P{marker - 1}]], and "{becomes}" from [[P{marker}]] on'
+                    break
+            lines.append(line)
+        if not lines:
+            return ""
+        return (
+            "\nTITLES AT THIS POINT IN THE BOOK. A man who becomes a woman is "
+            '"Miss" while unmarried and "Mrs." once married. This has been settled for '
+            "the whole book, so use exactly these:\n" + "\n".join(lines) + "\n"
+        )
+
     def _name_map_at(self, chapter_number, paragraph_index, name_map):
         """The name map as it stands at one paragraph of one chapter."""
         timeline = getattr(self, "_title_timeline", None)
@@ -3054,6 +3166,7 @@ class TransformService(BaseService):
             max_tokens=self._reply_budget([para]),
         )
         texts = self._parse_batch_response(response, 1)
+        self.model_replies = getattr(self, "model_replies", 0) + 1
         transformed_text = texts[0] if texts else para.get_text()
         source_text = para.get_text()
         if name_map:
@@ -3068,6 +3181,8 @@ class TransformService(BaseService):
         context: dict[str, Any],
         name_map: Optional[dict[str, str]],
         transform_type: "TransformType",
+        chapter_number: Optional[int] = None,
+        batch_start: int = 0,
     ) -> list:
         """Retry a failed batch by processing each paragraph alone.
 
@@ -3078,10 +3193,19 @@ class TransformService(BaseService):
         from src.models.book import Paragraph
 
         results = []
-        for para in batch_paragraphs:
+        for offset, para in enumerate(batch_paragraphs):
+            # Resolved at this paragraph, as the batch path is. Retried text
+            # was prompted and corrected with the titles the book opens on, so
+            # a man already married went back to "Miss" wherever a batch failed.
+            if chapter_number is not None:
+                at = batch_start + offset
+                para_context = self._context_at(context, chapter_number, at, [para], name_map)
+                para_map = self._name_map_at(chapter_number, at, name_map)
+            else:
+                para_context, para_map = context, name_map
             try:
                 transformed_text = await self._transform_single_paragraph(
-                    para, context, name_map, transform_type
+                    para, para_context, para_map, transform_type
                 )
                 results.append(Paragraph(sentences=[transformed_text]))
             except Exception as e:
@@ -3099,14 +3223,41 @@ class TransformService(BaseService):
                     group_para = Paragraph(sentences=group)
                     try:
                         part_text = await self._transform_single_paragraph(
-                            group_para, context, name_map, transform_type
+                            group_para, para_context, para_map, transform_type
                         )
                         merged_parts.append(part_text)
-                    except Exception:
-                        # True last resort: keep original sentence group text
+                    except Exception as error:
+                        # True last resort: keep original sentence group text.
+                        #
+                        # And say so. This kept the source and moved on without
+                        # a word, so a run in which the model never answered
+                        # once -- a dead key, an empty account, no network --
+                        # wrote the original book back out, counted the term
+                        # map's substitutions as its changes, and reported
+                        # success.
                         merged_parts.append(group_para.get_text())
+                        self._note_unanswered(chapter_number, error)
                 results.append(Paragraph(sentences=[" ".join(merged_parts)]))
         return results
+
+    def _note_unanswered(self, chapter_number: Optional[int], error: BaseException) -> None:
+        """Record text that was kept as written because no call for it succeeded."""
+        unanswered = self.__dict__.setdefault("unanswered", [])
+        unanswered.append((chapter_number, str(error) or type(error).__name__))
+
+    def finished_name_map(
+        self, name_map: Optional[dict[str, str]], characters: Optional["CharacterAnalysis"]
+    ) -> dict[str, str]:
+        """The map a run will actually apply, worked out without running it.
+
+        The transform adds every alias to the map it is given before the first
+        chapter, and that is where most of a map's faults are born. It needs
+        no model and no book, so anyone who wants to judge the map before
+        paying for the run can ask for exactly what the run will use.
+        """
+        if name_map and characters:
+            return self._expand_name_map_with_aliases(name_map, characters)
+        return dict(name_map or {})
 
     def _expand_name_map_with_aliases(
         self, name_map: dict[str, str], characters: "CharacterAnalysis"
@@ -3146,7 +3297,20 @@ class TransformService(BaseService):
 
         for char in characters.characters:
             all_names = [char.name] + list(char.aliases)
-            matched_target = next((name_map[n] for n in all_names if n in name_map), None)
+            # A title entry is not a rename. "Mr. Bingley" -> "Miss Bingley"
+            # says what title she takes and nothing about her given name, so
+            # it is no source for the rest of his names: taken as one, it made
+            # "Charles Bingley" -> "Miss Bingley" and "George Wickham" -> "Miss
+            # Wickham", and the given name was gone wherever the book used it.
+            matched_target = next(
+                (
+                    name_map[n]
+                    for n in all_names
+                    if n in name_map
+                    and not (self._TITLE_KEY.match(n) and self._TITLE_VALUE.match(name_map[n]))
+                ),
+                None,
+            )
             if not matched_target:
                 continue
             short = self._given_name(matched_target)
@@ -3436,8 +3600,13 @@ class TransformService(BaseService):
         response = response.strip()
 
         # A batch of one cannot be misaligned, so take the whole response.
+        # It can still be nothing: a reply with no text in it, taken whole,
+        # replaced the paragraph with an empty one and left no trace of it.
         if expected_count == 1:
-            return [self._PARAGRAPH_MARKER.sub("", response).strip()]
+            only = self._PARAGRAPH_MARKER.sub("", response).strip()
+            if not only:
+                raise BatchResponseError("The model returned no text for this paragraph.")
+            return [only]
 
         markers = list(self._PARAGRAPH_MARKER.finditer(response))
         if markers:
@@ -3585,9 +3754,17 @@ class TransformService(BaseService):
 
     @classmethod
     def _reply_budget(cls, batch_paragraphs: list) -> int:
-        """Room for this batch's reply: what went in, with margin for markers."""
+        """Room for this batch's reply: what went in, with room to spare.
+
+        This is a ceiling, not a charge: a reply costs what it writes, however
+        much room it was given. The margin used to be 1.6x, measured against
+        one model's tokens. A newer model counts the same words as up to a
+        third more tokens and may reason before it writes, out of the same
+        allowance, so that margin cut eight replies short in a five-chapter
+        sample and each had to be asked for twice.
+        """
         incoming = sum(cls._rough_tokens(p.get_text()) for p in batch_paragraphs)
-        return max(1024, min(cls.MAX_OUTPUT_TOKENS, int(incoming * 1.6) + 512))
+        return max(4096, min(cls.MAX_OUTPUT_TOKENS, incoming * 3 + 2048))
 
     def _estimate_batch_tokens(self, batch_paragraphs: list, context: dict[str, Any]) -> int:
         """Estimate total tokens for a batch including prompt."""
@@ -3719,6 +3896,7 @@ class TransformService(BaseService):
         character_instructions = self._build_character_instructions(
             characters, transform_type, character_mappings, context.get("name_map")
         )
+        character_instructions += context.get("titles_note") or ""
 
         plural = "" if batch_size == 1 else "s"
         system_prompt = f"""You rewrite the gender language of literary prose. \

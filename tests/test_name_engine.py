@@ -283,3 +283,75 @@ class TestTitleCollision:
         )
         name_map, report = asyncio.run(engine.build_name_map(cast, TransformType.ALL_FEMALE))
         assert name_map.get("Sir William") != "Lady William"
+
+
+class TestTheNamingReplyIsReadForItsFinalAnswer:
+    """Seen live, three times in three, on the default model.
+
+    It answered, wrote "Wait -- I must correct this", and answered again. Read
+    as one JSON document that is an error, and no name was chosen for anyone.
+    """
+
+    FIRST = '{"renames":[{"original":"William","target":"Wilhelmina","nicknames":{}}]}'
+    FINAL = '{"renames":[{"original":"William","target":"Eleanor","nicknames":{}}]}'
+    SECOND_THOUGHTS = (
+        FIRST
+        + "\n\nWait \u2014 I must correct this: Wilhelmina is a feminized form. "
+        + "Here is the corrected final answer:\n\n"
+        + FINAL
+    )
+
+    def read(self, reply, wanted="renames"):
+        from src.services.name_engine import _final_answer
+
+        return _final_answer(reply, wanted)
+
+    def test_the_last_answer_is_the_answer(self):
+        assert self.read(self.SECOND_THOUGHTS)["renames"][0]["target"] == "Eleanor"
+
+    def test_one_answer_reads_as_it_always_did(self):
+        assert self.read(self.FINAL)["renames"][0]["target"] == "Eleanor"
+
+    def test_a_fenced_answer_still_reads(self):
+        assert self.read("```json\n" + self.FINAL + "\n```")["renames"][0]["target"] == "Eleanor"
+
+    def test_words_around_it_do_not_matter(self):
+        reply = "Here are the names {as asked}:\n" + self.FINAL + "\nI hope these suit."
+        assert self.read(reply)["renames"][0]["target"] == "Eleanor"
+
+    def test_an_object_inside_the_answer_is_not_taken_for_it(self):
+        reply = '{"renames":[{"original":"Lizzy","target":"Eli","nicknames":{"Eliza":"Eli"}}]}'
+        assert list(self.read(reply)) == ["renames"]
+
+    def test_an_answer_without_the_key_is_still_handed_back(self):
+        """So that "no target proposed" is reported per name, as before."""
+        assert self.read("{}") == {}
+
+    def test_a_reply_with_no_json_fails_with_the_parsers_reason(self):
+        import json
+
+        with pytest.raises(json.JSONDecodeError):
+            self.read("I could not choose any names.")
+
+    def test_the_engine_uses_it_for_names(self):
+        import asyncio
+
+        from src.models.character import Character, CharacterAnalysis, Gender
+        from src.models.transformation import TransformType
+        from src.services.name_engine import NameEngine
+
+        class _Model:
+            async def complete(self, messages, **_kwargs):
+                return TestTheNamingReplyIsReadForItsFinalAnswer.SECOND_THOUGHTS
+
+        cast = CharacterAnalysis(
+            book_id="t",
+            characters=[
+                Character(name="William Lucas", gender=Gender.MALE, pronouns={}, titles=["Sir"])
+            ],
+        )
+        name_map, report = asyncio.run(
+            NameEngine(_Model()).build_name_map(cast, TransformType.GENDER_SWAP)
+        )
+        assert report["dropped"] == [] and report["accepted"] == 1
+        assert name_map["William"] == "Eleanor"

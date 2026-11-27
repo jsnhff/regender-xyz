@@ -109,7 +109,7 @@ class TestTheGateStillGates:
         broken = type("X", (), {})()
         out = tmp_path / "o.json"
         out.write_text("{}")
-        assert (
-            gate._run_quality_control(SOURCE, broken, TransformType.GENDER_SWAP, str(out), [])
-            is None
-        )
+        summary = gate._run_quality_control(SOURCE, broken, TransformType.GENDER_SWAP, str(out), [])
+        # Not raised, and not passed off as a clean report either: it used to
+        # come back as None, which is what a caller shows for "nothing found".
+        assert summary == {"did_not_run": "the transform produced no book to check"}
