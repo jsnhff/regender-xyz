@@ -461,6 +461,15 @@ class TransformService(BaseService):
         lines.append(
             "\nApply these specific character transformations consistently throughout the text."
         )
+        # Names are decided before the first chapter, once, for the whole book.
+        # A character with no new name above was left without one on purpose --
+        # or the reader asked for the originals -- and a model left to fill the
+        # gap fills it differently in every batch.
+        lines.append(
+            "NAMES: a character keeps the given name and surname the text uses unless a "
+            "new name is set for them above. Never invent or substitute a name. Titles "
+            "and other gendered words still change."
+        )
 
         return "\n".join(lines)
 

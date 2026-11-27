@@ -410,6 +410,7 @@ class Application:
         custom_title: Optional[str] = None,
         on_chapter_complete: Optional[Any] = None,
         characters: Optional[CharacterAnalysis] = None,
+        keep_names: bool = False,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -424,6 +425,8 @@ class Application:
             characters: The cast this run already analysed. Passing it is how a
                 caller that has shown the reader a cast guarantees the book is
                 transformed against that same cast and no other.
+            keep_names: Every character keeps the name the book gives them.
+                Entries in name_map are still applied; nothing is added to it.
 
         Returns:
             Processing results
@@ -466,10 +469,12 @@ class Application:
                 TransformType(transform_type),
                 base_map=name_map,
                 selected_characters=selected_characters,
+                propose=not keep_names,
             )
             self.logger.info(
                 f"Name map: {name_report['entries']} entries "
                 f"({name_report['accepted']} characters renamed)"
+                + (" -- names kept as written" if keep_names else "")
             )
 
             # Audit the map here, before a single chapter is transformed. Every
