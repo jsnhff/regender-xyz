@@ -130,6 +130,7 @@ async def process_book(args):
             output_path=str(output_path),
             selected_characters=selected_characters,
             name_map=name_map,
+            keep_names=args.keep_names,
             custom_title=args.title or None,
         )
 
@@ -241,6 +242,13 @@ async def async_main():
             "JSON string or path to .json file mapping original character names to replacements, "
             'e.g. \'{"Elizabeth":"Edward","Jane":"John"}\''
         ),
+    )
+
+    parser.add_argument(
+        "--keep-names",
+        action="store_true",
+        help="Every character keeps the name the book gives them. Entries passed "
+        "with --name-map are still applied; no others are chosen.",
     )
 
     parser.add_argument(

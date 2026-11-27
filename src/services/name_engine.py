@@ -1003,12 +1003,18 @@ class NameEngine:
         transform_type: TransformType,
         base_map: Optional[dict[str, str]] = None,
         selected_characters: Optional[list[str]] = None,
+        propose: bool = True,
     ) -> tuple[dict[str, str], dict[str, Any]]:
         """Build the book's rename map.
 
         Returns (name_map, report). base_map entries (user-provided) always win
         and suppress LLM proposals for those characters. The report records
         drops and review flags for QC.
+
+        propose=False is the reader saying "keep the originals". Supplied
+        entries are still honoured; the engine adds none of its own. Without
+        it there was no way to say so: declining every suggestion handed over
+        no map, and no map is exactly what asks the engine to choose.
         """
         index = self._cast_index(characters)
         reserved = self._reserved_names(index)
@@ -1064,7 +1070,13 @@ class NameEngine:
         base_lower = {k.lower() for k in base_map}
         accepted: dict[str, dict] = {}
 
-        if proposal_list and self.provider:
+        if proposal_list and not propose:
+            report["kept"] = len(proposal_list)
+            report["flags"].append(
+                f"names kept as written: {len(proposal_list)} given name(s) the engine "
+                "would have replaced were left alone, as asked"
+            )
+        elif proposal_list and self.provider:
             # Targets may not collide with anything in the book OR the user map.
             #
             # The GIVEN name of each supplied target, not the whole string. A

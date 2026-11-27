@@ -1349,6 +1349,10 @@ class RegenderTUI(App):
         # a cast reviewed for the previous book is not this book's cast.
         self._pending_characters = None
         self._name_map: dict[str, str] | None = None
+        # "Keep the originals" is a decision, not the absence of one. No map
+        # on its own asks the engine to choose names, so the answer has to be
+        # carried separately or it is undone a moment later.
+        self._keep_names = False
         self._name_suggestions: list[dict] = []
         self._name_review_idx: int = 0
         self._name_edit_mode: bool = False
@@ -3473,6 +3477,7 @@ class RegenderTUI(App):
         v = value.strip().lower()
         if v in ("a", ""):  # Accept all (A or Enter)
             self._name_map = {s["original"]: s["suggested"] for s in self._name_suggestions}
+            self._keep_names = False
             n = len(self._name_map)
             label = "character" if n == 1 else "characters"
             self.print(f"[#ffffff]✓[/] {n} {label} renamed")
@@ -3480,6 +3485,7 @@ class RegenderTUI(App):
             self._start_processing()
         elif v == "k":  # Keep originals
             self._name_map = None
+            self._keep_names = True
             self.print("[#555555]Keeping original names[/]")
             self._start_processing()
         elif v == "r":  # Ask for a different set
@@ -3575,6 +3581,7 @@ class RegenderTUI(App):
             "no_qc": self._no_qc,
             "output_path": str(self._output_path) if self._output_path else None,
             "name_map": self._name_map,
+            "keep_names": self._keep_names,
         }
 
         # Run processing in background worker
@@ -3647,6 +3654,7 @@ class RegenderTUI(App):
                 custom_title=self._custom_title or None,
                 on_chapter_complete=on_chapter_complete,
                 characters=self._pending_characters,
+                keep_names=bool(self._result.get("keep_names")),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 
