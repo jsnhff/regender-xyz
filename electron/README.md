@@ -22,16 +22,19 @@ In dev mode `main.js` resolves Python and the regender source from the parent re
 ## Ship a .dmg
 
 ```bash
-# One-time: enroll in Apple Developer, install your "Developer ID Application" cert
-# Export it as .p12 and set these env vars (or put them in a .env you source):
-export CSC_LINK="/path/to/developer-id.p12"
-export CSC_KEY_PASSWORD="..."
+# One-time: enroll in Apple Developer and install your "Developer ID Application"
+# cert in the login keychain. The build signs with it from there.
+# Set these for notarization (or put them in a .env you source):
 export APPLE_ID="you@example.com"
 export APPLE_APP_SPECIFIC_PASSWORD="abcd-efgh-ijkl-mnop"   # appleid.apple.com
 export APPLE_TEAM_ID="ABCDE12345"
 
 ./electron/build.sh         # signed + notarized .dmg in electron/dist/
 ```
+
+With no certificate in the keychain the script falls back to a `.p12` (`CSC_LINK` and
+`CSC_KEY_PASSWORD`). That path fails at signing on macOS 27.2 with electron-builder 24,
+so prefer the keychain.
 
 The script:
 1. Downloads `python-build-standalone` arm64 → `python-arm64/`
