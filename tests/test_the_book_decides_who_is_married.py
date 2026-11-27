@@ -281,6 +281,57 @@ class TestOnTheRepoSampleAndItsRealCast:
         assert all(name.count(" ") == 1 for name in states), sorted(states)
 
 
+class TestATitleIsNotARename:
+    """ "Mr. Bingley" -> "Miss Bingley" says nothing about his given name."""
+
+    def expand(self, name_map, *cast):
+        service = TransformService.__new__(TransformService)
+        return service.finished_name_map(
+            name_map, CharacterAnalysis(book_id="t", characters=list(cast))
+        )
+
+    def test_his_other_names_do_not_inherit_the_title(self):
+        bingley = Character(
+            name="Mr. Charles Bingley",
+            gender=Gender.MALE,
+            pronouns={},
+            aliases=["Mr. Bingley", "Charles Bingley", "Bingley"],
+            titles=["Mr."],
+        )
+        finished = self.expand({"Mr. Bingley": "Miss Bingley"}, bingley)
+        assert finished == {"Mr. Bingley": "Miss Bingley"}
+
+    def test_a_rename_still_reaches_them(self):
+        bingley = Character(
+            name="Mr. Charles Bingley",
+            gender=Gender.MALE,
+            pronouns={},
+            aliases=["Mr. Bingley", "Charles Bingley", "Charles"],
+            titles=["Mr."],
+        )
+        finished = self.expand(
+            {"Mr. Bingley": "Miss Bingley", "Charles Bingley": "Clara Bingley"}, bingley
+        )
+        assert finished["Mr. Bingley"] == "Miss Bingley"
+        assert finished["Charles Bingley"] == "Clara Bingley"
+        assert finished.get("Charles") == "Clara"
+
+    def test_the_finished_map_then_passes_its_own_audit(self):
+        from src.services.name_engine import audit_name_map
+
+        wickham = Character(
+            name="Mr. Wickham",
+            gender=Gender.MALE,
+            pronouns={},
+            aliases=["George Wickham", "Wickham"],
+            titles=["Mr."],
+        )
+        cast = CharacterAnalysis(book_id="t", characters=[wickham])
+        service = TransformService.__new__(TransformService)
+        finished = service.finished_name_map({"Mr. Wickham": "Miss Wickham"}, cast)
+        assert audit_name_map(finished, cast) == []
+
+
 # --------------------------------------------------------------------------- #
 # The model is told
 # --------------------------------------------------------------------------- #

@@ -3281,7 +3281,20 @@ class TransformService(BaseService):
 
         for char in characters.characters:
             all_names = [char.name] + list(char.aliases)
-            matched_target = next((name_map[n] for n in all_names if n in name_map), None)
+            # A title entry is not a rename. "Mr. Bingley" -> "Miss Bingley"
+            # says what title she takes and nothing about her given name, so
+            # it is no source for the rest of his names: taken as one, it made
+            # "Charles Bingley" -> "Miss Bingley" and "George Wickham" -> "Miss
+            # Wickham", and the given name was gone wherever the book used it.
+            matched_target = next(
+                (
+                    name_map[n]
+                    for n in all_names
+                    if n in name_map
+                    and not (self._TITLE_KEY.match(n) and self._TITLE_VALUE.match(name_map[n]))
+                ),
+                None,
+            )
             if not matched_target:
                 continue
             short = self._given_name(matched_target)
