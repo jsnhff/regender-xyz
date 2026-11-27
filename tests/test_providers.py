@@ -32,10 +32,9 @@ def _make_anthropic(create_side_effect=None, create_return=None):
     provider = AnthropicProvider()
     provider.model = provider.default_model
     provider._initialized = True
-    client = Mock()
-    client.messages = Mock()
-    client.messages.create = AsyncMock(side_effect=create_side_effect, return_value=create_return)
-    provider.client = client
+    provider.client = Mock()
+    # The one place the SDK is called, so the one place a test stands in for it.
+    provider._send = AsyncMock(side_effect=create_side_effect, return_value=create_return)
     return provider
 
 
@@ -57,9 +56,11 @@ def _make_openai(create_side_effect=None, create_return=None):
 def _anthropic_response(text: str):
     """Build a mock Anthropic SDK response object."""
     block = Mock()
+    block.type = "text"
     block.text = text
     response = Mock()
     response.content = [block]
+    response.stop_reason = "end_turn"
     return response
 
 
@@ -87,7 +88,7 @@ async def test_anthropic_overload_retries_then_raises():
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
     # Initial attempt + MAX_RETRIES retries.
-    assert provider.client.messages.create.call_count == AnthropicProvider.MAX_RETRIES + 1
+    assert provider._send.call_count == AnthropicProvider.MAX_RETRIES + 1
 
 
 async def test_anthropic_recovers_after_transient_overload():
@@ -103,7 +104,7 @@ async def test_anthropic_recovers_after_transient_overload():
     result = await provider._complete_impl([{"role": "user", "content": "hi"}])
 
     assert result == "recovered"
-    assert provider.client.messages.create.call_count == 3
+    assert provider._send.call_count == 3
 
 
 async def test_anthropic_rate_limit_retries_then_raises():
@@ -113,7 +114,7 @@ async def test_anthropic_rate_limit_retries_then_raises():
     with pytest.raises(Exception, match="429"):
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
-    assert provider.client.messages.create.call_count == AnthropicProvider.MAX_RETRIES + 1
+    assert provider._send.call_count == AnthropicProvider.MAX_RETRIES + 1
 
 
 async def test_anthropic_timeout_raises_timeouterror():
@@ -124,7 +125,7 @@ async def test_anthropic_timeout_raises_timeouterror():
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
     # Timeouts are not part of the retry budget.
-    assert provider.client.messages.create.call_count == 1
+    assert provider._send.call_count == 1
 
 
 async def test_anthropic_billing_error_raises_valueerror():
@@ -134,7 +135,7 @@ async def test_anthropic_billing_error_raises_valueerror():
     with pytest.raises(ValueError, match="billing"):
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
-    assert provider.client.messages.create.call_count == 1
+    assert provider._send.call_count == 1
 
 
 # --------------------------------------------------------------------------- #
@@ -211,3 +212,157 @@ class TestErrorClassification:
 
         handled = ErrorHandler().handle_error(asyncio.TimeoutError("timed out"))
         assert isinstance(handled, OperationTimeoutError)
+
+
+# --------------------------------------------------------------------------- #
+# What a reply has to be before it is returned as one
+# --------------------------------------------------------------------------- #
+
+HI = [{"role": "user", "content": "hi"}]
+
+
+def _block(kind: str, text: str = ""):
+    block = Mock()
+    block.type = kind
+    block.text = text
+    return block
+
+
+def _reply(*blocks, stop_reason="end_turn"):
+    response = Mock()
+    response.content = list(blocks)
+    response.stop_reason = stop_reason
+    return response
+
+
+class _BadRequestError(Exception):
+    status_code = 400
+
+
+class TestTemperatureIsDroppedWhereItIsRefused:
+    """Newer models answer a request carrying `temperature` with a 400.
+
+    Seen live: claude-sonnet-5, claude-sonnet-5-5, claude-opus-5-5 and
+    claude-haiku-5-5 all refuse it; claude-opus-4-5 and claude-haiku-4-5 take it.
+    """
+
+    async def test_the_call_is_repeated_without_it(self):
+        provider = _make_anthropic(
+            create_side_effect=[
+                _BadRequestError("`temperature` is deprecated for this model."),
+                _anthropic_response("done"),
+            ]
+        )
+        assert await provider._complete_impl(HI, temperature=0.3) == "done"
+        first, second = (call.args[0] for call in provider._send.call_args_list)
+        assert first["temperature"] == 0.3
+        assert "temperature" not in second
+
+    async def test_the_model_is_only_asked_once(self):
+        provider = _make_anthropic(
+            create_side_effect=[
+                _BadRequestError("`temperature` is deprecated for this model."),
+                _anthropic_response("one"),
+                _anthropic_response("two"),
+            ]
+        )
+        await provider._complete_impl(HI, temperature=0.3)
+        await provider._complete_impl(HI, temperature=0.3)
+        assert provider._send.call_count == 3
+        assert "temperature" not in provider._send.call_args_list[2].args[0]
+
+    async def test_a_model_that_takes_it_still_gets_it(self):
+        provider = _make_anthropic(create_return=_anthropic_response("done"))
+        await provider._complete_impl(HI, temperature=0.0)
+        assert provider._send.call_args.args[0]["temperature"] == 0.0
+
+    async def test_some_other_bad_request_is_not_retried(self):
+        provider = _make_anthropic(create_side_effect=_BadRequestError("messages: too long"))
+        with pytest.raises(_BadRequestError):
+            await provider._complete_impl(HI)
+        assert provider._send.call_count == 1
+
+
+class TestTheAnswerIsTheTextNotTheFirstBlock:
+    async def test_reasoning_ahead_of_the_text_is_skipped(self):
+        """claude-opus-5-5 and claude-haiku-5-5 answer ['thinking', 'text']."""
+        provider = _make_anthropic(
+            create_return=_reply(_block("thinking"), _block("text", "He gave her his book."))
+        )
+        assert await provider._complete_impl(HI) == "He gave her his book."
+
+    async def test_text_in_several_blocks_is_joined(self):
+        provider = _make_anthropic(
+            create_return=_reply(_block("text", "one "), _block("thinking"), _block("text", "two"))
+        )
+        assert await provider._complete_impl(HI) == "one two"
+
+
+class TestACutOffReplyIsNotAReply:
+    async def test_it_is_asked_again_with_more_room_once(self):
+        provider = _make_anthropic(
+            create_side_effect=[
+                _reply(_block("thinking"), stop_reason="max_tokens"),
+                _anthropic_response("whole"),
+            ]
+        )
+        assert await provider._complete_impl(HI, max_tokens=1000) == "whole"
+        first, second = (call.args[0]["max_tokens"] for call in provider._send.call_args_list)
+        assert first == 1000
+        assert second > first
+
+    async def test_still_cut_off_it_raises_rather_than_returning_half(self):
+        from src.providers.base_provider import ResponseIncompleteError
+
+        provider = _make_anthropic(
+            create_return=_reply(_block("text", "half a parag"), stop_reason="max_tokens")
+        )
+        with pytest.raises(ResponseIncompleteError, match="cut off"):
+            await provider._complete_impl(HI, max_tokens=1000)
+        assert provider._send.call_count == 2
+
+    async def test_a_refusal_raises(self):
+        from src.providers.base_provider import ResponseIncompleteError
+
+        provider = _make_anthropic(create_return=_reply(stop_reason="refusal"))
+        with pytest.raises(ResponseIncompleteError, match="declined"):
+            await provider._complete_impl(HI)
+
+
+async def test_an_error_that_merely_contains_rate_is_not_a_rate_limit():
+    """ "rate" is inside "generate"; matching it slept three minutes, then failed."""
+    provider = _make_anthropic(create_side_effect=Exception("failed to generate a response"))
+    with pytest.raises(Exception, match="generate"):
+        await provider._complete_impl(HI)
+    assert provider._send.call_count == 1
+
+
+class TestTheChosenModelIsTheModelCalled:
+    """The menu wrote DEFAULT_MODEL and nothing read it."""
+
+    def _model(self, monkeypatch, **env):
+        from src.app import Application
+
+        for name in ("DEFAULT_MODEL", "ANTHROPIC_MODEL"):
+            monkeypatch.delenv(name, raising=False)
+        monkeypatch.setenv("DEFAULT_PROVIDER", "anthropic")
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-not-a-real-key")
+        for name, value in env.items():
+            monkeypatch.setenv(name, value)
+        app = Application("src/config.json")
+        try:
+            return app.get_service("transform").provider.model
+        finally:
+            app.shutdown()
+
+    async def test_the_menu_choice_wins(self, monkeypatch):
+        model = self._model(
+            monkeypatch, DEFAULT_MODEL="claude-haiku-5-5", ANTHROPIC_MODEL="claude-opus-5-5"
+        )
+        assert model == "claude-haiku-5-5"
+
+    async def test_without_one_the_env_file_still_decides(self, monkeypatch):
+        assert self._model(monkeypatch, ANTHROPIC_MODEL="claude-opus-5-5") == "claude-opus-5-5"
+
+    async def test_with_neither_the_default_is_used(self, monkeypatch):
+        assert self._model(monkeypatch) == "claude-sonnet-5-5"

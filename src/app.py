@@ -196,8 +196,13 @@ class Application:
 
         if provider:
             try:
-                # Initialize provider (it will read API keys from environment)
-                provider.initialize({})
+                # Initialize provider (it will read API keys from environment).
+                #
+                # The model chosen in the interface arrives as DEFAULT_MODEL.
+                # Nothing read it: the menu reported and priced the choice
+                # while every call went to whatever <PROVIDER>_MODEL or the
+                # provider's own default named.
+                provider.initialize({"model": os.getenv("DEFAULT_MODEL") or None})
 
                 # Register as service for dependency injection
                 self.context.register_instance("llm_provider", provider)

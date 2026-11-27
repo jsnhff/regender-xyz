@@ -16,6 +16,15 @@ from src.providers.base import LLMProvider
 from src.providers.rate_limiter import TokenBucketRateLimiter as RateLimiter
 
 
+class ResponseIncompleteError(RuntimeError):
+    """The model answered, but not with a whole reply: cut off, or declined.
+
+    Raised rather than returned so a caller cannot mistake part of an answer
+    for the answer. Callers that already retry on failure split the work and
+    try again; nothing downstream has to learn to recognise half a paragraph.
+    """
+
+
 class BaseProviderPlugin(LLMProvider, Plugin):
     """
     Base class for all LLM provider plugins.

@@ -3585,9 +3585,17 @@ class TransformService(BaseService):
 
     @classmethod
     def _reply_budget(cls, batch_paragraphs: list) -> int:
-        """Room for this batch's reply: what went in, with margin for markers."""
+        """Room for this batch's reply: what went in, with room to spare.
+
+        This is a ceiling, not a charge: a reply costs what it writes, however
+        much room it was given. The margin used to be 1.6x, measured against
+        one model's tokens. A newer model counts the same words as up to a
+        third more tokens and may reason before it writes, out of the same
+        allowance, so that margin cut eight replies short in a five-chapter
+        sample and each had to be asked for twice.
+        """
         incoming = sum(cls._rough_tokens(p.get_text()) for p in batch_paragraphs)
-        return max(1024, min(cls.MAX_OUTPUT_TOKENS, int(incoming * 1.6) + 512))
+        return max(4096, min(cls.MAX_OUTPUT_TOKENS, incoming * 3 + 2048))
 
     def _estimate_batch_tokens(self, batch_paragraphs: list, context: dict[str, Any]) -> int:
         """Estimate total tokens for a batch including prompt."""

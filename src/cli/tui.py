@@ -121,7 +121,7 @@ def _get_resolved_model() -> str:
         return model
     provider = os.environ.get("DEFAULT_PROVIDER", "openai")
     if provider == "anthropic":
-        return os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5-20251101")
+        return os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5")
     return os.environ.get("OPENAI_MODEL", "gpt-4o")
 
 
@@ -145,17 +145,22 @@ MODEL_COSTS = {
     "gpt-4-turbo": (10.00, 30.00),
     "gpt-4": (30.00, 60.00),
     "gpt-3.5-turbo": (1.00, 2.00),
+    "claude-fable-5-2": (8.00, 40.00),
+    "claude-mythos-5-2": (8.00, 40.00),
     "claude-fable-5-1": (10.00, 50.00),
     "claude-fable-5": (10.00, 50.00),
     "claude-mythos-5-1": (10.00, 50.00),
+    "claude-opus-5-5": (4.00, 20.00),
     "claude-opus-5": (5.00, 25.00),
     "claude-opus-4-8": (5.00, 25.00),
     "claude-opus-4-7": (5.00, 25.00),
     "claude-opus-4-6": (5.00, 25.00),
     "claude-opus-4-5": (5.00, 25.00),
+    "claude-sonnet-5-5": (2.00, 10.00),
     "claude-sonnet-5": (2.00, 10.00),
     "claude-sonnet-4-6": (3.00, 15.00),
     "claude-sonnet-4": (3.00, 15.00),
+    "claude-haiku-5-5": (0.10, 0.50),
     "claude-haiku-4-5": (1.00, 5.00),
     "claude-3-opus": (15.00, 75.00),
     "claude-3-sonnet": (3.00, 15.00),
@@ -266,9 +271,9 @@ _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     "anthropic": [
         (mid, name, _price_label(mid))
         for mid, name in (
-            ("claude-opus-5", "Claude Opus 5"),
-            ("claude-sonnet-5", "Claude Sonnet 5"),
-            ("claude-haiku-4-5", "Claude Haiku 4.5"),
+            ("claude-opus-5-5", "Claude Opus 5.5"),
+            ("claude-sonnet-5-5", "Claude Sonnet 5.5"),
+            ("claude-haiku-5-5", "Claude Haiku 5.5"),
         )
     ],
     "openai": [
