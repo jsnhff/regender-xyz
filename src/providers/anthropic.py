@@ -264,7 +264,9 @@ class AnthropicProvider(BaseProviderPlugin):
                 raise ValueError("Anthropic API billing issue. Please check your account.") from e
 
             # Log and re-raise other errors
-            self.logger.error(f"Anthropic API error: {e}")
+            # With its type: some of these carry no message, and the line then
+            # said only that there had been an error.
+            self.logger.error(f"Anthropic API error: {type(e).__name__}: {e}")
             raise
 
         # What the call actually cost. The response already carries it and

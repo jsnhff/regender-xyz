@@ -113,6 +113,46 @@ _VARIANT_STYLE = {
 }
 
 
+def _final_answer(reply: str, wanted: str) -> dict:
+    """The JSON a naming reply settles on.
+
+    A model that reasons will sometimes answer, think better of it, and answer
+    again in the same reply:
+
+        {"renames": [... "William" -> "Wilhelmina" ...]}
+
+        Wait -- I must correct this: Wilhelmina is a feminized form. Here is
+        the corrected final answer:
+
+        {"renames": [... "William" -> "Eleanor" ...]}
+
+    Read as one JSON document that is "Extra data", an error, and an error
+    here meant no name was chosen for anyone. The last object carrying the key
+    asked for is the answer; anything before it is the model's working.
+    """
+    cleaned = re.sub(r"^```(?:json)?|```$", "", reply.strip(), flags=re.MULTILINE).strip()
+    decoder = json.JSONDecoder()
+    answer = fallback = None
+    at = cleaned.find("{")
+    while at != -1:
+        try:
+            value, end = decoder.raw_decode(cleaned, at)
+        except json.JSONDecodeError:
+            at = cleaned.find("{", at + 1)
+            continue
+        if isinstance(value, dict):
+            fallback = value
+            if wanted in value:
+                answer = value
+        at = cleaned.find("{", end)
+    if answer is not None:
+        return answer
+    if fallback is not None:
+        return fallback
+    # Nothing in it parses: fail as it always did, with the parser's reason.
+    return json.loads(cleaned)
+
+
 def _strip_titles(name: str) -> list[str]:
     """Split a display name into tokens with leading titles removed."""
     tokens = [t for t in re.split(r"\s+", name.strip()) if t]
@@ -913,8 +953,7 @@ class NameEngine:
         response = await self.provider.complete(
             messages=[{"role": "user", "content": prompt}], temperature=0.0
         )
-        cleaned = re.sub(r"^```(?:json)?|```$", "", response.strip(), flags=re.MULTILINE).strip()
-        data = json.loads(cleaned)
+        data = _final_answer(response, "renames")
         return {r["original"]: r for r in data.get("renames", []) if r.get("original")}
 
     async def _propose_nicknames(
@@ -938,8 +977,7 @@ class NameEngine:
             messages=[{"role": "user", "content": _NICKNAME_PROMPT.format(cast_lines=cast_lines)}],
             temperature=0.0,
         )
-        cleaned = re.sub(r"^```(?:json)?|```$", "", response.strip(), flags=re.MULTILINE).strip()
-        data = json.loads(cleaned)
+        data = _final_answer(response, "characters")
         return {
             entry["name"]: entry.get("nicknames") or {}
             for entry in data.get("characters", [])
