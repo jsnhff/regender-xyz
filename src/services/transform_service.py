@@ -244,6 +244,12 @@ class TransformService(BaseService):
 
         start_time = time.time()
 
+        # What went wrong belongs to the run it went wrong in. failed_chapters
+        # was a class attribute nothing reset, so a service used twice carried
+        # the first book's failures into the second.
+        self.failed_chapters = []
+        self.unanswered = []
+
         try:
             # Get character analysis if not provided
             if not characters:
@@ -282,6 +288,18 @@ class TransformService(BaseService):
             transformed_chapters, all_changes = await self._transform_chapters(
                 book.chapters, context, name_map=name_map, on_chapter_complete=on_chapter_complete
             )
+
+            # A chapter with any text the model never answered for is a chapter
+            # that kept original text, whether the whole of it raised or one
+            # paragraph fell through every retry.
+            partly = {number for number, _error in self.unanswered if number}
+            if partly:
+                self.logger.error(
+                    f"{len(self.unanswered)} passage(s) in chapter(s) "
+                    f"{', '.join(str(n) for n in sorted(partly))} kept their original text: "
+                    f"no model call for them succeeded ({self.unanswered[0][1]})"
+                )
+                self.failed_chapters = sorted({*self.failed_chapters, *partly})
 
             # Create transformation result
             transformation = Transformation(
@@ -944,7 +962,11 @@ class TransformService(BaseService):
                     f"Batch {batch_num}/{total_batches} failed ({e}), retrying at sentence level..."
                 )
                 retry_results = await self._retry_at_sentence_level(
-                    batch_paragraphs, context, name_map, transform_type
+                    batch_paragraphs,
+                    context,
+                    name_map,
+                    transform_type,
+                    chapter_number=chapter_index + 1,
                 )
                 transformed_paragraphs.extend(retry_results)
                 batch_start = batch_end
@@ -3068,6 +3090,7 @@ class TransformService(BaseService):
         context: dict[str, Any],
         name_map: Optional[dict[str, str]],
         transform_type: "TransformType",
+        chapter_number: Optional[int] = None,
     ) -> list:
         """Retry a failed batch by processing each paragraph alone.
 
@@ -3102,11 +3125,24 @@ class TransformService(BaseService):
                             group_para, context, name_map, transform_type
                         )
                         merged_parts.append(part_text)
-                    except Exception:
-                        # True last resort: keep original sentence group text
+                    except Exception as error:
+                        # True last resort: keep original sentence group text.
+                        #
+                        # And say so. This kept the source and moved on without
+                        # a word, so a run in which the model never answered
+                        # once -- a dead key, an empty account, no network --
+                        # wrote the original book back out, counted the term
+                        # map's substitutions as its changes, and reported
+                        # success.
                         merged_parts.append(group_para.get_text())
+                        self._note_unanswered(chapter_number, error)
                 results.append(Paragraph(sentences=[" ".join(merged_parts)]))
         return results
+
+    def _note_unanswered(self, chapter_number: Optional[int], error: BaseException) -> None:
+        """Record text that was kept as written because no call for it succeeded."""
+        unanswered = self.__dict__.setdefault("unanswered", [])
+        unanswered.append((chapter_number, str(error) or type(error).__name__))
 
     def _expand_name_map_with_aliases(
         self, name_map: dict[str, str], characters: "CharacterAnalysis"

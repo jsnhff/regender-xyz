@@ -38,8 +38,8 @@ def run_problems(result: dict) -> list[str]:
     if partial:
         noun = "Chapter" if len(partial) == 1 else "Chapters"
         problems.append(
-            f"{noun} {', '.join(str(n) for n in partial)} kept the original text: "
-            "the model call failed there, so the book is only partly transformed."
+            f"{noun} {', '.join(str(n) for n in partial)} kept original text, in whole or "
+            "in part: model calls failed there, so the book is only partly transformed."
         )
 
     qc = result.get("quality_control")
@@ -652,6 +652,21 @@ class Application:
                     f"{len(partial)} chapter(s) kept their original, untransformed text: "
                     + ", ".join(str(n) for n in partial)
                 )
+
+            # Every chapter kept original text: the model answered for none
+            # of the book. Writing that out as a transformed edition -- the
+            # source with the term map run over it -- is the worst thing a run
+            # can do quietly, so it is not written at all.
+            if partial and len(partial) >= len(book.chapters):
+                first = next(iter(getattr(transformer, "unanswered", []) or []), None)
+                reason = f" The first failure was: {first[1]}" if first else ""
+                return {
+                    "success": False,
+                    "error": (
+                        f"The model did not answer for any of the {len(book.chapters)} "
+                        f"chapters, so no book was written.{reason}"
+                    ),
+                }
 
             # What the safety net decided, and which of those decisions want a
             # second look. A capitalised word that does not open a sentence is

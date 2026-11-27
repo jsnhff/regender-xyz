@@ -52,7 +52,7 @@ class TestWhatCountsAsAProblem:
 
     def test_untransformed_chapters_are_named(self):
         (problem,) = run_problems({**CLEAN, "untransformed_chapters": [3, 7]})
-        assert "Chapters 3, 7 kept the original text" in problem
+        assert "Chapters 3, 7 kept original text" in problem
 
     def test_one_chapter_reads_as_one(self):
         (problem,) = run_problems({**CLEAN, "untransformed_chapters": [12]})
@@ -190,7 +190,7 @@ class TestTheCommandLine:
         assert "Finished, with problems" in out
         assert "Success" not in out, "the heading said success above a list of problems"
         assert "Before you use this book" in out
-        assert "Chapters 3, 7 kept the original text" in out
+        assert "Chapters 3, 7 kept original text" in out
         assert "Output:" in out, "the book was still written, and the path still shown"
 
     def test_a_qc_crash_is_said_and_changes_the_exit(self, monkeypatch, tmp_path, capsys):
