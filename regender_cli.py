@@ -188,7 +188,10 @@ async def process_book(args):
 
 # The book was written, and something about it needs reading first. Distinct
 # from 1, which means no book: a script can tell "failed" from "look at this".
-EXIT_FINISHED_WITH_PROBLEMS = 2
+#
+# Not 2: that is what the argument parser exits with for a mistyped option, and
+# "you spelled a flag wrong" must not read as "the book has problems".
+EXIT_FINISHED_WITH_PROBLEMS = 3
 
 
 def _print_run_report(result: dict, app) -> None:
@@ -262,8 +265,8 @@ async def async_main():
     parser = argparse.ArgumentParser(
         description="Regender-XYZ CLI - Transform gender representation in literature",
         epilog="Exit status: 0 the book was written and nothing needs reading first; "
-        "2 the book was written, with problems listed at the end of the output; "
-        "1 no book was written.",
+        "3 the book was written, with problems listed at the end of the output; "
+        "1 no book was written; 2 the command itself was wrong.",
     )
 
     # Main arguments (optional — when omitted, launches interactive TUI)

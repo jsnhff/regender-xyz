@@ -228,6 +228,24 @@ class TestTheRunUsesThePlanItIsHanded:
         states = {s["name"]: s for s in report["marital_states"]}
         assert states["Mr. Collins"]["reason"] == "settled by the reader"
 
+    def test_rulings_reach_a_run_that_has_to_plan_for_itself(
+        self, backend, tmp_path, simple_story_path
+    ):
+        """When the plan was lost, the rulings made on screen went with it."""
+        story = tmp_path / "bennet.txt"
+        story.write_text(
+            "CHAPTER 1: One\n\nMr. Bennet sighed and Mrs. Bennet spoke.\n\n"
+            "Mr. Bennet said nothing more.\n"
+        )
+        self.run(
+            backend,
+            tmp_path,
+            str(story),
+            marital_rulings={"Mr. Bennet": {"opens": "unmarried", "wedding": None}},
+        )
+        proposed = json.loads((tmp_path / "name_map_proposed.json").read_text())
+        assert proposed["Mr. Bennet"] == "Miss Bennet"
+
     def test_with_no_plan_the_run_makes_its_own(self, backend, tmp_path, simple_story_path):
         result = self.run(backend, tmp_path, simple_story_path)
         assert result["success"] is True
@@ -313,6 +331,18 @@ class TestTheNamesHandOverToThePlan:
         tui._handle_name_review_input("a")
         assert tui.went == ["_plan_run"]
 
+    def test_enter_keeps_when_nothing_was_suggested(self, tui):
+        """The screen cursors "keep the originals"; Enter accepted an empty list."""
+        tui._name_suggestions = []
+        tui._handle_name_review_input("")
+        assert tui._keep_names is True and tui._name_map is None
+        assert tui.went == ["_plan_run"]
+
+    def test_enter_still_accepts_when_there_is_something_to_accept(self, tui):
+        tui._name_suggestions = [{"original": "Elizabeth", "suggested": "Edmund"}]
+        tui._handle_name_review_input("")
+        assert tui._keep_names is False and tui._name_map == {"Elizabeth": "Edmund"}
+
     def test_keeping_the_names_plans_too(self, tui):
         tui._handle_name_review_input("k")
         assert tui.went == ["_plan_run"] and tui._keep_names is True
@@ -320,6 +350,54 @@ class TestTheNamesHandOverToThePlan:
     def test_the_run_is_handed_the_plan(self):
         assert '"name_plan": self._name_plan' in inspect.getsource(RegenderTUI._start_processing)
         assert "name_plan=" in inspect.getsource(RegenderTUI._run_processing)
+
+
+class TestNothingIsAnsweredWhileTheNamesAreChecked:
+    @pytest.fixture
+    def checking(self, tui):
+        tui._plan_run = RegenderTUI._plan_run.__get__(tui)
+        tui._check_the_names = lambda: tui.went.append("_check_the_names")
+        tui.query_one = lambda _cls: (_ for _ in ()).throw(RuntimeError("no screen"))
+        return tui
+
+    def test_the_stage_moves_on_before_the_wait(self, checking):
+        """A second Enter used to land on the question just answered."""
+        checking._stage = "name_review"
+        checking._plan_run()
+        assert checking._stage == "planning"
+        assert checking.went == ["_check_the_names"]
+
+    def test_the_old_plan_is_dropped_first(self, checking):
+        """Or a run started mid-check would use the plan from before a fix."""
+        assert checking._name_plan is not None
+        checking._plan_run()
+        assert checking._name_plan is None
+
+    def test_no_stage_answers_to_planning(self):
+        source = inspect.getsource(RegenderTUI.on_input_submitted)
+        assert '"planning"' not in source
+
+    def test_a_check_that_fails_is_said_to_have_failed(self, tui, monkeypatch):
+        """Silence here looked exactly like having nothing to ask."""
+
+        class _Broken:
+            def __init__(self, _config):
+                raise RuntimeError("no model is set up")
+
+        monkeypatch.setattr("src.app.Application", _Broken)
+        tui.query_one = lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("no screen"))
+        tui._selected_book = "book.txt"
+        asyncio.run(RegenderTUI._check_the_names.__wrapped__(tui))
+        shown = text(tui)
+        assert "could not be checked beforehand" in shown and "no model is set up" in shown
+        assert tui._name_plan is None
+        assert tui.went == ["_start_processing"], "the run did not go on to check them itself"
+
+    def test_the_rulings_go_with_the_run_even_without_a_plan(self):
+        assert '"marital_rulings": self._title_rulings' in inspect.getsource(
+            RegenderTUI._start_processing
+        )
+        assert "marital_rulings=" in inspect.getsource(RegenderTUI._run_processing)
 
 
 class TestWhoIsAskedAbout:
@@ -398,7 +476,17 @@ class TestAnswering:
         assert asked._title_rulings == {"Mr. Collins": {"opens": "unmarried", "wedding": [22, 0]}}
         assert "Miss Collins until chapter 22, then Mrs. Collins" in text(asked)
 
-    @pytest.mark.parametrize("chapter", ["0", "62", "soon", ""])
+    @pytest.mark.parametrize("answer", ["", "b"])
+    def test_the_chapter_prompt_can_be_left(self, asked, answer):
+        """The only way out used to be to make a chapter up."""
+        asked._handle_title_review_input("4")
+        asked._lines.clear()
+        asked._handle_title_review_input(answer)
+        assert asked._title_rulings == {} and asked._title_idx == 0
+        assert asked._title_chapter_mode is False
+        assert "Miss Collins until chapter 28" in text(asked), "the question was not shown again"
+
+    @pytest.mark.parametrize("chapter", ["0", "62", "soon"])
     def test_a_chapter_the_book_does_not_have_is_asked_for_again(self, asked, chapter):
         asked._handle_title_review_input("4")
         asked._handle_title_review_input(chapter)

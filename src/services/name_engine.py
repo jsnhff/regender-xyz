@@ -619,6 +619,18 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
     # the nicknames "Eliza" and "Lizzy" -- must be allowed to share a target.
     owner = cast_owner_index(characters)
 
+    # A given name on its own, to whoever in the cast has it -- when only one
+    # person does. The engine writes "Mary" -> "Martin" as its own entry, and
+    # the cast lists her as "Mary Bennet" with the nickname "Molly" and no
+    # bare "Mary". Unresolved, the key counted as a person of its own, and
+    # Mary beside her own nickname was reported as two people under one name.
+    given_owner: dict[str, set] = {}
+    for char in getattr(characters, "characters", characters) or []:
+        canonical = getattr(char, "name", "") or ""
+        given, _family = given_and_surname(canonical, surnames, givens)
+        if given:
+            given_owner.setdefault(given.lower(), set()).add(canonical)
+
     def whose(name: str) -> str:
         """The cast member a map key is about, or the key itself.
 
@@ -629,7 +641,12 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
         if key in owner:
             return owner[key]
         stripped = " ".join(_strip_titles(name)).lower()
-        return owner.get(stripped, stripped or key)
+        if stripped in owner:
+            return owner[stripped]
+        people = given_owner.get(stripped or key, set())
+        if len(people) == 1:
+            return next(iter(people))
+        return stripped or key
 
     problems: list[str] = []
     # Keyed by the whole source name, not its given name alone: two different

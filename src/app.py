@@ -608,6 +608,7 @@ class Application:
         keep_names: bool = False,
         stop_on_name_problems: bool = False,
         name_plan: Optional[dict] = None,
+        marital_rulings: Optional[dict[str, dict]] = None,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -630,6 +631,9 @@ class Application:
             name_plan: What plan_names returned, when the caller has already
                 shown it to someone. The run then uses exactly that plan: the
                 names and titles that were read are the ones that are applied.
+            marital_rulings: A reader's rulings on who is married and when,
+                for a run that has to plan for itself. Without this, rulings
+                made on screen were lost whenever the plan was.
 
         Returns:
             Processing results
@@ -676,6 +680,7 @@ class Application:
                 name_map=name_map,
                 selected_characters=selected_characters,
                 keep_names=keep_names,
+                marital_rulings=marital_rulings,
                 book=book,
             )
             name_map = plan["name_map"]
@@ -773,14 +778,18 @@ class Application:
             # of the book. Writing that out as a transformed edition -- the
             # source with the term map run over it -- is the worst thing a run
             # can do quietly, so it is not written at all.
-            if partial and len(partial) >= len(book.chapters):
+            #
+            # Judged on replies, not on chapters. A chapter with one passage
+            # the model never answered counts as untransformed, so "every
+            # chapter failed" was also true of a short book that came through
+            # all but whole, and that book was refused.
+            if partial and getattr(transformer, "model_replies", None) == 0:
                 first = next(iter(getattr(transformer, "unanswered", []) or []), None)
                 reason = f" The first failure was: {first[1]}" if first else ""
                 return {
                     "success": False,
                     "error": (
-                        f"The model did not answer for any of the {len(book.chapters)} "
-                        f"chapters, so no book was written.{reason}"
+                        f"The model did not give one usable reply, so no book was written.{reason}"
                     ),
                 }
 
@@ -847,8 +856,16 @@ class Application:
                         + "; ".join(map_problems[:6])
                     )
                     if output_dir:
+                        # With the ones found before the run, which this file
+                        # already held. Written alone, this list replaced them,
+                        # and the report went on counting problems the file no
+                        # longer listed.
                         with open(output_dir / "name_map_problems.json", "w") as f:
-                            json.dump(map_problems, f, indent=2)
+                            json.dump(
+                                list(dict.fromkeys([*name_report["problems"], *map_problems])),
+                                f,
+                                indent=2,
+                            )
 
                 qc_summary = self._run_quality_control(
                     book,

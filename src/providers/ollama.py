@@ -112,7 +112,10 @@ class OllamaProvider(BaseProviderPlugin):
                 raise ResponseIncompleteError(
                     "The local model's reply was cut off and is incomplete."
                 )
-            return choice.message.content or ""
+            content = choice.message.content or ""
+            if not content.strip():
+                raise ResponseIncompleteError("The local model returned no text.")
+            return content
 
         except asyncio.TimeoutError as e:
             raise TimeoutError(

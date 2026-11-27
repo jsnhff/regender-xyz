@@ -249,11 +249,20 @@ class AnthropicProvider(BaseProviderPlugin):
         if stop_reason == "refusal":
             raise ResponseIncompleteError("The model declined this request.")
 
+        # Any other way of stopping short. The reply holds whatever had been
+        # written when it stopped, which is not the reply.
+        if isinstance(stop_reason, str) and stop_reason not in ("end_turn", "stop_sequence"):
+            raise ResponseIncompleteError(f"The model stopped early ({stop_reason}).")
+
         # The text, wherever it sits. The first block is reasoning on a model
         # that reasons, and reading it as the answer raised on every call.
         content = "".join(
             block.text for block in response.content if getattr(block, "type", None) == "text"
         )
+        # Reasoning and nothing after it. Returned as an empty string, that
+        # was taken for a paragraph the model had rewritten as nothing.
+        if not content.strip():
+            raise ResponseIncompleteError("The model returned no text.")
 
         # If JSON was expected, validate it
         if kwargs.get("response_format") == "json_object":

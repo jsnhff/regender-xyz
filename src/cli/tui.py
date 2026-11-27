@@ -3582,6 +3582,12 @@ class RegenderTUI(App):
             return
 
         v = value.strip().lower()
+        # With nothing suggested the screen cursors "keep the originals", so
+        # that is what Enter has to do. It accepted an empty list instead,
+        # which hands the engine no names and no instruction to keep any, and
+        # the engine then chose names nobody was shown.
+        if v == "" and not self._name_suggestions:
+            v = "k"
         if v in ("a", ""):  # Accept all (A or Enter)
             self._name_map = {s["original"]: s["suggested"] for s in self._name_suggestions}
             self._keep_names = False
@@ -3627,8 +3633,7 @@ class RegenderTUI(App):
 
     # ------------------------------------------------- settled before the run
 
-    @work(exclusive=True)
-    async def _plan_run(self) -> None:
+    def _plan_run(self) -> None:
         """Settle the names before anything is spent, and ask what only a person can say.
 
         The run used to do this itself, behind the progress bar. A name given
@@ -3636,7 +3641,21 @@ class RegenderTUI(App):
         shares his surname, was known in the first seconds and reported at the
         end, in the finished book. Planning here puts those in front of the
         reader while they cost nothing to put right.
+
+        Nothing can be answered while it works. The keyboard stayed live and
+        the last question stayed current, so a second Enter checked the names
+        twice, and a "2" typed while a fixed name was being checked started the
+        run on the plan from before the fix.
         """
+        self._stage = "planning"
+        self._name_plan = None
+        with contextlib.suppress(Exception):
+            self.query_one(InputBar).disable()
+        self._check_the_names()
+
+    @work(exclusive=True)
+    async def _check_the_names(self) -> None:
+        """The part of _plan_run that waits on the model."""
         loader = BrailleLoader("Checking the names", time.time())
         with contextlib.suppress(Exception):
             self.query_one("#content", ContentArea).add_widget(loader)
@@ -3659,10 +3678,16 @@ class RegenderTUI(App):
             )
             self._capture_usage(app)
             app.shutdown()
-        except Exception:
+        except Exception as error:
             # The run plans for itself when it is handed nothing, so a failure
-            # here costs the reader the questions, not the book.
+            # here costs the reader the questions, not the book. It is still
+            # said: silence here looked exactly like having nothing to ask.
             plan = None
+            self.print(
+                "  [#e5c07b]The names could not be checked beforehand[/] "
+                f"[#666666]({str(error)[:60] or type(error).__name__})[/]"
+            )
+            self.print("  [#aaaaaa]The run will check them itself.[/]")
         finally:
             with contextlib.suppress(Exception):
                 loader.stop()
@@ -3782,6 +3807,11 @@ class RegenderTUI(App):
 
         if self._title_chapter_mode:
             self._title_chapter_mode = False
+            if answer in ("", "b", "back"):
+                # Changed their mind. Any other answer re-asked for a chapter,
+                # so the only way out of this prompt was to make one up.
+                self._show_title_item()
+                return
             last = self._last_chapter()
             if not answer.isdigit() or not 1 <= int(answer) <= last:
                 self.print(f"  [#666666]Enter a chapter from 1 to {last}[/]")
@@ -3811,7 +3841,7 @@ class RegenderTUI(App):
             self._rule_title(state, "unmarried", None)
         elif answer == "4":
             self._title_chapter_mode = True
-            self.print("  [#aaaaaa]Which chapter is he married from?[/]")
+            self.print("  [#aaaaaa]Which chapter is he married from? (Enter to go back)[/]")
             self.set_prompt(">  ")
         else:
             self._reject(4, "back", "rest")
@@ -3961,6 +3991,7 @@ class RegenderTUI(App):
             "name_map": self._name_map,
             "keep_names": self._keep_names,
             "name_plan": self._name_plan,
+            "marital_rulings": self._title_rulings or None,
         }
 
         # Run processing in background worker
@@ -4037,6 +4068,9 @@ class RegenderTUI(App):
                 # What was just read and ruled on. Without it the run would
                 # choose the names again, and they would not be the names seen.
                 name_plan=self._result.get("name_plan"),
+                # And the rulings on their own, for a run that has to plan for
+                # itself because the plan could not be made.
+                marital_rulings=self._result.get("marital_rulings"),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 

@@ -193,7 +193,7 @@ class TestTheCommandLine:
     ):
         with pytest.raises(SystemExit) as stopped:
             _run_cli(monkeypatch, tmp_path, {**CLEAN, "untransformed_chapters": [3, 7]})
-        assert stopped.value.code == regender_cli.EXIT_FINISHED_WITH_PROBLEMS == 2
+        assert stopped.value.code == regender_cli.EXIT_FINISHED_WITH_PROBLEMS == 3
         out = capsys.readouterr().out
         assert "Finished, with problems" in out
         assert "Success" not in out, "the heading said success above a list of problems"
@@ -205,7 +205,7 @@ class TestTheCommandLine:
         result = {**CLEAN, "quality_control": {"did_not_run": "boom"}}
         with pytest.raises(SystemExit) as stopped:
             _run_cli(monkeypatch, tmp_path, result)
-        assert stopped.value.code == 2
+        assert stopped.value.code == 3
         out = capsys.readouterr().out
         assert "Quality control did not run (boom)" in out
         assert "QC: 0 structural" not in out, "a crashed QC must not print a clean tally"
@@ -227,3 +227,15 @@ class TestTheCommandLine:
         with pytest.raises(SystemExit) as stopped:
             _run_cli(monkeypatch, tmp_path, {"success": False, "error": "no provider"})
         assert stopped.value.code == 1
+
+
+class TestTheExitStatusIsItsOwn:
+    def test_it_is_not_the_one_a_mistyped_option_gives(self):
+        """argparse exits 2 for a bad flag; that must not read as "problems"."""
+        import argparse as _argparse
+
+        parser = _argparse.ArgumentParser()
+        with pytest.raises(SystemExit) as wrong:
+            parser.parse_args(["--no-such-flag"])
+        assert wrong.value.code == 2
+        assert regender_cli.EXIT_FINISHED_WITH_PROBLEMS not in (0, 1, 2)

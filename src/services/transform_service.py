@@ -249,6 +249,9 @@ class TransformService(BaseService):
         # the first book's failures into the second.
         self.failed_chapters = []
         self.unanswered = []
+        # Replies the model gave that were usable. Zero, with failures on the
+        # record, is the one case where there is no book at all.
+        self.model_replies = 0
 
         try:
             # Get character analysis if not provided
@@ -921,6 +924,7 @@ class TransformService(BaseService):
 
                 # Split response by paragraph markers
                 transformed_texts = self._parse_batch_response(response, len(batch_paragraphs))
+                self.model_replies = getattr(self, "model_replies", 0) + 1
 
                 # Process each paragraph in the batch
                 for i, (paragraph, transformed_text) in enumerate(
@@ -986,7 +990,8 @@ class TransformService(BaseService):
                     context,
                     name_map,
                     transform_type,
-                    chapter_number=chapter_index + 1,
+                    chapter_number=getattr(chapter, "number", None) or chapter_index + 1,
+                    batch_start=batch_start,
                 )
                 transformed_paragraphs.extend(retry_results)
                 batch_start = batch_end
@@ -3161,6 +3166,7 @@ class TransformService(BaseService):
             max_tokens=self._reply_budget([para]),
         )
         texts = self._parse_batch_response(response, 1)
+        self.model_replies = getattr(self, "model_replies", 0) + 1
         transformed_text = texts[0] if texts else para.get_text()
         source_text = para.get_text()
         if name_map:
@@ -3176,6 +3182,7 @@ class TransformService(BaseService):
         name_map: Optional[dict[str, str]],
         transform_type: "TransformType",
         chapter_number: Optional[int] = None,
+        batch_start: int = 0,
     ) -> list:
         """Retry a failed batch by processing each paragraph alone.
 
@@ -3186,10 +3193,19 @@ class TransformService(BaseService):
         from src.models.book import Paragraph
 
         results = []
-        for para in batch_paragraphs:
+        for offset, para in enumerate(batch_paragraphs):
+            # Resolved at this paragraph, as the batch path is. Retried text
+            # was prompted and corrected with the titles the book opens on, so
+            # a man already married went back to "Miss" wherever a batch failed.
+            if chapter_number is not None:
+                at = batch_start + offset
+                para_context = self._context_at(context, chapter_number, at, [para], name_map)
+                para_map = self._name_map_at(chapter_number, at, name_map)
+            else:
+                para_context, para_map = context, name_map
             try:
                 transformed_text = await self._transform_single_paragraph(
-                    para, context, name_map, transform_type
+                    para, para_context, para_map, transform_type
                 )
                 results.append(Paragraph(sentences=[transformed_text]))
             except Exception as e:
@@ -3207,7 +3223,7 @@ class TransformService(BaseService):
                     group_para = Paragraph(sentences=group)
                     try:
                         part_text = await self._transform_single_paragraph(
-                            group_para, context, name_map, transform_type
+                            group_para, para_context, para_map, transform_type
                         )
                         merged_parts.append(part_text)
                     except Exception as error:
@@ -3584,8 +3600,13 @@ class TransformService(BaseService):
         response = response.strip()
 
         # A batch of one cannot be misaligned, so take the whole response.
+        # It can still be nothing: a reply with no text in it, taken whole,
+        # replaced the paragraph with an empty one and left no trace of it.
         if expected_count == 1:
-            return [self._PARAGRAPH_MARKER.sub("", response).strip()]
+            only = self._PARAGRAPH_MARKER.sub("", response).strip()
+            if not only:
+                raise BatchResponseError("The model returned no text for this paragraph.")
+            return [only]
 
         markers = list(self._PARAGRAPH_MARKER.finditer(response))
         if markers:

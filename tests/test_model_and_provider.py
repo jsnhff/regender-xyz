@@ -267,6 +267,12 @@ class TestOpenAIRepliesAreWholeOrAnError:
         with pytest.raises(ResponseIncompleteError, match="declined"):
             await provider._complete_impl(HI)
 
+    async def test_a_reply_with_no_content_raises(self):
+        """A refusal arrives as no content at all, with finish_reason "stop"."""
+        provider = _openai(return_value=_reply(None))
+        with pytest.raises(ResponseIncompleteError, match="no text"):
+            await provider._complete_impl(HI)
+
     async def test_usage_is_counted(self):
         provider = _openai(return_value=_reply(prompt_tokens=120, completion_tokens=40))
         await provider._complete_impl(HI)
@@ -300,6 +306,11 @@ class TestLocalModels:
         provider = _ollama(_reply("half a para", finish_reason="length"))
         with pytest.raises(ResponseIncompleteError):
             await provider._complete_impl(HI, max_tokens=500)
+
+    async def test_a_reply_with_no_content_raises(self):
+        provider = _ollama(_reply("  "))
+        with pytest.raises(ResponseIncompleteError, match="no text"):
+            await provider._complete_impl(HI)
 
     async def test_usage_is_counted(self):
         provider = _ollama(_reply(prompt_tokens=300, completion_tokens=90))

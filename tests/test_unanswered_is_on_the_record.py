@@ -102,7 +102,7 @@ class TestAModelThatNeverAnswers:
 
         assert model.transform_calls > 0, "the transform was never attempted"
         assert result["success"] is False
-        assert "did not answer for any of the 2 chapters" in result["error"]
+        assert "did not give one usable reply" in result["error"]
         assert "no book was written" in result["error"]
 
     def test_the_first_failure_is_quoted(self, simple_story_path, tmp_path):
@@ -153,3 +153,116 @@ class TestEachRunStartsClean:
         assert run(str(tmp_path / "a.json"))["untransformed_chapters"] == [2]
         model.refuses = lambda _text: False
         assert run(str(tmp_path / "b.json"))["untransformed_chapters"] == []
+
+
+class TestAShortBookThatCameThroughAllButWhole:
+    """One passage the model would not answer is not the model answering nothing.
+
+    The run was refused whenever every chapter held at least one such passage,
+    which for a one-chapter text is any failure at all.
+    """
+
+    def test_one_refused_paragraph_in_a_one_chapter_text_still_makes_a_book(self, tmp_path):
+        story = tmp_path / "one.txt"
+        story.write_text(
+            "CHAPTER 1: The Arrival\n\n"
+            + "\n\n".join(
+                [
+                    "James opened the door and he looked out.",
+                    "The garden was empty that morning.",
+                    "A REFUSED passage about him and his hat.",
+                    "He closed it again and sat down.",
+                    "Nothing more was said until the evening.",
+                ]
+            )
+            + "\n"
+        )
+        out = tmp_path / "out.json"
+        model = _Model(refuses=lambda text: "REFUSED" in text)
+        result = _run(model, str(story), out)
+
+        assert result["success"] is True, result.get("error")
+        assert out.exists()
+        assert result["untransformed_chapters"] == [1]
+
+
+class TestAnEmptyReplyIsNotAParagraph:
+    """Taken whole, a reply with no text replaced the paragraph with nothing."""
+
+    def test_the_parser_turns_it_away(self):
+        from src.exceptions import BatchResponseError
+        from src.services.transform_service import TransformService
+
+        service = TransformService.__new__(TransformService)
+        with pytest.raises(BatchResponseError, match="no text"):
+            service._parse_batch_response("   ", 1)
+        with pytest.raises(BatchResponseError, match="no text"):
+            service._parse_batch_response("[[P1]]\n", 1)
+
+    def test_a_paragraph_answered_with_nothing_keeps_its_words(self, simple_story_path, tmp_path):
+        class _Silent(_Model):
+            async def complete(self, messages, **kwargs):
+                reply = await super().complete(messages, **kwargs)
+                system = messages[0]["content"]
+                return "" if system.startswith(REWRITE) else reply
+
+        out = tmp_path / "out.json"
+        result = _run(_Silent(), simple_story_path, out)
+        assert result["success"] is False, "a book of empty paragraphs was written"
+        assert "did not give one usable reply" in result["error"]
+        assert not out.exists()
+
+
+class TestARetriedPassageKnowsWhereItIs:
+    """The retry path prompted with the titles the book opens on."""
+
+    def test_after_the_wedding_it_is_told_the_married_title(self):
+        from src.models.book import Paragraph
+        from src.models.transformation import TransformType
+        from src.services.transform_service import TransformService
+
+        prompts = []
+
+        class _Recording:
+            async def complete(self, messages, **_kwargs):
+                prompts.append(messages[0]["content"])
+                return messages[-1]["content"].split("\n\n", 1)[1]
+
+        service = TransformService.__new__(TransformService)
+        service.provider = _Recording()
+        service.config = type("C", (), {"llm_temperature": 0.0})()
+        service.logger = __import__("logging").getLogger("test")
+        service.set_title_timeline([(2, 0, {"Mr. Collins": "Mrs. Collins"})])
+        context = {
+            "transform_type": TransformType.GENDER_SWAP,
+            "rules": {},
+            "character_mappings": {},
+            "characters": None,
+            "name_map": {"Mr. Collins": "Miss Collins"},
+        }
+        para = Paragraph(sentences=["Mr. Collins bowed."])
+
+        asyncio.run(
+            service._retry_at_sentence_level(
+                [para],
+                context,
+                {"Mr. Collins": "Miss Collins"},
+                TransformType.GENDER_SWAP,
+                chapter_number=3,
+                batch_start=4,
+            )
+        )
+        assert '"Mr. Collins" is "Mrs. Collins"' in prompts[0]
+
+        prompts.clear()
+        asyncio.run(
+            service._retry_at_sentence_level(
+                [para],
+                context,
+                {"Mr. Collins": "Miss Collins"},
+                TransformType.GENDER_SWAP,
+                chapter_number=1,
+                batch_start=0,
+            )
+        )
+        assert '"Mr. Collins" is "Miss Collins"' in prompts[0]

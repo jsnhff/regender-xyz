@@ -211,3 +211,38 @@ class TestAgainstTheShippedEditions:
         # Few enough to act on, and every one about a real person.
         assert len(problems) <= 5, problems
         assert not [p for p in problems if "renamed 0" in p]
+
+
+class TestAGivenNameOnItsOwnIsWhoeverHasIt:
+    """The engine writes "Mary" -> "Martin"; the cast lists her as "Mary Bennet"."""
+
+    def cast(self, *characters):
+        from src.models.character import CharacterAnalysis
+
+        return CharacterAnalysis(book_id="t", characters=list(characters))
+
+    def person(self, name, *aliases):
+        from src.models.character import Character, Gender
+
+        return Character(name=name, gender=Gender.FEMALE, pronouns={}, aliases=list(aliases))
+
+    def test_her_own_nickname_is_not_a_second_person(self):
+        from src.services.name_engine import audit_name_map
+
+        cast = self.cast(self.person("Mary Bennet", "Molly"))
+        problems = audit_name_map({"Mary": "Martin", "Molly": "Martin"}, cast)
+        assert [p for p in problems if "one name" in p] == []
+
+    def test_two_people_given_one_name_are_still_two(self):
+        from src.services.name_engine import audit_name_map
+
+        cast = self.cast(self.person("Mary Bennet", "Molly"), self.person("Jane Bennet"))
+        problems = audit_name_map({"Mary": "Martin", "Jane": "Martin"}, cast)
+        assert len([p for p in problems if "one name" in p]) == 1
+
+    def test_a_given_name_two_people_share_is_not_guessed_at(self):
+        from src.services.name_engine import audit_name_map
+
+        cast = self.cast(self.person("Mary Bennet", "Molly"), self.person("Mary King"))
+        problems = audit_name_map({"Mary": "Martin", "Molly": "Martin"}, cast)
+        assert len([p for p in problems if "one name" in p]) == 1

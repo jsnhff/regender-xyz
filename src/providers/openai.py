@@ -224,6 +224,10 @@ class OpenAIProvider(BaseProviderPlugin):
             raise ResponseIncompleteError("The model declined this request.")
 
         content = choice.message.content or ""
+        # A refusal arrives as no content at all. Returned as an empty string,
+        # it was taken for a paragraph the model had rewritten as nothing.
+        if not content.strip():
+            raise ResponseIncompleteError("The model returned no text.")
 
         # If JSON mode was requested, validate the response
         if kwargs.get("response_format") == "json_object":

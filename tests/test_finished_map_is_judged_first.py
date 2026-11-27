@@ -243,6 +243,29 @@ class TestTheRunJudgesItBeforeSpending:
         assert result["success"] is True
         assert out.exists()
 
+    def test_the_problems_file_keeps_what_was_found_before_the_run(
+        self, app_with_mock, simple_story_path, tmp_path, monkeypatch
+    ):
+        """The audit after the run wrote its own list over the one from before."""
+        calls = []
+
+        def audit(_map, _cast=None):
+            calls.append(1)
+            return ["found before the run"] if len(calls) <= 2 else ["found after it"]
+
+        monkeypatch.setattr("src.services.name_engine.audit_name_map", audit)
+        asyncio.run(
+            app_with_mock.process_book(
+                file_path=simple_story_path,
+                transform_type="gender_swap",
+                output_path=str(tmp_path / "out.json"),
+            )
+        )
+        import json
+
+        listed = json.loads((tmp_path / "name_map_problems.json").read_text())
+        assert "found before the run" in listed and "found after it" in listed
+
     def test_the_command_line_has_the_flag(self):
         import regender_cli
 

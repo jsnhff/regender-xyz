@@ -366,3 +366,27 @@ class TestTheChosenModelIsTheModelCalled:
 
     async def test_with_neither_the_default_is_used(self, monkeypatch):
         assert self._model(monkeypatch) == "claude-sonnet-5-5"
+
+
+class TestAReplyWithNoTextInIt:
+    async def test_reasoning_and_nothing_after_it_raises(self):
+        from src.providers.base_provider import ResponseIncompleteError
+
+        provider = _make_anthropic(create_return=_reply(_block("thinking")))
+        with pytest.raises(ResponseIncompleteError, match="no text"):
+            await provider._complete_impl(HI)
+
+    async def test_a_stop_that_is_not_an_ending_raises(self):
+        from src.providers.base_provider import ResponseIncompleteError
+
+        provider = _make_anthropic(
+            create_return=_reply(_block("text", "part of"), stop_reason="pause_turn")
+        )
+        with pytest.raises(ResponseIncompleteError, match="pause_turn"):
+            await provider._complete_impl(HI)
+
+    async def test_a_stop_sequence_is_an_ending(self):
+        provider = _make_anthropic(
+            create_return=_reply(_block("text", "whole"), stop_reason="stop_sequence")
+        )
+        assert await provider._complete_impl(HI) == "whole"
