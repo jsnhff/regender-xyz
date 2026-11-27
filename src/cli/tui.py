@@ -943,6 +943,13 @@ _KEY = "[bold #ffffff]{}[/]"
 _PLAIN = re.compile(r"\[/?[^\]]*\]")
 
 
+def _wrap(text: str, width: int) -> list[str]:
+    """Plain word-wrap, for the lines that are sentences and not labels."""
+    import textwrap
+
+    return textwrap.wrap(text, width) or [""]
+
+
 def question_line(question: str, where: str = "") -> tuple[str, str]:
     """A heading and its dim location. `? Same person`, never `? Same person?`.
 
@@ -1416,6 +1423,16 @@ class RegenderTUI(App):
         self._name_custom_mode: bool = False
         self._name_regen_mode: bool = False
         self._name_steer: str = ""
+
+        # Everything decided about names before the run, as the run will apply
+        # it, and what a person ruled on the way.
+        self._name_plan: dict | None = None
+        self._title_items: list = []
+        self._title_idx: int = 0
+        self._title_rulings: dict = {}
+        self._title_chapter_mode: bool = False
+        self._titles_settled: bool = False
+        self._plan_fix_mode: bool = False
 
         # The editorial review queue, which is about this book's findings.
         self._review_items: list = []
@@ -1997,6 +2014,10 @@ class RegenderTUI(App):
             self._handle_cast_review_input(value)
         elif self._stage == "name_review":
             self._handle_name_review_input(value)
+        elif self._stage == "title_review":
+            self._handle_title_review_input(value)
+        elif self._stage == "plan_problems":
+            self._handle_plan_problems_input(value)
         elif self._stage == "qc_review":
             self._handle_review_input(value)
         elif self._stage == "export":
@@ -3565,12 +3586,12 @@ class RegenderTUI(App):
             label = "character" if n == 1 else "characters"
             self.print(f"[#ffffff]✓[/] {n} {label} renamed")
             self.print("")
-            self._start_processing()
+            self._plan_run()
         elif v == "k":  # Keep originals
             self._name_map = None
             self._keep_names = True
             self.print("[#555555]Keeping original names[/]")
-            self._start_processing()
+            self._plan_run()
         elif v == "r":  # Ask for a different set
             self._name_regen_mode = True
             self.print("")
@@ -3600,6 +3621,290 @@ class RegenderTUI(App):
                     self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
             except ValueError:
                 self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
+
+    # ------------------------------------------------- settled before the run
+
+    @work(exclusive=True)
+    async def _plan_run(self) -> None:
+        """Settle the names before anything is spent, and ask what only a person can say.
+
+        The run used to do this itself, behind the progress bar. A name given
+        to two characters, or a bachelor titled "Mrs." because his mother
+        shares his surname, was known in the first seconds and reported at the
+        end, in the finished book. Planning here puts those in front of the
+        reader while they cost nothing to put right.
+        """
+        loader = BrailleLoader("Checking the names", time.time())
+        with contextlib.suppress(Exception):
+            self.query_one("#content", ContentArea).add_widget(loader)
+
+        plan = None
+        try:
+            from dotenv import load_dotenv
+
+            from src.app import Application
+
+            load_dotenv()
+            app = Application("src/config.json")
+            plan = await app.plan_names(
+                transform_type=self._selected_transform or "",
+                characters=self._pending_characters,
+                file_path=str(self._selected_book),
+                name_map=self._name_map,
+                keep_names=self._keep_names,
+                marital_rulings=self._title_rulings or None,
+            )
+            self._capture_usage(app)
+            app.shutdown()
+        except Exception:
+            # The run plans for itself when it is handed nothing, so a failure
+            # here costs the reader the questions, not the book.
+            plan = None
+        finally:
+            with contextlib.suppress(Exception):
+                loader.stop()
+                loader.remove()
+
+        self._name_plan = plan
+        self._say_what_was_refused()
+        self._start_title_review()
+
+    def _say_what_was_refused(self) -> None:
+        """Name every supplied rename the engine would not use, and why.
+
+        The engine holds a name a person typed to the same bar as one it chose
+        itself, and drops the ones that fail. Dropped in silence, a fix typed
+        a moment ago simply does not happen and the same problem comes back.
+        """
+        refused = ((self._name_plan or {}).get("report") or {}).get("refused") or {}
+        for original, why in refused.items():
+            self.print(f"  [#e5c07b]\u2717[/] [#aaaaaa]{original} was left as it is:[/]")
+            for line in _wrap(str(why), 70):
+                self.print(f"    [#666666]{line}[/]")
+
+    #: A man the book titles fewer times than this is not asked about.
+    _TITLE_FLOOR = 5
+
+    def _start_title_review(self) -> None:
+        """Ask who is married, where the book leaves room to be wrong."""
+        states = (self._name_plan or {}).get("marital_states") or {}
+        self._title_items = (
+            []
+            if self._titles_settled
+            else sorted(
+                (
+                    state
+                    for state in states.values()
+                    if state.worth_a_look and state.mentions >= self._TITLE_FLOOR
+                ),
+                key=lambda state: -state.mentions,
+            )
+        )
+        self._title_idx = 0
+        self._title_chapter_mode = False
+
+        if not self._title_items:
+            self._show_plan_problems()
+            return
+
+        count = len(self._title_items)
+        self.print("")
+        self.print(
+            f"[#ffffff]◆[/] [bold #ffffff]{count} title{'s' if count > 1 else ''} to settle[/]"
+        )
+        self.print(
+            '  [#aaaaaa]A swap turns "Mr." into "Miss" or "Mrs.", so it has to know who is[/]'
+        )
+        self.print("  [#aaaaaa]married, and from when. This is what the book appears to say.[/]")
+        self._show_title_item()
+
+    @staticmethod
+    def _title_summary(name: str, opens: str, wedding) -> str:
+        """One man's titles across the book, in a line."""
+        surname = name.split(" ", 1)[1] if " " in name else name
+        if opens == "married":
+            return f"Mrs. {surname} throughout"
+        if wedding:
+            return f"Miss {surname} until chapter {wedding[0]}, then Mrs. {surname}"
+        return f"Miss {surname} throughout"
+
+    def _show_title_item(self) -> None:
+        """Ask about one man."""
+        self._stage = "title_review"
+        self._title_chapter_mode = False
+        if self._title_idx >= len(self._title_items):
+            self._finish_title_review()
+            return
+
+        state = self._title_items[self._title_idx]
+        position = f"{self._title_idx + 1} of {len(self._title_items)}"
+        surname = state.name.split(" ", 1)[1]
+
+        self.print("")
+        self._ask_heading("Is this right?", where=position, live=True)
+        self.print("")
+        self.print(
+            f"  [#e5c07b]{state.name}[/]   "
+            f"[#ffffff]{self._title_summary(state.name, state.opens, state.wedding)}[/]"
+        )
+        # What the reading rests on, and the line of the book it came from.
+        # Wrapped, not cut: half a reason is no reason, and the quotation is
+        # the one thing here a person can check against their own memory.
+        for line in _wrap(state.reason, 70):
+            self.print(f"    [#aaaaaa]{line}[/]")
+        if state.evidence:
+            for line in _wrap(f'"\u2026{state.evidence}\u2026"', 70):
+                self.print(f"    [#666666]{line}[/]")
+        # Enter keeps what the book appears to say. The other three are the
+        # ways it can be wrong: she is his mother, the "Mrs." was said before
+        # the wedding, or his wife is never called by his surname.
+        self._ask_answers(
+            options=(
+                ("Yes", "keep it"),
+                ("Married from the start", f"Mrs. {surname} throughout"),
+                ("Never marries", f"Miss {surname} throughout"),
+                ("Marries in another chapter", "type which"),
+            ),
+            verbs=("back", "rest"),
+        )
+        self.status_text = f"Titles {position}"
+        self._accept_input()
+
+    def _handle_title_review_input(self, value: str) -> None:
+        """Enter keeps it, 2-4 rule otherwise, b goes back, s keeps the rest."""
+        answer = value.strip().lower()
+        if self._title_idx >= len(self._title_items):
+            return  # the last one was answered; a stray keystroke rules on nobody
+        state = self._title_items[self._title_idx]
+
+        if self._title_chapter_mode:
+            self._title_chapter_mode = False
+            last = self._last_chapter()
+            if not answer.isdigit() or not 1 <= int(answer) <= last:
+                self.print(f"  [#666666]Enter a chapter from 1 to {last}[/]")
+                self._title_chapter_mode = True
+                return
+            self._rule_title(state, "unmarried", [int(answer), 0])
+            return
+
+        if answer in ("b", "back"):
+            self._title_idx = max(0, self._title_idx - 1)
+            self._title_rulings.pop(self._title_items[self._title_idx].name, None)
+            self._show_title_item()
+            return
+
+        if answer in ("s", "skip"):
+            self._title_idx = len(self._title_items)
+            self._show_title_item()
+            return
+
+        if answer in ("", "1", "y", "yes"):
+            self._title_rulings.pop(state.name, None)
+            self._title_idx += 1
+            self._show_title_item()
+        elif answer == "2":
+            self._rule_title(state, "married", None)
+        elif answer == "3":
+            self._rule_title(state, "unmarried", None)
+        elif answer == "4":
+            self._title_chapter_mode = True
+            self.print("  [#aaaaaa]Which chapter is he married from?[/]")
+            self.set_prompt(">  ")
+        else:
+            self._reject(4, "back", "rest")
+
+    def _rule_title(self, state, opens: str, wedding) -> None:
+        """Record one ruling, say what it means, and move on."""
+        self._title_rulings[state.name] = {"opens": opens, "wedding": wedding}
+        summary = self._title_summary(state.name, opens, wedding)
+        self.print(f"  [#98c379]✓[/] [#aaaaaa]{state.name}: {summary}[/]")
+        self._title_idx += 1
+        self._show_title_item()
+
+    def _last_chapter(self) -> int:
+        chapters = ((self._name_plan or {}).get("book") or {}).get("chapters") or []
+        numbers = [c.get("number") for c in chapters if c.get("number")]
+        return max(numbers) if numbers else len(chapters) or 1
+
+    def _finish_title_review(self) -> None:
+        """Lay the rulings over the plan. No model is needed for this part."""
+        self._settle_heading()
+        self._titles_settled = True
+        if self._title_rulings and self._name_plan:
+            try:
+                from src.app import Application
+
+                app = Application("src/config.json")
+                self._name_plan = app.finish_name_plan(
+                    self._name_plan, self._pending_characters, self._title_rulings
+                )
+                app.shutdown()
+            except Exception:
+                # The plan as it stood is still a whole plan; the rulings are
+                # the only thing lost, and the reader is told.
+                self.print("  [#e5c07b]Could not apply those rulings; using the book's reading[/]")
+        self._show_plan_problems()
+
+    def _show_plan_problems(self) -> None:
+        """Say what is wrong with the finished name map, before it is used."""
+        problems = (self._name_plan or {}).get("problems") or []
+        if not problems:
+            self.print("")
+            self._start_processing()
+            return
+
+        self._stage = "plan_problems"
+        self._plan_fix_mode = False
+        count = len(problems)
+        self.print("")
+        self._ask_heading(f"The name map has {count} problem{'s' if count > 1 else ''}", live=True)
+        self.print("")
+        for problem in problems[:8]:
+            for i, line in enumerate(_wrap(problem, 72)):
+                bullet = "\u2022" if i == 0 else " "
+                self.print(f"  [#e5c07b]{bullet}[/] [#aaaaaa]{line}[/]")
+        if count > 8:
+            self.print(f"    [#666666]and {count - 8} more[/]")
+        # Enter is the answer that costs nothing. Starting anyway writes these
+        # into every chapter and is paid for before anyone reads a page.
+        self._ask_answers(
+            options=(
+                ("Fix a name", "say who should be called what"),
+                ("Start anyway", "the book will carry these"),
+            ),
+        )
+        self.status_text = "Names"
+        self._accept_input()
+
+    def _handle_plan_problems_input(self, value: str) -> None:
+        """1 fixes a name and checks again, 2 starts the run as it stands."""
+        raw = value.strip()
+
+        if self._plan_fix_mode:
+            self._plan_fix_mode = False
+            if "=" in raw:
+                original, new = (part.strip() for part in raw.split("=", 1))
+                if original and new:
+                    self._name_map = {**(self._name_map or {}), original: new}
+                    self.print(f"  [#98c379]✓[/] [#aaaaaa]{original} \u2192 {new}[/]")
+                    self._settle_heading()
+                    self._plan_run()
+                    return
+            self.print("  [#666666]Nothing changed[/]")
+            self._show_plan_problems()
+            return
+
+        answer = raw.lower()
+        if answer in ("", "1"):
+            self._plan_fix_mode = True
+            self.print("  [#aaaaaa]Enter it as Original=Target (e.g. Lizzy=Eddie):[/]")
+            self.set_prompt(">  ")
+        elif answer == "2":
+            self._settle_heading()
+            self.print("")
+            self._start_processing()
+        else:
+            self._reject(2)
 
     # -------------------------------------------------------------------------
     # Processing
@@ -3652,6 +3957,7 @@ class RegenderTUI(App):
             "output_path": str(self._output_path) if self._output_path else None,
             "name_map": self._name_map,
             "keep_names": self._keep_names,
+            "name_plan": self._name_plan,
         }
 
         # Run processing in background worker
@@ -3725,6 +4031,9 @@ class RegenderTUI(App):
                 on_chapter_complete=on_chapter_complete,
                 characters=self._pending_characters,
                 keep_names=bool(self._result.get("keep_names")),
+                # What was just read and ruled on. Without it the run would
+                # choose the names again, and they would not be the names seen.
+                name_plan=self._result.get("name_plan"),
             )
             debug_log.info(f"process_book returned: success={result.get('success')}")
 

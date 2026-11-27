@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 # "Mrs. Darcy" appearing for the first time in a book that has been calling him
@@ -185,6 +185,23 @@ class MaritalState:
     wife_in_cast: bool
     reason: str
 
+    @property
+    def worth_a_look(self) -> bool:
+        """Whether a person should see this verdict before it is used.
+
+        One kind needs no second opinion: the book never prints a "Mrs." of
+        his name and the cast names none, so there is nothing to mistake. Every
+        other verdict rests on a "Mrs." that might be his mother, his brother's
+        wife, or his own a chapter before the wedding, and telling those apart
+        takes someone who has read the book.
+        """
+        nothing_to_mistake = (
+            self.opens == "unmarried"
+            and self.wedding is None
+            and self.before_first_mrs == self.mentions
+        )
+        return not nothing_to_mistake
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
@@ -196,6 +213,47 @@ class MaritalState:
             "wife_in_cast": self.wife_in_cast,
             "reason": self.reason,
         }
+
+
+def with_rulings(
+    states: dict[str, MaritalState], rulings: dict[str, dict] | None
+) -> dict[str, MaritalState]:
+    """The verdicts, with a reader's rulings laid over them.
+
+    A ruling is ``{"opens": "married" | "unmarried", "wedding": [chapter,
+    paragraph] | None}`` for one "Mr. Surname". It replaces the verdict whole:
+    a person who has read the book outranks a count of how often it says
+    "Mrs.".
+    """
+    ruled = dict(states)
+    for name, ruling in (rulings or {}).items():
+        state = ruled.get(name)
+        if state is None or ruling.get("opens") not in _MARITAL_TITLE:
+            continue
+        wedding = ruling.get("wedding")
+        wedding = (int(wedding[0]), int(wedding[1])) if wedding else None
+        if ruling["opens"] == "married":
+            wedding = None  # already married; there is no later wedding to mark
+        ruled[name] = replace(
+            state, opens=ruling["opens"], wedding=wedding, reason="settled by the reader"
+        )
+    return ruled
+
+
+def changes_from(states: dict[str, MaritalState]) -> list[StateChange]:
+    """The weddings in a set of verdicts, as changes the timeline can apply."""
+    return [
+        StateChange(
+            character=state.name,
+            kind="marital",
+            becomes="married",
+            chapter=state.wedding[0],
+            paragraph=state.wedding[1],
+            evidence=state.evidence,
+        )
+        for state in states.values()
+        if state.wedding
+    ]
 
 
 def marital_states(book: dict | None, characters: Iterable[Any]) -> dict[str, MaritalState]:
@@ -310,9 +368,7 @@ def marital_states(book: dict | None, characters: Iterable[Any]) -> dict[str, Ma
             )
         elif before >= _SINGLE_LIFE:
             opens, wedding = "unmarried", point
-            reason = (
-                f"named {before} times before the first Mrs. of this name: a single man until then"
-            )
+            reason = f"named {before} times before the first Mrs. of this name: single until then"
         elif wife:
             opens = "married"
             reason = "the cast records a Mrs. of this name, and the book prints her early"
@@ -340,7 +396,9 @@ def marital_states(book: dict | None, characters: Iterable[Any]) -> dict[str, Ma
             name=f"Mr. {surname}",
             opens=opens,
             wedding=wedding,
-            evidence=seen[2] if seen and wedding else "",
+            # The first "Mrs." of his name, whatever was made of it: it is
+            # what a person needs to read to agree or disagree.
+            evidence=seen[2] if seen else "",
             mentions=len(mentions),
             before_first_mrs=before,
             wife_in_cast=wife,
@@ -361,18 +419,7 @@ def detect_marital_changes(book: dict, characters: Iterable[Any]) -> list[StateC
     Each change names the man as the text does, "Mr. Darcy". See
     marital_states for how a wedding is told from a marriage already made.
     """
-    return [
-        StateChange(
-            character=state.name,
-            kind="marital",
-            becomes="married",
-            chapter=state.wedding[0],
-            paragraph=state.wedding[1],
-            evidence=state.evidence,
-        )
-        for state in marital_states(book, characters).values()
-        if state.wedding
-    ]
+    return changes_from(marital_states(book, characters))
 
 
 def initial_marital_state(characters: Iterable[Any], book: dict | None = None) -> dict[str, str]:

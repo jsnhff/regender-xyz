@@ -196,8 +196,11 @@ class TestTheRunJudgesItBeforeSpending:
     def test_the_audit_sits_ahead_of_the_transform(self):
         from src.app import Application
 
+        # The finished map is built and audited by the planning step, and the
+        # run asks for the plan before it transforms anything.
+        assert "finished_name_map(" in inspect.getsource(Application.finish_name_plan)
         source = inspect.getsource(Application.process_book)
-        judged = source.index("transformer.finished_name_map(")
+        judged = source.index("self.plan_names(")
         spent = source.index("await transformer.transform_book(")
         assert judged < spent
 
