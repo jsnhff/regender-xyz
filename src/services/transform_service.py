@@ -261,7 +261,7 @@ class TransformService(BaseService):
             # This runs before the context is built: the prompt has to carry the
             # finished map, or the model is told about a name it will never see.
             if name_map and characters:
-                expanded = self._expand_name_map_with_aliases(name_map, characters)
+                expanded = self.finished_name_map(name_map, characters)
                 if len(expanded) > len(name_map):
                     self.logger.info(
                         f"Expanded name_map with {len(expanded) - len(name_map)} character aliases"
@@ -3107,6 +3107,20 @@ class TransformService(BaseService):
                         merged_parts.append(group_para.get_text())
                 results.append(Paragraph(sentences=[" ".join(merged_parts)]))
         return results
+
+    def finished_name_map(
+        self, name_map: Optional[dict[str, str]], characters: Optional["CharacterAnalysis"]
+    ) -> dict[str, str]:
+        """The map a run will actually apply, worked out without running it.
+
+        The transform adds every alias to the map it is given before the first
+        chapter, and that is where most of a map's faults are born. It needs
+        no model and no book, so anyone who wants to judge the map before
+        paying for the run can ask for exactly what the run will use.
+        """
+        if name_map and characters:
+            return self._expand_name_map_with_aliases(name_map, characters)
+        return dict(name_map or {})
 
     def _expand_name_map_with_aliases(
         self, name_map: dict[str, str], characters: "CharacterAnalysis"

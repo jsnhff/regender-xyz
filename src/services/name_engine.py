@@ -669,6 +669,13 @@ def audit_name_map(name_map: dict, characters: Any = None) -> list[str]:
     for (given, surname), sources in sorted(by_target.items()):
         if len({person for person, _g, _s in sources}) < 2:
             continue
+        # Two people who shared a name before still share one. The engine
+        # renames a given name once for everyone who has it, on purpose, so
+        # Kitty Bennet and Lady Catherine both leaving "Catherine" for
+        # "Christopher" is the map doing what it was built to do. Nobody has
+        # been merged who was not already a namesake.
+        if len({g.lower() for _p, g, _s in sources}) == 1:
+            continue
         # Two people may share a given name, as Austen's own cast does; they are
         # only confusable when the surname matches too.
         who = ", ".join(sorted(f"{g} {s}".strip() for _p, g, s in sources))

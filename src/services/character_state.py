@@ -200,6 +200,24 @@ def initial_marital_state(characters: Iterable[Any]) -> dict[str, str]:
 # never asked -- and the answer changes as the book goes on.
 _MARITAL_TITLE = {"married": "Mrs.", "unmarried": "Miss"}
 
+# Words that end a cast name without being the family name.
+_GENERATION = {"senior", "junior", "sr", "jr", "elder", "younger", "esq"}
+
+
+def _is_a_description(tokens: list[str]) -> bool:
+    """True when a titled cast name describes a person instead of naming one.
+
+    Judged on the word that would be read as the surname, and on anything
+    possessive before it: "Mr. Jones's shopboy" is about the shopboy.
+    """
+    last = tokens[-1]
+    # No capital anywhere, so "d'Arcy" and "de Bourgh" are still surnames.
+    if not any(ch.isupper() for ch in last) or re.search(r"[()\[\]]", last):
+        return True
+    if last.rstrip(".").lower() in _GENERATION:
+        return True
+    return any(re.search(r"['\u2019]s$", token) for token in tokens[:-1])
+
 
 def marital_title_maps(
     characters: Iterable[Any],
@@ -227,6 +245,17 @@ def marital_title_maps(
         tokens = [t for t in re.split(r"\s+", name.strip()) if t]
         if not tokens or tokens[0].rstrip(".") != "Mr":
             continue  # only "Mr." is ambiguous; Miss and Mrs. already say enough
+        # The cast is written by a model, and it describes people as readily
+        # as it names them: "Mr. Darcy (the late)", "Mr. Darcy's father", "Mr.
+        # Wickham senior". The last word of those is not a family name, and
+        # taking it for one wrote "Miss late)", "Mrs. father" and "Mrs. senior"
+        # into the map, which then told the model to call them that.
+        #
+        # Nothing else is turned away here. "Mr. Charles Bingley" still gets
+        # his entry: it never matches the text, but it is the line that tells
+        # the model he is "Miss Bingley", and that is why he came out as one.
+        if _is_a_description(tokens):
+            continue
 
         opening = initial.get(name, "unmarried")
         base[name] = f"{_MARITAL_TITLE[opening]} {surname}"

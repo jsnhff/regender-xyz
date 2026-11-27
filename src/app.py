@@ -405,6 +405,7 @@ class Application:
         custom_title: Optional[str] = None,
         on_chapter_complete: Optional[Any] = None,
         characters: Optional[CharacterAnalysis] = None,
+        stop_on_name_problems: bool = False,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -419,6 +420,9 @@ class Application:
             characters: The cast this run already analysed. Passing it is how a
                 caller that has shown the reader a cast guarantees the book is
                 transformed against that same cast and no other.
+            stop_on_name_problems: Return before the transform, with the
+                problems, when the finished name map has any. The map and the
+                cast are still written beside where the book would have gone.
 
         Returns:
             Processing results
@@ -567,6 +571,40 @@ class Application:
             protected = getattr(transformer, "_protected_names", None)
             if protected:
                 self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")
+
+            # The map is finished here: the engine's renames, the titles a swap
+            # derives from marital state, and every alias the transform will
+            # add. The audit above saw only the first of those, so it called a
+            # map clean that went on to give two people one name -- and the
+            # audit that did see it ran after the book had been paid for.
+            # Nothing below this line needs a model, so judge it now.
+            finished_map = transformer.finished_name_map(name_map, characters)
+            name_report["problems"] = list(
+                dict.fromkeys([*name_report["problems"], *audit_name_map(finished_map, characters)])
+            )
+            if output_dir:
+                with open(output_dir / "name_map_proposed.json", "w") as f:
+                    json.dump(finished_map, f, indent=2, ensure_ascii=False)
+                with open(output_dir / "name_report.json", "w") as f:
+                    json.dump(name_report, f, indent=2)
+                if name_report["problems"]:
+                    with open(output_dir / "name_map_problems.json", "w") as f:
+                        json.dump(name_report["problems"], f, indent=2)
+            if name_report["problems"]:
+                self.logger.error(
+                    f"{len(name_report['problems'])} problem(s) in the finished name map, "
+                    "before transforming: " + "; ".join(name_report["problems"][:6])
+                )
+                if stop_on_name_problems:
+                    return {
+                        "success": False,
+                        "stopped_before_transform": True,
+                        "error": (
+                            f"The name map has {len(name_report['problems'])} problem(s), "
+                            "so the transform was not started."
+                        ),
+                        "name_map_problems": name_report["problems"],
+                    }
 
             # Log selected characters if specified
             if selected_characters:
