@@ -132,6 +132,7 @@ async def process_book(args):
             name_map=name_map,
             keep_names=args.keep_names,
             custom_title=args.title or None,
+            stop_on_name_problems=args.stop_on_name_problems,
         )
 
     # Display results
@@ -164,6 +165,8 @@ async def process_book(args):
             sys.exit(EXIT_FINISHED_WITH_PROBLEMS)
     else:
         print(f"\n❌ Error: {result['error']}")
+        for problem in result.get("name_map_problems") or []:
+            print(f"  - {problem}")
         if "llm_provider" in str(result["error"]):
             print(
                 "\n  No model is set up. Add ANTHROPIC_API_KEY or OPENAI_API_KEY to a .env file"
@@ -308,6 +311,14 @@ async def async_main():
         action="store_true",
         help="Every character keeps the name the book gives them. Entries passed "
         "with --name-map are still applied; no others are chosen.",
+    )
+
+    parser.add_argument(
+        "--stop-on-name-problems",
+        action="store_true",
+        help="Check the finished name map before transforming, and stop if two "
+        "characters would share a name or a name would be lost. The map is written "
+        "beside the output so it can be corrected and passed back with --name-map.",
     )
 
     parser.add_argument(

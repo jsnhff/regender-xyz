@@ -465,6 +465,7 @@ class Application:
         on_chapter_complete: Optional[Any] = None,
         characters: Optional[CharacterAnalysis] = None,
         keep_names: bool = False,
+        stop_on_name_problems: bool = False,
     ) -> dict[str, Any]:
         """
         Process a book through the full pipeline.
@@ -481,6 +482,9 @@ class Application:
                 transformed against that same cast and no other.
             keep_names: Every character keeps the name the book gives them.
                 Entries in name_map are still applied; nothing is added to it.
+            stop_on_name_problems: Return before the transform, with the
+                problems, when the finished name map has any. The map and the
+                cast are still written beside where the book would have gone.
 
         Returns:
             Processing results
@@ -607,12 +611,21 @@ class Application:
                 from src.services.character_state import (
                     detect_marital_changes,
                     initial_marital_state,
+                    marital_states,
                     marital_title_maps,
                 )
 
                 book_dict = book.to_dict() if hasattr(book, "to_dict") else book
                 changes = detect_marital_changes(book_dict, characters.characters)
-                opening = initial_marital_state(characters.characters)
+                # With the book, not from the cast alone: the cast cannot tell
+                # a wife from a bride, or a wife from a mother.
+                opening = initial_marital_state(characters.characters, book_dict)
+                # Each verdict with what it rests on, so it can be read and
+                # disputed before the book is printed rather than after.
+                name_report["marital_states"] = [
+                    state.to_dict()
+                    for state in marital_states(book_dict, characters.characters).values()
+                ]
                 title_base, title_timeline = marital_title_maps(
                     characters.characters, changes, opening
                 )
@@ -631,6 +644,40 @@ class Application:
             protected = getattr(transformer, "_protected_names", None)
             if protected:
                 self.logger.info(f"Protecting cast surnames from the term map: {protected.pattern}")
+
+            # The map is finished here: the engine's renames, the titles a swap
+            # derives from marital state, and every alias the transform will
+            # add. The audit above saw only the first of those, so it called a
+            # map clean that went on to give two people one name -- and the
+            # audit that did see it ran after the book had been paid for.
+            # Nothing below this line needs a model, so judge it now.
+            finished_map = transformer.finished_name_map(name_map, characters)
+            name_report["problems"] = list(
+                dict.fromkeys([*name_report["problems"], *audit_name_map(finished_map, characters)])
+            )
+            if output_dir:
+                with open(output_dir / "name_map_proposed.json", "w") as f:
+                    json.dump(finished_map, f, indent=2, ensure_ascii=False)
+                with open(output_dir / "name_report.json", "w") as f:
+                    json.dump(name_report, f, indent=2)
+                if name_report["problems"]:
+                    with open(output_dir / "name_map_problems.json", "w") as f:
+                        json.dump(name_report["problems"], f, indent=2)
+            if name_report["problems"]:
+                self.logger.error(
+                    f"{len(name_report['problems'])} problem(s) in the finished name map, "
+                    "before transforming: " + "; ".join(name_report["problems"][:6])
+                )
+                if stop_on_name_problems:
+                    return {
+                        "success": False,
+                        "stopped_before_transform": True,
+                        "error": (
+                            f"The name map has {len(name_report['problems'])} problem(s), "
+                            "so the transform was not started."
+                        ),
+                        "name_map_problems": name_report["problems"],
+                    }
 
             # Log selected characters if specified
             if selected_characters:

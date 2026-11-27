@@ -267,7 +267,7 @@ class TransformService(BaseService):
             # This runs before the context is built: the prompt has to carry the
             # finished map, or the model is told about a name it will never see.
             if name_map and characters:
-                expanded = self._expand_name_map_with_aliases(name_map, characters)
+                expanded = self.finished_name_map(name_map, characters)
                 if len(expanded) > len(name_map):
                     self.logger.info(
                         f"Expanded name_map with {len(expanded) - len(name_map)} character aliases"
@@ -890,9 +890,20 @@ class TransformService(BaseService):
             else:
                 progress_bar.set_postfix({"paragraphs": f"{batch_start + 1}-{batch_end}"})
 
-            # Create batch prompt with the actual paragraph objects
+            # Create batch prompt with the actual paragraph objects. The
+            # context is resolved at this batch: a man who marries in chapter
+            # twenty-eight is "Miss" in the prompt for chapter thirteen and
+            # "Mrs." in the prompt for chapter forty.
             prompt = self._create_batch_transform_prompt(
-                batch_paragraphs, context, len(batch_paragraphs)
+                batch_paragraphs,
+                self._context_at(
+                    context,
+                    getattr(chapter, "number", None) or chapter_index + 1,
+                    batch_start,
+                    batch_paragraphs,
+                    name_map,
+                ),
+                len(batch_paragraphs),
             )
 
             try:
@@ -2687,6 +2698,71 @@ class TransformService(BaseService):
             else None
         )
 
+    # A title entry: the man as the text names him, and the woman's title
+    # that answers the question "Mr." never asked.
+    _TITLE_KEY = re.compile(r"^Mr\. \S+$")
+    _TITLE_VALUE = re.compile(r"^(?:Miss|Mrs\.) \S+$")
+
+    def _context_at(self, context, chapter_number, batch_start, batch_paragraphs, name_map):
+        """The transform context as it stands at one batch of one chapter.
+
+        The map applied after the model was already resolved paragraph by
+        paragraph. The map shown to the model was not: it was built once, so
+        the prompt said "Miss Wickham" in every chapter of the book, the model
+        wrote it, and the correction that follows only touches a name the
+        model left alone. A title the model gets wrong stays wrong.
+
+        Only a gender swap carries title entries, so every other transform
+        gets its context back untouched.
+        """
+        if context.get("transform_type") != TransformType.GENDER_SWAP or not name_map:
+            return context
+        here = self._name_map_at(chapter_number, batch_start, name_map)
+        note = self._titles_note(here, chapter_number, batch_start, batch_paragraphs)
+        if here is name_map and not note:
+            return context
+        return {**context, "name_map": here, "titles_note": note}
+
+    def _titles_note(self, name_map, chapter_number, batch_start, batch_paragraphs) -> str:
+        """What to call each "Mr. Surname" in this batch, and from which paragraph.
+
+        Said in the words the text uses. The cast may know a man as "Mr.
+        Fitzwilliam Darcy" or plain "Fitzwilliam Darcy"; the book says "Mr.
+        Darcy", so that is the form the instruction has to be about. Only the
+        men this batch mentions are listed.
+        """
+        text = "\n".join(p.get_text() for p in batch_paragraphs)
+        batch_end = batch_start + len(batch_paragraphs)
+        timeline = getattr(self, "_title_timeline", None) or []
+        lines = []
+        for key, value in sorted((name_map or {}).items()):
+            if not (self._TITLE_KEY.match(key) and self._TITLE_VALUE.match(value)):
+                continue
+            if not re.search(r"(?<![A-Za-z])" + re.escape(key) + r"(?![A-Za-z])", text):
+                continue
+            line = f'- "{key}" is "{value}"'
+            # A wedding inside this batch: say where, by the markers the model
+            # is already returning its paragraphs under.
+            for chapter, paragraph, entries in timeline:
+                becomes = entries.get(key)
+                if (
+                    chapter == chapter_number
+                    and batch_start < paragraph < batch_end
+                    and becomes
+                    and becomes != value
+                ):
+                    marker = paragraph - batch_start + 1
+                    line += f' up to [[P{marker - 1}]], and "{becomes}" from [[P{marker}]] on'
+                    break
+            lines.append(line)
+        if not lines:
+            return ""
+        return (
+            "\nTITLES AT THIS POINT IN THE BOOK. A man who becomes a woman is "
+            '"Miss" while unmarried and "Mrs." once married. This has been settled for '
+            "the whole book, so use exactly these:\n" + "\n".join(lines) + "\n"
+        )
+
     def _name_map_at(self, chapter_number, paragraph_index, name_map):
         """The name map as it stands at one paragraph of one chapter."""
         timeline = getattr(self, "_title_timeline", None)
@@ -3152,6 +3228,20 @@ class TransformService(BaseService):
         """Record text that was kept as written because no call for it succeeded."""
         unanswered = self.__dict__.setdefault("unanswered", [])
         unanswered.append((chapter_number, str(error) or type(error).__name__))
+
+    def finished_name_map(
+        self, name_map: Optional[dict[str, str]], characters: Optional["CharacterAnalysis"]
+    ) -> dict[str, str]:
+        """The map a run will actually apply, worked out without running it.
+
+        The transform adds every alias to the map it is given before the first
+        chapter, and that is where most of a map's faults are born. It needs
+        no model and no book, so anyone who wants to judge the map before
+        paying for the run can ask for exactly what the run will use.
+        """
+        if name_map and characters:
+            return self._expand_name_map_with_aliases(name_map, characters)
+        return dict(name_map or {})
 
     def _expand_name_map_with_aliases(
         self, name_map: dict[str, str], characters: "CharacterAnalysis"
@@ -3772,6 +3862,7 @@ class TransformService(BaseService):
         character_instructions = self._build_character_instructions(
             characters, transform_type, character_mappings, context.get("name_map")
         )
+        character_instructions += context.get("titles_note") or ""
 
         plural = "" if batch_size == 1 else "s"
         system_prompt = f"""You rewrite the gender language of literary prose. \
