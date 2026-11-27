@@ -2635,7 +2635,11 @@ class RegenderTUI(App):
                 colour="#e5c07b",
             )
 
-        if qc:
+        if not qc or qc.get("did_not_run"):
+            # Silence here read as a clean report. A run whose QC crashed, or
+            # never started, has to say that nothing was checked.
+            row("QC", "did not run: this book is unchecked", colour="#e5c07b")
+        else:
             note = (
                 f"{qc.get('structural', 0)} structural, "
                 f"{qc.get('auto_fixable', 0)} auto-fixable, "
@@ -2643,9 +2647,21 @@ class RegenderTUI(App):
             )
             row("QC", note, colour="#e5c07b" if qc.get("structural") else "#ffffff")
 
+        # Known when the run ended, written to a file beside the book, and
+        # until now shown nowhere: two people sharing one name, or a given
+        # name dropped with nothing in its place.
+        name_problems = result.get("name_map_problems") or []
+        if name_problems:
+            count = len(name_problems)
+            row(
+                "Name map",
+                f"{count} problem{'' if count == 1 else 's'} \u2014 see name_map_problems.json",
+                colour="#e5c07b",
+            )
+
         flagged = result.get("substitutions_to_review")
         if flagged:
-            row("To review", f"{flagged} substitution pairs")
+            row("To review", f"{flagged} substitution pair{'' if flagged == 1 else 's'}")
 
         # The path on its own line, relative where possible: the run folder is
         # long enough to wrap mid-word beside a label.
