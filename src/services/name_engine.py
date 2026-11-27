@@ -1138,7 +1138,7 @@ class NameEngine:
                 report["flags"].extend(surname_skips)
             except Exception as e:  # LLM/JSON failure → no auto renames, still safe
                 self._log("warning", f"Name proposal failed ({e}); characters keep original names")
-                report["dropped"] = [f"proposal failed: {e}"]
+                report["dropped"] = [f"proposal failed: {str(e) or type(e).__name__}"]
         elif proposal_list:
             report["dropped"] = ["no provider — characters keep original names"]
 

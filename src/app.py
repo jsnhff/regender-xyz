@@ -505,6 +505,14 @@ class Application:
         early = [
             *audit_name_map(engine_map or {}, characters),
             *CharacterService.unresolved_collisions(characters, kind, engine_map or {}),
+            # And the characters the engine meant to rename and could not: a
+            # proposal turned down twice, or the call that makes them failing.
+            # They keep their old names under a new gender, and that was only
+            # ever a warning in the log.
+            *(
+                f"no new name was chosen, so the original is kept: {item}"
+                for item in report.get("dropped") or []
+            ),
         ]
         return self.finish_name_plan(
             {

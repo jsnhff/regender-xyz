@@ -200,6 +200,74 @@ class TestThePlan:
         assert plan["title_timeline"] is None and plan["marital_states"] == {}
 
 
+class TestANameThatCouldNotBeChosen:
+    """Seen on a full run: the naming call stalled, six characters kept their names.
+
+    Nothing said so. It was a warning in the log, and the book came out with
+    men's names on the women the swap had made of them.
+    """
+
+    CAST = [
+        Character(name="George Wickham", gender=Gender.MALE, pronouns={}, titles=["Mr."]),
+        Character(name="Lydia Bennet", gender=Gender.FEMALE, pronouns={}, titles=["Miss"]),
+    ]
+
+    def plan(self, backend, reply):
+        async def complete(messages, **_kwargs):
+            if "choosing replacement GIVEN NAMES" in messages[-1]["content"]:
+                if isinstance(reply, Exception):
+                    raise reply
+                return reply
+            return "{}"
+
+        backend.model.complete = complete
+        return asyncio.run(
+            backend.plan_names(
+                transform_type="gender_swap",
+                characters=CharacterAnalysis(book_id="t", characters=self.CAST),
+                book=BOOK,
+            )
+        )
+
+    def test_a_failed_call_is_a_problem_with_its_reason(self, backend):
+        plan = self.plan(backend, RuntimeError("the connection stalled"))
+        (problem,) = [p for p in plan["problems"] if "no new name was chosen" in p]
+        assert "the connection stalled" in problem
+
+    def test_a_failure_with_no_message_still_says_what_it_was(self, backend):
+        """httpx raises its read timeout with an empty string."""
+
+        class ReadTimeout(Exception):  # noqa: N818
+            pass
+
+        plan = self.plan(backend, ReadTimeout(""))
+        (problem,) = [p for p in plan["problems"] if "no new name was chosen" in p]
+        assert "ReadTimeout" in problem
+
+    def test_names_that_were_chosen_raise_nothing(self, backend):
+        reply = json.dumps(
+            {
+                "renames": [
+                    {"original": "George", "target": "Harriet"},
+                    {"original": "Lydia", "target": "Lionel"},
+                ]
+            }
+        )
+        plan = self.plan(backend, reply)
+        assert [p for p in plan["problems"] if "no new name was chosen" in p] == []
+
+    def test_keeping_the_originals_is_not_a_failure_to_choose(self, backend):
+        plan = asyncio.run(
+            backend.plan_names(
+                transform_type="gender_swap",
+                characters=CharacterAnalysis(book_id="t", characters=self.CAST),
+                book=BOOK,
+                keep_names=True,
+            )
+        )
+        assert [p for p in plan["problems"] if "no new name was chosen" in p] == []
+
+
 class TestTheRunUsesThePlanItIsHanded:
     def run(self, backend, tmp_path, simple_story_path, **kwargs):
         return asyncio.run(

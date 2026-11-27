@@ -17,6 +17,35 @@ from src.providers.base_provider import (
 )
 
 
+def _is_transport_failure(error: BaseException) -> bool:
+    """A reply lost to the connection, as opposed to refused by the API.
+
+    Told by type name, through the chain of causes, so that neither httpx nor
+    a particular SDK release has to be imported to recognise it. An API error
+    that carries a status code is the API answering, and is never this.
+    """
+    seen = 0
+    while error is not None and seen < 5:
+        if getattr(error, "status_code", None) is not None:
+            return False
+        name = type(error).__name__
+        if name in _TRANSPORT_ERRORS or name.endswith(("Timeout", "TimeoutError")):
+            return not isinstance(error, asyncio.TimeoutError)
+        error = error.__cause__ or error.__context__
+        seen += 1
+    return False
+
+
+_TRANSPORT_ERRORS = {
+    "APIConnectionError",
+    "APITimeoutError",
+    "RemoteProtocolError",
+    "ReadError",
+    "ConnectError",
+    "NetworkError",
+}
+
+
 class AnthropicProvider(BaseProviderPlugin):
     """Anthropic provider plugin implementation."""
 
@@ -31,6 +60,9 @@ class AnthropicProvider(BaseProviderPlugin):
 
     # How far a reply cut off at its limit may be allowed to grow, once.
     MAX_GROWN_TOKENS = 32000
+
+    # How many times a reply lost to the connection is asked for again.
+    MAX_TRANSPORT_RETRIES = 2
 
     # What the run has actually spent so far. Class-level defaults so a
     # provider built without going through initialize() still reads as zero
@@ -173,6 +205,28 @@ class AnthropicProvider(BaseProviderPlugin):
                 no_temperature.add(model)
                 self.logger.info(f"{model} takes no temperature; sending requests without it")
                 return await self._complete_impl(messages, _attempt=_attempt, **kwargs)
+
+            # A connection that went quiet, or dropped, part-way through a
+            # reply. The SDK retries these before a reply starts and not once
+            # it has, so a stalled stream failed the call outright -- and the
+            # error it raises has no message at all, which logged as
+            # "Anthropic API error: " and nothing more. For the one call that
+            # chooses names, failing meant characters kept their old ones.
+            if _is_transport_failure(e):
+                if _attempt >= self.MAX_TRANSPORT_RETRIES:
+                    self.logger.error(
+                        f"Anthropic connection failed {_attempt + 1} times "
+                        f"({type(e).__name__}), giving up"
+                    )
+                    raise TimeoutError(
+                        f"The connection to Anthropic stalled or dropped ({type(e).__name__})."
+                    ) from e
+                self.logger.warning(
+                    f"Anthropic connection stalled or dropped ({type(e).__name__}), "
+                    f"asking again (retry {_attempt + 1}/{self.MAX_TRANSPORT_RETRIES})..."
+                )
+                await asyncio.sleep(5)
+                return await self._complete_impl(messages, _attempt=_attempt + 1, **kwargs)
 
             # "rate limit", not "rate": the bare word is inside "generate" and
             # "separate", and matching it made unrelated errors wait a minute,

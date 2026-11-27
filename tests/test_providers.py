@@ -390,3 +390,50 @@ class TestAReplyWithNoTextInIt:
             create_return=_reply(_block("text", "whole"), stop_reason="stop_sequence")
         )
         assert await provider._complete_impl(HI) == "whole"
+
+
+class ReadTimeout(Exception):  # noqa: N818 -- the name is the thing under test
+    """Stands in for httpx.ReadTimeout, which is raised with no message at all."""
+
+
+class TestAReplyLostToTheConnection:
+    """Seen on a full run: a stream went quiet for 579 seconds and the call failed.
+
+    The SDK retries a connection that fails before a reply starts, not one that
+    stalls part-way through it.
+    """
+
+    async def test_it_is_asked_for_again(self, no_sleep):
+        provider = _make_anthropic(
+            create_side_effect=[ReadTimeout(""), _anthropic_response("the names")]
+        )
+        assert await provider._complete_impl(HI) == "the names"
+        assert provider._send.call_count == 2
+
+    async def test_it_gives_up_after_a_few_and_says_what_happened(self, no_sleep):
+        provider = _make_anthropic(create_side_effect=ReadTimeout(""))
+        with pytest.raises(TimeoutError, match="stalled or dropped \\(ReadTimeout\\)"):
+            await provider._complete_impl(HI)
+        assert provider._send.call_count == AnthropicProvider.MAX_TRANSPORT_RETRIES + 1
+
+    async def test_a_failure_wrapped_in_another_is_still_recognised(self, no_sleep):
+        class APIConnectionError(Exception):
+            pass
+
+        wrapped = APIConnectionError("Connection error.")
+        wrapped.__cause__ = ReadTimeout("")
+        provider = _make_anthropic(create_side_effect=[wrapped, _anthropic_response("ok")])
+        assert await provider._complete_impl(HI) == "ok"
+
+    async def test_an_answer_from_the_api_is_not_a_lost_connection(self, no_sleep):
+        """A 400 is the API replying; asking again would only get it again."""
+        provider = _make_anthropic(create_side_effect=_BadRequestError("messages: too long"))
+        with pytest.raises(_BadRequestError):
+            await provider._complete_impl(HI)
+        assert provider._send.call_count == 1
+
+    async def test_our_own_ten_minute_limit_is_still_final(self):
+        provider = _make_anthropic(create_side_effect=asyncio.TimeoutError())
+        with pytest.raises(TimeoutError):
+            await provider._complete_impl(HI)
+        assert provider._send.call_count == 1

@@ -222,7 +222,7 @@ class TestTheRunJudgesItBeforeSpending:
         )
         assert result["success"] is False
         assert result["stopped_before_transform"] is True
-        assert result["name_map_problems"] == ["'laurie' is the new name of 2 different characters"]
+        assert "'laurie' is the new name of 2 different characters" in result["name_map_problems"]
         assert not out.exists(), "a book was written by a run that said it had stopped"
         assert (tmp_path / "name_map_problems.json").exists()
         assert (tmp_path / "name_map_proposed.json").exists()
