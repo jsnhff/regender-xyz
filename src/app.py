@@ -175,9 +175,6 @@ class Application:
             Default configuration dictionary
         """
         return {
-            "providers": [
-                {"type": "unified", "module": "src.providers.unified_provider", "config": {}}
-            ],
             "services": {
                 "parser": {
                     "class": "src.services.parser_service.ParserService",

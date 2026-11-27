@@ -36,7 +36,6 @@ def tui():
     app._custom_title = None
     app.book_title = "Pride and Prejudice"
     app._suggested_title = ""
-    app._no_qc = False
     app._analysis_running = False
     app._pending_characters = None
     app._output_path = "out.json"

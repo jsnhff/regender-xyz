@@ -1399,7 +1399,6 @@ class RegenderTUI(App):
         self._stage = "book"  # book, transform, options, name_map, processing, done
         self._selected_book: Path | None = None
         self._selected_transform: str | None = None
-        self._no_qc = False
         self._result: dict | None = None
         self._ran_application = None
 
@@ -1930,7 +1929,6 @@ class RegenderTUI(App):
                 f"[#ffffff]✓[/] Keeping: [bold #ffffff]{self._custom_title or self.book_title}[/]"
             )
         self.print("")
-        self._no_qc = True
         self._show_character_analysis_prompt()
 
     def _get_book_title(self, path: Path) -> str:
@@ -1993,8 +1991,6 @@ class RegenderTUI(App):
             self._handle_editorial_notice_input(value)
         elif self._stage == "model":
             self._handle_model_input(value)
-        elif self._stage == "options":
-            self._handle_options_input(value)
         elif self._stage == "retitle":
             self._handle_retitle_input(value)
         elif self._stage == "cast_review":
@@ -3605,18 +3601,6 @@ class RegenderTUI(App):
             except ValueError:
                 self.print(f"[#666666]Enter a, k, m, r, or 1-{len(self._name_suggestions)}[/]")
 
-    def _handle_options_input(self, value: str) -> None:
-        """Handle options."""
-        if value.lower() in ("n", "no"):
-            self._no_qc = True
-            self.print("[#ffffff]✓[/] QC disabled")
-        else:
-            self._no_qc = False
-            self.print("[#ffffff]✓[/] QC enabled")
-
-        self.print("")
-        self._start_processing()
-
     # -------------------------------------------------------------------------
     # Processing
     # -------------------------------------------------------------------------
@@ -3665,7 +3649,6 @@ class RegenderTUI(App):
         self._result = {
             "input": str(self._selected_book),
             "transform_type": self._selected_transform,
-            "no_qc": self._no_qc,
             "output_path": str(self._output_path) if self._output_path else None,
             "name_map": self._name_map,
             "keep_names": self._keep_names,
@@ -4117,7 +4100,6 @@ def run_tui(process_callback: Callable | None = None) -> dict | None:
         process_callback: Function to call for processing. Should accept:
             - input_path: str
             - transform_type: str
-            - no_qc: bool
             - progress_callback: Callable
             - stage_callback: Callable
 

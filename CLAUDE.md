@@ -51,15 +51,15 @@ pip install -r requirements.txt
 # Transform a book (complete pipeline)
 python regender_cli.py books/texts/pg1342.txt all_female -o output.json
 
-# Download books from Project Gutenberg
-python -m download.download 1342  # Pride and Prejudice
-
 # Use specific provider
 export DEFAULT_PROVIDER='openai'
 python regender_cli.py input.txt gender_swap
 
-# Skip quality control for faster processing
-python regender_cli.py input.txt all_male --no-qc
+# Keep every character's name as the book gives it
+python regender_cli.py input.txt all_male --keep-names
+
+# Check the finished name map first, and stop if it has problems
+python regender_cli.py input.txt gender_swap --stop-on-name-problems
 
 # Verbose mode for debugging
 python regender_cli.py input.txt nonbinary -v
@@ -129,10 +129,10 @@ python -m pytest tests/test_qc_service.py
    - `TransformStrategy` - Transformation algorithms
 
 4. **src/providers/** - LLM Provider plugins
-   - `legacy_client.py` - Unified LLM interface
-   - `openai_provider.py` - OpenAI integration
-   - `anthropic_provider.py` - Anthropic integration
-   - `unified_provider.py` - Provider wrapper
+   - `base_provider.py` - Shared interface: `complete(messages)`
+   - `anthropic.py` - Anthropic integration
+   - `openai.py` - OpenAI integration
+   - `ollama.py` - Local models through Ollama
 
 ### Data Flow
 
@@ -166,7 +166,6 @@ The `src/config.json` file defines:
 - Environment variables loaded through provider configuration
 - Test suite uses unittest-style patterns
 - Logs stored in `logs/` directory for debugging
-- Clean architecture: 84% faster, 60% less memory, <5% code duplication
 
 ## Available Agents
 
