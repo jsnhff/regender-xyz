@@ -142,19 +142,27 @@ class _App:
         self.shut_down = True
 
 
+class _Args(argparse.Namespace):
+    """Every option not set here reads as unset, as the parser leaves it.
+
+    Listed by hand, this broke the moment another change gave the command line
+    a new flag: the test was about the report and failed on an attribute.
+    """
+
+    def __getattr__(self, name):
+        if name.startswith("__"):
+            raise AttributeError(name)
+        return None
+
+
 def _run_cli(monkeypatch, tmp_path, result):
     app_class = type("App", (_App,), {"result": result})
     monkeypatch.setattr(regender_cli, "Application", app_class)
     monkeypatch.setattr(regender_cli, "_write_decision_sheet", lambda *_a: None)
-    args = argparse.Namespace(
-        config=None,
+    args = _Args(
         input="book.txt",
         output=str(tmp_path / "gender_swap.json"),
         transform_type="gender_swap",
-        characters=None,
-        characters_file=None,
-        name_map=None,
-        title=None,
     )
     asyncio.run(regender_cli.process_book(args))
 
