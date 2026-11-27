@@ -10,12 +10,11 @@ import asyncio
 import json
 from typing import Any
 
-from src.providers.base_provider import BaseProviderPlugin, ResponseIncompleteError
-
-
-def _token_count(value) -> int:
-    """A usage figure as an int, or zero for anything that is not one."""
-    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+from src.providers.base_provider import (
+    BaseProviderPlugin,
+    ResponseIncompleteError,
+    _token_count,
+)
 
 
 class AnthropicProvider(BaseProviderPlugin):

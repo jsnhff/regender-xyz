@@ -172,7 +172,7 @@ async def test_openai_quota_error_raises_valueerror():
     """Quota exhaustion fails fast with an actionable ValueError."""
     provider = _make_openai(create_side_effect=Exception("insufficient_quota"))
 
-    with pytest.raises(ValueError, match="quota"):
+    with pytest.raises(ValueError, match="no credits"):
         await provider._complete_impl([{"role": "user", "content": "hi"}])
 
     assert provider.client.chat.completions.create.call_count == 1

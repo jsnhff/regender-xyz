@@ -80,6 +80,16 @@ class TestModelPricing:
     def test_an_unknown_model_is_still_unknown(self):
         assert _lookup_model_cost("some-other-vendor-model") is None
 
+    @pytest.mark.parametrize(
+        "model_id", ["gpt-4.1-mini", "gpt-4-turbo-preview", "claude-opus-4-9", "claude-fable-5-9"]
+    )
+    def test_a_newer_model_does_not_borrow_an_older_ones_price(self, model_id):
+        """It began with a listed name, and that was enough to be given its price."""
+        assert _lookup_model_cost(model_id) is None
+
+    def test_an_old_style_snapshot_still_resolves(self):
+        assert _lookup_model_cost("gpt-3.5-turbo-0125") == (1.00, 2.00)
+
 
 class TestPricingDrift:
     """The table is hand-maintained, so it needs a way to announce its own age.

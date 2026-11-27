@@ -173,17 +173,24 @@ MODEL_COSTS = {
 _UNPRICED = "pricing unknown"
 
 
+# What may follow a listed name and still be that model: the date of a
+# snapshot, in any of the three shapes the two vendors have used.
+_SNAPSHOT_SUFFIX = re.compile(r"^-(?:\d{8}|\d{4}-\d{2}-\d{2}|\d{4})$")
+
+
 def _lookup_model_cost(model: str) -> tuple[float, float] | None:
     """Match model string to cost table. Returns None if model is unrecognized.
 
-    Prefixes are tried longest first so a dated or point-release id resolves to
-    the most specific entry — `claude-fable-5-1` must not match `claude-fable-5`,
-    and `claude-sonnet-4-6` must not match `claude-sonnet-4`.
+    A listed name prices itself and its dated snapshots, nothing else. Any
+    longer id used to take the price of whatever it began with, so a model
+    released after this table was written was shown a price that belonged to
+    another: `gpt-4.1-mini` at the `gpt-4.1` rate, `claude-opus-5-5` at the
+    `claude-opus-5` rate. A wrong price is worse than "pricing unknown".
     """
     if model in MODEL_COSTS:
         return MODEL_COSTS[model]
     for key in sorted(MODEL_COSTS, key=len, reverse=True):
-        if model.startswith(key):
+        if model.startswith(key) and _SNAPSHOT_SUFFIX.match(model[len(key) :]):
             return MODEL_COSTS[key]
     return None
 
@@ -285,7 +292,11 @@ _FALLBACK_MODELS: dict[str, list[tuple[str, str, str]]] = {
     ],
 }
 
-_OPENAI_SHOW_PREFIXES = ("gpt-4", "gpt-3.5-turbo", "o1", "o3", "o4")
+# A family, not a list of generations. The list read ("gpt-4", "gpt-3.5-turbo",
+# "o1", "o3", "o4"), so an account offering GPT-5 and GPT-6 was shown GPT-4.1,
+# GPT-4o and o3 and nothing newer: the menu fell a generation behind every
+# time a generation shipped.
+_OPENAI_FAMILY = re.compile(r"^(?:gpt-|o\d)")
 _OPENAI_SKIP_PATTERNS = (
     "instruct",
     "realtime",
@@ -295,14 +306,56 @@ _OPENAI_SKIP_PATTERNS = (
     "dall-e",
     "embedding",
     "search",
+    "image",
+    "transcribe",
+    "moderation",
+    "codex",
+    "live",
+    "healthcare",
+    # Served by a different endpoint from the one this app calls.
+    "-pro",
 )
+_DATED_SNAPSHOT = re.compile(r"-\d{4}-\d{2}-\d{2}$")
 
 
 def _should_show_openai_model(model_id: str) -> bool:
     """Return True if this OpenAI model is suitable for text generation."""
     if any(s in model_id for s in _OPENAI_SKIP_PATTERNS):
         return False
-    return any(model_id.startswith(p) for p in _OPENAI_SHOW_PREFIXES)
+    return bool(_OPENAI_FAMILY.match(model_id))
+
+
+def _openai_models_to_offer(listed: list) -> list[str]:
+    """The ids worth showing, newest first, from what the account lists.
+
+    A dated snapshot is dropped when its undated name is also listed: they are
+    the same model, and thirty rows of dates bury the nine choices among them.
+    """
+    ids = {m.id for m in listed}
+    keep = [
+        m
+        for m in listed
+        if _should_show_openai_model(m.id)
+        and not (_DATED_SNAPSHOT.search(m.id) and _DATED_SNAPSHOT.sub("", m.id) in ids)
+    ]
+    keep.sort(key=lambda m: (-(getattr(m, "created", 0) or 0), m.id))
+    seen: set[str] = set()
+    ordered = [m.id for m in keep if not (m.id in seen or seen.add(m.id))]
+    # The recommended model leads, so Enter on a fresh install lands on a
+    # model this app has been run against rather than on whatever is newest.
+    return sorted(ordered, key=lambda mid: not _is_recommended_model(mid))
+
+
+def _provider_for_model(model_id: str, pricing: str = "") -> str:
+    """Which provider serves a model offered in the menu.
+
+    The menu lists every provider with a key side by side. Choosing a model
+    only recorded the model, so with both keys set and Anthropic the default,
+    picking GPT-4o sent "gpt-4o" to Anthropic.
+    """
+    if pricing == "local":
+        return "ollama"
+    return "anthropic" if model_id.startswith("claude-") else "openai"
 
 
 def _openai_display_name(model_id: str) -> str:
@@ -1429,6 +1482,11 @@ class RegenderTUI(App):
         has_openai = bool(openai_key and not openai_key.startswith("your-"))
         has_anthropic = bool(anthropic_key and not anthropic_key.startswith("your-"))
 
+        # A local model needs no key. Without this the wizard ran again on
+        # every launch for anyone who had chosen one.
+        if provider == "ollama":
+            return False
+
         if not has_openai and not has_anthropic:
             return True  # Needs setup
 
@@ -2416,7 +2474,12 @@ class RegenderTUI(App):
             try:
                 import httpx
 
+                # The same variable the provider reads, which ends in /v1 for
+                # its OpenAI-style endpoint. The model list lives beside that,
+                # not under it, so the documented value always missed and the
+                # menu showed four models that may not be installed.
                 base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+                base_url = base_url.rstrip("/").removesuffix("/v1")
                 async with httpx.AsyncClient(timeout=5.0) as client:
                     resp = await client.get(f"{base_url}/api/tags")
                     models = resp.json().get("models", [])
@@ -2451,13 +2514,10 @@ class RegenderTUI(App):
 
                 client = AsyncOpenAI()
                 models_page = await client.models.list()
-                openai_models: list[tuple[str, str, str]] = []
-                seen: set[str] = set()
-                for m in sorted(models_page.data, key=lambda x: x.id):
-                    if m.id in seen or not _should_show_openai_model(m.id):
-                        continue
-                    seen.add(m.id)
-                    openai_models.append((m.id, _openai_display_name(m.id), _price_label(m.id)))
+                openai_models: list[tuple[str, str, str]] = [
+                    (mid, _openai_display_name(mid), _price_label(mid))
+                    for mid in _openai_models_to_offer(list(models_page.data))
+                ]
                 choices.extend(
                     openai_models if openai_models else _FALLBACK_MODELS.get("openai", [])
                 )
@@ -2474,8 +2534,8 @@ class RegenderTUI(App):
             return
 
         if len(self._model_choices) == 1:
-            model_id, display_name, _ = self._model_choices[0]
-            os.environ["DEFAULT_MODEL"] = model_id
+            model_id, display_name, pricing = self._model_choices[0]
+            self._choose_model(model_id, pricing)
             self.print(f"[#ffffff]✓[/] Using [bold #ffffff]{display_name}[/]")
             self._recalculate_cost(model_id)
             self.print("")
@@ -2749,6 +2809,12 @@ class RegenderTUI(App):
             "update MODEL_COSTS in src/cli/tui.py.[/]"
         )
 
+    @staticmethod
+    def _choose_model(model_id: str, pricing: str = "") -> None:
+        """Record the model, and the provider that serves it, for this run."""
+        os.environ["DEFAULT_MODEL"] = model_id
+        os.environ["DEFAULT_PROVIDER"] = _provider_for_model(model_id, pricing)
+
     def _handle_model_input(self, value: str) -> None:
         """Handle model selection."""
         choices = self._model_choices
@@ -2765,8 +2831,8 @@ class RegenderTUI(App):
         try:
             idx = int(value or getattr(self, "_model_default", 1)) - 1
             if 0 <= idx < len(visible):
-                model_id, display_name, _ = visible[idx]
-                os.environ["DEFAULT_MODEL"] = model_id
+                model_id, display_name, pricing = visible[idx]
+                self._choose_model(model_id, pricing)
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")
@@ -2775,9 +2841,9 @@ class RegenderTUI(App):
         except ValueError:
             pass
 
-        for model_id, display_name, _ in choices:
+        for model_id, display_name, pricing in choices:
             if value.lower() in (model_id.lower(), display_name.lower()):
-                os.environ["DEFAULT_MODEL"] = model_id
+                self._choose_model(model_id, pricing)
                 self.print(f"[#ffffff]✓[/] {display_name}")
                 self._recalculate_cost(model_id)
                 self.print("")

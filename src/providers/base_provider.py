@@ -16,6 +16,11 @@ from src.providers.base import LLMProvider
 from src.providers.rate_limiter import TokenBucketRateLimiter as RateLimiter
 
 
+def _token_count(value) -> int:
+    """A usage figure as an int, or zero for anything that is not one."""
+    return value if isinstance(value, int) and not isinstance(value, bool) else 0
+
+
 class ResponseIncompleteError(RuntimeError):
     """The model answered, but not with a whole reply: cut off, or declined.
 
