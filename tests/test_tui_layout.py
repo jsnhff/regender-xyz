@@ -135,3 +135,25 @@ class TestPricingDrift:
             assert costs is not None, f"{model_id} missing from MODEL_COSTS"
             assert f"${costs[0]:.2f}" in pricing, f"{model_id}: {pricing} disagrees with the table"
             assert f"${costs[1]:.2f}" in pricing, f"{model_id}: {pricing} disagrees with the table"
+
+
+class TestTheVersionShown:
+    """The header said "v1.0" through two releases."""
+
+    def test_it_is_the_packages_own_number(self):
+        import inspect
+
+        from src import __version__
+        from src.cli import tui
+
+        assert "v{__version__}" in inspect.getsource(tui.HeaderBar.compose)
+        assert tui.__version__ == __version__
+
+    def test_the_mac_app_carries_the_same_one(self):
+        import json
+        import pathlib
+
+        from src import __version__
+
+        package = pathlib.Path(__file__).parent.parent / "electron" / "package.json"
+        assert json.loads(package.read_text())["version"] == __version__

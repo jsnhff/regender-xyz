@@ -29,6 +29,7 @@ from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widgets import DirectoryTree, Input, Label, Static
 
+from src import __version__
 from src.exporters import FORMATS, export_book
 from src.progress import ProgressContext, ProgressEvent, Stage, StageCompleteEvent
 
@@ -778,7 +779,9 @@ class HeaderBar(Container):
         with Horizontal(id="top-bar"), Horizontal(id="top-bar-content"):
             tagline = gradient_text("transform characters' gender in books", GREEN_GRADIENT)
             yield Label(f"{LOGO_ART}  {tagline}")
-            yield Label(gradient_text("v1.0", ["#aaaaaa", "#ffffff"]), id="version")
+            # One number, the release's. This said "v1.0" through two releases
+            # while the package said 2.0.0 and the Mac app said 1.1.0.
+            yield Label(gradient_text(f"v{__version__}", ["#aaaaaa", "#ffffff"]), id="version")
 
         # Border (wide enough for large terminals)
         yield Label("─" * 200, id="border1")
