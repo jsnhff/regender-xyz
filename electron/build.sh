@@ -6,7 +6,7 @@
 #   - Node 18+ and npm
 #   - Xcode command-line tools (for codesign / node-pty native build)
 #   - Apple Developer ID Application cert installed in the login keychain
-#   - Signing/notarization env vars (see "Signing & notarization" below)
+#   - Notarization env vars: APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID
 #
 # Usage:
 #   ./build.sh             # full pipeline: deps -> bundle python -> dmg
@@ -93,12 +93,30 @@ if [[ "${DEV_MODE}" -eq 1 ]]; then
     -c.mac.identity=null \
     -c.mac.notarize=false
 else
-  # Required env vars for signed + notarized build:
-  : "${CSC_LINK:?set CSC_LINK to your .p12 path or base64 (Developer ID Application)}"
-  : "${CSC_KEY_PASSWORD:?set CSC_KEY_PASSWORD}"
+  # Required env vars for notarization:
   : "${APPLE_ID:?set APPLE_ID}"
   : "${APPLE_APP_SPECIFIC_PASSWORD:?set APPLE_APP_SPECIFIC_PASSWORD (app-specific password from appleid.apple.com)}"
   : "${APPLE_TEAM_ID:?set APPLE_TEAM_ID}"
+
+  # Sign with the Developer ID certificate installed in the keychain when
+  # there is one, and fall back to a .p12 only when there is not.
+  #
+  # Handed a .p12 (CSC_LINK), electron-builder 24 imports it into a temporary
+  # keychain and then runs `security set-key-partition-list` with the
+  # certificate's password where the keychain's own is wanted. macOS 27.2
+  # refuses that, the build stops at signing, and the error it prints is the
+  # whole command, password included. The 1.2.0 build hit exactly this. With
+  # the certificate already in the keychain none of that happens, and the
+  # password is never handed to anything.
+  if security find-identity -v -p codesigning 2>/dev/null \
+    | grep -q "Developer ID Application: .*(${APPLE_TEAM_ID})"; then
+    echo "    signing with the Developer ID certificate in the keychain"
+    unset CSC_LINK CSC_KEY_PASSWORD
+  else
+    echo "    no Developer ID certificate for team ${APPLE_TEAM_ID} in the keychain; using CSC_LINK"
+    : "${CSC_LINK:?install your Developer ID Application certificate in the keychain, or set CSC_LINK to its .p12}"
+    : "${CSC_KEY_PASSWORD:?set CSC_KEY_PASSWORD}"
+  fi
   npx electron-builder --mac --arm64 \
     -c.mac.notarize.teamId="${APPLE_TEAM_ID}"
 fi
